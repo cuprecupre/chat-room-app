@@ -1,32 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Lobby</title>
+    <title>El Impostor</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 </head>
 <body>
-    <div id="home-screen">
-        <h1>Create a Game</h1>
-        <input type="text" id="nameInput" placeholder="Enter your name">
-        <button id="createGameBtn">Create Game</button>
+
+    <!-- Create Game Screen -->
+    <div id="create-screen" class="container">
+        <h1>Crea una Partida</h1>
+        <h2>¡Invita a tus amigos!</h2>
+        <input type="text" id="host-name-input" placeholder="Escribe tu nombre para empezar" maxlength="20">
+        <button id="create-game-button">Crear Partida</button>
     </div>
 
-    <div id="join-screen" style="display: none;">
-        <h1>Join Game</h1>
-        <input type="text" id="joinNameInput" placeholder="Enter your name">
-        <button id="joinGameBtn">Join</button>
+    <!-- Join Game Screen -->
+    <div id="join-screen" class="container hidden">
+        <h1>Únete a la Partida</h1>
+        <input type="text" id="player-name-input" placeholder="Escribe tu nombre para unirte" maxlength="20">
+        <button id="join-game-button">Unirse</button>
     </div>
 
-    <div id="game-lobby" style="display: none;">
-        <h1>Game Lobby</h1>
-        <h2>Waiting for players...</h2>
-        <button id="copyLinkBtn">Copy Invite Link</button>
-        <h3>Players:</h3>
+    <!-- Game Lobby Screen -->
+    <div id="game-lobby" class="container hidden">
+        <h2>Sala de Espera</h2>
+        <p id="game-id-display">ID: cargando...</p>
+        <h3>Jugadores Conectados:</h3>
         <ul id="player-list"></ul>
+        <button id="copy-link-button">Copiar Enlace de Invitación</button>
+        <button id="start-game-button" class="hidden">Comenzar Partida</button>
     </div>
 
+    <!-- Game Screen -->
+    <div id="game-screen" class="container hidden">
+        <h2>Tu rol es: <span id="role-display"></span></h2>
+        <p>La palabra secreta es:</p>
+        <h1 id="word-display"></h1>
+        <button id="end-game-button" class="hidden">Terminar Partida y Revelar</button>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over-screen" class="container hidden">
+        <h2>¡Partida Terminada!</h2>
+        <p id="result-display"></p>
+        <button id="play-again-button" class="hidden">Jugar Otra Ronda</button>
+        <button id="new-game-button" class="hidden">Crear Nueva Partida</button>
+    </div>
+
+    <div id="toast-notification" class="hidden"></div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="app.js"></script>
 </body>
