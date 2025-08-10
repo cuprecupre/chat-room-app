@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Lobby</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="home-screen">
+        <h1>Create a Game</h1>
+        <input type="text" id="nameInput" placeholder="Enter your name">
+        <button id="createGameBtn">Create Game</button>
+    </div>
+
+    <div id="join-screen" style="display: none;">
+        <h1>Join Game</h1>
+        <input type="text" id="joinNameInput" placeholder="Enter your name">
+        <button id="joinGameBtn">Join</button>
+    </div>
+
+    <div id="game-lobby" style="display: none;">
+        <h1>Game Lobby</h1>
+        <h2>Waiting for players...</h2>
+        <button id="copyLinkBtn">Copy Invite Link</button>
+        <h3>Players:</h3>
+        <ul id="player-list"></ul>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
