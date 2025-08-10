@@ -1,2 +1,23 @@
-node_modules
+# Dependencias
+/node_modules
+/client/node_modules
+
+# Archivos de build
+/client/dist
+
+# Variables de entorno y claves secretas
+.env
+.env.*
+!/.env.example
+
+# Claves de servicio de Firebase
+serviceAccountKey.json
+firebase-service-account.json
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos del sistema operativo
 .DS_Store

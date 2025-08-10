@@ -1,148 +1,219 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const admin = require('firebase-admin');
+const fs = require('fs');
+const path = require('path');
+
+const words = require('./words'); 
+const Game = require('./Game'); 
+
+// --- Firebase Admin SDK Setup ---
+// Admite múltiples rutas/formas de credenciales:
+// 1) ./firebase-service-account.json
+// 2) ./serviceAccountKey.json
+// 3) GOOGLE_APPLICATION_CREDENTIALS con applicationDefault()
+(() => {
+  let initialized = false;
+  const candidates = [
+    './firebase-service-account.json',
+    './serviceAccountKey.json',
+  ];
+  for (const p of candidates) {
+    try {
+      const serviceAccount = require(p);
+      admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+      console.log(`Firebase Admin inicializado con ${p}.`);
+      initialized = true;
+      break;
+    } catch (_) {
+      // continuar con siguiente candidato
+    }
+  }
+  if (!initialized) {
+    try {
+      admin.initializeApp({ credential: admin.credential.applicationDefault() });
+      console.log('Firebase Admin inicializado con applicationDefault().');
+      initialized = true;
+    } catch (e) {
+      console.error('No se pudo inicializar Firebase Admin.');
+      console.error("Proporciona 'firebase-service-account.json' o 'serviceAccountKey.json' en la raíz, o configura GOOGLE_APPLICATION_CREDENTIALS.");
+      process.exit(1);
+    }
+  }
+})();
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+  cors: {
+    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+    methods: ["GET", "POST"]
+  }
+});
 
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static('public'));
+// --- Middleware for authenticating Firebase tokens ---
+const verifyFirebaseToken = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).send('Unauthorized: No token provided');
+    }
+    const idToken = authHeader.split('Bearer ')[1];
+    try {
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        req.user = decodedToken; // Add user info to the request object
+        next();
+    } catch (error) {
+        console.error('Error verifying Firebase token:', error);
+        return res.status(401).send('Unauthorized: Invalid token');
+    }
+};
 
-const crypto = require('crypto');
-const words = require('./words');
 
-let games = {}; // { gameId: { hostId: string, players: [{id, name}], word: string, impostorId: string } }
+// --- Server Setup: serve only the React (shadcn) app build ---
+const clientDist = path.join(__dirname, 'client', 'dist');
+app.use(express.static(clientDist));
+// SPA fallback
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/socket.io/')) return next();
+  const indexPath = path.join(clientDist, 'index.html');
+  if (!fs.existsSync(indexPath)) {
+    return res
+      .status(500)
+      .send('Client build not found. Run "npm run build" inside the client/ folder.');
+  }
+  res.sendFile(indexPath);
+});
 
+// --- In-memory State ---
+const games = {}; // { gameId: Game_instance }
+const userSockets = {}; // { userId: socket.id }
+
+// --- Socket.IO Middleware ---
+io.use(async (socket, next) => {
+  const { token, name, photoURL } = socket.handshake.auth;
+  if (!token) {
+    return next(new Error('Authentication error: No token provided.'));
+  }
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    socket.user = {
+      uid: decodedToken.uid,
+      name: name || decodedToken.name, // Fallback to token's name
+      photoURL: photoURL,
+    };
+    next();
+  } catch (error) {
+    console.error('Authentication error:', error.message);
+    next(new Error('Authentication error: Invalid token.'));
+  }
+});
+
+// --- Socket.IO Connection Logic ---
 io.on('connection', (socket) => {
-    console.log('A user connected:', socket.id);
+    const user = socket.user;
+    console.log(`User connected: ${user.name} (${user.uid})`);
+    userSockets[user.uid] = socket.id;
 
-    socket.on('create-game', ({ playerName }) => {
-        const gameId = crypto.randomBytes(4).toString('hex');
-        games[gameId] = {
-            hostId: socket.id,
-            players: [{ id: socket.id, name: playerName }]
-        };
+    // Helper to find which game a user belongs to
+    const findUserGame = (userId) => Object.values(games).find(g => g.players.some(p => p.uid === userId));
+
+    // Reconnection logic: if user is already in a game, send them the state
+    const existingGame = findUserGame(user.uid);
+    if (existingGame) {
+        socket.join(existingGame.gameId);
+        console.log(`User ${user.name} reconnected to game ${existingGame.gameId}`);
+        // Send the specific state to the reconnected user only
+        socket.emit('game-state', existingGame.getStateFor(user.uid));
+    }
+
+    // Helper to broadcast the state to all players in a game
+    const emitGameState = (game) => {
+        game.players.forEach(p => {
+            const playerSocketId = userSockets[p.uid];
+            if (playerSocketId) {
+                // Send each player their specific version of the state
+                io.to(playerSocketId).emit('game-state', game.getStateFor(p.uid));
+            }
+        });
+    };
+
+    socket.on('create-game', () => {
+        if (findUserGame(user.uid)) return socket.emit('error-message', 'Ya estás en una partida.');
+        const newGame = new Game(user);
+        games[newGame.gameId] = newGame;
+        socket.join(newGame.gameId);
+        emitGameState(newGame);
+        console.log(`Game created: ${newGame.gameId} by ${user.name}`);
+    });
+
+    socket.on('join-game', (gameId) => {
+        const gameToJoin = games[gameId];
+        if (!gameToJoin) return socket.emit('error-message', 'La partida no existe.');
+        // Allow rejoining the same game, but not a different one
+        const userGame = findUserGame(user.uid);
+        if (userGame && userGame.gameId !== gameId) {
+             return socket.emit('error-message', 'Ya estás en otra partida.');
+        }
+        
+        gameToJoin.addPlayer(user);
         socket.join(gameId);
-        socket.emit('game-created', { gameId, hostId: socket.id });
-        io.to(gameId).emit('playerList', games[gameId].players.map(p => p.name));
-        console.log(`Game created: ${gameId} by ${playerName} (${socket.id})`);
+        emitGameState(gameToJoin);
+        console.log(`User ${user.name} joined game ${gameId}`);
     });
 
-    socket.on('join-game', ({ gameId, playerName }) => {
+    // Generic handler for game actions to reduce boilerplate
+    const handleGameAction = (gameId, action) => {
         const game = games[gameId];
-        if (game) {
-            game.players.push({ id: socket.id, name: playerName });
-            socket.join(gameId);
-            socket.emit('lobby-joined', { 
-                players: game.players.map(p => p.name),
-                hostId: game.hostId
-            });
-            socket.to(gameId).emit('playerList', game.players.map(p => p.name));
-            console.log(`Player ${playerName} (${socket.id}) joined ${gameId}`);
-        } else {
-            socket.emit('error-message', 'La partida no existe.');
+        if (!game) return socket.emit('error-message', 'La partida no existe.');
+        // Ensure the player is in the game before allowing actions
+        if (!game.players.some(p => p.uid === user.uid)) {
+            return socket.emit('error-message', 'No perteneces a esta partida.');
         }
-    });
+        try {
+            action(game);
+            emitGameState(game);
+        } catch (error) {
+            console.error(`Action failed for game ${gameId}:`, error.message);
+            socket.emit('error-message', error.message);
+        }
+    };
 
-    socket.on('start-game', (gameId) => {
+    socket.on('start-game', (gameId) => handleGameAction(gameId, g => g.startGame(user.uid)));
+    socket.on('end-game', (gameId) => handleGameAction(gameId, g => g.endGame(user.uid)));
+    socket.on('play-again', (gameId) => handleGameAction(gameId, g => g.playAgain(user.uid)));
+    socket.on('leave-game', (gameId) => {
         const game = games[gameId];
-        if (!game || socket.id !== game.hostId) {
-            return; // Only host can start
-        }
-        if (game.players.length < 2) {
-            // Optional: prevent starting with less than 2 players
-            io.to(socket.id).emit('error-message', 'Necesitas al menos 2 jugadores para empezar.');
+        if (!game || !game.players.some(p => p.uid === user.uid)) {
+            // Game doesn't exist or user is not in it. Nothing to do.
+            // We can send a null state just in case the client is out of sync.
+            socket.emit('game-state', null);
             return;
         }
 
-        const word = words[Math.floor(Math.random() * words.length)];
-        game.word = word;
+        console.log(`User ${user.name} is leaving game ${gameId}`);
+        
+        // Remove player from the game model
+        game.removePlayer(user.uid);
+        
+        // 1. Tell the leaving player to go to the lobby by resetting their state
+        socket.emit('game-state', null);
+        socket.leave(gameId);
 
-        const impostorIndex = Math.floor(Math.random() * game.players.length);
-        const impostor = game.players[impostorIndex];
-        game.impostorId = impostor.id;
-
-        game.players.forEach(player => {
-            const role = player.id === game.impostorId ? 'Impostor' : 'Amigo';
-            const secretWord = role === 'Impostor' ? '???' : game.word;
-            io.to(player.id).emit('game-started', { role, word: secretWord });
-        });
-        console.log(`Game ${gameId} started. Word: ${word}, Impostor: ${impostor.name}`);
-    });
-
-    socket.on('end-game', (gameId) => {
-        const game = games[gameId];
-        if (!game || socket.id !== game.hostId) {
-            return; // Only host can end the game
-        }
-
-        const impostor = game.players.find(p => p.id === game.impostorId);
-        const result = {
-            impostorName: impostor ? impostor.name : 'N/A',
-            secretWord: game.word || 'N/A'
-        };
-
-        io.to(gameId).emit('game-over', result);
-        console.log(`Game ${gameId} ended. Impostor was ${result.impostorName}`);
-    });
-
-    socket.on('play-again', (gameId) => {
-        const game = games[gameId];
-        if (!game || socket.id !== game.hostId) {
-            return; // Only host can restart
-        }
-
-        // Reset game state for a new round
-        game.word = null;
-        game.impostorId = null;
-
-        // Reuse the start-game logic
-        const word = words[Math.floor(Math.random() * words.length)];
-        game.word = word;
-
-        const impostorIndex = Math.floor(Math.random() * game.players.length);
-        const impostor = game.players[impostorIndex];
-        game.impostorId = impostor.id;
-
-        game.players.forEach(player => {
-            const role = player.id === game.impostorId ? 'Impostor' : 'Amigo';
-            const secretWord = role === 'Impostor' ? '???' : game.word;
-            io.to(player.id).emit('game-started', { role, word: secretWord });
-        });
-        console.log(`New round for game ${gameId} started. Word: ${word}, Impostor: ${impostor.name}`);
+        // 2. Notify all *remaining* players of the change
+        emitGameState(game);
     });
 
     socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
-        let gameIdToDelete = null;
-
-        for (const gameId in games) {
-            const game = games[gameId];
-            const playerIndex = game.players.findIndex(p => p.id === socket.id);
-
-            if (playerIndex !== -1) {
-                game.players.splice(playerIndex, 1);
-
-                if (game.players.length === 0) {
-                    gameIdToDelete = gameId;
-                } else {
-                    // If the host disconnected, assign a new host
-                    if (socket.id === game.hostId) {
-                        game.hostId = game.players[0].id;
-                        console.log(`Host disconnected. New host is ${game.players[0].name}`);
-                    }
-                    io.to(gameId).emit('playerList', game.players.map(p => p.name));
-                }
-                break; 
-            }
+        console.log(`User disconnected: ${user.name}`);
+        const userGame = findUserGame(user.uid);
+        if (userGame) {
+            userGame.removePlayer(user.uid);
+            emitGameState(userGame);
         }
-
-        if (gameIdToDelete) {
-            delete games[gameIdToDelete];
-            console.log(`Game ${gameIdToDelete} deleted.`);
-        }
+        delete userSockets[user.uid];
     });
 });
 
