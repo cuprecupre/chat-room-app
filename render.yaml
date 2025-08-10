@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: impostor-game
+    env: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm install
+    startCommand: node server.js
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false
+      - key: CLIENT_ORIGINS
+        value: ""
+    healthCheckPath: /

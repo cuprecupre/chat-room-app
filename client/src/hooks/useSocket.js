@@ -4,7 +4,8 @@ import { io } from 'socket.io-client';
 export function useSocket(user) {
   const socketRef = useRef(null);
   const [connected, setConnected] = useState(false);
-  const [state, setState] = useState(null);
+  const [gameState, setGameState] = useState(null);
+  const attemptedResumeRef = useRef(false);
 
   useEffect(() => {
     if (!user) {
@@ -14,7 +15,8 @@ export function useSocket(user) {
         socketRef.current = null;
       }
       setConnected(false);
-      setState(null);
+      setGameState(null);
+      attemptedResumeRef.current = false;
       return;
     }
 
@@ -39,6 +41,7 @@ export function useSocket(user) {
         socket.on('connect', () => {
           console.log('Socket connected');
           if (isMounted) setConnected(true);
+          attemptedResumeRef.current = false; // fresh session
           const urlParams = new URLSearchParams(window.location.search);
           const gameIdFromUrl = urlParams.get('gameId');
           if (gameIdFromUrl) {
@@ -50,19 +53,29 @@ export function useSocket(user) {
           console.log('Socket disconnected');
           if (isMounted) {
             setConnected(false);
-            setState(null);
+            setGameState(null);
+            attemptedResumeRef.current = false;
           }
         });
 
         socket.on('game-state', (newState) => {
-          if (isMounted) setState(newState);
+          console.log('[Socket] Received game-state:', newState ? { phase: newState.phase, role: newState.role } : null);
+          if (isMounted) setGameState(newState);
           const url = new URL(window.location);
           if (newState?.gameId) {
             url.searchParams.set('gameId', newState.gameId);
+            window.history.replaceState({}, '', url.toString());
           } else {
-            url.searchParams.delete('gameId');
+            const urlGameId = url.searchParams.get('gameId');
+            if (urlGameId && !attemptedResumeRef.current) {
+              console.log('[Socket] Attempting resume via URL gameId:', urlGameId);
+              attemptedResumeRef.current = true;
+              socket.emit('join-game', urlGameId);
+            } else {
+              url.searchParams.delete('gameId');
+              window.history.replaceState({}, '', url.toString());
+            }
           }
-          window.history.replaceState({}, '', url);
         });
 
         socket.on('error-message', (message) => {
@@ -91,5 +104,5 @@ export function useSocket(user) {
     socketRef.current?.emit(event, payload);
   }, []);
 
-  return { connected, state, emit };
+  return { connected, gameState, emit };
 }

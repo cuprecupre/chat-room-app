@@ -18,27 +18,27 @@ export default function App() {
     }
   }, [user]);
 
-  const { connected, state, emit } = useSocket(user);
+  const { connected, gameState, emit } = useSocket(user);
 
-  const isHost = useMemo(() => state && user && state.hostId === user.uid, [state, user]);
+  const isHost = useMemo(() => gameState && user && gameState.hostId === user.uid, [gameState, user]);
 
   const createGame = useCallback(() => emit('create-game'), [emit]);
   const joinGame = useCallback((gameId) => emit('join-game', gameId), [emit]);
-  const startGame = useCallback(() => emit('start-game', state?.gameId), [emit, state]);
-  const endGame = useCallback(() => emit('end-game', state?.gameId), [emit, state]);
-  const playAgain = useCallback(() => emit('play-again', state?.gameId), [emit, state]);
+  const startGame = useCallback(() => emit('start-game', gameState?.gameId), [emit, gameState]);
+  const endGame = useCallback(() => emit('end-game', gameState?.gameId), [emit, gameState]);
+  const playAgain = useCallback(() => emit('play-again', gameState?.gameId), [emit, gameState]);
   const leaveGame = useCallback(() => {
-    if (state?.gameId) {
-      emit('leave-game', state.gameId);
+    if (gameState?.gameId) {
+      emit('leave-game', gameState.gameId);
     }
-  }, [emit, state]);
+  }, [emit, gameState]);
 
   const copyLink = useCallback(async () => {
-    if (!state?.gameId) return;
-    const url = `${window.location.origin}?gameId=${state.gameId}`;
+    if (!gameState?.gameId) return;
+    const url = `${window.location.origin}?gameId=${gameState.gameId}`;
     await navigator.clipboard.writeText(url);
     window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Enlace copiado' }));
-  }, [state]);
+  }, [gameState]);
 
   const handleLogout = useCallback(async () => {
     try {
@@ -73,10 +73,10 @@ export default function App() {
       return <LoginScreen onLogin={login} error={error} />;
     }
 
-    if (state?.gameId) {
+    if (gameState?.gameId) {
       return (
         <GameRoom 
-          state={state} 
+          state={gameState} 
           isHost={isHost} 
           user={user} 
           onStartGame={startGame}

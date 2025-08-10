@@ -10,11 +10,23 @@ const Game = require('./Game');
 
 // --- Firebase Admin SDK Setup ---
 // Admite múltiples rutas/formas de credenciales:
-// 1) ./firebase-service-account.json
-// 2) ./serviceAccountKey.json
-// 3) GOOGLE_APPLICATION_CREDENTIALS con applicationDefault()
+// 1) FIREBASE_SERVICE_ACCOUNT (JSON string en env)
+// 2) ./firebase-service-account.json
+// 3) ./serviceAccountKey.json
+// 4) GOOGLE_APPLICATION_CREDENTIALS con applicationDefault()
 (() => {
   let initialized = false;
+  // Preferred: FIREBASE_SERVICE_ACCOUNT as full JSON string
+  if (process.env.FIREBASE_SERVICE_ACCOUNT && !initialized) {
+    try {
+      const json = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+      admin.initializeApp({ credential: admin.credential.cert(json) });
+      console.log('Firebase Admin inicializado con FIREBASE_SERVICE_ACCOUNT.');
+      initialized = true;
+    } catch (e) {
+      console.error('FIREBASE_SERVICE_ACCOUNT inválido. Intentando alternativas...');
+    }
+  }
   const candidates = [
     './firebase-service-account.json',
     './serviceAccountKey.json',
@@ -37,7 +49,7 @@ const Game = require('./Game');
       initialized = true;
     } catch (e) {
       console.error('No se pudo inicializar Firebase Admin.');
-      console.error("Proporciona 'firebase-service-account.json' o 'serviceAccountKey.json' en la raíz, o configura GOOGLE_APPLICATION_CREDENTIALS.");
+      console.error("Proporciona 'FIREBASE_SERVICE_ACCOUNT' como variable de entorno, 'firebase-service-account.json' o 'serviceAccountKey.json' en la raíz, o configura GOOGLE_APPLICATION_CREDENTIALS.");
       process.exit(1);
     }
   }
@@ -45,10 +57,19 @@ const Game = require('./Game');
 
 const app = express();
 const server = http.createServer(app);
+const dynamicOrigins = (process.env.CLIENT_ORIGINS || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+const defaultDevOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175'
+];
 const io = socketIo(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
-    methods: ["GET", "POST"]
+    origin: [...defaultDevOrigins, ...dynamicOrigins],
+    methods: ['GET', 'POST']
   }
 });
 
@@ -90,6 +111,11 @@ app.get('*', (req, res, next) => {
 // --- In-memory State ---
 const games = {}; // { gameId: Game_instance }
 const userSockets = {}; // { userId: socket.id }
+// Users pending removal after grace period: { [uid]: { timeout, gameId } }
+const pendingDisconnects = {};
+
+// Helper to find which game a user belongs to (global scope)
+const findUserGame = (userId) => Object.values(games).find(g => g.players.some(p => p.uid === userId));
 
 // --- Socket.IO Middleware ---
 io.use(async (socket, next) => {
@@ -117,14 +143,16 @@ io.on('connection', (socket) => {
     console.log(`User connected: ${user.name} (${user.uid})`);
     userSockets[user.uid] = socket.id;
 
-    // Helper to find which game a user belongs to
-    const findUserGame = (userId) => Object.values(games).find(g => g.players.some(p => p.uid === userId));
-
-    // Reconnection logic: if user is already in a game, send them the state
+    // Reconnection logic: if user is already in a game, join room and send state
     const existingGame = findUserGame(user.uid);
     if (existingGame) {
         socket.join(existingGame.gameId);
         console.log(`User ${user.name} reconnected to game ${existingGame.gameId}`);
+        // Cancel any pending removal timer
+        if (pendingDisconnects[user.uid]) {
+            clearTimeout(pendingDisconnects[user.uid].timeout);
+            delete pendingDisconnects[user.uid];
+        }
         // Send the specific state to the reconnected user only
         socket.emit('game-state', existingGame.getStateFor(user.uid));
     }
@@ -210,8 +238,22 @@ io.on('connection', (socket) => {
         console.log(`User disconnected: ${user.name}`);
         const userGame = findUserGame(user.uid);
         if (userGame) {
-            userGame.removePlayer(user.uid);
-            emitGameState(userGame);
+            // Start grace period before removing the player
+            if (pendingDisconnects[user.uid]) {
+                clearTimeout(pendingDisconnects[user.uid].timeout);
+            }
+            pendingDisconnects[user.uid] = {
+                gameId: userGame.gameId,
+                timeout: setTimeout(() => {
+                    const g = games[userGame.gameId];
+                    if (!g) return;
+                    console.log(`[Grace Expired] Removing user ${user.name} from game ${userGame.gameId}`);
+                    g.removePlayer(user.uid);
+                    emitGameState(g);
+                    delete pendingDisconnects[user.uid];
+                }, 30000) // 30s grace period
+            };
+            console.log(`[Disconnect] Grace timer started for user ${user.name} in game ${userGame.gameId}`);
         }
         delete userSockets[user.uid];
     });
