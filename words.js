@@ -1,4 +1,4 @@
-const words = [
+let words = [
   "casa", "árbol", "perro", "gato", "sol", "luna", "agua", "fuego", "tierra", "aire",
   "montaña", "río", "mar", "cielo", "nube", "estrella", "flor", "hoja", "fruta", "semilla",
   "hombre", "mujer", "niño", "niña", "familia", "amigo", "enemigo", "amor", "odio", "paz",
@@ -81,5 +81,138 @@ const words = [
   "autorizar", "denegar", "registrar", "monitorizar", "auditar", "reportar", "alertar", "notificar", "consultar", "buscar",
   "filtrar", "ordenar", "agrupar", "visualizar", "imprimir", "escanear", "fotocopiar", "faxear", "llamar", "textear"
 ];
+
+// --- Generación de palabras variadas (~1000) ---
+// Categorías base (concisas para mantener el archivo ligero)
+const baseNouns = [
+  "cuchara","tenedor","cuchillo","plato","vaso","taza","silla","mesa","puerta","ventana",
+  "pared","techo","suelo","lámpara","escoba","bolso","cartera","reloj","llave","botella",
+  "mochila","bicicleta","patinete","patineta","balón","pelota","raqueta","red","casco","guante",
+  "pizza","tortilla","empanada","arepa","ensalada","sopa","arroz","fideo","asado","tarta",
+  "manzana","banana","naranja","pera","uva","limón","sandía","melón","frutilla","mango",
+  "ciudad","pueblo","aldea","barrio","plaza","parque","estadio","museo","mercado","puerto",
+  "bosque","desierto","playa","acantilado","valle","pradera","selva","glaciar","caverna","volcán",
+  "computadora","portátil","teclado","ratón","pantalla","altavoz","auricular","micrófono","cámara","impresora",
+  "camisa","pantalón","abrigo","chaqueta","falda","vestido","zapato","zapatilla","gorra","sombrero",
+  "tren","avión","barco","cohete","subte","metro","autobús","taxi","camión","moto",
+  "martillo","destornillador","alicate","llave inglesa","sierra","taladro","cincel","lija","regla","cinta",
+  "periódico","revista","libro","cuaderno","agenda","diccionario","mapa","calendario","póster","sobre",
+  "perla","oro","plata","bronce","hierro","acero","madera","plástico","vidrio","cerámica",
+  "perro","gato","caballo","vaca","oveja","cabra","cerdo","pollo","pato","ganso",
+  "águila","halcón","búho","loro","tucán","pez","delfín","ballena","tiburón","foca"
+];
+
+const adjectives = [
+  "rojo","azul","verde","amarillo","morado","rosa","negro","blanco","gris","marrón",
+  "alto","bajo","largo","corto","ancho","estrecho","rápido","lento","fuerte","débil",
+  "dulce","amargo","salado","ácido","suave","duro","caliente","frío","limpio","sucio",
+  "nuevo","viejo","moderno","clásico","caro","barato","ligero","pesado","raro","común"
+];
+
+const professions = [
+  "doctor","actor","pintor","panadero","carpintero","mecánico","ingeniero","diseñador","arquitecto","abogado",
+  "profesor","enfermero","periodista","bombero","policía","camionero","electricista","fontanero","cocinero","jardinero",
+  "músico","cantante","bailarín","deportista","programador","analista","gestor","contador","fotógrafo","agricultor"
+];
+
+const emotions = [
+  "alegría","tristeza","miedo","ira","sorpresa","asco","calma","ansiedad","orgullo","vergüenza",
+  "esperanza","nostalgia","culpa","paz","euforia","melancolía","ternura","envidia","celos","compasión"
+];
+
+const tech = [
+  "algoritmo","base de datos","servidor","cliente","protocolo","enlace","paquete","byte","bit","nube",
+  "repositorio","rama","commit","despliegue","contenedor","imagen","token","credencial","caché","latencia"
+];
+
+const sports = [
+  "fútbol","baloncesto","tenis","natación","atletismo","ciclismo","boxeo","esgrima","gimnasia","voley",
+  "rugby","béisbol","golf","hockey","surf","escalada","remo","patinaje","yoga","pilates"
+];
+
+const verbs = [
+  "correr","saltar","caminar","nadar","volar","cocinar","leer","escribir","dibujar","pintar",
+  "construir","romper","arreglar","comprar","vender","enseñar","aprender","cantar","bailar","soñar",
+  "jugar","pensar","creer","hablar","escuchar","mirar","viajar","programar","probar","medir",
+  "iniciar","finalizar","conectar","desconectar","guardar","cargar","compartir","publicar","proteger","verificar"
+];
+
+// Utilidades básicas
+const uniq = arr => Array.from(new Set(arr));
+const toASCII = (s) => s.normalize('NFD').replace(/\p{Diacritic}+/gu, '');
+const lowerASCII = (s) => toASCII(String(s)).toLowerCase();
+const pluralize = (w) => {
+  if (/z$/i.test(w)) return w.replace(/z$/i, "ces");
+  if (/[aeiouáéíóú]$/i.test(w)) return w + "s";
+  return w + "es";
+};
+const feminine = (w) => w.replace(/o$/i, "a");
+const gerund = (v) => v.replace(/(ar)$/i, "ando").replace(/(er|ir)$/i, "iendo");
+const participle = (v) => v.replace(/(ar)$/i, "ado").replace(/(er|ir)$/i, "ido");
+const present3s = (v) => v.replace(/ar$/i, "a").replace(/(er|ir)$/i, "e");
+
+// Sufijos comunes para sustantivos (diminutivo/augmentativo)
+const nounWithSuffixes = (w) => {
+  const base = w;
+  const toRoot = (s) => s.replace(/a$|o$/i, "");
+  const root = toRoot(base);
+  const fem = feminine(base);
+  return [
+    base, pluralize(base), fem, pluralize(fem),
+    root + "ito", root + "ita", root + "azo", root + "aza"
+  ];
+};
+
+// Generación
+let generated = [];
+// Sustantivos + variantes
+for (const n of baseNouns) generated.push(...nounWithSuffixes(n));
+// Adjetivos: formas masc/fem + plural
+for (const a of adjectives) {
+  const femA = feminine(a);
+  generated.push(a, femA, pluralize(a), pluralize(femA));
+}
+// Profesiones: masc/fem + plural
+for (const p of professions) {
+  let femP = p;
+  if (/or$/i.test(p)) femP = p + "a".replace(/ora$/, "ora");
+  else if (/o$/i.test(p)) femP = feminine(p);
+  generated.push(p, femP, pluralize(p), pluralize(femP));
+}
+// Emociones y tecnología, deportes (solo plural adicional cuando aplica)
+for (const e of emotions.concat(tech, sports)) {
+  generated.push(e);
+  if (!/\s/.test(e)) generated.push(pluralize(e));
+}
+// Verbos: gerundio, participio, 3ª persona
+for (const v of verbs) generated.push(v, gerund(v), participle(v), present3s(v));
+
+// Stopwords: artículos, preposiciones, conjunciones, determinantes/pronombres comunes
+const stopwords = new Set([
+  'el','la','los','las','lo','un','una','unos','unas','al','del',
+  'a','ante','bajo','cabe','con','contra','de','desde','durante','en','entre','hacia','hasta','mediante','para','por','segun','sin','so','sobre','tras','versus','via',
+  'y','e','ni','o','u','pero','mas','sino','aunque','que','como','si','porque','mientras','tambien','tampoco','muy','mucho','poco','mas','menos','tan','tanto','asi','bien','mal',
+  'yo','tu','usted','el','ella','ello','nosotros','vosotros','ellos','ellas','mi','mis','tu','tus','su','sus','nuestro','nuestra','nuestros','nuestras','vuestro','vuestra','vuestros','vuestras',
+  'este','esta','estos','estas','ese','esa','esos','esas','aquel','aquella','aquellos','aquellas','esto','eso','aquello'
+]);
+
+// Consolidar, deduplicar y recortar a 1000 entradas
+let pool = uniq(words.concat(generated))
+  .filter(w => typeof w === 'string')
+  .map(w => w.normalize('NFC'))
+  // excluir frases con espacios o guiones largos poco útiles
+  .filter(w => !/\s/.test(w))
+  // excluir tokens demasiado cortos
+  .filter(w => w.length >= 3)
+  // excluir stopwords (comparación insensible a acentos)
+  .filter(w => !stopwords.has(lowerASCII(w)));
+
+// Mezclar de forma simple para variedad
+for (let i = pool.length - 1; i > 0; i--) {
+  const j = Math.floor((Math.sin(i * 9301 + 49297) % 1 + 1) % 1 * (i + 1));
+  [pool[i], pool[j]] = [pool[j], pool[i]];
+}
+
+words = pool.slice(0, 1000);
 
 module.exports = words;
