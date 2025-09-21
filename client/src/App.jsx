@@ -29,6 +29,12 @@ export default function App() {
   const playAgain = useCallback(() => emit('play-again', gameState?.gameId), [emit, gameState]);
   const leaveGame = useCallback(() => {
     if (gameState?.gameId) {
+      // Remove gameId from URL BEFORE leaving to avoid auto-rejoin via useSocket resume logic
+      const url = new URL(window.location);
+      if (url.searchParams.get('gameId') === gameState.gameId) {
+        url.searchParams.delete('gameId');
+        window.history.replaceState({}, '', url.toString());
+      }
       emit('leave-game', gameState.gameId);
     }
   }, [emit, gameState]);
