@@ -131,9 +131,10 @@ export default function App() {
                 <button
                   aria-label="Abrir menú de usuario"
                   onClick={() => setMenuOpen(v => !v)}
-                  className="rounded-full ring-1 ring-transparent hover:ring-white/20 focus:outline-none"
+                  className="relative group rounded-full ring-1 ring-transparent hover:ring-white/20 focus:outline-none"
                 >
                   <img src={user.photoURL} alt={user.displayName} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full" />
+                  <span className="pointer-events-none absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 group-active:bg-white/20 transition-opacity" />
                 </button>
                 {menuOpen && (
                   <div className="absolute right-0 mt-2 w-56 rounded-xl border border-white/10 bg-gray-950/95 backdrop-blur-md shadow-2xl ring-1 ring-white/10 p-2 z-20">
