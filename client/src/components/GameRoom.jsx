@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Key, User } from 'lucide-react';
 import { Button } from './ui/Button';
 
 function PlayerList({ players, currentUserId }) {
@@ -68,15 +69,23 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'playing' && (
         <>
-        <div className="w-full max-w-sm mx-auto text-center bg-white/10 rounded-lg p-6 flex flex-col">
-          <p className="text-xs tracking-wider uppercase text-gray-400">Tu rol</p>
-          <p className="text-2xl font-semibold my-2 text-neutral-50">{state.role}</p>
+        <div className="w-full max-w-sm mx-auto text-center rounded-xl p-6 flex flex-col bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl">
+          <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-400">
+            <User className="w-3.5 h-3.5" />
+            <span>Tu rol</span>
+          </div>
+          <p className="text-xl font-semibold mt-2 text-neutral-50">{state.role}</p>
           {state.role === 'impostor' ? (
-            <p className="text-sm text-gray-400 mt-3">Tu objetivo es adivinar la palabra secreta.</p>
+            <p className="text-sm text-gray-300 mt-3">Tu objetivo es adivinar la palabra secreta.</p>
           ) : (
             <>
-              <p className="text-xs tracking-wider uppercase text-indigo-300 mt-4">Palabra secreta</p>
-              <p className="text-xl font-semibold inline-block mt-1 px-3 py-1 rounded-md bg-white/5 text-neutral-50">{state.secretWord}</p>
+              <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-indigo-300 mt-4">
+                <Key className="w-3.5 h-3.5" />
+                <span>Palabra secreta</span>
+              </div>
+              <p className="text-lg font-semibold inline-flex items-center gap-2 mt-2 px-3 py-1.5 rounded-md bg-black/30 ring-1 ring-white/10 text-neutral-50">
+                {state.secretWord}
+              </p>
             </>
           )}
           {/* Botón Terminar Partida fuera del recuadro */}
@@ -97,12 +106,18 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'over' && (
         <>
-        <div className="w-full max-w-sm mx-auto text-center bg-white/10 rounded-lg p-6 space-y-4 flex flex-col">
+        <div className="w-full max-w-sm mx-auto text-center rounded-xl p-6 space-y-4 flex flex-col bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl">
           <div>
-            <p className="text-xs tracking-wider uppercase text-indigo-300">Impostor</p>
-            <p className="font-semibold text-xl text-red-400 my-2">{state.impostorName}</p>
-            <p className="text-xs tracking-wider uppercase text-indigo-300 mt-4">Palabra secreta</p> 
-            <p className="font-semibold text-lg inline-block mt-1 px-3 py-1 rounded-md bg-white/5 text-neutral-50">{state.secretWord}</p>
+            <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-indigo-300">
+              <User className="w-3.5 h-3.5" />
+              <span>Impostor</span>
+            </div>
+            <p className="font-semibold text-lg text-red-400 mt-2">{state.impostorName}</p>
+            <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-indigo-300 mt-4">
+              <Key className="w-3.5 h-3.5" />
+              <span>Palabra secreta</span>
+            </div>
+            <p className="font-semibold text-base inline-block mt-2 px-3 py-1.5 rounded-md bg-black/30 ring-1 ring-white/10 text-neutral-50">{state.secretWord}</p>
           </div>
           {/* Botón Jugar Otra Ronda fuera del recuadro */}
         </div>
