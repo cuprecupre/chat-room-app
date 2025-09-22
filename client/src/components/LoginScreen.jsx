@@ -14,11 +14,12 @@ export function LoginScreen({ onLogin, error, isLoading }) {
         <Button 
           onClick={onLogin} 
           disabled={isLoading}
-          variant="primary"
+          variant="outline"
           size="md"
+          className="rounded-xl bg-white/5 border-white/10 text-white hover:bg-white/10"
         >
           <svg className="w-5 h-5 mr-3" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 21.2 172.9 56.5l-63.8 63.8C324.5 99.8 288.7 80 248 80c-82.8 0-150.5 67.7-150.5 150.5S165.2 406.5 248 406.5c93.9 0 134.4-66.3 138.6-100.3h-138.6v-83.3h238.9c2.3 12.7 3.9 26.9 3.9 41.4z"></path></svg>
-          {isLoading ? 'Conectando...' : 'Entrar con Google'}
+          {isLoading ? 'Conectando...' : 'Continuar con Google'}
         </Button>
         {error && (
           <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 text-red-400">
