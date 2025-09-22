@@ -69,14 +69,14 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       {state.phase === 'playing' && (
         <>
         <div className="w-full max-w-sm mx-auto text-center bg-white/10 rounded-lg p-6 flex flex-col">
-          <p className="text-lg text-indigo-300">Tu rol:</p>
-          <p className="text-4xl font-bold my-2">{state.role}</p>
+          <p className="text-xs tracking-wider uppercase text-gray-400">Tu rol</p>
+          <p className="text-2xl font-semibold my-2 text-neutral-50">{state.role}</p>
           {state.role === 'impostor' ? (
-            <p className="text-lg text-gray-400 mt-4">Tu objetivo es adivinar la palabra secreta.</p>
+            <p className="text-sm text-gray-400 mt-3">Tu objetivo es adivinar la palabra secreta.</p>
           ) : (
             <>
-              <p className="text-lg text-indigo-300 mt-4">La palabra es:</p>
-              <p className="text-3xl font-bold">{state.secretWord}</p>
+              <p className="text-xs tracking-wider uppercase text-indigo-300 mt-4">Palabra secreta</p>
+              <p className="text-xl font-semibold inline-block mt-1 px-3 py-1 rounded-md bg-white/5 text-neutral-50">{state.secretWord}</p>
             </>
           )}
           {/* Botón Terminar Partida fuera del recuadro */}
@@ -99,10 +99,10 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         <>
         <div className="w-full max-w-sm mx-auto text-center bg-white/10 rounded-lg p-6 space-y-4 flex flex-col">
           <div>
-            <p className="text-lg text-indigo-300">El impostor era:</p>
-            <p className="font-bold text-3xl text-red-400 my-2">{state.impostorName}</p>
-            <p className="text-lg text-indigo-300 mt-4">La palabra era:</p> 
-            <p className="font-bold text-2xl">{state.secretWord}</p>
+            <p className="text-xs tracking-wider uppercase text-indigo-300">Impostor</p>
+            <p className="font-semibold text-xl text-red-400 my-2">{state.impostorName}</p>
+            <p className="text-xs tracking-wider uppercase text-indigo-300 mt-4">Palabra secreta</p> 
+            <p className="font-semibold text-lg inline-block mt-1 px-3 py-1 rounded-md bg-white/5 text-neutral-50">{state.secretWord}</p>
           </div>
           {/* Botón Jugar Otra Ronda fuera del recuadro */}
         </div>
