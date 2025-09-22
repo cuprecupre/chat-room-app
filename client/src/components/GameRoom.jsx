@@ -57,7 +57,12 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               </div>
             )}
             <button onClick={onCopyLink} className="w-full h-11 inline-flex items-center justify-center rounded-md bg-gray-600 text-white hover:bg-gray-700 font-semibold">Copiar Enlace de Invitación</button>
-            <button onClick={onLeaveGame} className="w-full text-gray-500 hover:text-gray-400 pt-2">Abandonar Sala</button>
+            <button
+              onClick={onLeaveGame}
+              className="w-full h-11 inline-flex items-center justify-center rounded-md border border-gray-500 text-gray-200 hover:bg-white/10 font-semibold"
+            >
+              Abandonar Sala
+            </button>
           </div>
         </div>
       )}
