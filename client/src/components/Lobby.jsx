@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from './ui/Button';
+import maskImg from '../assets/mascara.png';
 
 export function Lobby({ onCreateGame, onJoinGame }) {
   const [gameId, setGameId] = useState('');
@@ -16,7 +17,8 @@ export function Lobby({ onCreateGame, onJoinGame }) {
 
   return (
     <div className="w-full space-y-8">
-      <div className="text-center">
+      <div className="text-center space-y-4">
+        <img src={maskImg} alt="Máscara" className="mx-auto w-28 sm:w-32 rounded-lg shadow-lg ring-1 ring-white/10" />
         <h2 className="text-3xl sm:text-4xl font-bold text-neutral-50">Empieza a jugar</h2>
         <p className="text-lg text-gray-400 mt-2">Crea una nueva partida o únete a una existente.</p>
       </div>
