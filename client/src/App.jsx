@@ -5,6 +5,7 @@ import { LoginScreen } from './components/LoginScreen';
 import { Lobby } from './components/Lobby';
 import { GameRoom } from './components/GameRoom';
 import { Toaster } from './components/Toaster';
+import { Settings } from 'lucide-react';
 
 export default function App() {
   const { user, loading, error, login, logout } = useAuth();
@@ -104,7 +105,7 @@ export default function App() {
        <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
         {user && connected && (
           <header className="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
-            <h1 className="text-2xl sm:text-3xl font-bold text-violet-400">El Impostor</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-neutral-50">El Impostor</h1>
             <div className="flex items-center gap-3 sm:gap-4">
               <span className="text-sm sm:text-base font-medium hidden sm:inline">{user.displayName}</span>
               <img src={user.photoURL} alt={user.displayName} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full" />
@@ -112,15 +113,12 @@ export default function App() {
                 <button
                   aria-label="Abrir menú de configuración"
                   onClick={() => setMenuOpen(v => !v)}
-                  className="p-2 rounded-md hover:bg-white/10 text-gray-300 hover:text-white"
+                  className="p-2 rounded-md hover:bg:white/10 text-gray-300 hover:text-white"
                 >
-                  {/* Ícono engranaje */}
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-                    <path d="M11.983 1.574a1 1 0 0 0-1.966 0l-.107.6a7.967 7.967 0 0 0-1.698.986l-.537-.31a1 1 0 0 0-1.366.366l-.983 1.703a1 1 0 0 0 .366 1.366l.536.31a7.97 7.97 0 0 0-.001 1.975l-.535.309a1 1 0 0 0-.366 1.366l.983 1.703a1 1 0 0 0 1.366.366l.537-.31c.53.404 1.099.737 1.698.986l.107.6a1 1 0 0 0 1.966 0l.107-.6c.599-.249 1.168-.582 1.698-.986l.537.31a1 1 0 0 0 1.366-.366l.983-1.703a1 1 0 0 0-.366-1.366l-.536-.309a7.97 7.97 0 0 0 0-1.975l.536-.31a1 1 0 0 0 .366-1.366l-.983-1.703a1 1 0 0 0-1.366-.366l-.537.31a7.967 7.967 0 0 0-1.698-.986l-.107-.6ZM10 12.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" />
-                  </svg>
+                  <Settings className="w-5 h-5" />
                 </button>
                 {menuOpen && (
-                  <div className="absolute right-0 mt-2 w-44 rounded-md border border-white/10 bg-gray-800 shadow-lg py-1 z-10">
+                  <div className="absolute right-0 mt-2 w-44 rounded-md border border:white/10 bg-gray-800 shadow-lg py-1 z-10">
                     <button
                       onClick={handleLogout}
                       className="block w-full text-left px-3 py-2 text-gray-300 hover:text-white hover:bg-white/10"
@@ -136,7 +134,6 @@ export default function App() {
         <main>
           {renderContent()}
         </main>
-        {/* Footer sin enlace de cierre de sesión (migrado al dropdown de la cabecera) */}
       </div>
     </div>
   );
