@@ -84,7 +84,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 <Key className="w-3.5 h-3.5" />
                 <span>Palabra secreta</span>
               </div>
-              <p className="text-lg font-semibold inline-flex items-center gap-2 mt-2 px-3 py-1.5 rounded-md bg-black/30 ring-1 ring-white/10 text-neutral-50">
+              <p className="font-semibold text-base inline-block mt-2 px-3 py-1.5 rounded-md bg-black/30 ring-1 ring-white/10 text-neutral-50">
                 {capitalize(state.secretWord)}
               </p>
             </>
