@@ -17,7 +17,7 @@ export function Lobby({ onCreateGame, onJoinGame }) {
   return (
     <div className="w-full space-y-8">
       <div className="text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold text-indigo-300">Empieza a jugar</h2>
+        <h2 className="text-3xl sm:text-4xl font-bold text-neutral-50">Empieza a jugar</h2>
         <p className="text-lg text-gray-400 mt-2">Crea una nueva partida o únete a una existente.</p>
       </div>
       <div className="max-w-sm mx-auto space-y-4">
@@ -30,7 +30,7 @@ export function Lobby({ onCreateGame, onJoinGame }) {
             onChange={(e) => setGameId(e.target.value)}
             placeholder="Introduce el código de la partida"
             maxLength="5"
-            className="w-full h-12 px-4 rounded-md bg-white/10 border border-transparent focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none text-center uppercase tracking-widest"
+            className="w-full h-12 px-4 rounded-md bg-white/10 border border-transparent focus:border-gray-500 focus:ring-gray-500 focus:outline-none text-center uppercase tracking-widest"
           />
           <Button onClick={handleJoin} variant="outline" className="h-12">Unirse a Partida</Button>
           {error && <p className="text-red-400 text-center pt-2">{error}</p>}

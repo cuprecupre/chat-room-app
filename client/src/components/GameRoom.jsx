@@ -79,7 +79,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             <p className="text-sm text-gray-300 mt-3">Tu objetivo es adivinar la palabra secreta.</p>
           ) : (
             <>
-              <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-indigo-300 mt-4">
+          <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300 mt-4">
                 <Key className="w-3.5 h-3.5" />
                 <span>Palabra secreta</span>
               </div>
@@ -108,12 +108,12 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         <>
         <div className="w-full max-w-sm mx-auto text-center rounded-xl p-6 space-y-4 flex flex-col bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl">
           <div>
-            <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-indigo-300">
+            <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300">
               <User className="w-3.5 h-3.5" />
               <span>Impostor</span>
             </div>
             <p className="font-semibold text-lg text-red-400 mt-2">{state.impostorName}</p>
-            <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-indigo-300 mt-4">
+            <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300 mt-4">
               <Key className="w-3.5 h-3.5" />
               <span>Palabra secreta</span>
             </div>
