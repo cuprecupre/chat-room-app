@@ -79,8 +79,13 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               <p className="text-3xl font-bold">{state.secretWord}</p>
             </>
           )}
-          {isHost && <Button onClick={onEndGame} variant="danger" className="mt-6">Terminar Partida</Button>}
+          {/* Botón Terminar Partida fuera del recuadro */}
         </div>
+        {isHost && (
+          <div className="w-full max-w-sm mx-auto">
+            <Button onClick={onEndGame} variant="danger">Terminar Partida</Button>
+          </div>
+        )}
         <div className="w-full max-w-sm mx-auto mt-4">
           <PlayerList players={state.players} currentUserId={user.uid} />
         </div>
@@ -99,8 +104,13 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             <p className="text-lg text-indigo-300 mt-4">La palabra era:</p> 
             <p className="font-bold text-2xl">{state.secretWord}</p>
           </div>
-          {isHost && <Button onClick={onPlayAgain} variant="primary">Jugar Otra Ronda</Button>}
+          {/* Botón Jugar Otra Ronda fuera del recuadro */}
         </div>
+        {isHost && (
+          <div className="w-full max-w-sm mx-auto">
+            <Button onClick={onPlayAgain} variant="primary">Jugar Otra Ronda</Button>
+          </div>
+        )}
         <div className="w-full max-w-sm mx-auto mt-4">
           <PlayerList players={state.players} currentUserId={user.uid} />
         </div>
