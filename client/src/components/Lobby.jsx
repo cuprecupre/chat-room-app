@@ -30,7 +30,7 @@ export function Lobby({ onCreateGame, onJoinGame }) {
             onChange={(e) => setGameId(e.target.value)}
             placeholder="Introduce el código de la partida"
             maxLength="5"
-            className="w-full h-12 px-4 rounded-md bg-white/10 border border-transparent focus:border-gray-500 focus:ring-gray-500 focus:outline-none text-center uppercase tracking-widest"
+            className="w-full h-12 px-4 rounded-md bg-white/10 border border-transparent focus:border-gray-500 focus:ring-gray-500 focus:outline-none text-center uppercase tracking-widest text-sm"
           />
           <Button onClick={handleJoin} variant="outline" size="md">Unirse a Partida</Button>
           {error && <p className="text-red-400 text-center pt-2">{error}</p>}

@@ -5,7 +5,6 @@ import { LoginScreen } from './components/LoginScreen';
 import { Lobby } from './components/Lobby';
 import { GameRoom } from './components/GameRoom';
 import { Toaster } from './components/Toaster';
-import { Settings } from 'lucide-react';
 
 export default function App() {
   const { user, loading, error, login, logout } = useAuth();
@@ -128,14 +127,13 @@ export default function App() {
             <h1 className="text-2xl sm:text-3xl font-bold text-neutral-50">El Impostor</h1>
             <div className="flex items-center gap-3 sm:gap-4">
               <span className="text-sm sm:text-base font-medium hidden sm:inline">{user.displayName}</span>
-              <img src={user.photoURL} alt={user.displayName} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full" />
               <div className="relative" ref={menuRef}>
                 <button
-                  aria-label="Abrir menú de configuración"
+                  aria-label="Abrir menú de usuario"
                   onClick={() => setMenuOpen(v => !v)}
-                  className="p-2 rounded-md hover:bg-white/10 text-gray-300 hover:text-white"
+                  className="rounded-full ring-1 ring-transparent hover:ring-white/20 focus:outline-none"
                 >
-                  <Settings className="w-5 h-5" />
+                  <img src={user.photoURL} alt={user.displayName} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full" />
                 </button>
                 {menuOpen && (
                   <div className="absolute right-0 mt-2 w-56 rounded-xl border border-white/10 bg-gray-950/95 backdrop-blur-md shadow-2xl ring-1 ring-white/10 p-2 z-20">
