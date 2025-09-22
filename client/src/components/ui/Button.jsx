@@ -18,7 +18,7 @@ const sizeClasses = {
   lg: 'h-12 text-lg',
 };
 
-const baseClasses = 'w-full inline-flex items-center justify-center rounded-md font-semibold transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed';
+const baseClasses = 'w-full inline-flex items-center justify-center rounded-md font-semibold transition-colors disabled:bg-gray-500 disabled:text-gray-400 disabled:cursor-not-allowed';
 
 export function Button({
   children,

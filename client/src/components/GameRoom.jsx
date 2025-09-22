@@ -56,12 +56,12 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   variant="primary"
                   size="md"
                 >
-                  Comenzar Partida
+                  Comenzar partida
                 </Button>
               </div>
             )}
-            <Button onClick={onCopyLink} variant="outline" size="md">Copiar Enlace de Invitación</Button>
-            <Button onClick={onLeaveGame} variant="outline" size="md">Abandonar Sala</Button>
+            <Button onClick={onCopyLink} variant="outline" size="md">Copiar enlace</Button>
+            <Button onClick={onLeaveGame} variant="outline" size="md">Abandonar sala</Button>
           </div>
           <div className="w-full mt-6">
             <PlayerList players={state.players} currentUserId={user.uid} />
