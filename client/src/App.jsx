@@ -79,7 +79,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-gray-900 text-white">
+      <div className="w-full h-screen flex items-center justify-center bg-gray-950 text-white">
         <p>Autenticando...</p>
       </div>
     );
@@ -87,7 +87,7 @@ export default function App() {
 
   if (user && !connected) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-gray-900 text-white">
+      <div className="w-full h-screen flex items-center justify-center bg-gray-950 text-white">
         <p>Conectando al servidor...</p>
       </div>
     );

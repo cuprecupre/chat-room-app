@@ -54,13 +54,14 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   onClick={onStartGame} 
                   disabled={state.players.length < 2}
                   variant="primary"
+                  size="md"
                 >
                   Comenzar Partida
                 </Button>
               </div>
             )}
-            <Button onClick={onCopyLink} variant="outline">Copiar Enlace de Invitación</Button>
-            <Button onClick={onLeaveGame} variant="outline">Abandonar Sala</Button>
+            <Button onClick={onCopyLink} variant="outline" size="md">Copiar Enlace de Invitación</Button>
+            <Button onClick={onLeaveGame} variant="outline" size="md">Abandonar Sala</Button>
           </div>
           <div className="w-full mt-6">
             <PlayerList players={state.players} currentUserId={user.uid} />
@@ -91,14 +92,14 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         </div>
         {isHost && (
           <div className="w-full max-w-sm mx-auto">
-            <Button onClick={onEndGame} variant="danger">Terminar Partida</Button>
+            <Button onClick={onEndGame} variant="danger" size="md">Terminar Partida</Button>
           </div>
         )}
         <div className="w-full max-w-sm mx-auto mt-4">
           <PlayerList players={state.players} currentUserId={user.uid} />
         </div>
         <div className="w-full mt-4 pt-4 border-t border-white/10">
-          <Button onClick={onLeaveGame} variant="ghost">Abandonar Partida</Button>
+          <Button onClick={onLeaveGame} variant="ghost" size="md">Abandonar Partida</Button>
         </div>
         </>
       )}
@@ -120,14 +121,14 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         </div>
         {isHost && (
           <div className="w-full max-w-sm mx-auto">
-            <Button onClick={onPlayAgain} variant="primary">Jugar Otra Ronda</Button>
+            <Button onClick={onPlayAgain} variant="primary" size="md">Jugar Otra Ronda</Button>
           </div>
         )}
         <div className="w-full max-w-sm mx-auto mt-4">
           <PlayerList players={state.players} currentUserId={user.uid} />
         </div>
         <div className="w-full max-w-sm mx-auto mt-4 pt-4 border-t border-white/10">
-          <Button onClick={onLeaveGame} variant="ghost">Volver al Lobby</Button>
+          <Button onClick={onLeaveGame} variant="ghost" size="md">Volver al Lobby</Button>
         </div>
         </>
       )}

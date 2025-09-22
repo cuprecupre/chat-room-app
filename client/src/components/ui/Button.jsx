@@ -12,16 +12,23 @@ const variantClasses = {
   ghost: 'text-gray-400 hover:text-gray-300',
 };
 
-const baseClasses = 'w-full h-11 inline-flex items-center justify-center rounded-md font-semibold transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed';
+const sizeClasses = {
+  sm: 'h-9 text-sm',
+  md: 'h-11 text-base',
+  lg: 'h-12 text-lg',
+};
+
+const baseClasses = 'w-full inline-flex items-center justify-center rounded-md font-semibold transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed';
 
 export function Button({
   children,
   variant = 'primary',
   className = '',
   type = 'button',
+  size = 'md',
   ...props
 }) {
-  const styles = classNames([baseClasses, variantClasses[variant], className]);
+  const styles = classNames([baseClasses, sizeClasses[size], variantClasses[variant], className]);
   return (
     <button type={type} className={styles} {...props}>
       {children}
