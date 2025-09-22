@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from 'react';
-import { Key, User } from 'lucide-react';
+// removed icons from labels
 import { Button } from './ui/Button';
 
 function PlayerList({ players, currentUserId }) {
   return (
     <div className="w-full rounded-lg">
-      <h2 className="text-lg font-semibold mb-3 text-indigo-300">Jugadores Conectados: {players.length}</h2>
+      <h2 className="text-sm font-regular mb-3 text-gray-600">Jugadores Conectados: {players.length}</h2>
       <ul className="space-y-2">
         {players.map(p => (
           <li key={p.uid} className="flex items-center justify-between bg-white/5 p-4 rounded-md">
@@ -72,7 +72,6 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         <>
         <div className="w-full max-w-sm mx-auto text-center rounded-xl p-6 flex flex-col bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl">
           <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-400">
-            <User className="w-3.5 h-3.5" />
             <span>Tu rol</span>
           </div>
           <p className="text-xl font-semibold mt-2 text-neutral-50">{capitalize(state.role)}</p>
@@ -80,8 +79,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             <p className="text-sm text-gray-300 mt-3">Tu objetivo es adivinar la palabra secreta.</p>
           ) : (
             <>
-          <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300 mt-4">
-                <Key className="w-3.5 h-3.5" />
+              <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300 mt-4">
                 <span>Palabra secreta</span>
               </div>
               <p className="font-semibold text-base inline-block mt-2 px-3 py-1.5 rounded-md bg-black/30 ring-1 ring-white/10 text-neutral-50">
@@ -110,12 +108,10 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         <div className="w-full max-w-sm mx-auto text-center rounded-xl p-6 space-y-4 flex flex-col bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl">
           <div>
             <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300">
-              <User className="w-3.5 h-3.5" />
               <span>Impostor</span>
             </div>
             <p className="font-semibold text-lg text-red-400 mt-2">{state.impostorName}</p>
             <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300 mt-4">
-              <Key className="w-3.5 h-3.5" />
               <span>Palabra secreta</span>
             </div>
             <p className="font-semibold text-base inline-block mt-2 px-3 py-1.5 rounded-md bg-black/30 ring-1 ring-white/10 text-neutral-50">{capitalize(state.secretWord)}</p>
