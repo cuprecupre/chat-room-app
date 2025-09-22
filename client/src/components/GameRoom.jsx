@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 // removed icons from labels
 import { Button } from './ui/Button';
+import waitImg from '../assets/reloj.png';
 
 function PlayerList({ players, currentUserId }) {
   return (
@@ -46,6 +47,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'lobby' && (
         <div className="w-full max-w-sm mx-auto text-center space-y-4">
+          <img src={waitImg} alt="Esperando jugadores" className="mx-auto w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover shadow-lg ring-1 ring-white/10" />
           <p className="text-gray-400">¡Invita a tus amigos para empezar!</p>
           <div className="w-full space-y-3">
             {isHost && (
