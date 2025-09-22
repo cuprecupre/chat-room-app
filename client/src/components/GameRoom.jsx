@@ -22,6 +22,7 @@ function PlayerList({ players, currentUserId }) {
 }
 
 export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAgain, onLeaveGame, onCopyLink }) {
+  const capitalize = (s) => (typeof s === 'string' && s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s);
   const prevPlayersRef = useRef(state.players);
 
   useEffect(() => {
@@ -74,7 +75,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             <User className="w-3.5 h-3.5" />
             <span>Tu rol</span>
           </div>
-          <p className="text-xl font-semibold mt-2 text-neutral-50">{state.role}</p>
+          <p className="text-xl font-semibold mt-2 text-neutral-50">{capitalize(state.role)}</p>
           {state.role === 'impostor' ? (
             <p className="text-sm text-gray-300 mt-3">Tu objetivo es adivinar la palabra secreta.</p>
           ) : (
@@ -84,7 +85,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 <span>Palabra secreta</span>
               </div>
               <p className="text-lg font-semibold inline-flex items-center gap-2 mt-2 px-3 py-1.5 rounded-md bg-black/30 ring-1 ring-white/10 text-neutral-50">
-                {state.secretWord}
+                {capitalize(state.secretWord)}
               </p>
             </>
           )}
@@ -117,7 +118,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               <Key className="w-3.5 h-3.5" />
               <span>Palabra secreta</span>
             </div>
-            <p className="font-semibold text-base inline-block mt-2 px-3 py-1.5 rounded-md bg-black/30 ring-1 ring-white/10 text-neutral-50">{state.secretWord}</p>
+            <p className="font-semibold text-base inline-block mt-2 px-3 py-1.5 rounded-md bg-black/30 ring-1 ring-white/10 text-neutral-50">{capitalize(state.secretWord)}</p>
           </div>
           {/* Botón Jugar Otra Ronda fuera del recuadro */}
         </div>
