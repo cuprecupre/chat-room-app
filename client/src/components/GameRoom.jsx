@@ -34,7 +34,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         !currentPlayers.some(cp => cp.uid === p.uid)
       );
       if (leftPlayer) {
-        window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: `${leftPlayer.name} ha abandonado la partida.`, type: 'error' } }));
+        window.dispatchEvent(new CustomEvent('app:toast', { detail: `${leftPlayer.name} ha abandonado la partida.` }));
       }
     }
 
