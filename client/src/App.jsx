@@ -9,6 +9,7 @@ import { Toaster } from './components/Toaster';
 export default function App() {
   const { user, loading, error, login, logout } = useAuth();
   const [token, setToken] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -107,22 +108,35 @@ export default function App() {
             <div className="flex items-center gap-3 sm:gap-4">
               <span className="text-sm sm:text-base font-medium hidden sm:inline">{user.displayName}</span>
               <img src={user.photoURL} alt={user.displayName} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full" />
+              <div className="relative">
+                <button
+                  aria-label="Abrir menú de configuración"
+                  onClick={() => setMenuOpen(v => !v)}
+                  className="p-2 rounded-md hover:bg-white/10 text-gray-300 hover:text-white"
+                >
+                  {/* Ícono engranaje */}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                    <path d="M11.983 1.574a1 1 0 0 0-1.966 0l-.107.6a7.967 7.967 0 0 0-1.698.986l-.537-.31a1 1 0 0 0-1.366.366l-.983 1.703a1 1 0 0 0 .366 1.366l.536.31a7.97 7.97 0 0 0-.001 1.975l-.535.309a1 1 0 0 0-.366 1.366l.983 1.703a1 1 0 0 0 1.366.366l.537-.31c.53.404 1.099.737 1.698.986l.107.6a1 1 0 0 0 1.966 0l.107-.6c.599-.249 1.168-.582 1.698-.986l.537.31a1 1 0 0 0 1.366-.366l.983-1.703a1 1 0 0 0-.366-1.366l-.536-.309a7.97 7.97 0 0 0 0-1.975l.536-.31a1 1 0 0 0 .366-1.366l-.983-1.703a1 1 0 0 0-1.366-.366l-.537.31a7.967 7.967 0 0 0-1.698-.986l-.107-.6ZM10 12.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" />
+                  </svg>
+                </button>
+                {menuOpen && (
+                  <div className="absolute right-0 mt-2 w-44 rounded-md border border-white/10 bg-gray-800 shadow-lg py-1 z-10">
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-3 py-2 text-gray-300 hover:text-white hover:bg-white/10"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </header>
         )}
         <main>
           {renderContent()}
         </main>
-        {user && connected && (
-          <footer className="mt-8 pt-6 border-t border-white/10 flex justify-center">
-            <button
-              onClick={handleLogout}
-              className="text-gray-400 hover:text-gray-300 font-semibold underline underline-offset-4"
-            >
-              Cerrar sesión
-            </button>
-          </footer>
-        )}
+        {/* Footer sin enlace de cierre de sesión (migrado al dropdown de la cabecera) */}
       </div>
     </div>
   );
