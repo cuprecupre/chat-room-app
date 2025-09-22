@@ -10,7 +10,7 @@ export function LoginScreen({ onLogin, error, isLoading }) {
     <Screen>
       <div className="text-center space-y-6">
         <h1 className="text-6xl font-bold text-neutral-50">El Impostor</h1>
-        <p className="text-xl text-gray-300">Descubre quién miente. <br>¿Estás listo para el desafío?</p>
+        <p className="text-xl text-gray-300">Descubre quién miente. ¿Estás listo para el desafío?</p>
         <Button 
           onClick={onLogin} 
           disabled={isLoading}
