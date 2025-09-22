@@ -65,7 +65,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       )}
 
       {state.phase === 'playing' && (
-        <div className="w-full max-w-sm mx-auto text-center bg-white/10 rounded-lg p-6">
+        <div className="w-full max-w-sm mx-auto text-center bg-white/10 rounded-lg p-6 flex flex-col">
           <p className="text-lg text-indigo-300">Tu rol:</p>
           <p className="text-4xl font-bold my-2">{state.role}</p>
           {state.role === 'impostor' ? (
@@ -77,12 +77,14 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             </>
           )}
           {isHost && <Button onClick={onEndGame} variant="danger" className="mt-6">Terminar Partida</Button>}
-          <button onClick={onLeaveGame} className="w-full text-gray-500 hover:text-gray-400 pt-4 mt-2">Abandonar Partida</button>
+          <div className="mt-6 pt-4 border-t border-white/10">
+            <Button onClick={onLeaveGame} variant="ghost">Abandonar Partida</Button>
+          </div>
         </div>
       )}
 
       {state.phase === 'over' && (
-        <div className="w-full max-w-sm mx-auto text-center bg-white/10 rounded-lg p-6 space-y-4">
+        <div className="w-full max-w-sm mx-auto text-center bg-white/10 rounded-lg p-6 space-y-4 flex flex-col">
           <div>
             <p className="text-lg text-indigo-300">El impostor era:</p>
             <p className="font-bold text-3xl text-red-400 my-2">{state.impostorName}</p>
@@ -90,7 +92,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             <p className="font-bold text-2xl">{state.secretWord}</p>
           </div>
           {isHost && <Button onClick={onPlayAgain} variant="primary">Jugar Otra Ronda</Button>}
-          <button onClick={onLeaveGame} className="w-full text-gray-500 hover:text-gray-400 pt-2">Volver al Lobby</button>
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <Button onClick={onLeaveGame} variant="ghost">Volver al Lobby</Button>
+          </div>
         </div>
       )}
     </div>
