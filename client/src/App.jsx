@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { useSocket } from './hooks/useSocket';
 import { LoginScreen } from './components/LoginScreen';
@@ -11,6 +11,7 @@ export default function App() {
   const { user, loading, error, login, logout } = useAuth();
   const [token, setToken] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
   useEffect(() => {
     if (user) {
@@ -56,6 +57,25 @@ export default function App() {
       console.error("Error during logout:", e);
     }
   }, [logout]);
+
+  // Cerrar dropdown al hacer click fuera o al presionar Escape
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    window.addEventListener('mousedown', onClick);
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('mousedown', onClick);
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [menuOpen]);
 
   if (loading) {
     return (
@@ -109,19 +129,24 @@ export default function App() {
             <div className="flex items-center gap-3 sm:gap-4">
               <span className="text-sm sm:text-base font-medium hidden sm:inline">{user.displayName}</span>
               <img src={user.photoURL} alt={user.displayName} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full" />
-              <div className="relative">
+              <div className="relative" ref={menuRef}>
                 <button
                   aria-label="Abrir menú de configuración"
                   onClick={() => setMenuOpen(v => !v)}
-                  className="p-2 rounded-md hover:bg:white/10 text-gray-300 hover:text-white"
+                  className="p-2 rounded-md hover:bg-white/10 text-gray-300 hover:text-white"
                 >
                   <Settings className="w-5 h-5" />
                 </button>
                 {menuOpen && (
-                  <div className="absolute right-0 mt-2 w-44 rounded-md border border:white/10 bg-gray-800 shadow-lg py-1 z-10">
+                  <div className="absolute right-0 mt-2 w-48 rounded-lg border border-white/10 bg-gray-900/95 backdrop-blur shadow-xl py-2 z-20">
+                    <div className="px-3 py-2">
+                      <p className="text-sm font-semibold text-gray-200 truncate">{user.displayName}</p>
+                      {user.email && <p className="text-xs text-gray-400 truncate">{user.email}</p>}
+                    </div>
+                    <div className="my-1 h-px bg-white/10" />
                     <button
                       onClick={handleLogout}
-                      className="block w-full text-left px-3 py-2 text-gray-300 hover:text-white hover:bg-white/10"
+                      className="block w-full text-left px-3 py-2 text-gray-200 hover:text-white hover:bg-white/10 rounded-md"
                     >
                       Cerrar sesión
                     </button>

@@ -22,7 +22,7 @@ export function Lobby({ onCreateGame, onJoinGame }) {
       </div>
       <div className="max-w-sm mx-auto space-y-4">
         <Button onClick={onCreateGame} variant="primary" className="h-12 text-lg">Crear Nueva Partida</Button>
-        <div className="relative flex items-center justify-center text-gray-400"><span className="absolute bg-gray-900 px-2">o</span><div className="w-full h-px bg-gray-700"></div></div>
+        <div className="relative flex items-center justify-center text-gray-400"><span className="absolute bg-gray-950 px-2">o</span><div className="w-full h-px bg-gray-700"></div></div>
         <div className="space-y-2">
           <input 
             type="text" 
@@ -32,7 +32,7 @@ export function Lobby({ onCreateGame, onJoinGame }) {
             maxLength="5"
             className="w-full h-12 px-4 rounded-md bg-white/10 border border-transparent focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none text-center uppercase tracking-widest"
           />
-          <Button onClick={handleJoin} variant="secondary" className="h-12">Unirse a Partida</Button>
+          <Button onClick={handleJoin} variant="outline" className="h-12">Unirse a Partida</Button>
           {error && <p className="text-red-400 text-center pt-2">{error}</p>}
         </div>
       </div>
