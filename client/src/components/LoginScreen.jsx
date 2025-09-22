@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from './ui/Button';
+import heroImg from '../assets/impostor-home.png';
 
 function Screen({ children }) {
   return <div className="w-full max-w-md mx-auto p-4 min-h-screen flex flex-col justify-center">{children}</div>;
@@ -9,6 +10,7 @@ export function LoginScreen({ onLogin, error, isLoading }) {
   return (
     <Screen>
       <div className="text-center space-y-6">
+        <img src={heroImg} alt="El Impostor" className="mx-auto w-56 rounded-lg shadow-xl ring-1 ring-white/10" />
         <h1 className="text-6xl font-bold text-neutral-50">El Impostor</h1>
         <p className="text-xl text-gray-300">Descubre quién miente. ¿Estás listo para el desafío?</p>
         <Button 
