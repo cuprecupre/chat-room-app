@@ -138,7 +138,8 @@ export default function App() {
                   <Settings className="w-5 h-5" />
                 </button>
                 {menuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-lg border border-white/10 bg-gray-900/95 backdrop-blur shadow-xl py-2 z-20">
+                  <div className="absolute right-0 mt-2 w-56 rounded-xl border border-white/10 bg-gray-950/95 backdrop-blur-md shadow-2xl ring-1 ring-white/10 p-2 z-20">
+                    <div className="absolute -top-1 right-6 h-3 w-3 rotate-45 bg-gray-950/95 border-t border-l border-white/10" />
                     <div className="px-3 py-2">
                       <p className="text-sm font-semibold text-gray-200 truncate">{user.displayName}</p>
                       {user.email && <p className="text-xs text-gray-400 truncate">{user.email}</p>}

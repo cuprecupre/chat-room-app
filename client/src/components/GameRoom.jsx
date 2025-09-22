@@ -7,12 +7,12 @@ function PlayerList({ players, currentUserId }) {
       <h2 className="text-lg font-semibold mb-3 text-indigo-300">Jugadores Conectados: {players.length}</h2>
       <ul className="space-y-2">
         {players.map(p => (
-          <li key={p.uid} className="flex items-center justify-between bg-white/5 p-2 rounded-md">
+          <li key={p.uid} className="flex items-center justify-between bg-white/5 p-4 rounded-md">
             <div className="flex items-center gap-3">
               <img src={p.photoURL} alt={p.name} className="w-8 h-8 rounded-full" />
               <span className="font-medium">{p.name}{p.uid === currentUserId ? ' (Tú)' : ''}</span>
             </div>
-            <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
           </li>
         ))}
       </ul>
