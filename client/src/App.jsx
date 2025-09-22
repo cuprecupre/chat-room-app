@@ -103,19 +103,26 @@ export default function App() {
        <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
         {user && connected && (
           <header className="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
-            <h1 className="text-2xl sm:text-3xl font-bold text-violet-400">El Impostor v1.1</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-violet-400">El Impostor</h1>
             <div className="flex items-center gap-3 sm:gap-4">
               <span className="text-sm sm:text-base font-medium hidden sm:inline">{user.displayName}</span>
               <img src={user.photoURL} alt={user.displayName} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full" />
-              <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 sm:px-4 rounded-md text-xs sm:text-sm">
-                Salir
-              </button>
             </div>
           </header>
         )}
         <main>
           {renderContent()}
         </main>
+        {user && connected && (
+          <footer className="mt-8 pt-6 border-t border-white/10 flex justify-end">
+            <button
+              onClick={handleLogout}
+              className="text-red-500 hover:text-red-400 font-semibold underline underline-offset-4"
+            >
+              Cerrar sesión
+            </button>
+          </footer>
+        )}
       </div>
     </div>
   );
