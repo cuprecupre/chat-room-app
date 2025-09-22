@@ -114,10 +114,10 @@ export default function App() {
           {renderContent()}
         </main>
         {user && connected && (
-          <footer className="mt-8 pt-6 border-t border-white/10 flex justify-end">
+          <footer className="mt-8 pt-6 border-t border-white/10 flex justify-center">
             <button
               onClick={handleLogout}
-              className="text-red-500 hover:text-red-400 font-semibold underline underline-offset-4"
+              className="text-gray-400 hover:text-gray-300 font-semibold underline underline-offset-4"
             >
               Cerrar sesión
             </button>
