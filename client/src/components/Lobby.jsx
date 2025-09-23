@@ -18,13 +18,13 @@ export function Lobby({ onCreateGame, onJoinGame }) {
   return (
     <div className="w-full space-y-8">
       <div className="text-center space-y-4">
-        <img src={maskImg} alt="Llave" className="mx-auto w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover shadow-lg ring-1 ring-white/10" />
+        <img src={maskImg} alt="Llave" className="mx-auto w-72 h-72 sm:w-32 sm:h-32 rounded-full object-cover shadow-lg ring-1 ring-white/10" />
         <h2 className="text-3xl sm:text-4xl font-bold text-neutral-50">Empieza a jugar</h2>
         <p className="text-lg text-gray-400 mt-2">Crea una nueva partida o únete a una existente.</p>
       </div>
       <div className="max-w-sm mx-auto space-y-4">
         <Button onClick={onCreateGame} variant="primary" size="md">Crear Nueva Partida</Button>
-        <div className="relative flex items-center justify-center text-gray-400"><span className="absolute bg-gray-950 px-2">o</span><div className="w-full h-px bg-gray-700"></div></div>
+        <div className="relative flex items-center justify-center text-gray-400"><span className="absolute bg-neutral-950 px-2">o</span><div className="w-full h-px bg-neutral-700"></div></div>
         <div className="space-y-2">
           <input 
             type="text" 
@@ -32,7 +32,7 @@ export function Lobby({ onCreateGame, onJoinGame }) {
             onChange={(e) => setGameId(e.target.value)}
             placeholder="Introduce el código de la partida"
             maxLength="5"
-            className="w-full h-12 px-4 rounded-md bg-white/10 border border-transparent focus:border-gray-500 focus:ring-gray-500 focus:outline-none text-center uppercase tracking-widest text-sm"
+            className="w-full h-12 px-4 rounded-md bg-white/10 border border-transparent focus:border-neutral-500 focus:ring-neutral-500 focus:outline-none text-center uppercase tracking-widest text-sm"
           />
           <Button onClick={handleJoin} variant="outline" size="md">Unirse a Partida</Button>
           {error && <p className="text-red-400 text-center pt-2">{error}</p>}

@@ -78,7 +78,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-gray-950 text-white">
+      <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
         <p>Autenticando...</p>
       </div>
     );
@@ -86,7 +86,7 @@ export default function App() {
 
   if (user && !connected) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-gray-950 text-white">
+      <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
         <p>Conectando al servidor...</p>
       </div>
     );
@@ -124,7 +124,7 @@ export default function App() {
     : "w-full max-w-4xl mx-auto min-h-screen flex items-center justify-center p-0";
 
   return (
-    <div className="bg-gray-950 text-white min-h-screen font-sans">
+    <div className="bg-neutral-950 text-white min-h-screen font-sans">
       <Toaster />
        <div className={containerClasses}>
         {showHeader && (
@@ -142,7 +142,7 @@ export default function App() {
                   <span className="pointer-events-none absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 group-active:bg-white/20 transition-opacity" />
                 </button>
                 {menuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-xl border border-white/10 bg-gray-950/95 backdrop-blur-md shadow-2xl ring-1 ring-white/10 p-2 z-20">
+                  <div className="absolute right-0 mt-2 w-56 rounded-xl border border-white/10 bg-neutral-950/95 backdrop-blur-md shadow-2xl ring-1 ring-white/10 p-2 z-20">
                     <div className="px-3 py-2">
                       <p className="text-sm font-semibold text-gray-200 truncate">{user.displayName}</p>
                       {user.email && <p className="text-xs text-gray-400 truncate">{user.email}</p>}
