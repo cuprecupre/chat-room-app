@@ -87,7 +87,10 @@ export default function App() {
   if (loading) {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
-        <p>Autenticando...</p>
+        <div className="text-center">
+          <p>Autenticando...</p>
+          <p className="text-sm text-gray-400 mt-2">Verificando sesión...</p>
+        </div>
       </div>
     );
   }
@@ -95,7 +98,10 @@ export default function App() {
   if (user && !connected) {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
-        <p>Conectando al servidor...</p>
+        <div className="text-center">
+          <p>Conectando al servidor...</p>
+          <p className="text-sm text-gray-400 mt-2">Estableciendo conexión...</p>
+        </div>
       </div>
     );
   }

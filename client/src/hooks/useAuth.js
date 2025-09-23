@@ -10,30 +10,28 @@ export function useAuth() {
     console.log('🔧 Inicializando listener de autenticación...');
     console.log('🔍 Usuario actual al inicializar:', auth.currentUser);
     
-    // Verificar si ya hay un usuario autenticado
-    if (auth.currentUser) {
-      console.log('✅ Usuario ya autenticado encontrado:', auth.currentUser.displayName);
-      setUser(auth.currentUser);
-      setLoading(false);
-    }
+    let isMounted = true;
+    let authResolved = false;
     
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       console.log('🔄 Estado de autenticación cambió:', u ? `Usuario: ${u.displayName}` : 'Sin usuario');
-      setUser(u);
-      setLoading(false);
+      authResolved = true;
+      if (isMounted) {
+        setUser(u);
+        setLoading(false);
+      }
     });
 
-    // Timeout de seguridad para evitar loading infinito
+    // Timeout de seguridad solo si la autenticación no se resuelve
     const timeout = setTimeout(() => {
-      console.warn('⚠️ Timeout de inicialización de Firebase Auth');
-      if (auth.currentUser) {
-        console.log('🔄 Aplicando usuario actual por timeout:', auth.currentUser.displayName);
-        setUser(auth.currentUser);
+      if (!authResolved && isMounted) {
+        console.warn('⚠️ Timeout de inicialización de Firebase Auth');
+        setLoading(false);
       }
-      setLoading(false);
     }, 5000);
 
     return () => {
+      isMounted = false;
       clearTimeout(timeout);
       unsubscribe();
     };
