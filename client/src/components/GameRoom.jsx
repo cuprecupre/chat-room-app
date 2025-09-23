@@ -63,8 +63,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 </Button>
               </div>
             )}
-            <Button onClick={onCopyLink} variant="outline" size="md">Copiar enlace</Button>
-            <Button onClick={onLeaveGame} variant="outline" size="md">Abandonar sala</Button>
+            <Button onClick={onCopyLink} variant={state.players.length === 1 ? "primary" : "outline"} size="md">Copiar enlace</Button>
           </div>
           <div className="w-full mt-6">
             <PlayerList players={state.players} currentUserId={user.uid} />
@@ -72,7 +71,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           
           {/* Footer con código de sala */}
           <div className="w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5">
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center mb-4">
               <button
                 onClick={() => onCopyGameCode()}
                 className="flex items-center gap-2 px-3 py-2 text-sm text-neutral-500 hover:bg-white/10 rounded transition-colors"
@@ -84,6 +83,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 </svg>
               </button>
             </div>
+            <Button onClick={onLeaveGame} variant="outline" size="md">Abandonar sala</Button>
           </div>
         </div>
       )}
@@ -163,7 +163,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           <PlayerList players={state.players} currentUserId={user.uid} />
         </div>
         <div className="w-full max-w-sm mx-auto mt-4 pt-4 border-t border-white/10">
-          <Button onClick={onLeaveGame} variant="ghost" size="md">Volver al Lobby</Button>
+          <Button onClick={onLeaveGame} variant="ghost" size="md">Abandonar partida</Button>
         </div>
         
         {/* Footer con código de sala */}

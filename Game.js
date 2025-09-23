@@ -58,10 +58,18 @@ class Game {
 
   playAgain(userId) {
     if (userId !== this.hostId) throw new Error('Solo el host puede empezar una nueva ronda.');
+    
+    // Reset game state
     this.secretWord = '';
     this.impostorId = '';
-    this.phase = 'lobby';
     this.roundPlayers = [];
+    
+    // Start new game directly (same logic as startGame but without validations)
+    this.roundPlayers = this.players.map(p => p.uid);
+    const impostorIndex = Math.floor(Math.random() * this.roundPlayers.length);
+    this.impostorId = this.roundPlayers[impostorIndex];
+    this.secretWord = words[Math.floor(Math.random() * words.length)];
+    this.phase = 'playing';
   }
 
   getStateFor(userId) {
