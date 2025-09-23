@@ -47,7 +47,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'lobby' && (
         <div className="w-full max-w-sm mx-auto text-center space-y-4">
-          <img src={waitImg} alt="Esperando jugadores" className="mx-auto w-64 h-64 sm:w-64 sm:h-64 rounded-full object-cover shadow-lg ring-1 ring-white/10" />
+          <img src={waitImg} alt="Esperando jugadores" className="mx-auto w-64 h-64 sm:w-64 sm:h-64 rounded-full object-cover shadow-lg ring-1 ring-white/10" loading="lazy" />
           <h2 className="text-3xl sm:text-4xl font-bold text-neutral-50">Invita a tus amigos para empezar</h2>
           <p className="text-lg text-neutral-400 mt-2">Se necesitan al menos 4 jugadores.</p>
           <div className="w-full space-y-3">

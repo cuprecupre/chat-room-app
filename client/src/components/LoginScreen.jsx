@@ -10,7 +10,7 @@ export function LoginScreen({ onLogin, error, isLoading }) {
   return (
     <Screen>
       <div className="text-center space-y-6">
-        <img src={heroImg} alt="El Impostor" className="mx-auto w-72 h-72 rounded-full object-cover shadow-xl ring-1 ring-white/10" />
+        <img src={heroImg} alt="El Impostor" className="mx-auto w-72 h-72 rounded-full object-cover shadow-xl ring-1 ring-white/10" loading="lazy" />
         <h1 className="text-5xl font-bold text-neutral-50">El impostor</h1>
         <p className="text-xl text-gray-300">Alguien no dice la verdad.<br />¿Lo vas a descubrir?</p>
 
