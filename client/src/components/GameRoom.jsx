@@ -22,7 +22,7 @@ function PlayerList({ players, currentUserId }) {
   );
 }
 
-export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAgain, onLeaveGame, onCopyLink }) {
+export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAgain, onLeaveGame, onCopyLink, onCopyGameCode }) {
   const capitalize = (s) => (typeof s === 'string' && s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s);
   const prevPlayersRef = useRef(state.players);
 
@@ -74,9 +74,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           <div className="w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5">
             <div className="flex items-center justify-center">
               <button
-                onClick={() => onCopyLink()}
+                onClick={() => onCopyGameCode()}
                 className="flex items-center gap-2 px-3 py-2 text-sm text-neutral-500 hover:bg-white/10 rounded transition-colors"
-                title="Copiar enlace"
+                title="Copiar código"
               >
                 <span>Código de sala: <span className="font-mono font-semibold text-neutral-300">{state.gameId}</span></span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,9 +125,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         <div className="w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5">
           <div className="flex items-center justify-center">
             <button
-              onClick={() => onCopyLink()}
+              onClick={() => onCopyGameCode()}
               className="flex items-center gap-2 px-3 py-2 text-sm text-neutral-500 hover:bg-white/10 rounded transition-colors"
-              title="Copiar enlace"
+              title="Copiar código"
             >
               <span>Código de sala: <span className="font-mono font-semibold text-neutral-300">{state.gameId}</span></span>
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -170,9 +170,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         <div className="w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5">
           <div className="flex items-center justify-center">
             <button
-              onClick={() => onCopyLink()}
+              onClick={() => onCopyGameCode()}
               className="flex items-center gap-2 px-3 py-2 text-sm text-neutral-500 hover:bg-white/10 rounded transition-colors"
-              title="Copiar enlace"
+              title="Copiar código"
             >
               <span>Código de sala: <span className="font-mono font-semibold text-neutral-300">{state.gameId}</span></span>
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

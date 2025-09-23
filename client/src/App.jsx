@@ -48,6 +48,12 @@ export default function App() {
     window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Enlace copiado' }));
   }, [gameState]);
 
+  const copyGameCode = useCallback(async () => {
+    if (!gameState?.gameId) return;
+    await navigator.clipboard.writeText(gameState.gameId);
+    window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Código copiado' }));
+  }, [gameState]);
+
   const handleLogout = useCallback(async () => {
     try {
       // Close dropdown first
@@ -113,6 +119,7 @@ export default function App() {
           onPlayAgain={playAgain}
           onLeaveGame={leaveGame}
           onCopyLink={copyLink}
+          onCopyGameCode={copyGameCode}
         />
       );
     }
