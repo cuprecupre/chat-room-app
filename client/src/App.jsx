@@ -50,6 +50,8 @@ export default function App() {
 
   const handleLogout = useCallback(async () => {
     try {
+      // Close dropdown first
+      setMenuOpen(false);
       // useSocket hook handles emitting leave-game on disconnect
       await logout();
     } catch (e) {
