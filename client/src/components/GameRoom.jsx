@@ -4,11 +4,18 @@ import { Button } from './ui/Button';
 import waitImg from '../assets/reloj.png';
 
 function PlayerList({ players, currentUserId }) {
+  // Ordenar jugadores para que el usuario actual aparezca primero
+  const sortedPlayers = [...players].sort((a, b) => {
+    if (a.uid === currentUserId) return -1;
+    if (b.uid === currentUserId) return 1;
+    return 0;
+  });
+
   return (
     <div className="w-full rounded-lg">
       <p className="text-sm font-regular mb-3 text-neutral-600">Jugadores Conectados: {players.length}</p>
       <ul className="space-y-2">
-        {players.map(p => (
+        {sortedPlayers.map(p => (
           <li key={p.uid} className="flex items-center justify-between bg-white/5 p-4 rounded-md">
             <div className="flex items-center gap-3">
               <img src={p.photoURL} alt={p.name} className="w-8 h-8 rounded-full" />
@@ -83,7 +90,19 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 </svg>
               </button>
             </div>
-            <Button onClick={onLeaveGame} variant="outline" size="md">Abandonar sala</Button>
+            <div className="w-full border-t border-white/10 my-4"></div>
+            <div className="flex justify-center">
+              <button
+                onClick={onLeaveGame}
+                className="flex items-center justify-center gap-2 px-3 py-2 text-sm text-neutral-500 hover:bg-neutral-500/20 rounded transition-colors"
+                title="Abandonar partida"
+              >
+                <span>Abandonar partida</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -102,7 +121,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300 mt-4">
                 <span>Palabra secreta</span>
               </div>
-              <p className="font-semibold text-base inline-block mt-2 px-3 py-1.5 rounded-md bg-black/30 ring-1 ring-white/10 text-neutral-50">
+              <p className="font-semibold text-xl mt-2 text-neutral-50">
                 {capitalize(state.secretWord)}
               </p>
             </>
@@ -150,7 +169,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300 mt-4">
               <span>Palabra secreta</span>
             </div>
-            <p className="font-semibold text-base inline-block mt-2 px-3 py-1.5 rounded-md bg-black/30 ring-1 ring-white/10 text-neutral-50">{capitalize(state.secretWord)}</p>
+            <p className="font-semibold text-xl mt-2 text-neutral-50">{capitalize(state.secretWord)}</p>
           </div>
           {/* Botón Jugar Otra Ronda fuera del recuadro */}
         </div>
