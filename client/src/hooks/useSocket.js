@@ -80,11 +80,8 @@ export function useSocket(user) {
             window.history.replaceState({}, '', url.toString());
           } else {
             const urlGameId = url.searchParams.get('gameId');
-            if (urlGameId && !attemptedResumeRef.current) {
-              console.log('[Socket] Attempting resume via URL gameId:', urlGameId);
-              attemptedResumeRef.current = true;
-              socket.emit('join-game', urlGameId);
-            } else {
+            // Do not auto-join here; let App render recovery UI if mismatch
+            if (!urlGameId) {
               url.searchParams.delete('gameId');
               window.history.replaceState({}, '', url.toString());
             }

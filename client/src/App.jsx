@@ -101,11 +101,70 @@ export default function App() {
   }
 
   const renderContent = () => {
+    // Detect URL vs session mismatch and provide safe recovery UI
+    const url = new URL(window.location);
+    const urlGameId = url.searchParams.get('gameId');
+
     if (error) {
        return <LoginScreen onLogin={login} error={error} />;
     }
     if (!user) {
       return <LoginScreen onLogin={login} error={error} />;
+    }
+
+    // Case 1: URL has a gameId but session is in another game → offer switch
+    if (urlGameId && gameState?.gameId && urlGameId !== gameState.gameId) {
+      return (
+        <div className="w-full max-w-sm mx-auto text-center space-y-4">
+          <div className="rounded-xl p-6 bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl">
+            <h3 className="text-lg font-semibold text-neutral-50">¿Cambiar de sala?</h3>
+            <p className="text-sm text-neutral-300 mt-2">
+              Estás en la sala <span className="font-mono">{gameState.gameId}</span>,
+              pero la URL apunta a <span className="font-mono">{urlGameId}</span>.
+            </p>
+            <div className="mt-4 space-y-3">
+              <button
+                onClick={() => emit('join-game', urlGameId)}
+                className="w-full inline-flex items-center justify-center rounded-md font-semibold transition-colors h-11 text-base text-neutral-200 border border-neutral-500 hover:bg-white/10"
+              >
+                Cambiarme a {urlGameId}
+              </button>
+              <button
+                onClick={() => { url.searchParams.delete('gameId'); window.history.replaceState({}, '', url.toString()); window.dispatchEvent(new Event('popstate')); }}
+                className="w-full inline-flex items-center justify-center rounded-md font-semibold transition-colors h-11 text-base text-neutral-400 hover:text-neutral-300"
+              >
+                Mantenerme en {gameState.gameId}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Case 2: URL has a gameId but session is not attached → allow joining or clearing
+    if (urlGameId && !gameState?.gameId) {
+      return (
+        <div className="w-full max-w-sm mx-auto text-center space-y-4">
+          <div className="rounded-xl p-6 bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl">
+            <h3 className="text-lg font-semibold text-neutral-50">Unirse a sala</h3>
+            <p className="text-sm text-neutral-300 mt-2">¿Quieres unirte a la sala <span className="font-mono">{urlGameId}</span>?</p>
+            <div className="mt-4 space-y-3">
+              <button
+                onClick={() => emit('join-game', urlGameId)}
+                className="w-full inline-flex items-center justify-center rounded-md font-semibold transition-colors h-11 text-base text-neutral-200 border border-neutral-500 hover:bg-white/10"
+              >
+                Unirme ahora
+              </button>
+              <button
+                onClick={() => { url.searchParams.delete('gameId'); window.history.replaceState({}, '', url.toString()); window.dispatchEvent(new Event('popstate')); }}
+                className="w-full inline-flex items-center justify-center rounded-md font-semibold transition-colors h-11 text-base text-neutral-400 hover:text-neutral-300"
+              >
+                Volver al lobby
+              </button>
+            </div>
+          </div>
+        </div>
+      );
     }
 
     if (gameState?.gameId) {
