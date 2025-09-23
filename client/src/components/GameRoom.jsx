@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 // removed icons from labels
 import { Button } from './ui/Button';
-import waitImg from '../assets/reloj.png';
+import keyImg from '../assets/llave.png';
 
 function PlayerList({ players, currentUserId }) {
   // Ordenar jugadores para que el usuario actual aparezca primero
@@ -54,7 +54,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'lobby' && (
         <div className="w-full max-w-sm mx-auto text-center space-y-4">
-          <img src={waitImg} alt="Esperando jugadores" className="mx-auto w-48 h-48 sm:w-48 sm:h-48 rounded-full object-cover shadow-lg ring-1 ring-white/10" loading="lazy" />
+          <img src={keyImg} alt="Esperando jugadores" className="mx-auto w-48 h-48 sm:w-48 sm:h-48 rounded-full object-cover shadow-lg ring-1 ring-white/10" loading="lazy" />
           <h2 className="text-3xl sm:text-4xl font-bold text-neutral-50">Invita a tus amigos para empezar</h2>
           <p className="text-lg text-neutral-400 mt-2">Se necesitan al menos 4 jugadores.</p>
           <div className="w-full space-y-3">
@@ -189,7 +189,12 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
             </button>
-            <Button onClick={onLeaveGame} variant="outline" size="md">Abandonar partida</Button>
+            <Button onClick={onLeaveGame} variant="ghost" size="md" className="gap-2">
+              <span>Abandonar partida</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </Button>
           </div>
         </div>
         </>
