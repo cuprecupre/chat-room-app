@@ -196,6 +196,18 @@ io.on('connection', (socket) => {
         }
         // Send the specific state to the reconnected user only
         socket.emit('game-state', existingGame.getStateFor(user.uid));
+    } else {
+        // User not in any game, check if they have a pending disconnect
+        if (pendingDisconnects[user.uid]) {
+            const pendingGame = games[pendingDisconnects[user.uid].gameId];
+            if (pendingGame) {
+                socket.join(pendingGame.gameId);
+                console.log(`User ${user.name} reconnected to pending game ${pendingGame.gameId}`);
+                clearTimeout(pendingDisconnects[user.uid].timeout);
+                delete pendingDisconnects[user.uid];
+                socket.emit('game-state', pendingGame.getStateFor(user.uid));
+            }
+        }
     }
 
     // Helper to broadcast the state to all players in a game
@@ -210,7 +222,15 @@ io.on('connection', (socket) => {
     };
 
     socket.on('create-game', () => {
-        if (findUserGame(user.uid)) return socket.emit('error-message', 'Ya estás en una partida.');
+        // Allow creating new game even if in another - leave current first
+        const userGame = findUserGame(user.uid);
+        if (userGame) {
+            console.log(`User ${user.name} leaving game ${userGame.gameId} to create new game`);
+            userGame.removePlayer(user.uid);
+            socket.leave(userGame.gameId);
+            emitGameState(userGame);
+        }
+        
         const newGame = new Game(user);
         games[newGame.gameId] = newGame;
         socket.join(newGame.gameId);
@@ -221,10 +241,15 @@ io.on('connection', (socket) => {
     socket.on('join-game', (gameId) => {
         const gameToJoin = games[gameId];
         if (!gameToJoin) return socket.emit('error-message', 'La partida no existe.');
-        // Allow rejoining the same game, but not a different one
+        
+        // Allow switching games - leave current game first if in one
         const userGame = findUserGame(user.uid);
         if (userGame && userGame.gameId !== gameId) {
-             return socket.emit('error-message', 'Ya estás en una partida. Debes abandonar la actual antes de unirte a otra.');
+            console.log(`User ${user.name} switching from game ${userGame.gameId} to ${gameId}`);
+            // Remove from current game
+            userGame.removePlayer(user.uid);
+            socket.leave(userGame.gameId);
+            emitGameState(userGame);
         }
         
         gameToJoin.addPlayer(user);
@@ -292,7 +317,7 @@ io.on('connection', (socket) => {
                     g.removePlayer(user.uid);
                     emitGameState(g);
                     delete pendingDisconnects[user.uid];
-                }, 30000) // 30s grace period
+                }, 60000) // 60s grace period - increased from 30s
             };
             console.log(`[Disconnect] Grace timer started for user ${user.name} in game ${userGame.gameId}`);
         }

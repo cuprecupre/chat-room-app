@@ -44,7 +44,8 @@ export function useSocket(user) {
           attemptedResumeRef.current = false; // fresh session
           const urlParams = new URLSearchParams(window.location.search);
           const gameIdFromUrl = urlParams.get('gameId');
-          if (gameIdFromUrl) {
+          if (gameIdFromUrl && !attemptedResumeRef.current) {
+            attemptedResumeRef.current = true;
             socket.emit('join-game', gameIdFromUrl);
           }
         });
@@ -53,7 +54,7 @@ export function useSocket(user) {
           console.log('Socket disconnected');
           if (isMounted) {
             setConnected(false);
-            setGameState(null);
+            // Don't clear gameState on disconnect - keep it for reconnection
             attemptedResumeRef.current = false;
           }
         });
@@ -75,6 +76,17 @@ export function useSocket(user) {
               url.searchParams.delete('gameId');
               window.history.replaceState({}, '', url.toString());
             }
+          }
+        });
+
+        // Add reconnection recovery
+        socket.on('reconnect', () => {
+          console.log('Socket reconnected, attempting to resume...');
+          const urlParams = new URLSearchParams(window.location.search);
+          const gameIdFromUrl = urlParams.get('gameId');
+          if (gameIdFromUrl && !attemptedResumeRef.current) {
+            attemptedResumeRef.current = true;
+            socket.emit('join-game', gameIdFromUrl);
           }
         });
 
