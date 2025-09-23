@@ -95,6 +95,18 @@ const verifyFirebaseToken = async (req, res, next) => {
 
 // --- Server Setup: serve only the React (shadcn) app build ---
 const clientDist = path.join(__dirname, 'client', 'dist');
+
+// Sirve og.png con no-cache para forzar refresco en scrapers (WhatsApp)
+app.get('/og.png', (req, res) => {
+  const ogPath = path.join(clientDist, 'og.png');
+  if (!fs.existsSync(ogPath)) return res.status(404).end();
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.type('png');
+  res.sendFile(ogPath);
+});
+
 app.use(express.static(clientDist));
 // SPA fallback con inyección de OG absoluta
 app.get('*', (req, res, next) => {
@@ -117,6 +129,13 @@ app.get('*', (req, res, next) => {
       .replace(/(property=\"og:image\"\s+content=)\"[^\"]*\"/g, `$1"${absoluteOg}"`)
       .replace(/(name=\"twitter:image\"\s+content=)\"[^\"]*\"/g, `$1"${absoluteOg}"`)
       .replace(/(rel=\"icon\"[^>]*href=)\"[^\"]*\"/g, `$1"${absoluteFav}"`);
+    // Asegurar og:image:secure_url
+    if (/property=\"og:image:secure_url\"/.test(html)) {
+      html = html.replace(/(property=\"og:image:secure_url\"\s+content=)\"[^\"]*\"/g, `$1"${absoluteOg}"`);
+    } else {
+      const secureTag = `\n    <meta property=\"og:image:secure_url\" content=\"${absoluteOg}\" />`;
+      html = html.replace(/<title>[\s\S]*?<\/title>/, (m) => `${m}${secureTag}`);
+    }
     // Asegurar og:url presente
     if (!/property=\"og:url\"/.test(html)) {
       const injectTag = `\n    <meta property="og:url" content="${baseUrl}${req.originalUrl}" />`;
