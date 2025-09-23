@@ -6,7 +6,7 @@ import waitImg from '../assets/reloj.png';
 function PlayerList({ players, currentUserId }) {
   return (
     <div className="w-full rounded-lg">
-      <h2 className="text-sm font-regular mb-3 text-gray-600">Jugadores Conectados: {players.length}</h2>
+      <p className="text-sm font-regular mb-3 text-neutral-600">Jugadores Conectados: {players.length}</p>
       <ul className="space-y-2">
         {players.map(p => (
           <li key={p.uid} className="flex items-center justify-between bg-white/5 p-4 rounded-md">
