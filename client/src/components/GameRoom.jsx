@@ -133,6 +133,25 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         <div className="w-full max-w-sm mx-auto mt-4 pt-4 border-t border-white/10">
           <Button onClick={onLeaveGame} variant="ghost" size="md">Volver al Lobby</Button>
         </div>
+        
+        {/* Footer con código de sala */}
+        <div className="w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5">
+          <div className="flex items-center justify-between text-sm text-neutral-500">
+            <span>Código de sala:</span>
+            <div className="flex items-center gap-2">
+              <span className="font-mono font-semibold text-neutral-300">{state.gameId}</span>
+              <button
+                onClick={() => onCopyLink()}
+                className="p-1 hover:bg-white/10 rounded transition-colors"
+                title="Copiar enlace"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
         </>
       )}
     </div>
