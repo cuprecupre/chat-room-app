@@ -118,11 +118,16 @@ export default function App() {
     return <Lobby user={user} onCreateGame={createGame} onJoinGame={joinGame} onLogout={handleLogout} />;
   };
 
+  const showHeader = user && connected;
+  const containerClasses = showHeader
+    ? "w-full max-w-4xl mx-auto p-4 sm:p-6 lg:p-8"
+    : "w-full max-w-4xl mx-auto min-h-screen flex items-center justify-center p-0";
+
   return (
     <div className="bg-gray-950 text-white min-h-screen font-sans">
       <Toaster />
-       <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
-        {user && connected && (
+       <div className={containerClasses}>
+        {showHeader && (
           <header className="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
             <h1 className="text-2xl sm:text-3xl font-bold text-neutral-50">El Impostor</h1>
             <div className="flex items-center gap-3 sm:gap-4">
