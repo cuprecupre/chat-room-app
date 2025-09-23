@@ -5,6 +5,7 @@ import { LoginScreen } from './components/LoginScreen';
 import { Lobby } from './components/Lobby';
 import { GameRoom } from './components/GameRoom';
 import { Toaster } from './components/Toaster';
+import { Spinner } from './components/ui/Spinner';
 
 export default function App() {
   const { user, loading, error, login, logout } = useAuth();
@@ -87,9 +88,12 @@ export default function App() {
   if (loading) {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
-        <div className="text-center">
-          <p>Autenticando...</p>
-          <p className="text-sm text-gray-400 mt-2">Verificando sesión...</p>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <Spinner size="md" />
+          <div>
+            <p>Autenticando...</p>
+            <p className="text-sm text-gray-400 mt-1">Verificando sesión...</p>
+          </div>
         </div>
       </div>
     );
@@ -98,9 +102,12 @@ export default function App() {
   if (user && !connected) {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
-        <div className="text-center">
-          <p>Conectando al servidor...</p>
-          <p className="text-sm text-gray-400 mt-2">Estableciendo conexión...</p>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <Spinner size="md" />
+          <div>
+            <p>Conectando al servidor...</p>
+            <p className="text-sm text-gray-400 mt-1">Estableciendo conexión...</p>
+          </div>
         </div>
       </div>
     );

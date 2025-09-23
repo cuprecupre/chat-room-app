@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from './ui/Button';
+import { Spinner } from './ui/Spinner';
 import heroImg from '../assets/impostor-home.png';
 
 function Screen({ children }) {
@@ -23,7 +24,10 @@ export function LoginScreen({ onLogin, error, isLoading }) {
           size="md"
           className="bg-white/5 border-white/10 text-white hover:bg-white/10"
         >
-          <span className="mr-3 inline-block align-middle">
+          <span className="mr-3 inline-flex items-center justify-center align-middle">
+            {isLoading ? (
+              <Spinner size="sm" />
+            ) : (
             <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
               <g clipPath="url(#clip0_643_9687)">
                 <path d="M8.00018 3.16667C9.18018 3.16667 10.2368 3.57333 11.0702 4.36667L13.3535 2.08333C11.9668 0.793333 10.1568 0 8.00018 0C4.87352 0 2.17018 1.79333 0.853516 4.40667L3.51352 6.47C4.14352 4.57333 5.91352 3.16667 8.00018 3.16667Z" fill="#EA4335"/>
@@ -37,6 +41,7 @@ export function LoginScreen({ onLogin, error, isLoading }) {
                 </clipPath>
               </defs>
             </svg>
+            )}
           </span>
           <span className="align-middle">{isLoading ? 'Conectando...' : 'Continuar con Google'}</span>
         </Button>
