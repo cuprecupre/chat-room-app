@@ -96,7 +96,7 @@ const verifyFirebaseToken = async (req, res, next) => {
 // --- Server Setup: serve only the React (shadcn) app build ---
 const clientDist = path.join(__dirname, 'client', 'dist');
 app.use(express.static(clientDist));
-// SPA fallback
+// SPA fallback con inyección de OG absoluta
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/socket.io/')) return next();
   const indexPath = path.join(clientDist, 'index.html');
@@ -105,7 +105,29 @@ app.get('*', (req, res, next) => {
       .status(500)
       .send('Client build not found. Run "npm run build" inside the client/ folder.');
   }
-  res.sendFile(indexPath);
+  try {
+    const raw = fs.readFileSync(indexPath, 'utf8');
+    const host = req.get('x-forwarded-host') || req.get('host');
+    const proto = req.get('x-forwarded-proto') || req.protocol || 'https';
+    const baseUrl = `${proto}://${host}`;
+    const absoluteOg = `${baseUrl}/og.png`;
+    const absoluteFav = `${baseUrl}/favicon.png`;
+    // Reemplazos simples para asegurar URLs absolutas en OG/Twitter y opcionalmente favicon
+    let html = raw
+      .replace(/(property=\"og:image\"\s+content=)\"[^\"]*\"/g, `$1"${absoluteOg}"`)
+      .replace(/(name=\"twitter:image\"\s+content=)\"[^\"]*\"/g, `$1"${absoluteOg}"`)
+      .replace(/(rel=\"icon\"[^>]*href=)\"[^\"]*\"/g, `$1"${absoluteFav}"`);
+    // Asegurar og:url presente
+    if (!/property=\"og:url\"/.test(html)) {
+      const injectTag = `\n    <meta property="og:url" content="${baseUrl}${req.originalUrl}" />`;
+      html = html.replace(/<title>[\s\S]*?<\/title>/, (m) => `${m}${injectTag}`);
+    }
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(html);
+  } catch (e) {
+    // Si falla la inyección, servir archivo estático
+    res.sendFile(indexPath);
+  }
 });
 
 // --- In-memory State ---
@@ -183,7 +205,7 @@ io.on('connection', (socket) => {
         // Allow rejoining the same game, but not a different one
         const userGame = findUserGame(user.uid);
         if (userGame && userGame.gameId !== gameId) {
-             return socket.emit('error-message', 'Ya estás en otra partida.');
+             return socket.emit('error-message', 'Ya estás en una partida. Debes abandonar la actual antes de unirte a otra.');
         }
         
         gameToJoin.addPlayer(user);
