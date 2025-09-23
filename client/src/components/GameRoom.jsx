@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 // removed icons from labels
 import { Button } from './ui/Button';
 import keyImg from '../assets/llave.png';
@@ -62,6 +62,8 @@ function PlayerList({ players, currentUserId }) {
 export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAgain, onLeaveGame, onCopyLink, onCopyGameCode }) {
   const capitalize = (s) => (typeof s === 'string' && s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s);
   const prevPlayersRef = useRef(state.players);
+  const [reveal, setReveal] = useState(false);
+  const revealTimeoutRef = useRef(null);
 
   useEffect(() => {
     const previousPlayers = prevPlayersRef.current;
@@ -78,6 +80,19 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
     prevPlayersRef.current = currentPlayers;
   }, [state.players]);
+
+  // Reveal helpers
+  const triggerReveal = () => {
+    if (revealTimeoutRef.current) clearTimeout(revealTimeoutRef.current);
+    setReveal(true);
+    revealTimeoutRef.current = setTimeout(() => setReveal(false), 5000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (revealTimeoutRef.current) clearTimeout(revealTimeoutRef.current);
+    };
+  }, []);
 
   return (
     <div className="w-full flex flex-col items-center space-y-6">
@@ -132,31 +147,52 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'playing' && (
         <>
-        <div className="w-full max-w-sm mx-auto text-center rounded-xl p-8 flex flex-col bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl">
-          <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-400">
-            <span>Tu rol</span>
-          </div>
-          <p className="text-xl font-semibold mt-2 text-neutral-50">{capitalize(state.role)}</p>
-          {state.role === 'impostor' ? (
-            <>
-              {state.secretCategory && (
-                <p className="text-sm text-gray-300 mt-3">
-                  La categoría de la palabra secreta es:<br />
-                  <span className="text-neutral-50 font-semibold uppercase">{state.secretCategory}</span>
-                </p>
-              )}
-            </>
-          ) : (
-            <>
-              <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300 mt-4">
-                <span>Palabra secreta</span>
+        <div className="w-full max-w-sm mx-auto flip-card relative z-10 pointer-events-auto h-56 md:h-64">
+          <div className={`flip-card-inner h-full ${reveal ? 'is-flipped' : ''}`}>
+            {/* Frente completo (card completa con CTA) */}
+            <div className="flip-card-front">
+              <div className="text-center rounded-xl p-8 bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl h-full flex items-center justify-center">
+                <div className="flex flex-col items-center gap-3">
+                  <button
+                    onClick={triggerReveal}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm text-neutral-200 border border-white/10 hover:bg-white/10 active:bg-white/20"
+                    title="Ver mi carta"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    Ver mi carta
+                  </button>
+                </div>
               </div>
-              <p className="font-semibold text-xl mt-2 text-neutral-50">
-                {capitalize(state.secretWord)}
-              </p>
-            </>
-          )}
-          {/* Botón Terminar Partida fuera del recuadro */}
+            </div>
+            {/* Dorso completo (card completa con información) */}
+            <div className="flip-card-back">
+              <div className="text-center rounded-xl p-8 bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl h-full flex flex-col items-center justify-center">
+                <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-400">
+                  <span>Tu rol</span>
+                </div>
+                <p className="text-xl font-semibold mt-2 text-neutral-50">{capitalize(state.role)}</p>
+                {state.role === 'impostor' ? (
+                  <>
+                    {state.secretCategory && (
+                      <p className="text-sm text-gray-300 mt-3">
+                        La categoría de la palabra secreta es:<br />
+                        <span className="text-neutral-50 font-semibold uppercase">{state.secretCategory}</span>
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300 mt-4">
+                      <span>Palabra secreta</span>
+                    </div>
+                    <p className="font-semibold text-xl mt-2 text-neutral-50">
+                      {capitalize(state.secretWord)}
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
         {isHost && (
           <div className="w-full max-w-sm mx-auto">
