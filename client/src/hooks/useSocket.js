@@ -48,6 +48,18 @@ export function useSocket(user) {
             attemptedResumeRef.current = true;
             socket.emit('join-game', gameIdFromUrl);
           }
+          
+          // Start heartbeat to keep connection alive
+          const heartbeatInterval = setInterval(() => {
+            if (socket.connected) {
+              socket.emit('heartbeat');
+            } else {
+              clearInterval(heartbeatInterval);
+            }
+          }, 30000); // Send heartbeat every 30 seconds
+          
+          // Store interval for cleanup
+          socket.heartbeatInterval = heartbeatInterval;
         });
 
         socket.on('disconnect', () => {
@@ -106,6 +118,10 @@ export function useSocket(user) {
       isMounted = false;
       if (socketRef.current) {
         console.log('Cleaning up socket connection...');
+        // Clear heartbeat interval
+        if (socketRef.current.heartbeatInterval) {
+          clearInterval(socketRef.current.heartbeatInterval);
+        }
         socketRef.current.disconnect();
         socketRef.current = null;
       }

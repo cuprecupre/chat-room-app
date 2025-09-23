@@ -154,6 +154,8 @@ const games = {}; // { gameId: Game_instance }
 const userSockets = {}; // { userId: socket.id }
 // Users pending removal after grace period: { [uid]: { timeout, gameId } }
 const pendingDisconnects = {};
+// Heartbeat tracking: { [uid]: { lastSeen, timeout } }
+const userHeartbeats = {};
 
 // Helper to find which game a user belongs to (global scope)
 const findUserGame = (userId) => Object.values(games).find(g => g.players.some(p => p.uid === userId));
@@ -183,6 +185,12 @@ io.on('connection', (socket) => {
     const user = socket.user;
     console.log(`User connected: ${user.name} (${user.uid})`);
     userSockets[user.uid] = socket.id;
+    
+    // Initialize heartbeat for this user
+    userHeartbeats[user.uid] = {
+        lastSeen: Date.now(),
+        timeout: null
+    };
 
     // Reconnection logic: if user is already in a game, join room and send state
     const existingGame = findUserGame(user.uid);
@@ -289,6 +297,12 @@ io.on('connection', (socket) => {
 
         console.log(`User ${user.name} is leaving game ${gameId}`);
         
+        // Clear any pending disconnect timer since user is manually leaving
+        if (pendingDisconnects[user.uid]) {
+            clearTimeout(pendingDisconnects[user.uid].timeout);
+            delete pendingDisconnects[user.uid];
+        }
+        
         // Remove player from the game model
         game.removePlayer(user.uid);
         
@@ -300,28 +314,69 @@ io.on('connection', (socket) => {
         emitGameState(game);
     });
 
+    // Heartbeat handler to detect if user is still active
+    socket.on('heartbeat', () => {
+        if (userHeartbeats[user.uid]) {
+            userHeartbeats[user.uid].lastSeen = Date.now();
+            // Clear any existing timeout
+            if (userHeartbeats[user.uid].timeout) {
+                clearTimeout(userHeartbeats[user.uid].timeout);
+            }
+            // Set new timeout for 2 minutes of inactivity
+            userHeartbeats[user.uid].timeout = setTimeout(() => {
+                console.log(`User ${user.name} appears to be inactive, but keeping in game`);
+                // Don't remove from game, just log for monitoring
+            }, 120000); // 2 minutes
+        }
+    });
+
     socket.on('disconnect', () => {
         console.log(`User disconnected: ${user.name}`);
         const userGame = findUserGame(user.uid);
         if (userGame) {
-            // Start grace period before removing the player
-            if (pendingDisconnects[user.uid]) {
-                clearTimeout(pendingDisconnects[user.uid].timeout);
+            // Check if user was recently active (within last 2 minutes)
+            const heartbeat = userHeartbeats[user.uid];
+            const timeSinceLastSeen = heartbeat ? Date.now() - heartbeat.lastSeen : Infinity;
+            const wasRecentlyActive = timeSinceLastSeen < 120000; // 2 minutes
+            
+            if (wasRecentlyActive) {
+                // User was recently active, likely just mobile lock - start long grace period
+                if (pendingDisconnects[user.uid]) {
+                    clearTimeout(pendingDisconnects[user.uid].timeout);
+                }
+                pendingDisconnects[user.uid] = {
+                    gameId: userGame.gameId,
+                    timeout: setTimeout(() => {
+                        const g = games[userGame.gameId];
+                        if (!g) return;
+                        console.log(`[Grace Expired] Removing user ${user.name} from game ${userGame.gameId} after 5 minutes`);
+                        g.removePlayer(user.uid);
+                        emitGameState(g);
+                        delete pendingDisconnects[user.uid];
+                    }, 300000) // 5 minutes grace period for mobile users who lock their phones
+                };
+                console.log(`[Disconnect] Long grace timer started for user ${user.name} in game ${userGame.gameId} (mobile lock detected)`);
+            } else {
+                // User was inactive for a while, likely real disconnect - shorter grace period
+                if (pendingDisconnects[user.uid]) {
+                    clearTimeout(pendingDisconnects[user.uid].timeout);
+                }
+                pendingDisconnects[user.uid] = {
+                    gameId: userGame.gameId,
+                    timeout: setTimeout(() => {
+                        const g = games[userGame.gameId];
+                        if (!g) return;
+                        console.log(`[Grace Expired] Removing user ${user.name} from game ${userGame.gameId} after 1 minute`);
+                        g.removePlayer(user.uid);
+                        emitGameState(g);
+                        delete pendingDisconnects[user.uid];
+                    }, 60000) // 1 minute for users who were already inactive
+                };
+                console.log(`[Disconnect] Short grace timer started for user ${user.name} in game ${userGame.gameId} (was already inactive)`);
             }
-            pendingDisconnects[user.uid] = {
-                gameId: userGame.gameId,
-                timeout: setTimeout(() => {
-                    const g = games[userGame.gameId];
-                    if (!g) return;
-                    console.log(`[Grace Expired] Removing user ${user.name} from game ${userGame.gameId}`);
-                    g.removePlayer(user.uid);
-                    emitGameState(g);
-                    delete pendingDisconnects[user.uid];
-                }, 60000) // 60s grace period - increased from 30s
-            };
-            console.log(`[Disconnect] Grace timer started for user ${user.name} in game ${userGame.gameId}`);
         }
         delete userSockets[user.uid];
+        delete userHeartbeats[user.uid];
     });
 });
 
