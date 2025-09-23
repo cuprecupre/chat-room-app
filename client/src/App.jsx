@@ -129,7 +129,7 @@ export default function App() {
        <div className={containerClasses}>
         {showHeader && (
           <header className="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
-            <h1 className="text-2xl sm:text-3xl font-bold text-neutral-50">El Impostor</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-neutral-50">El impostor</h1>
             <div className="flex items-center gap-3 sm:gap-4">
               <span className="text-sm sm:text-base font-medium hidden sm:inline">{user.displayName}</span>
               <div className="relative" ref={menuRef}>
