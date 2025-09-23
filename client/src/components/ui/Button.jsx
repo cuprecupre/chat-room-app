@@ -9,7 +9,7 @@ const variantClasses = {
   secondary: 'bg-neutral-600 text-white hover:bg-neutral-700',
   danger: 'bg-red-500 text-white hover:bg-red-600',
   outline: 'border border-neutral-500 text-gray-200 hover:bg-white/10',
-  ghost: 'text-gray-400 hover:text-gray-300',
+  ghost: 'text-neutral-400 hover:text-neutral-300',
 };
 
 const sizeClasses = {
