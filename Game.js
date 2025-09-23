@@ -1,4 +1,4 @@
-const words = require('./words');
+const { getRandomWordWithCategory } = require('./words');
 
 class Game {
   constructor(hostUser) {
@@ -7,6 +7,7 @@ class Game {
     this.players = [];
     this.phase = 'lobby'; // lobby, game, over, lobby_wait (per-user)
     this.secretWord = '';
+    this.secretCategory = '';
     this.impostorId = '';
     this.roundPlayers = []; // uids activos en la ronda actual
 
@@ -45,7 +46,10 @@ class Game {
     const impostorIndex = Math.floor(Math.random() * this.roundPlayers.length);
     this.impostorId = this.roundPlayers[impostorIndex];
 
-    this.secretWord = words[Math.floor(Math.random() * words.length)];
+    const { word, category } = getRandomWordWithCategory();
+    this.secretWord = word;
+    this.secretCategory = category;
+    console.log(`[Game ${this.gameId}] Nueva ronda: palabra='${this.secretWord}', categoría='${this.secretCategory}', impostor='${this.impostorId}'`);
 
     this.phase = 'playing';
 
@@ -61,6 +65,7 @@ class Game {
     
     // Reset game state
     this.secretWord = '';
+    this.secretCategory = '';
     this.impostorId = '';
     this.roundPlayers = [];
     
@@ -68,7 +73,10 @@ class Game {
     this.roundPlayers = this.players.map(p => p.uid);
     const impostorIndex = Math.floor(Math.random() * this.roundPlayers.length);
     this.impostorId = this.roundPlayers[impostorIndex];
-    this.secretWord = words[Math.floor(Math.random() * words.length)];
+    const { word, category } = getRandomWordWithCategory();
+    this.secretWord = word;
+    this.secretCategory = category;
+    console.log(`[Game ${this.gameId}] Otra ronda: palabra='${this.secretWord}', categoría='${this.secretCategory}', impostor='${this.impostorId}'`);
     this.phase = 'playing';
   }
 
@@ -89,7 +97,11 @@ class Game {
         baseState.phase = 'lobby_wait';
       } else {
         baseState.role = this.impostorId === userId ? 'impostor' : 'amigo';
-        baseState.secretWord = this.impostorId === userId ? 'Descubre la palabra secreta' : this.secretWord;
+        const isImpostor = this.impostorId === userId;
+        baseState.secretWord = isImpostor ? 'Descubre la palabra secreta' : this.secretWord;
+        if (isImpostor) {
+          baseState.secretCategory = this.secretCategory;
+        }
       }
     } else if (this.phase === 'over') {
       const impostor = this.players.find(p => p.uid === this.impostorId);

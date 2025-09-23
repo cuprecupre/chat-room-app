@@ -132,13 +132,20 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'playing' && (
         <>
-        <div className="w-full max-w-sm mx-auto text-center rounded-xl p-6 flex flex-col bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl">
+        <div className="w-full max-w-sm mx-auto text-center rounded-xl p-8 flex flex-col bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl">
           <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-400">
             <span>Tu rol</span>
           </div>
           <p className="text-xl font-semibold mt-2 text-neutral-50">{capitalize(state.role)}</p>
           {state.role === 'impostor' ? (
-            <p className="text-sm text-gray-300 mt-3">Tu objetivo es adivinar la palabra secreta.</p>
+            <>
+              {state.secretCategory && (
+                <p className="text-sm text-gray-300 mt-3">
+                  La categoría de la palabra secreta es:<br />
+                  <span className="text-neutral-50 font-semibold uppercase">{state.secretCategory}</span>
+                </p>
+              )}
+            </>
           ) : (
             <>
               <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300 mt-4">
@@ -185,7 +192,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'over' && (
         <>
-        <div className="w-full max-w-sm mx-auto text-center rounded-xl p-6 space-y-4 flex flex-col bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl">
+        <div className="w-full max-w-sm mx-auto text-center rounded-xl p-8 space-y-4 flex flex-col bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl">
           <div>
             <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300">
               <span>Impostor</span>
