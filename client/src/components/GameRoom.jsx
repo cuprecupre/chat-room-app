@@ -11,19 +11,49 @@ function PlayerList({ players, currentUserId }) {
     return 0;
   });
 
+  const handleImageError = (e) => {
+    console.log('❌ Error cargando imagen:', e.target.src);
+    // Si la imagen falla, mostrar iniciales del nombre
+    const name = e.target.alt || 'U';
+    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    e.target.style.display = 'none';
+    e.target.nextSibling.textContent = initials;
+    e.target.nextSibling.style.display = 'flex';
+  };
+
   return (
     <div className="w-full rounded-lg">
       <p className="text-sm font-regular mb-3 text-neutral-600">Jugadores Conectados: {players.length}</p>
       <ul className="space-y-2">
-        {sortedPlayers.map(p => (
-          <li key={p.uid} className="flex items-center justify-between bg-white/5 p-4 rounded-md">
-            <div className="flex items-center gap-3">
-              <img src={p.photoURL} alt={p.name} className="w-8 h-8 rounded-full" />
-              <span className="font-medium">{p.name}{p.uid === currentUserId ? ' (Tú)' : ''}</span>
-            </div>
-            <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
-          </li>
-        ))}
+        {sortedPlayers.map(p => {
+          console.log('👤 Jugador:', { name: p.name, photoURL: p.photoURL, uid: p.uid });
+          return (
+            <li key={p.uid} className="flex items-center justify-between bg-white/5 p-4 rounded-md">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <img 
+                    src={p.photoURL} 
+                    alt={p.name} 
+                    className="w-8 h-8 rounded-full object-cover" 
+                    onError={handleImageError}
+                    onLoad={(e) => {
+                      console.log('✅ Imagen cargada:', e.target.src);
+                      // Ocultar placeholder cuando la imagen se carga
+                      e.target.nextSibling.style.display = 'none';
+                    }}
+                  />
+                  <div 
+                    className="w-8 h-8 rounded-full bg-neutral-600 flex items-center justify-center text-white text-xs font-semibold"
+                  >
+                    {p.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                  </div>
+                </div>
+                <span className="font-medium">{p.name}{p.uid === currentUserId ? ' (Tú)' : ''}</span>
+              </div>
+              <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

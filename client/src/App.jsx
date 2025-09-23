@@ -212,7 +212,27 @@ export default function App() {
                   onClick={() => setMenuOpen(v => !v)}
                   className="relative group rounded-full ring-1 ring-transparent hover:ring-white/20 focus:outline-none"
                 >
-                  <img src={user.photoURL} alt={user.displayName} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full" />
+                  <div className="relative">
+                    <img 
+                      src={user.photoURL} 
+                      alt={user.displayName} 
+                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover" 
+                      onError={(e) => {
+                        console.log('❌ Error cargando imagen del header:', e.target.src);
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                      onLoad={(e) => {
+                        e.target.nextSibling.style.display = 'none';
+                      }}
+                    />
+                    <div 
+                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-neutral-600 flex items-center justify-center text-white text-xs font-semibold"
+                      style={{ display: 'none' }}
+                    >
+                      {user.displayName?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U'}
+                    </div>
+                  </div>
                   <span className="pointer-events-none absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 group-active:bg-white/20 transition-opacity" />
                 </button>
                 {menuOpen && (
