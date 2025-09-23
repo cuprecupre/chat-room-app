@@ -3,7 +3,7 @@ import { Button } from './ui/Button';
 import heroImg from '../assets/impostor-home.png';
 
 function Screen({ children }) {
-  return <div className="w-full max-w-md mx-auto p-4 min-h-screen flex flex-col justify-center">{children}</div>;
+  return <div className="w-full max-w-md mx-auto p-4 min-h-dvh flex flex-col justify-center">{children}</div>;
 }
 
 export function LoginScreen({ onLogin, error, isLoading }) {

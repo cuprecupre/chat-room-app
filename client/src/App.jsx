@@ -195,7 +195,7 @@ export default function App() {
   const showHeader = user && connected;
   const containerClasses = showHeader
     ? "w-full max-w-4xl mx-auto p-4 sm:p-6 lg:p-8"
-    : "w-full max-w-4xl mx-auto min-h-screen flex items-center justify-center p-0";
+    : "w-full max-w-4xl mx-auto min-h-dvh flex items-center justify-center p-0";
 
   return (
     <div className="bg-neutral-950 text-white min-h-screen font-sans">
