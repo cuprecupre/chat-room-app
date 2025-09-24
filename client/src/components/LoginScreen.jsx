@@ -45,6 +45,9 @@ export function LoginScreen({ onLogin, error, isLoading }) {
           </span>
           <span className="align-middle">{isLoading ? 'Conectando...' : 'Continuar con Google'}</span>
         </Button>
+        <p className="text-xs text-neutral-400">
+          Si ves un error de “missing initial state”, prueba a desactivar bloqueo de cookies, permitir almacenamiento para esta página o usa el botón otra vez. También puedes abrir en ventana nueva.
+        </p>
         {error && (
           <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 text-red-400">
             <p className="font-semibold">Error al iniciar sesión:</p>

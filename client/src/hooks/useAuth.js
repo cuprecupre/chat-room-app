@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { auth, provider, ensurePersistence, signInWithPopup, signInWithRedirect, onAuthStateChanged, signOut } from '../lib/firebase';
+import { auth, provider, ensurePersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from '../lib/firebase';
 
 export function useAuth() {
   const [user, setUser] = useState(null);
@@ -13,13 +13,17 @@ export function useAuth() {
     let isMounted = true;
     let authResolved = false;
     
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
+    const unsubscribe = onAuthStateChanged(auth, async (u) => {
       console.log('🔄 Estado de autenticación cambió:', u ? `Usuario: ${u.displayName}` : 'Sin usuario');
       authResolved = true;
       if (isMounted) {
         setUser(u);
         setLoading(false);
       }
+    });
+    // Manejar posible flujo de redirect en navegadores con partitioned storage
+    getRedirectResult(auth).catch((err) => {
+      console.warn('⚠️ Redirect result error:', err?.code || err?.message || err);
     });
 
     // Timeout de seguridad solo si la autenticación no se resuelve
