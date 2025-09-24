@@ -46,7 +46,16 @@ export function useSocket(user) {
           const gameIdFromUrl = urlParams.get('gameId');
           if (gameIdFromUrl && !attemptedResumeRef.current) {
             attemptedResumeRef.current = true;
+            // Intento de reanudar sesión
             socket.emit('join-game', gameIdFromUrl);
+            // Si en 2s no llega estado, forzar UI de recuperación
+            if (socket.resumeTimer) clearTimeout(socket.resumeTimer);
+            socket.resumeTimer = setTimeout(() => {
+              if (!socketRef.current) return;
+              console.log('[Socket] Resume timeout, mostrando UI de unión');
+              // No borrar el gameId de la URL: App mostrará la UI de unión/limpieza
+              if (isMounted) setGameState(null);
+            }, 2000);
           }
           
           // Start heartbeat to keep connection alive
@@ -74,6 +83,10 @@ export function useSocket(user) {
         socket.on('game-state', (newState) => {
           console.log('[Socket] Received game-state:', newState ? { phase: newState.phase, role: newState.role } : null);
           if (isMounted) setGameState(newState);
+          if (socket.resumeTimer) {
+            clearTimeout(socket.resumeTimer);
+            socket.resumeTimer = null;
+          }
           const url = new URL(window.location);
           if (newState?.gameId) {
             url.searchParams.set('gameId', newState.gameId);
@@ -102,6 +115,13 @@ export function useSocket(user) {
         socket.on('error-message', (message) => {
           console.error('Server error:', message);
           window.dispatchEvent(new CustomEvent('app:toast', { detail: message }));
+          // Si la sala no existe o no perteneces, limpiar estado y URL para evitar quedar bloqueado
+          if (/no existe|no perteneces/i.test(message)) {
+            const url = new URL(window.location);
+            url.searchParams.delete('gameId');
+            window.history.replaceState({}, '', url.toString());
+            if (isMounted) setGameState(null);
+          }
         });
 
       } catch (error) {

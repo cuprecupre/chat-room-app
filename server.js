@@ -314,6 +314,15 @@ io.on('connection', (socket) => {
         emitGameState(game);
     });
 
+    // Safety: if a client requests their current state explicitly
+    socket.on('get-state', () => {
+        const userGame = findUserGame(user.uid);
+        if (!userGame) {
+            return socket.emit('game-state', null);
+        }
+        socket.emit('game-state', userGame.getStateFor(user.uid));
+    });
+
     // Heartbeat handler to detect if user is still active
     socket.on('heartbeat', () => {
         if (userHeartbeats[user.uid]) {

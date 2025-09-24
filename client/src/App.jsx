@@ -22,6 +22,11 @@ export default function App() {
   }, [user]);
 
   const { connected, gameState, emit } = useSocket(user);
+  const getUrlGameId = () => {
+    try {
+      return new URL(window.location).searchParams.get('gameId');
+    } catch (_) { return null; }
+  };
 
   const isHost = useMemo(() => gameState && user && gameState.hostId === user.uid, [gameState, user]);
 
@@ -65,6 +70,23 @@ export default function App() {
       console.error("Error during logout:", e);
     }
   }, [logout]);
+  // Minimal recovery bar: always show controls if URL has gameId but no session
+  const urlGameId = getUrlGameId();
+  const RecoveryBar = () => {
+    if (!urlGameId || gameState?.gameId) return null;
+    return (
+      <div className="w-full max-w-sm mx-auto mb-4">
+        <div className="rounded-xl p-3 bg-white/5 ring-1 ring-white/10 text-center">
+          <p className="text-sm text-neutral-300">Tienes una sala en la URL: <span className="font-mono">{urlGameId}</span></p>
+          <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <button onClick={() => emit('join-game', urlGameId)} className="inline-flex items-center justify-center rounded-md h-10 text-sm text-neutral-200 border border-neutral-500 hover:bg-white/10">Unirme</button>
+            <button onClick={() => emit('get-state')} className="inline-flex items-center justify-center rounded-md h-10 text-sm text-neutral-200 border border-neutral-500 hover:bg-white/10">Reintentar</button>
+            <button onClick={() => { const url=new URL(window.location); url.searchParams.delete('gameId'); window.history.replaceState({}, '', url.toString()); window.dispatchEvent(new Event('popstate')); }} className="inline-flex items-center justify-center rounded-md h-10 text-sm text-neutral-400 hover:text-neutral-300">Volver al lobby</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // Cerrar dropdown al hacer click fuera o al presionar Escape
   useEffect(() => {
@@ -174,6 +196,12 @@ export default function App() {
               >
                 Volver al lobby
               </button>
+              <button
+                onClick={() => emit('get-state')}
+                className="w-full inline-flex items-center justify-center rounded-md font-semibold transition-colors h-11 text-base text-neutral-400 hover:text-neutral-300"
+              >
+                Reintentar sincronización
+              </button>
             </div>
           </div>
         </div>
@@ -261,6 +289,7 @@ export default function App() {
             </div>
           </header>
         )}
+        {showHeader && <RecoveryBar />}
         <main>
           {renderContent()}
         </main>
