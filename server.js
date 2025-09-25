@@ -184,6 +184,18 @@ io.use(async (socket, next) => {
 io.on('connection', (socket) => {
     const user = socket.user;
     console.log(`User connected: ${user.name} (${user.uid})`);
+    
+    // Handle multiple sessions: if user already has a socket, disconnect the old one
+    if (userSockets[user.uid]) {
+        const oldSocketId = userSockets[user.uid];
+        const oldSocket = io.sockets.sockets.get(oldSocketId);
+        if (oldSocket) {
+            console.log(`Disconnecting old session for user ${user.name}`);
+            oldSocket.emit('session-replaced', 'Tu sesión ha sido reemplazada por una nueva pestaña');
+            oldSocket.disconnect(true);
+        }
+    }
+    
     userSockets[user.uid] = socket.id;
     
     // Initialize heartbeat for this user
@@ -384,7 +396,10 @@ io.on('connection', (socket) => {
                 console.log(`[Disconnect] Short grace timer started for user ${user.name} in game ${userGame.gameId} (was already inactive)`);
             }
         }
-        delete userSockets[user.uid];
+        // Only delete userSockets if this is the current socket (not replaced)
+        if (userSockets[user.uid] === socket.id) {
+            delete userSockets[user.uid];
+        }
         delete userHeartbeats[user.uid];
     });
 });

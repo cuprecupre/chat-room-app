@@ -19,7 +19,7 @@ export function Lobby({ onCreateGame, onJoinGame }) {
     <div className="w-full space-y-8">
       <div className="text-center space-y-4">
         <img src={homeImg} alt="Impostor" className="mx-auto w-48 h-48 sm:w-48 sm:h-48 rounded-full object-cover shadow-lg ring-1 ring-white/10" loading="lazy" />
-        <h2 className="text-3xl sm:text-4xl font-bold text-neutral-50">Empieza a jugar</h2>
+        <h2 className="text-3xl sm:text-4xl font-bold text-neutral-50">Empezar una partida</h2>
         <p className="text-lg text-gray-400 mt-2">Crea una nueva partida o únete a una existente.</p>
       </div>
       <div className="max-w-sm mx-auto space-y-4">

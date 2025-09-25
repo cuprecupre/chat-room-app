@@ -5,7 +5,7 @@ function classNames(list) {
 }
 
 const variantClasses = {
-  primary: 'bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800',
+  primary: 'bg-orange-700 text-white hover:bg-orange-800 active:bg-orange-900',
   secondary: 'bg-neutral-600 text-white hover:bg-neutral-700 active:bg-neutral-800',
   danger: 'bg-red-500 text-white hover:bg-red-600 active:bg-red-700',
   outline: 'border border-neutral-500 text-gray-200 hover:bg-white/10 active:bg-white/20',
@@ -18,7 +18,7 @@ const sizeClasses = {
   lg: 'h-12 text-lg',
 };
 
-const baseClasses = 'w-full inline-flex items-center justify-center rounded-md font-semibold transition-all duration-150 active:scale-95 touch-manipulation focus:outline-none ring-1 ring-transparent focus-visible:ring-white/20 disabled:bg-neutral-500 disabled:text-gray-400 disabled:cursor-not-allowed';
+const baseClasses = 'w-full inline-flex items-center justify-center rounded-3xl font-semibold transition-all duration-150 active:scale-95 touch-manipulation focus:outline-none ring-1 ring-transparent focus-visible:ring-white/20 disabled:bg-neutral-500 disabled:text-gray-400 disabled:cursor-not-allowed';
 
 export function Button({
   children,

@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 // removed icons from labels
 import { Button } from './ui/Button';
 import keyImg from '../assets/llave.png';
+import dualImpostorImg from '../assets/dual-impostor.png';
+import cardImg from '../assets/card.png';
+import cardBackImg from '../assets/card-back.png';
 
 function PlayerList({ players, currentUserId }) {
   // Ordenar jugadores para que el usuario actual aparezca primero
@@ -23,7 +26,7 @@ function PlayerList({ players, currentUserId }) {
 
   return (
     <div className="w-full rounded-lg">
-      <p className="text-sm font-regular mb-3 text-neutral-600">Jugadores Conectados: {players.length}</p>
+      <p className="text-sm font-regular mb-3 text-neutral-500">Jugadores Conectados: {players.length}</p>
       <ul className="space-y-2">
         {sortedPlayers.map(p => {
           console.log('👤 Jugador:', { name: p.name, photoURL: p.photoURL, uid: p.uid });
@@ -63,6 +66,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   const capitalize = (s) => (typeof s === 'string' && s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s);
   const prevPlayersRef = useRef(state.players);
   const [reveal, setReveal] = useState(false);
+  const [userInteracted, setUserInteracted] = useState(false);
   const revealTimeoutRef = useRef(null);
 
   useEffect(() => {
@@ -84,9 +88,20 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   // Reveal helpers
   const triggerReveal = () => {
     if (revealTimeoutRef.current) clearTimeout(revealTimeoutRef.current);
-    setReveal(true);
-    revealTimeoutRef.current = setTimeout(() => setReveal(false), 5000);
+    setUserInteracted(true); // Marcar que el usuario ha interactuado
+    setReveal(!reveal); // Toggle entre mostrar/ocultar
   };
+
+  // Auto-reveal después de 10 segundos (solo si el usuario no ha interactuado)
+  useEffect(() => {
+    if (state.phase === 'playing' && !reveal && !userInteracted) {
+      const autoRevealTimer = setTimeout(() => {
+        setReveal(true);
+      }, 10000);
+      
+      return () => clearTimeout(autoRevealTimer);
+    }
+  }, [state.phase, reveal, userInteracted]);
 
   useEffect(() => {
     return () => {
@@ -99,8 +114,8 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'lobby' && (
         <div className="w-full max-w-sm mx-auto text-center space-y-4">
-          <img src={keyImg} alt="Esperando jugadores" className="mx-auto w-48 h-48 sm:w-48 sm:h-48 rounded-full object-cover shadow-lg ring-1 ring-white/10" loading="lazy" />
-          <h2 className="text-3xl sm:text-4xl font-bold text-neutral-50">Invita a tus amigos para empezar</h2>
+          <img src={dualImpostorImg} alt="Esperando jugadores" className="mx-auto w-48 h-48 sm:w-48 sm:h-48 rounded-full object-cover shadow-lg ring-1 ring-white/10" loading="lazy" />
+          <h2 className="text-3xl sm:text-4xl font-bold text-neutral-50">Invita a tus amigos<br />para empezar</h2>
           <p className="text-lg text-neutral-400 mt-2">Se necesitan al menos 4 jugadores.</p>
           <div className="w-full space-y-3">
             {isHost && (
@@ -126,7 +141,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             <div className="space-y-4">
               <button
                 onClick={() => onCopyGameCode()}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 rounded-md transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150"
                 title="Copiar código"
               >
                 <span>Código de sala: <span className="font-mono font-semibold text-neutral-300">{state.gameId}</span></span>
@@ -147,56 +162,83 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'playing' && (
         <>
-        <div className="w-full max-w-sm mx-auto flip-card relative z-10 pointer-events-auto h-56 md:h-64">
-          <div className={`flip-card-inner h-full ${reveal ? 'is-flipped' : ''}`}>
-            {/* Frente completo (card completa con CTA) */}
-            <div className="flip-card-front">
-              <div className="text-center rounded-xl p-8 bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl h-full flex items-center justify-center">
-                <div className="flex flex-col items-center gap-3">
-                  <button
+        <div className="w-full max-w-sm mx-auto text-center mb-4">
+          <h2 className="text-2xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>Esta es tu carta</h2>
+        </div>
+        <div className="w-full max-w-sm mx-auto space-y-3">
+          <div className="flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full">
+            <div className={`flip-card-inner h-full ${reveal ? 'is-flipped' : ''}`}>
+              {/* Frente completo (card completa con imagen) */}
+              <div className="flip-card-front">
+                <div className="h-full flex items-center justify-center">
+                  <img 
+                    src={cardImg} 
+                    alt="Frente de la carta" 
+                    className="w-full h-full object-cover rounded-xl cursor-pointer" 
                     onClick={triggerReveal}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm text-neutral-200 border border-white/10 hover:bg-white/10 active:bg-white/20"
                     title="Ver mi carta"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                    Ver mi carta
-                  </button>
+                  />
                 </div>
               </div>
-            </div>
-            {/* Dorso completo (card completa con información) */}
-            <div className="flip-card-back">
-              <div className="text-center rounded-xl p-8 bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl h-full flex flex-col items-center justify-center">
-                <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-400">
-                  <span>Tu rol</span>
-                </div>
-                <p className="text-xl font-semibold mt-2 text-neutral-50">{capitalize(state.role)}</p>
-                {state.role === 'impostor' ? (
-                  <>
-                    {state.secretCategory && (
-                      <p className="text-sm text-gray-300 mt-3">
-                        La categoría de la palabra secreta es:<br />
-                        <span className="text-neutral-50 font-semibold uppercase">{state.secretCategory}</span>
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300 mt-4">
-                      <span>Palabra secreta</span>
+              {/* Dorso completo (card completa con información) */}
+              <div className="flip-card-back">
+                <div className="relative h-full flex flex-col items-center justify-center rounded-xl overflow-hidden">
+                  {/* Imagen de fondo */}
+                  <img 
+                    src={cardBackImg} 
+                    alt="Fondo del dorso" 
+                    className="absolute inset-0 w-full h-full object-cover" 
+                  />
+                  {/* Contenido sobre la imagen */}
+                  <div className="relative z-10 text-center p-8 backdrop-blur-sm rounded-xl">
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300">
+                          <span>Tu rol</span>
+                        </div>
+                        <p className="text-xl font-semibold mt-1 text-white" style={{fontFamily: 'Trocchi, serif'}}>{capitalize(state.role)}</p>
+                      </div>
+                      {state.role === 'impostor' ? (
+                        <>
+                          {state.secretCategory && (
+                            <p className="text-sm text-gray-200">
+                              La pista para descubrir la palabra secreta es:<br />
+                              <span className="text-white font-semibold uppercase" style={{fontFamily: 'Trocchi, serif'}}>{state.secretCategory}</span>
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <div>
+                          <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-200">
+                            <span>Palabra secreta</span>
+                          </div>
+                          <p className="font-semibold text-xl mt-1 text-white" style={{fontFamily: 'Trocchi, serif'}}>
+                            {capitalize(state.secretWord)}
+                          </p>
+                        </div>
+                      )}
                     </div>
-                    <p className="font-semibold text-xl mt-2 text-neutral-50">
-                      {capitalize(state.secretWord)}
-                    </p>
-                  </>
-                )}
+                  </div>
+                </div>
               </div>
             </div>
+          </div>
+          {/* Botón Girar carta */}
+          <div className="flex justify-center">
+            <button
+              onClick={triggerReveal}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm text-neutral-400 hover:text-neutral-300 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150 border border-neutral-600/30 hover:border-neutral-500/50"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Girar carta</span>
+            </button>
           </div>
         </div>
         {isHost && (
           <div className="w-full max-w-sm mx-auto">
-            <Button onClick={onEndGame} variant="danger" size="md">Terminar Partida</Button>
+            <Button onClick={onEndGame} variant="outline" size="md" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20">Terminar Partida</Button>
           </div>
         )}
         <div className="w-full max-w-sm mx-auto mt-4">
@@ -207,7 +249,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           <div className="space-y-4">
             <button
               onClick={() => onCopyGameCode()}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 rounded-md transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150"
               title="Copiar código"
             >
               <span>Código de sala: <span className="font-mono font-semibold text-neutral-300">{state.gameId}</span></span>
@@ -228,18 +270,52 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'over' && (
         <>
-        <div className="w-full max-w-sm mx-auto text-center rounded-xl p-8 space-y-4 flex flex-col bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10 shadow-xl">
-          <div>
-            <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300">
-              <span>Impostor</span>
+        <div className="w-full max-w-sm mx-auto text-center mb-4">
+          <h2 className="text-2xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>Resultados</h2>
+        </div>
+        <div className="w-full max-w-sm mx-auto space-y-3">
+          <div className="flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full">
+            <div className="flip-card-inner h-full is-flipped">
+              {/* Frente completo (card completa con imagen) */}
+              <div className="flip-card-front">
+                <div className="h-full flex items-center justify-center">
+                  <img 
+                    src={cardImg} 
+                    alt="Frente de la carta" 
+                    className="w-full h-full object-cover rounded-xl" 
+                  />
+                </div>
+              </div>
+              {/* Dorso completo (card completa con información) */}
+              <div className="flip-card-back">
+                <div className="relative h-full flex flex-col items-center justify-center rounded-xl overflow-hidden">
+                  {/* Imagen de fondo */}
+                  <img 
+                    src={cardBackImg} 
+                    alt="Fondo del dorso" 
+                    className="absolute inset-0 w-full h-full object-cover" 
+                  />
+                  {/* Contenido sobre la imagen */}
+                  <div className="relative z-10 text-center p-8 backdrop-blur-sm rounded-xl">
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300">
+                          <span>Impostor</span>
+                        </div>
+                        <p className="font-semibold text-lg text-orange-400 mt-1" style={{fontFamily: 'Trocchi, serif'}}>{state.impostorName}</p>
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300">
+                          <span>Palabra secreta</span>
+                        </div>
+                        <p className="font-semibold text-xl mt-1 text-orange-400" style={{fontFamily: 'Trocchi, serif'}}>{capitalize(state.secretWord)}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <p className="font-semibold text-lg text-red-400 mt-2">{state.impostorName}</p>
-            <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300 mt-4">
-              <span>Palabra secreta</span>
-            </div>
-            <p className="font-semibold text-xl mt-2 text-neutral-50">{capitalize(state.secretWord)}</p>
           </div>
-          {/* Botón Jugar Otra Ronda fuera del recuadro */}
         </div>
         {isHost && (
           <div className="w-full max-w-sm mx-auto">
@@ -254,7 +330,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           <div className="space-y-4">
             <button
               onClick={() => onCopyGameCode()}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 rounded-md transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150"
               title="Copiar código"
             >
               <span>Código de sala: <span className="font-mono font-semibold text-neutral-300">{state.gameId}</span></span>

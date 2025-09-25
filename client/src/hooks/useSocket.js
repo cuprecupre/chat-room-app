@@ -124,6 +124,19 @@ export function useSocket(user) {
           }
         });
 
+        socket.on('session-replaced', (message) => {
+          console.log('Session replaced:', message);
+          window.dispatchEvent(new CustomEvent('app:toast', { detail: message }));
+          // Clear game state and redirect to lobby
+          if (isMounted) {
+            setGameState(null);
+            setConnected(false);
+            const url = new URL(window.location);
+            url.searchParams.delete('gameId');
+            window.history.replaceState({}, '', url.toString());
+          }
+        });
+
       } catch (error) {
         console.error('Failed to get Firebase token for socket connection:', error);
       }

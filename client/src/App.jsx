@@ -6,6 +6,7 @@ import { Lobby } from './components/Lobby';
 import { GameRoom } from './components/GameRoom';
 import { Toaster } from './components/Toaster';
 import { Spinner } from './components/ui/Spinner';
+import bellImg from './assets/bell.png';
 
 export default function App() {
   const { user, loading, error, login, logout } = useAuth();
@@ -22,6 +23,21 @@ export default function App() {
   }, [user]);
 
   const { connected, gameState, emit } = useSocket(user);
+  const [isStuck, setIsStuck] = useState(false);
+  
+  // Detect when app is stuck (no connection for 10 seconds)
+  useEffect(() => {
+    if (user && !connected) {
+      const timer = setTimeout(() => {
+        setIsStuck(true);
+      }, 10000); // 10 seconds
+      
+      return () => clearTimeout(timer);
+    } else {
+      setIsStuck(false);
+    }
+  }, [user, connected]);
+  
   const getUrlGameId = () => {
     try {
       return new URL(window.location).searchParams.get('gameId');
@@ -44,6 +60,11 @@ export default function App() {
         window.history.replaceState({}, '', url.toString());
       }
       emit('leave-game', gameState.gameId);
+      
+      // Force page reload to clear all state and return to clean lobby
+      setTimeout(() => {
+        window.location.reload();
+      }, 100); // Small delay to ensure the leave-game event is processed
     }
   }, [emit, gameState]);
 
@@ -64,29 +85,44 @@ export default function App() {
     try {
       // Close dropdown first
       setMenuOpen(false);
+      
+      // Clear URL parameters before logout
+      const url = new URL(window.location);
+      url.searchParams.delete('gameId');
+      window.history.replaceState({}, '', url.toString());
+      
+      // Leave game if in one
+      if (gameState?.gameId) {
+        emit('leave-game', gameState.gameId);
+      }
+      
       // useSocket hook handles emitting leave-game on disconnect
       await logout();
+      
+      // Force page reload to clear all state
+      window.location.reload();
     } catch (e) {
       console.error("Error during logout:", e);
     }
-  }, [logout]);
-  // Minimal recovery bar: always show controls if URL has gameId but no session
-  const urlGameId = getUrlGameId();
-  const RecoveryBar = () => {
-    if (!urlGameId || gameState?.gameId) return null;
-    return (
-      <div className="w-full max-w-sm mx-auto mb-4">
-        <div className="rounded-xl p-3 bg-white/5 ring-1 ring-white/10 text-center">
-          <p className="text-sm text-neutral-300">Tienes una sala en la URL: <span className="font-mono">{urlGameId}</span></p>
-          <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
-            <button onClick={() => emit('join-game', urlGameId)} className="inline-flex items-center justify-center rounded-md h-10 text-sm text-neutral-200 border border-neutral-500 hover:bg-white/10">Unirme</button>
-            <button onClick={() => emit('get-state')} className="inline-flex items-center justify-center rounded-md h-10 text-sm text-neutral-200 border border-neutral-500 hover:bg-white/10">Reintentar</button>
-            <button onClick={() => { const url=new URL(window.location); url.searchParams.delete('gameId'); window.history.replaceState({}, '', url.toString()); window.dispatchEvent(new Event('popstate')); }} className="inline-flex items-center justify-center rounded-md h-10 text-sm text-neutral-400 hover:text-neutral-300">Volver al lobby</button>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  }, [logout, emit, gameState]);
+
+  const forceExit = useCallback(() => {
+    // Clear URL parameters
+    const url = new URL(window.location);
+    url.searchParams.delete('gameId');
+    window.history.replaceState({}, '', url.toString());
+    
+    // Force disconnect and clear state
+    if (gameState?.gameId) {
+      emit('leave-game', gameState.gameId);
+    }
+    
+    // Show toast
+    window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Sesión reiniciada. Vuelve al lobby.' }));
+    
+    // Force page reload to clear all state
+    window.location.reload();
+  }, [emit, gameState]);
 
   // Cerrar dropdown al hacer click fuera o al presionar Escape
   useEffect(() => {
@@ -122,6 +158,40 @@ export default function App() {
   }
 
   if (user && !connected) {
+    if (isStuck) {
+      return (
+        <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
+        <div className="w-full max-w-sm mx-auto text-center space-y-6">
+          <div className="flex justify-center">
+            <img 
+              src={bellImg} 
+              alt="Advertencia" 
+              className="w-20 h-20 rounded-full object-cover ring-2 ring-orange-400/30 shadow-lg"
+            />
+          </div>
+          <div>
+              <h2 className="text-2xl font-bold text-neutral-50 mb-2">Conexión perdida</h2>
+              <p className="text-gray-400">No se puede conectar al servidor. Esto puede deberse a problemas de red o el servidor está inactivo.</p>
+            </div>
+            <div className="space-y-3">
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full inline-flex items-center justify-center rounded-md font-semibold transition-all duration-150 h-11 text-base text-neutral-200 border border-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95"
+              >
+                Reintentar conexión
+              </button>
+              <button
+                onClick={forceExit}
+                className="w-full inline-flex items-center justify-center rounded-md font-semibold transition-all duration-150 h-11 text-base text-orange-400 hover:text-orange-300 border border-orange-500/30 hover:bg-orange-500/10 active:bg-orange-500/20 active:scale-95"
+              >
+                Forzar salida
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
         <div className="flex flex-col items-center gap-3 text-center">
@@ -170,6 +240,12 @@ export default function App() {
               >
                 Mantenerme en {gameState.gameId}
               </button>
+              <button
+                onClick={forceExit}
+                className="w-full inline-flex items-center justify-center rounded-md font-semibold transition-colors h-11 text-base text-orange-400 hover:text-orange-300 border border-orange-500/30 hover:bg-orange-500/10"
+              >
+                Forzar salida
+              </button>
             </div>
           </div>
         </div>
@@ -197,10 +273,10 @@ export default function App() {
                 Volver al lobby
               </button>
               <button
-                onClick={() => emit('get-state')}
-                className="w-full inline-flex items-center justify-center rounded-md font-semibold transition-colors h-11 text-base text-neutral-400 hover:text-neutral-300"
+                onClick={forceExit}
+                className="w-full inline-flex items-center justify-center rounded-md font-semibold transition-colors h-11 text-base text-orange-400 hover:text-orange-300 border border-orange-500/30 hover:bg-orange-500/10"
               >
-                Reintentar sincronización
+                Forzar salida
               </button>
             </div>
           </div>
@@ -289,7 +365,6 @@ export default function App() {
             </div>
           </header>
         )}
-        {showHeader && <RecoveryBar />}
         <main>
           {renderContent()}
         </main>
