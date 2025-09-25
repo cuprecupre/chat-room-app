@@ -66,7 +66,6 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   const capitalize = (s) => (typeof s === 'string' && s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s);
   const prevPlayersRef = useRef(state.players);
   const [reveal, setReveal] = useState(false);
-  const [userInteracted, setUserInteracted] = useState(false);
   const revealTimeoutRef = useRef(null);
 
   useEffect(() => {
@@ -88,20 +87,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   // Reveal helpers
   const triggerReveal = () => {
     if (revealTimeoutRef.current) clearTimeout(revealTimeoutRef.current);
-    setUserInteracted(true); // Marcar que el usuario ha interactuado
     setReveal(!reveal); // Toggle entre mostrar/ocultar
   };
 
-  // Auto-reveal después de 10 segundos (solo si el usuario no ha interactuado)
-  useEffect(() => {
-    if (state.phase === 'playing' && !reveal && !userInteracted) {
-      const autoRevealTimer = setTimeout(() => {
-        setReveal(true);
-      }, 10000);
-      
-      return () => clearTimeout(autoRevealTimer);
-    }
-  }, [state.phase, reveal, userInteracted]);
 
   useEffect(() => {
     return () => {
@@ -162,8 +150,8 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'playing' && (
         <>
-        <div className="w-full max-w-sm mx-auto text-center mb-4">
-          <h2 className="text-2xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>Esta es tu carta</h2>
+        <div className="w-full max-w-sm mx-auto text-center mb-5">
+          <h2 className="text-2xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>Tu carta</h2>
         </div>
         <div className="w-full max-w-sm mx-auto space-y-3">
           <div className="flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full">
@@ -190,7 +178,11 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                     className="absolute inset-0 w-full h-full object-cover" 
                   />
                   {/* Contenido sobre la imagen */}
-                  <div className="relative z-10 text-center p-8 backdrop-blur-sm rounded-xl">
+                  <div 
+                    className="relative z-10 text-center p-8 backdrop-blur-sm rounded-xl cursor-pointer" 
+                    onClick={triggerReveal}
+                    title="Volver al frente"
+                  >
                     <div className="space-y-4">
                       <div>
                         <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300">
@@ -270,8 +262,8 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'over' && (
         <>
-        <div className="w-full max-w-sm mx-auto text-center mb-4">
-          <h2 className="text-2xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>Resultados</h2>
+        <div className="w-full max-w-sm mx-auto text-center mb-5">
+          <h2 className="text-2xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>Resultado</h2>
         </div>
         <div className="w-full max-w-sm mx-auto space-y-3">
           <div className="flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full">
@@ -296,7 +288,11 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                     className="absolute inset-0 w-full h-full object-cover" 
                   />
                   {/* Contenido sobre la imagen */}
-                  <div className="relative z-10 text-center p-8 backdrop-blur-sm rounded-xl">
+                  <div 
+                    className="relative z-10 text-center p-8 backdrop-blur-sm rounded-xl cursor-pointer" 
+                    onClick={triggerReveal}
+                    title="Volver al frente"
+                  >
                     <div className="space-y-4">
                       <div>
                         <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-300">
