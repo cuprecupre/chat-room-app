@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { useSocket } from './hooks/useSocket';
+import { useAppAssetsPreloader } from './hooks/useImagePreloader';
 import { LoginScreen } from './components/LoginScreen';
 import { Lobby } from './components/Lobby';
 import { GameRoom } from './components/GameRoom';
@@ -12,6 +13,9 @@ export default function App() {
   const { user, loading, error, login, logout } = useAuth();
   const [token, setToken] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  
+  // Precargar assets de la app
+  const { isLoading: assetsLoading } = useAppAssetsPreloader();
   const menuRef = useRef(null);
 
   useEffect(() => {

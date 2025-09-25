@@ -107,7 +107,26 @@ app.get('/og.png', (req, res) => {
   res.sendFile(ogPath);
 });
 
-app.use(express.static(clientDist));
+// Configurar cache para assets estáticos
+app.use(express.static(clientDist, {
+  maxAge: '1y', // Cache por 1 año para assets estáticos
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, path) => {
+    // Cache más agresivo para imágenes
+    if (path.match(/\.(png|jpg|jpeg|gif|svg|ico|webp)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+    // Cache para CSS y JS
+    if (path.match(/\.(css|js)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+    // Cache para HTML
+    if (path.match(/\.html$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+    }
+  }
+}));
 // SPA fallback con inyección de OG absoluta
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/socket.io/')) return next();
