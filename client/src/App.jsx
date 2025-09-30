@@ -320,18 +320,18 @@ export default function App() {
           <header className="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
             <h1 className="text-xl sm:text-2xl font-bold text-neutral-50">El impostor</h1>
             <div className="flex items-center gap-3 sm:gap-4">
-              <span className="text-sm sm:text-base font-medium hidden sm:inline">{user.displayName}</span>
+              <span className="text-sm sm:text-base font-medium hidden sm:inline flex items-center">{user.displayName}</span>
               <div className="relative" ref={menuRef}>
                 <button
                   aria-label="Abrir menú de usuario"
                   onClick={() => setMenuOpen(v => !v)}
-                  className="relative group rounded-full ring-1 ring-transparent hover:ring-white/20 focus:outline-none"
+                  className="relative group rounded-full ring-1 ring-transparent focus:outline-none active:scale-95 transition-all duration-150"
                 >
                   <div className="relative">
                     <img 
                       src={user.photoURL} 
                       alt={user.displayName} 
-                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover" 
+                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover block" 
                       onError={(e) => {
                         console.log('❌ Error cargando imagen del header:', e.target.src);
                         e.target.style.display = 'none';
