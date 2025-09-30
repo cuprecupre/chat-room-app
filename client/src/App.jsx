@@ -325,7 +325,16 @@ export default function App() {
                 <button
                   aria-label="Abrir menú de usuario"
                   onClick={() => setMenuOpen(v => !v)}
-                  className="relative group rounded-full ring-1 ring-transparent focus:outline-none active:scale-95 transition-all duration-150 active:bg-transparent"
+                  className="relative group rounded-full ring-1 ring-transparent focus:outline-none active:scale-95 transition-all duration-150"
+                  style={{ 
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    WebkitTapHighlightColor: 'transparent',
+                    WebkitTouchCallout: 'none',
+                    WebkitUserSelect: 'none',
+                    userSelect: 'none'
+                  }}
                 >
                   <div className="relative">
                     <img 
@@ -348,7 +357,7 @@ export default function App() {
                       {user.displayName?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U'}
                     </div>
                   </div>
-                  <span className="pointer-events-none absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 group-active:bg-white/20 transition-opacity" />
+                  <span className="pointer-events-none absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>
                 {menuOpen && (
                   <div className="absolute right-0 mt-2 w-56 rounded-xl border border-white/10 bg-neutral-950/95 backdrop-blur-md shadow-2xl ring-1 ring-white/10 p-2 z-20">
