@@ -31,7 +31,7 @@ function PlayerList({ players, currentUserId }) {
         {sortedPlayers.map(p => {
           console.log('👤 Jugador:', { name: p.name, photoURL: p.photoURL, uid: p.uid });
           return (
-            <li key={p.uid} className="flex items-center justify-between bg-white/5 p-4 rounded-md">
+            <li key={p.uid} className="flex items-center bg-white/5 p-4 rounded-md">
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <img 
@@ -50,10 +50,11 @@ function PlayerList({ players, currentUserId }) {
                   >
                     {p.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                   </div>
+                  {/* Bullet de estado posicionado como en LinkedIn/Facebook */}
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-neutral-950"></div>
                 </div>
                 <span className="font-medium">{p.name}{p.uid === currentUserId ? ' (Tú)' : ''}</span>
               </div>
-              <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
             </li>
           );
         })}
