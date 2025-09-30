@@ -325,7 +325,8 @@ export default function App() {
                 <button
                   aria-label="Abrir menú de usuario"
                   onClick={() => setMenuOpen(v => !v)}
-                  className="relative group rounded-full ring-1 ring-transparent focus:outline-none active:scale-95 transition-all duration-150 active:bg-transparent"
+                  className="relative group rounded-full ring-1 ring-transparent focus:outline-none active:scale-95 transition-all duration-150 active:bg-transparent active:ring-transparent"
+                  style={{ backgroundColor: 'transparent' }}
                 >
                   <div className="relative">
                     <img 
