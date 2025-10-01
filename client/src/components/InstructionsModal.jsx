@@ -4,7 +4,7 @@ import { Modal } from './ui/Modal';
 export function InstructionsModal({ isOpen, onClose }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Instrucciones">
-      <div className="max-w-none select-text" style={{ fontFamily: 'system-ui, -apple-system, sans-serif', userSelect: 'text', WebkitUserSelect: 'text' }}>
+      <div className="max-w-none select-text" style={{ userSelect: 'text', WebkitUserSelect: 'text' }}>
         
         {/* ¿Qué es El impostor? */}
         <section className="mb-8">
