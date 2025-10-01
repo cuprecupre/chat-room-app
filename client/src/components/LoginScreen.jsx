@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from './ui/Button';
 import { Spinner } from './ui/Spinner';
-import { Footer } from './Footer';
 import heroImg from '../assets/impostor-home.png';
 
 function Screen({ children }) {
@@ -66,7 +65,13 @@ export function LoginScreen({ onLogin, error, isLoading, onOpenInstructions }) {
           )}
         </div>
       </Screen>
-      <Footer onOpenInstructions={onOpenInstructions} />
+      <footer className="w-full max-w-4xl mx-auto mt-8 pt-6 pb-6 px-6">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <p className="text-sm text-neutral-500">
+            © 2025 El impostor. Todos los derechos reservados.
+          </p>
+        </div>
+      </footer>
     </>
   );
 }
