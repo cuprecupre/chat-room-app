@@ -25,7 +25,6 @@ export function InstructionsModal({ isOpen, onClose }) {
         <section className="mb-8">
           <h3 className="text-xl font-bold text-neutral-50 mb-3">Qué necesitas</h3>
           <ul className="list-disc list-inside space-y-2 text-neutral-300">
-            <li><strong>App web</strong> (sin instalación).</li>
             <li><strong>Un dispositivo</strong> con conexión por jugador.</li>
             <li><strong>Espacio para jugar</strong> juntos (mesa/sofá) o <strong>videollamada</strong>.</li>
           </ul>
