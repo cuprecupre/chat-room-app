@@ -47,6 +47,17 @@ export function LoginScreen({ onLogin, error, isLoading, onOpenInstructions }) {
             </span>
             <span className="align-middle">{isLoading ? 'Conectando...' : 'Continuar con Google'}</span>
           </Button>
+
+          <button
+            onClick={onOpenInstructions}
+            className="inline-flex items-center justify-center gap-2 text-neutral-400 hover:text-neutral-200 transition-colors duration-150"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Cómo jugar</span>
+          </button>
+
           {error && (
             <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 text-red-400">
               <p className="font-semibold">Error al iniciar sesión:</p>
