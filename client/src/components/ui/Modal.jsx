@@ -29,29 +29,24 @@ export function Modal({ isOpen, onClose, title, children }) {
     };
   }, [isOpen]);
 
-  // Manejar apertura y cierre con animaciones
+  // Manejar apertura con animación
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
       setIsClosing(false);
-    } else if (isVisible) {
-      setIsClosing(true);
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-        setIsClosing(false);
-      }, 200); // Duración de la animación
-      return () => clearTimeout(timer);
     }
-  }, [isOpen, isVisible]);
+  }, [isOpen]);
 
   const handleClose = () => {
     setIsClosing(true);
     setTimeout(() => {
+      setIsVisible(false);
+      setIsClosing(false);
       onClose();
     }, 200); // Duración de la animación
   };
 
-  if (!isVisible) return null;
+  if (!isVisible && !isOpen) return null;
 
   return (
     <div 
