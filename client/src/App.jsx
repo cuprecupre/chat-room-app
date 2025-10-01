@@ -7,12 +7,15 @@ import { Lobby } from './components/Lobby';
 import { GameRoom } from './components/GameRoom';
 import { Toaster } from './components/Toaster';
 import { Spinner } from './components/ui/Spinner';
+import { Footer } from './components/Footer';
+import { InstructionsModal } from './components/InstructionsModal';
 import bellImg from './assets/bell.png';
 
 export default function App() {
   const { user, loading, error, login, logout } = useAuth();
   const [token, setToken] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [instructionsOpen, setInstructionsOpen] = useState(false);
   
   // Precargar assets de la app
   const { isLoading: assetsLoading } = useAppAssetsPreloader();
@@ -313,9 +316,11 @@ export default function App() {
     : "w-full max-w-4xl mx-auto min-h-dvh flex items-center justify-center p-0";
 
   return (
-    <div className="bg-neutral-950 text-white min-h-screen font-sans">
+    <div className="bg-neutral-950 text-white min-h-screen font-sans flex flex-col">
       <Toaster />
-       <div className={containerClasses}>
+      <InstructionsModal isOpen={instructionsOpen} onClose={() => setInstructionsOpen(false)} />
+      
+      <div className={containerClasses}>
         {showHeader && (
           <header className="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
             <h1 className="text-xl sm:text-2xl font-bold text-neutral-50">El impostor</h1>
@@ -382,6 +387,8 @@ export default function App() {
           {renderContent()}
         </main>
       </div>
+      
+      {user && <Footer onOpenInstructions={() => setInstructionsOpen(true)} />}
     </div>
   );
 }

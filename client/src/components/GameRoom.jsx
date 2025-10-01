@@ -6,7 +6,7 @@ import dualImpostorImg from '../assets/dual-impostor.png';
 import cardImg from '../assets/card.png';
 import cardBackImg from '../assets/card-back.png';
 
-function PlayerList({ players, currentUserId }) {
+function PlayerList({ players, currentUserId, isHost, onCopyLink }) {
   // Ordenar jugadores para que el usuario actual aparezca primero
   const sortedPlayers = [...players].sort((a, b) => {
     if (a.uid === currentUserId) return -1;
@@ -119,11 +119,15 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 </Button>
               </div>
             )}
-            <Button onClick={onCopyLink} variant={state.players.length === 1 ? "primary" : "outline"} size="md">Copiar enlace</Button>
           </div>
           <div className="w-full mt-6">
-            <PlayerList players={state.players} currentUserId={user.uid} />
+            <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} />
           </div>
+          {!isHost && (
+            <div className="w-full mt-4">
+              <Button onClick={onCopyLink} variant={state.players.length === 1 ? "primary" : "outline"} size="md">Copiar enlace</Button>
+            </div>
+          )}
           
           {/* Footer con código de sala */}
           <div className="w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5">
@@ -235,7 +239,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           </div>
         )}
         <div className="w-full max-w-sm mx-auto mt-4">
-          <PlayerList players={state.players} currentUserId={user.uid} />
+          <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} />
         </div>
         {/* Footer único y consistente */}
         <div className="w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5">
@@ -320,7 +324,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           </div>
         )}
         <div className="w-full max-w-sm mx-auto mt-4">
-          <PlayerList players={state.players} currentUserId={user.uid} />
+          <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} />
         </div>
         {/* Footer único y consistente */}
         <div className="w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5">
