@@ -3,20 +3,16 @@ import { Button } from './ui/Button';
 import { Spinner } from './ui/Spinner';
 import heroImg from '../assets/impostor-home.png';
 
-function Screen({ children }) {
-  return <div className="w-full max-w-md mx-auto p-4 min-h-dvh flex flex-col justify-center">{children}</div>;
-}
-
 export function LoginScreen({ onLogin, error, isLoading, onOpenInstructions }) {
   return (
-    <>
-      <Screen>
-        <div className="text-center space-y-6">
+    <div className="w-full h-dvh flex flex-col">
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md text-center space-y-4 sm:space-y-6">
           <div className="perspective-1000">
-            <img src={heroImg} alt="El Impostor" className="mx-auto w-72 h-72 rounded-full object-cover shadow-xl ring-1 ring-white/10 animate-tilt-oscillate" loading="lazy" />
+            <img src={heroImg} alt="El Impostor" className="mx-auto w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 rounded-full object-cover shadow-xl ring-1 ring-white/10 animate-tilt-oscillate" loading="lazy" />
           </div>
-          <h1 className="text-5xl font-bold text-neutral-50">El impostor</h1>
-          <p className="text-xl text-gray-300">Alguien no dice la verdad.<br />¿Lo vas a descubrir?</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-neutral-50">El impostor</h1>
+          <p className="text-lg sm:text-xl text-gray-300">Alguien no dice la verdad.<br />¿Lo vas a descubrir?</p>
 
           <Button 
             onClick={onLogin} 
@@ -58,20 +54,21 @@ export function LoginScreen({ onLogin, error, isLoading, onOpenInstructions }) {
           </button>
 
           {error && (
-            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 text-red-400">
-              <p className="font-semibold">Error al iniciar sesión:</p>
-              <p className="text-sm mt-1">{error.message || error}</p>
+            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 sm:p-4 text-red-400">
+              <p className="font-semibold text-sm sm:text-base">Error al iniciar sesión:</p>
+              <p className="text-xs sm:text-sm mt-1">{error.message || error}</p>
             </div>
           )}
         </div>
-      </Screen>
-      <footer className="w-full max-w-4xl mx-auto mt-8 pt-6 pb-6 px-6">
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <p className="text-sm text-neutral-500">
+      </div>
+      
+      <footer className="w-full py-4 px-6">
+        <div className="flex items-center justify-center">
+          <p className="text-xs sm:text-sm text-neutral-500">
             © 2025 El impostor. Todos los derechos reservados.
           </p>
         </div>
       </footer>
-    </>
+    </div>
   );
 }
