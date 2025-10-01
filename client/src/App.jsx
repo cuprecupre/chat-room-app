@@ -218,10 +218,10 @@ export default function App() {
     const urlGameId = url.searchParams.get('gameId');
 
     if (error) {
-       return <LoginScreen onLogin={login} error={error} />;
+       return <LoginScreen onLogin={login} error={error} onOpenInstructions={() => setInstructionsOpen(true)} />;
     }
     if (!user) {
-      return <LoginScreen onLogin={login} error={error} />;
+      return <LoginScreen onLogin={login} error={error} onOpenInstructions={() => setInstructionsOpen(true)} />;
     }
 
     // Case 1: URL has a gameId but session is in another game → offer switch
@@ -388,7 +388,7 @@ export default function App() {
         </main>
       </div>
       
-      {user && <Footer onOpenInstructions={() => setInstructionsOpen(true)} />}
+      {user && connected && <Footer onOpenInstructions={() => setInstructionsOpen(true)} />}
     </div>
   );
 }
