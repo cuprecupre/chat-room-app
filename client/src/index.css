@@ -95,6 +95,15 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 @keyframes scaleIn {
   from {
     opacity: 0;
@@ -106,10 +115,29 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
 .animate-fade-in {
   animation: fadeIn 200ms ease-out;
 }
 
+.animate-fade-out {
+  animation: fadeOut 200ms ease-in;
+}
+
 .animate-scale-in {
   animation: scaleIn 200ms ease-out;
+}
+
+.animate-scale-out {
+  animation: scaleOut 200ms ease-in;
 }
