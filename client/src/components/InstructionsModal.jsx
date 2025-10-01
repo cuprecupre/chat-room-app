@@ -167,13 +167,13 @@ export function InstructionsModal({ isOpen, onClose }) {
         <section className="mb-8">
           <h3 className="text-xl font-semibold text-neutral-50 mb-4">Sistema de puntos</h3>
           
-          <h4 className="text-lg font-semibold text-blue-400 mb-2 mt-4">🔵 Amigos</h4>
+          <h4 className="text-lg font-semibold text-blue-400 mb-2 mt-4">🟦 Amigos</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><strong>+1</strong> punto por <strong>votar correctamente</strong> al impostor (aunque no sea expulsado) en cada vuelta.</li>
             <li><strong>+1</strong> punto adicional si el impostor es <strong>expulsado</strong>.</li>
           </ul>
 
-          <h4 className="text-lg font-semibold text-red-400 mb-2 mt-4">🔴 Impostor</h4>
+          <h4 className="text-lg font-semibold text-red-400 mb-2 mt-4">🟥 Impostor</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><strong>+2</strong> puntos por <strong>sobrevivir cada vuelta</strong>.</li>
             <li><strong>+4</strong> puntos extra si <strong>gana la ronda</strong> (no lo descubren tras 3 vueltas).</li>
