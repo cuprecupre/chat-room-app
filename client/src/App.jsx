@@ -10,6 +10,7 @@ import { Spinner } from './components/ui/Spinner';
 import { Footer } from './components/Footer';
 import { InstructionsModal } from './components/InstructionsModal';
 import bellImg from './assets/bell.png';
+import heroImg from './assets/impostor-home.png';
 
 export default function App() {
   const { user, loading, error, login, logout } = useAuth();
@@ -158,11 +159,18 @@ export default function App() {
   if (loading) {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <Spinner size="md" />
-          <div>
-            <p>Autenticando</p>
-            <p className="text-sm text-gray-400 mt-1">Verificando sesión...</p>
+        <div className="flex flex-col items-center gap-6 text-center">
+          <img 
+            src={heroImg} 
+            alt="El Impostor" 
+            className="w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10 animate-pulse" 
+          />
+          <div className="flex flex-col items-center gap-3">
+            <Spinner size="md" />
+            <div>
+              <p>Autenticando</p>
+              <p className="text-sm text-gray-400 mt-1">Verificando sesión...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -206,11 +214,18 @@ export default function App() {
     
     return (
       <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <Spinner size="md" />
-          <div>
-            <p>Conectando al servidor...</p>
-            <p className="text-sm text-gray-400 mt-1">Estableciendo conexión...</p>
+        <div className="flex flex-col items-center gap-6 text-center">
+          <img 
+            src={heroImg} 
+            alt="El Impostor" 
+            className="w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10 animate-pulse" 
+          />
+          <div className="flex flex-col items-center gap-3">
+            <Spinner size="md" />
+            <div>
+              <p>Conectando al servidor...</p>
+              <p className="text-sm text-gray-400 mt-1">Estableciendo conexión...</p>
+            </div>
           </div>
         </div>
       </div>
