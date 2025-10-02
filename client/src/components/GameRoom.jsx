@@ -311,30 +311,6 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           </div>
         )}
         
-        {/* Tabla de puntos */}
-        <div className="w-full max-w-sm mx-auto mt-4">
-          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-neutral-300">Puntuación</h3>
-              <span className="text-xs text-neutral-500">Objetivo: {state.targetScore} pts</span>
-            </div>
-            <div className="space-y-2">
-              {[...state.players]
-                .sort((a, b) => (state.playerScores[b.uid] || 0) - (state.playerScores[a.uid] || 0))
-                .map(p => (
-                  <div key={p.uid} className="flex items-center justify-between text-sm">
-                    <span className={`${p.uid === user.uid ? 'font-semibold text-white' : 'text-neutral-400'}`}>
-                      {p.name.split(' ')[0]}{p.uid === user.uid ? ' (Tú)' : ''}
-                    </span>
-                    <span className={`font-mono ${p.uid === user.uid ? 'font-bold text-white' : 'text-neutral-400'}`}>
-                      {state.playerScores[p.uid] || 0} pts
-                    </span>
-                  </div>
-                ))}
-            </div>
-          </div>
-        </div>
-        
         <div className="w-full max-w-sm mx-auto mt-4">
           <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
         </div>
