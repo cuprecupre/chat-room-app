@@ -161,7 +161,7 @@ export default function App() {
         <div className="flex flex-col items-center gap-3 text-center">
           <Spinner size="md" />
           <div>
-            <p>Autenticando...</p>
+            <p>Autenticando</p>
             <p className="text-sm text-gray-400 mt-1">Verificando sesión...</p>
           </div>
         </div>

@@ -10,7 +10,7 @@ const sizeClasses = {
   lg: 'w-8 h-8',
 };
 
-export function Spinner({ size = 'md', className = '', colorClass = 'border-white/50' }) {
+export function Spinner({ size = 'md', className = '', colorClass = 'border-orange-400' }) {
   const styles = classNames([
     'inline-block rounded-full animate-spin border-2 border-t-transparent',
     sizeClasses[size],
