@@ -209,8 +209,19 @@ class Game {
 
     // Manejar empate
     if (mostVoted.length > 1) {
-      console.log(`[Game ${this.gameId}] Empate entre: ${mostVoted.join(', ')}. Siguiente vuelta.`);
-      this.startNextTurn();
+      console.log(`[Game ${this.gameId}] Empate entre: ${mostVoted.join(', ')}.`);
+      
+      // Si ya estamos en la vuelta 3, el impostor gana
+      if (this.currentTurn >= this.maxTurns) {
+        console.log(`[Game ${this.gameId}] Vuelta 3 completada con empate. ¡El impostor gana!`);
+        // Dar puntos al impostor por sobrevivir la última vuelta
+        this.playerScores[this.impostorId] = (this.playerScores[this.impostorId] || 0) + 2;
+        this.lastRoundScores[this.impostorId] = (this.lastRoundScores[this.impostorId] || 0) + 2;
+        this.endRound(false); // Impostor gana
+      } else {
+        console.log(`[Game ${this.gameId}] Siguiente vuelta.`);
+        this.startNextTurn();
+      }
       return;
     }
 

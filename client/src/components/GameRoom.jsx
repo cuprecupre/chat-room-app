@@ -158,8 +158,12 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
 export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAgain, onLeaveGame, onCopyLink, onCopyGameCode, onVote }) {
   const capitalize = (s) => (typeof s === 'string' && s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s);
   const prevPlayersRef = useRef(state.players);
+  const prevTurnRef = useRef(state.currentTurn);
   const [reveal, setReveal] = useState(false);
+  const [showTurnOverlay, setShowTurnOverlay] = useState(false);
+  const [eliminatedPlayerInfo, setEliminatedPlayerInfo] = useState(null);
   const revealTimeoutRef = useRef(null);
+  const turnOverlayTimeoutRef = useRef(null);
 
   useEffect(() => {
     const previousPlayers = prevPlayersRef.current;
@@ -184,9 +188,40 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   };
 
 
+  // Detectar cambio de vuelta y mostrar overlay
+  useEffect(() => {
+    const prevTurn = prevTurnRef.current;
+    const currentTurn = state.currentTurn;
+    
+    // Si la vuelta cambió y es vuelta 2 o superior (nueva vuelta), mostrar overlay
+    if (state.phase === 'playing' && prevTurn && currentTurn > prevTurn && currentTurn > 1) {
+      // Buscar al último jugador eliminado
+      const eliminatedIds = state.eliminatedInRound || [];
+      if (eliminatedIds.length > 0) {
+        const lastEliminatedId = eliminatedIds[eliminatedIds.length - 1];
+        const eliminatedPlayer = state.players.find(p => p.uid === lastEliminatedId);
+        setEliminatedPlayerInfo(eliminatedPlayer || null);
+      } else {
+        setEliminatedPlayerInfo(null);
+      }
+      
+      setShowTurnOverlay(true);
+      
+      // Ocultar después de 4 segundos
+      if (turnOverlayTimeoutRef.current) clearTimeout(turnOverlayTimeoutRef.current);
+      turnOverlayTimeoutRef.current = setTimeout(() => {
+        setShowTurnOverlay(false);
+        setEliminatedPlayerInfo(null);
+      }, 4000);
+    }
+    
+    prevTurnRef.current = currentTurn;
+  }, [state.currentTurn, state.phase, state.eliminatedInRound, state.players]);
+
   useEffect(() => {
     return () => {
       if (revealTimeoutRef.current) clearTimeout(revealTimeoutRef.current);
+      if (turnOverlayTimeoutRef.current) clearTimeout(turnOverlayTimeoutRef.current);
     };
   }, []);
 
@@ -250,27 +285,25 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'playing' && (
         <>
-        {/* Indicador de vuelta */}
-        <div className="w-full max-w-sm mx-auto bg-white/5 rounded-lg p-4 border border-white/10 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="text-neutral-300 font-medium">Vuelta {state.currentTurn} de {state.maxTurns}</span>
-            </div>
-            {state.hasVoted ? (
-              <div className="flex items-center gap-1.5 text-green-400 text-sm">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                <span>Has votado</span>
-              </div>
-            ) : state.canVote ? (
-              <span className="text-neutral-500 text-sm">Esperando tu voto...</span>
-            ) : (
-              <span className="text-neutral-500 text-sm">No puedes votar</span>
-            )}
+        {/* Indicador de ronda y vuelta */}
+        <div className="w-full max-w-sm mx-auto mb-4">
+          <p className="text-center text-xs text-neutral-500 mb-3">
+            Ronda {state.roundCount || 1} • Vuelta {state.currentTurn} de {state.maxTurns}
+          </p>
+          {/* Stepper de vueltas */}
+          <div className="flex items-center justify-center gap-1.5">
+            {[1, 2, 3].map((turn) => (
+              <div 
+                key={turn} 
+                className={`w-2 h-2 rounded-full transition-all ${
+                  state.currentTurn === turn 
+                    ? 'bg-orange-500 scale-125' 
+                    : state.currentTurn > turn
+                    ? 'bg-green-500/50'
+                    : 'bg-white/20'
+                }`}
+              />
+            ))}
           </div>
         </div>
         
@@ -388,102 +421,150 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {/* Resultado de ronda */}
       {state.phase === 'round_result' && (
-        <>
-        <div className="w-full max-w-sm mx-auto text-center mb-5">
-          <h2 className="text-2xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>Resultado de la ronda</h2>
-        </div>
-        
-        {/* Revelar impostor y palabra */}
-        <div className="w-full max-w-sm mx-auto bg-white/5 rounded-lg p-6 border border-white/10 mb-6">
-          <div className="space-y-4 text-center">
-            <div>
-              <span className="text-xs tracking-wider uppercase text-neutral-500">El impostor era</span>
-              <p className="font-semibold text-xl text-red-400 mt-1" style={{fontFamily: 'Trocchi, serif'}}>
-                {state.impostorName}
-              </p>
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="w-full max-w-sm mx-auto space-y-6 my-8">
+            <div className="text-center space-y-2 animate-scaleIn">
+              <h2 className="text-4xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
+                Resultado de la ronda
+              </h2>
+              {state.roundCount && state.maxRounds && (
+                <p className="text-sm text-neutral-400">
+                  Ronda {state.roundCount}/{state.maxRounds} • Objetivo: {state.targetScore} puntos
+                </p>
+              )}
             </div>
-            <div>
-              <span className="text-xs tracking-wider uppercase text-neutral-500">Palabra secreta</span>
-              <p className="font-semibold text-2xl text-blue-400 mt-1" style={{fontFamily: 'Trocchi, serif'}}>
-                {capitalize(state.secretWord)}
-              </p>
+            
+            {/* Revelar impostor y palabra */}
+            <div className="bg-white/10 rounded-xl p-6 border border-white/20 backdrop-blur-md">
+              <div className="space-y-6 text-center">
+                <div>
+                  <span className="text-xs tracking-wider uppercase text-neutral-400">El impostor era</span>
+                  <p className="font-semibold text-2xl text-red-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
+                    {state.impostorName}
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-white/10">
+                  <span className="text-xs tracking-wider uppercase text-neutral-400">Palabra secreta</span>
+                  <p className="font-semibold text-3xl text-blue-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
+                    {capitalize(state.secretWord)}
+                  </p>
+                </div>
+              </div>
             </div>
+            
+            {/* Puntuación */}
+            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
+            </div>
+            
+            {isHost && (
+              <Button onClick={onPlayAgain} variant="primary" size="md">Siguiente Ronda</Button>
+            )}
           </div>
         </div>
-        
-        {/* Info de progreso */}
-        {state.roundCount && state.maxRounds && (
-          <div className="w-full max-w-sm mx-auto bg-white/5 rounded-lg p-3 border border-white/10 mb-6">
-            <p className="text-center text-sm text-neutral-400">
-              Ronda {state.roundCount}/{state.maxRounds} • Objetivo: {state.targetScore} puntos
-            </p>
-          </div>
-        )}
-        
-        {isHost && (
-          <div className="w-full max-w-sm mx-auto">
-            <Button onClick={onPlayAgain} variant="primary" size="md">Siguiente Ronda</Button>
-          </div>
-        )}
-        
-        <div className="w-full max-w-sm mx-auto mt-4">
-          <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
-        </div>
-        </>
       )}
       
       {/* Fin de la partida */}
       {state.phase === 'game_over' && (
-        <>
-        <div className="w-full max-w-sm mx-auto text-center mb-5">
-          <h2 className="text-3xl font-bold text-neutral-50 mb-2" style={{fontFamily: 'Trocchi, serif'}}>¡Partida Terminada!</h2>
-          {state.winner && (
-            <p className="text-xl text-orange-400 font-semibold">
-              Ganador: {state.winner}
-            </p>
-          )}
-        </div>
-        
-        <div className="w-full max-w-sm mx-auto mt-4">
-          <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
-        </div>
-        
-        {isHost && (
-          <div className="w-full max-w-sm mx-auto mt-6">
-            <Button 
-              onClick={() => {
-                console.log('🎮 Click en Nueva Partida', { gameId: state.gameId, isHost });
-                onPlayAgain();
-              }} 
-              variant="primary" 
-              size="md"
-            >
-              Nueva Partida
-            </Button>
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="w-full max-w-sm mx-auto space-y-6 my-8">
+            <div className="text-center space-y-3 animate-scaleIn">
+              <h2 className="text-5xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
+                ¡Partida Terminada!
+              </h2>
+              {state.winner && (
+                <p className="text-2xl text-orange-400 font-semibold">
+                  Ganador: {state.winner}
+                </p>
+              )}
+            </div>
+            
+            {/* Puntuación final */}
+            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
+            </div>
+            
+            {isHost && (
+              <Button 
+                onClick={() => {
+                  console.log('🎮 Click en Nueva Partida', { gameId: state.gameId, isHost });
+                  onPlayAgain();
+                }} 
+                variant="primary" 
+                size="md"
+              >
+                Nueva Partida
+              </Button>
+            )}
+            
+            {/* Footer */}
+            <div className="pt-4 border-t border-white/10 space-y-3">
+              <button
+                onClick={() => onCopyGameCode()}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150"
+                title="Copiar código"
+              >
+                <span>Código de sala: <span className="font-mono font-semibold text-neutral-300">{state.gameId}</span></span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </button>
+              <Button onClick={onLeaveGame} variant="ghost" size="md" className="gap-2">
+                <span>Abandonar partida</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </Button>
+            </div>
           </div>
-        )}
-        {/* Footer único y consistente */}
-        <div className="w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5">
-          <div className="space-y-4">
-            <button
-              onClick={() => onCopyGameCode()}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150"
-              title="Copiar código"
-            >
-              <span>Código de sala: <span className="font-mono font-semibold text-neutral-300">{state.gameId}</span></span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-            </button>
-            <Button onClick={onLeaveGame} variant="ghost" size="md" className="gap-2">
-              <span>Abandonar partida</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-            </Button>
+        </div>
+      )}
+      
+      {/* Overlay de nueva vuelta */}
+      {showTurnOverlay && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm animate-fadeIn px-4">
+          <div className="text-center space-y-6 animate-scaleIn max-w-sm">
+            <h2 className="text-6xl font-bold text-orange-400" style={{fontFamily: 'Trocchi, serif'}}>
+              Vuelta {state.currentTurn}
+            </h2>
+            
+            {eliminatedPlayerInfo && (
+              <div className="space-y-4">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="relative">
+                    <img 
+                      src={eliminatedPlayerInfo.photoURL} 
+                      alt={eliminatedPlayerInfo.name}
+                      className="w-20 h-20 rounded-full object-cover ring-4 ring-red-500/50"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                    <div 
+                      className="w-20 h-20 rounded-full bg-neutral-600 flex items-center justify-center text-white text-lg font-semibold ring-4 ring-red-500/50"
+                      style={{display: 'none'}}
+                    >
+                      {eliminatedPlayerInfo.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                    </div>
+                  </div>
+                  <p className="text-lg text-neutral-300">
+                    <span className="font-semibold text-red-400">{eliminatedPlayerInfo.name.split(' ')[0]}</span> fue eliminado
+                  </p>
+                </div>
+                <p className="text-xl text-neutral-200 font-medium">
+                  El impostor sigue entre nosotros
+                </p>
+              </div>
+            )}
+            
+            {!eliminatedPlayerInfo && (
+              <p className="text-xl text-neutral-300">
+                {state.currentTurn === state.maxTurns ? '¡Última vuelta!' : 'Continúa votando'}
+              </p>
+            )}
           </div>
         </div>
-        </>
       )}
     </div>
   );
