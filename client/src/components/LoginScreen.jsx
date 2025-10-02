@@ -11,10 +11,10 @@ export function LoginScreen({ onLogin, error, isLoading, onOpenInstructions }) {
           <div className="perspective-1000 animate-scaleIn">
             <img src={heroImg} alt="El Impostor" className="mx-auto w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 rounded-full object-cover shadow-xl ring-1 ring-white/10 animate-tilt-oscillate" loading="lazy" />
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-neutral-50 animate-fadeIn">El impostor</h1>
-          <p className="text-lg sm:text-xl text-gray-300 animate-fadeIn">Alguien no dice la verdad.<br />¿Lo vas a descubrir?</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-neutral-50 animate-fadeIn animate-delay-200">El impostor</h1>
+          <p className="text-lg sm:text-xl text-gray-300 animate-fadeIn animate-delay-300">Alguien no dice la verdad.<br />¿Lo vas a descubrir?</p>
 
-          <div className="animate-fadeIn">
+          <div className="animate-fadeIn animate-delay-400">
             <Button 
               onClick={onLogin} 
               disabled={isLoading}
@@ -47,7 +47,7 @@ export function LoginScreen({ onLogin, error, isLoading, onOpenInstructions }) {
 
           <button
             onClick={onOpenInstructions}
-            className="inline-flex items-center justify-center gap-2 text-neutral-400 hover:text-neutral-200 transition-colors duration-150 animate-fadeIn"
+            className="inline-flex items-center justify-center gap-2 text-neutral-400 hover:text-neutral-200 transition-colors duration-150 animate-fadeIn animate-delay-500"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
