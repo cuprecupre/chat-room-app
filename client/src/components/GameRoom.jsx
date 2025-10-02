@@ -487,6 +487,19 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               <div className="space-y-6 text-center">
                 <div>
                   <span className="text-xs tracking-wider uppercase text-neutral-400">El impostor era</span>
+                  {/* Avatar del impostor */}
+                  <div className="flex justify-center my-4">
+                    {state.players && (() => {
+                      const impostor = state.players.find(p => p.name === state.impostorName);
+                      return impostor ? (
+                        <img 
+                          src={impostor.avatar} 
+                          alt={impostor.name}
+                          className="w-20 h-20 rounded-full ring-4 ring-orange-400/50 shadow-lg"
+                        />
+                      ) : null;
+                    })()}
+                  </div>
                   <p className="font-semibold text-2xl text-orange-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
                     {state.impostorName}
                   </p>
