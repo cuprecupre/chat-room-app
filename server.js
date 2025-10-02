@@ -317,6 +317,24 @@ io.on('connection', (socket) => {
     socket.on('start-game', (gameId) => handleGameAction(gameId, g => g.startGame(user.uid)));
     socket.on('end-game', (gameId) => handleGameAction(gameId, g => g.endGame(user.uid)));
     socket.on('play-again', (gameId) => handleGameAction(gameId, g => g.playAgain(user.uid)));
+    
+    // Voting endpoint
+    socket.on('cast-vote', ({ gameId, targetId }) => {
+        const game = games[gameId];
+        if (!game) return socket.emit('error-message', 'La partida no existe.');
+        if (!game.players.some(p => p.uid === user.uid)) {
+            return socket.emit('error-message', 'No perteneces a esta partida.');
+        }
+        try {
+            game.castVote(user.uid, targetId);
+            // Broadcast updated state to all players
+            emitGameState(game);
+        } catch (error) {
+            console.error(`Vote failed for game ${gameId}:`, error.message);
+            socket.emit('error-message', error.message);
+        }
+    });
+    
     socket.on('leave-game', (gameId) => {
         const game = games[gameId];
         if (!game || !game.players.some(p => p.uid === user.uid)) {
