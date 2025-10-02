@@ -493,9 +493,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                       const impostor = state.players.find(p => p.name === state.impostorName);
                       return impostor ? (
                         <img 
-                          src={impostor.avatar} 
+                          src={impostor.photoURL} 
                           alt={impostor.name}
-                          className="w-20 h-20 rounded-full ring-4 ring-orange-400/50 shadow-lg"
+                          className="w-20 h-20 rounded-full object-cover ring-4 ring-orange-400/50 shadow-lg"
                         />
                       ) : null;
                     })()}
