@@ -120,6 +120,7 @@ class Game {
       this.roundCount = 0;
       this.initialPlayerCount = this.players.length;
       this.maxRounds = this.initialPlayerCount * 2;
+      this.phase = 'lobby'; // Cambiar fase para evitar checks de game_over
       console.log(`[Game ${this.gameId}] ✅ Nueva partida iniciada desde game_over. Jugadores: ${this.initialPlayerCount}, Max rondas: ${this.maxRounds}`);
     } else {
       console.log(`[Game ${this.gameId}] Continuando con siguiente ronda. Ronda actual: ${this.roundCount}`);
