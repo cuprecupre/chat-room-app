@@ -7,6 +7,7 @@ import { Lobby } from './components/Lobby';
 import { GameRoom } from './components/GameRoom';
 import { Toaster } from './components/Toaster';
 import { Spinner } from './components/ui/Spinner';
+import { Button } from './components/ui/Button';
 import { Footer } from './components/Footer';
 import { InstructionsModal } from './components/InstructionsModal';
 import bellImg from './assets/bell.png';
@@ -193,19 +194,19 @@ export default function App() {
               <h2 className="text-2xl font-bold text-neutral-50 mb-2">Conexión perdida</h2>
               <p className="text-gray-400">No se puede conectar al servidor. Esto puede deberse a problemas de red o el servidor está inactivo.</p>
             </div>
-            <div className="space-y-3">
-              <button
+            <div className="space-y-3 px-6">
+              <Button
                 onClick={() => window.location.reload()}
-                className="w-full inline-flex items-center justify-center rounded-md font-semibold transition-all duration-150 h-11 text-base text-neutral-200 border border-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95"
+                variant="primary"
               >
                 Reintentar conexión
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={forceExit}
-                className="w-full inline-flex items-center justify-center rounded-md font-semibold transition-all duration-150 h-11 text-base text-orange-400 hover:text-orange-300 border border-orange-500/30 hover:bg-orange-500/10 active:bg-orange-500/20 active:scale-95"
+                variant="outline"
               >
                 Forzar salida
-              </button>
+              </Button>
             </div>
           </div>
         </div>
