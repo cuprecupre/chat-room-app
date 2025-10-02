@@ -212,12 +212,12 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       
       setShowTurnOverlay(true);
       
-      // Ocultar después de 4 segundos
+      // Ocultar después de 3 segundos
       if (turnOverlayTimeoutRef.current) clearTimeout(turnOverlayTimeoutRef.current);
       turnOverlayTimeoutRef.current = setTimeout(() => {
         setShowTurnOverlay(false);
         setEliminatedPlayerInfo(null);
-      }, 4000);
+      }, 3000);
     }
     
     prevTurnRef.current = currentTurn;
