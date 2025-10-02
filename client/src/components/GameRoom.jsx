@@ -20,19 +20,16 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   const playerScores = gameState?.playerScores || {};
   const lastRoundScores = gameState?.lastRoundScores || {};
   
-  // Filtrar al usuario actual solo durante el juego (playing)
+  // Ordenar jugadores: usuario actual siempre primero (excepto en scores)
   const sortedPlayers = [...players]
-    .filter(p => isPlaying ? p.uid !== currentUserId : true)
     .sort((a, b) => {
       // Si mostramos puntos, ordenar por puntuación
       if (showScores) {
         return (playerScores[b.uid] || 0) - (playerScores[a.uid] || 0);
       }
-      // En lobby, usuario actual primero
-      if (!isPlaying) {
-        if (a.uid === currentUserId) return -1;
-        if (b.uid === currentUserId) return 1;
-      }
+      // Usuario actual siempre primero
+      if (a.uid === currentUserId) return -1;
+      if (b.uid === currentUserId) return 1;
       // Ordenar por nombre
       return a.name.localeCompare(b.name);
     });
@@ -60,9 +57,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
 
   // Determinar qué título mostrar
   let headerText = `Jugadores Conectados: ${players.length}`;
-  if (isPlaying) {
-    headerText = 'Vota al impostor de esta lista';
-  } else if (showScores) {
+  if (showScores) {
     headerText = isGameOver ? 'Puntuación Final' : 'Puntuación';
   }
 
@@ -102,14 +97,14 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                   </div>
                   {/* Check verde solo si este usuario ya votó (todos lo ven) */}
                   {isPlaying && hasVoted && (
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-neutral-950 flex items-center justify-center">
-                      <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-neutral-950 flex items-center justify-center">
+                      <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     </div>
                   )}
                   {!isPlaying && !showScores && (
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-neutral-950"></div>
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-neutral-950"></div>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
