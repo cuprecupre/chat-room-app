@@ -459,9 +459,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {/* Resultado de ronda */}
       {state.phase === 'round_result' && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm p-4 overflow-y-auto animate-fadeIn">
           <div className="w-full max-w-sm mx-auto space-y-6 my-8">
-            <div className="text-center space-y-2 animate-scaleIn">
+            <div className="text-center space-y-2 animate-scaleIn animate-delay-200">
               <h2 className="text-4xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
                 Resultado de la ronda
               </h2>
@@ -473,7 +473,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             </div>
             
             {/* Revelar impostor y palabra */}
-            <div className="bg-white/10 rounded-xl p-6 backdrop-blur-md">
+            <div className="bg-white/10 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400">
               <div className="space-y-6 text-center">
                 <div>
                   <span className="text-xs tracking-wider uppercase text-neutral-400">El impostor era</span>
@@ -491,12 +491,14 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             </div>
             
             {/* Puntuación */}
-            <div className="bg-white/5 rounded-xl p-4">
+            <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-600">
               <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
             </div>
             
             {isHost && (
-              <Button onClick={onPlayAgain} variant="primary" size="md">Siguiente Ronda</Button>
+              <div className="animate-fadeIn animate-delay-800">
+                <Button onClick={onPlayAgain} variant="primary" size="md">Siguiente Ronda</Button>
+              </div>
             )}
           </div>
         </div>
@@ -504,9 +506,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       
       {/* Fin de la partida */}
       {state.phase === 'game_over' && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm p-4 overflow-y-auto animate-fadeIn">
           <div className="w-full max-w-sm mx-auto space-y-6 my-8">
-            <div className="text-center space-y-3 animate-scaleIn">
+            <div className="text-center space-y-3 animate-scaleIn animate-delay-200">
               <h2 className="text-5xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
                 ¡Partida Terminada!
               </h2>
@@ -518,25 +520,27 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             </div>
             
             {/* Puntuación final */}
-            <div className="bg-white/5 rounded-xl p-4">
+            <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
               <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
             </div>
             
             {isHost && (
-              <Button 
-                onClick={() => {
-                  console.log('🎮 Click en Nueva Partida', { gameId: state.gameId, isHost });
-                  onPlayAgain();
-                }} 
-                variant="primary" 
-                size="md"
-              >
-                Nueva Partida
-              </Button>
+              <div className="animate-fadeIn animate-delay-600">
+                <Button 
+                  onClick={() => {
+                    console.log('🎮 Click en Nueva Partida', { gameId: state.gameId, isHost });
+                    onPlayAgain();
+                  }} 
+                  variant="primary" 
+                  size="md"
+                >
+                  Nueva Partida
+                </Button>
+              </div>
             )}
             
             {/* Footer */}
-            <div className="pt-4 border-t border-white/10 space-y-3">
+            <div className="pt-4 border-t border-white/10 space-y-3 animate-fadeIn animate-delay-800">
               <button
                 onClick={() => onCopyGameCode()}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150"
