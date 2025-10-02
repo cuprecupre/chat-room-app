@@ -162,6 +162,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   const prevPhaseRef = useRef(state.phase);
   const [reveal, setReveal] = useState(false);
   const [showTurnOverlay, setShowTurnOverlay] = useState(false);
+  const [isOverlayClosing, setIsOverlayClosing] = useState(false);
   const [eliminatedPlayerInfo, setEliminatedPlayerInfo] = useState(null);
   const [showCardEntrance, setShowCardEntrance] = useState(false);
   const revealTimeoutRef = useRef(null);
@@ -211,13 +212,20 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       }
       
       setShowTurnOverlay(true);
+      setIsOverlayClosing(false);
       
-      // Ocultar después de 2 segundos
+      // Iniciar animación de salida después de 1.7 segundos
       if (turnOverlayTimeoutRef.current) clearTimeout(turnOverlayTimeoutRef.current);
       turnOverlayTimeoutRef.current = setTimeout(() => {
-        setShowTurnOverlay(false);
-        setEliminatedPlayerInfo(null);
-      }, 2000);
+        setIsOverlayClosing(true);
+        
+        // Ocultar completamente después de la animación (300ms)
+        setTimeout(() => {
+          setShowTurnOverlay(false);
+          setIsOverlayClosing(false);
+          setEliminatedPlayerInfo(null);
+        }, 300);
+      }, 1700);
     }
     
     prevTurnRef.current = currentTurn;
@@ -552,8 +560,8 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       
       {/* Overlay de nueva vuelta */}
       {showTurnOverlay && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm animate-fadeIn px-4">
-          <div className="text-center space-y-6 animate-scaleIn max-w-sm">
+        <div className={`fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm px-4 transition-opacity duration-300 ${isOverlayClosing ? 'opacity-0' : 'animate-fadeIn'}`}>
+          <div className={`text-center space-y-6 max-w-sm transition-all duration-300 ${isOverlayClosing ? 'opacity-0 scale-95' : 'animate-scaleIn'}`}>
             <h2 className="text-6xl font-bold text-orange-400" style={{fontFamily: 'Trocchi, serif'}}>
               Vuelta {state.currentTurn}
             </h2>
