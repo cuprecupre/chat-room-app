@@ -8,19 +8,20 @@ export function LoginScreen({ onLogin, error, isLoading, onOpenInstructions }) {
     <div className="w-full h-dvh flex flex-col">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md text-center space-y-4 sm:space-y-6">
-          <div className="perspective-1000">
+          <div className="perspective-1000 animate-scaleIn">
             <img src={heroImg} alt="El Impostor" className="mx-auto w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 rounded-full object-cover shadow-xl ring-1 ring-white/10 animate-tilt-oscillate" loading="lazy" />
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-neutral-50">El impostor</h1>
-          <p className="text-lg sm:text-xl text-gray-300">Alguien no dice la verdad.<br />¿Lo vas a descubrir?</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-neutral-50 animate-fadeIn">El impostor</h1>
+          <p className="text-lg sm:text-xl text-gray-300 animate-fadeIn">Alguien no dice la verdad.<br />¿Lo vas a descubrir?</p>
 
-          <Button 
-            onClick={onLogin} 
-            disabled={isLoading}
-            variant="outline"
-            size="md"
-            className="bg-white/5 border-white/10 text-white hover:bg-white/10"
-          >
+          <div className="animate-fadeIn">
+            <Button 
+              onClick={onLogin} 
+              disabled={isLoading}
+              variant="outline"
+              size="md"
+              className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+            >
             <span className="mr-3 inline-flex items-center justify-center align-middle">
               {isLoading ? (
                 <Spinner size="sm" />
@@ -41,11 +42,12 @@ export function LoginScreen({ onLogin, error, isLoading, onOpenInstructions }) {
               )}
             </span>
             <span className="align-middle">{isLoading ? 'Conectando...' : 'Continuar con Google'}</span>
-          </Button>
+            </Button>
+          </div>
 
           <button
             onClick={onOpenInstructions}
-            className="inline-flex items-center justify-center gap-2 text-neutral-400 hover:text-neutral-200 transition-colors duration-150"
+            className="inline-flex items-center justify-center gap-2 text-neutral-400 hover:text-neutral-200 transition-colors duration-150 animate-fadeIn"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
