@@ -108,6 +108,8 @@ class Game {
   playAgain(userId) {
     if (userId !== this.hostId) throw new Error('Solo el host puede empezar una nueva ronda.');
     
+    console.log(`[Game ${this.gameId}] playAgain called. Current phase: ${this.phase}`);
+    
     // Si el juego está en game_over, reiniciar completamente
     if (this.phase === 'game_over') {
       // Resetear todos los puntos y contadores
@@ -118,7 +120,9 @@ class Game {
       this.roundCount = 0;
       this.initialPlayerCount = this.players.length;
       this.maxRounds = this.initialPlayerCount * 2;
-      console.log(`[Game ${this.gameId}] Nueva partida iniciada. Jugadores: ${this.initialPlayerCount}, Max rondas: ${this.maxRounds}`);
+      console.log(`[Game ${this.gameId}] ✅ Nueva partida iniciada desde game_over. Jugadores: ${this.initialPlayerCount}, Max rondas: ${this.maxRounds}`);
+    } else {
+      console.log(`[Game ${this.gameId}] Continuando con siguiente ronda. Ronda actual: ${this.roundCount}`);
     }
     
     this.startNewRound();

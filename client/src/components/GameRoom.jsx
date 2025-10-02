@@ -8,16 +8,26 @@ import cardBackImg from '../assets/card-back.png';
 
 function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onVote }) {
   const isPlaying = gameState?.phase === 'playing';
+  const isRoundResult = gameState?.phase === 'round_result';
+  const isGameOver = gameState?.phase === 'game_over';
+  const showScores = isRoundResult || isGameOver;
+  
   const canVote = isPlaying && gameState?.canVote && !gameState?.hasVoted;
   const votedPlayers = gameState?.votedPlayers || [];
   const eliminatedPlayers = gameState?.eliminatedInRound || [];
   const activePlayers = gameState?.activePlayers || [];
   const myVote = gameState?.myVote || null; // A quién voté yo
+  const playerScores = gameState?.playerScores || {};
+  const lastRoundScores = gameState?.lastRoundScores || {};
   
   // Filtrar al usuario actual solo durante el juego (playing)
   const sortedPlayers = [...players]
     .filter(p => isPlaying ? p.uid !== currentUserId : true)
     .sort((a, b) => {
+      // Si mostramos puntos, ordenar por puntuación
+      if (showScores) {
+        return (playerScores[b.uid] || 0) - (playerScores[a.uid] || 0);
+      }
       // En lobby, usuario actual primero
       if (!isPlaying) {
         if (a.uid === currentUserId) return -1;
@@ -48,20 +58,30 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
     return myVote === playerId;
   };
 
+  // Determinar qué título mostrar
+  let headerText = `Jugadores Conectados: ${players.length}`;
+  if (isPlaying) {
+    headerText = 'Vota al impostor de esta lista';
+  } else if (showScores) {
+    headerText = isGameOver ? 'Puntuación Final' : 'Puntuación';
+  }
+
   return (
     <div className="w-full rounded-lg">
-      <p className={`mb-3 ${isPlaying ? 'text-base font-regular text-neutral-200' : 'text-sm font-regular text-neutral-500'}`}>
-        {isPlaying ? 'Vota al impostor de esta lista' : `Jugadores Conectados: ${players.length}`}
+      <p className={`mb-3 ${isPlaying || showScores ? 'text-base font-regular text-neutral-200' : 'text-sm font-regular text-neutral-500'}`}>
+        {headerText}
       </p>
       <ul className="space-y-2">
-        {sortedPlayers.map(p => {
+        {sortedPlayers.map((p, index) => {
           const isEliminated = eliminatedPlayers.includes(p.uid);
           const hasVoted = votedPlayers.includes(p.uid);
           const showVoteButton = canVoteFor(p.uid);
           const iVotedForThisPlayer = isMyVote(p.uid);
+          const score = playerScores[p.uid] || 0;
+          const scoreGained = lastRoundScores[p.uid] || 0;
           
           return (
-            <li key={p.uid} className={`flex items-center justify-between bg-white/5 p-4 rounded-md ${isEliminated ? 'opacity-50' : ''}`}>
+            <li key={p.uid} className={`flex items-center justify-between bg-white/5 p-4 rounded-md ${isEliminated ? 'opacity-50' : ''} ${isGameOver && index === 0 ? 'bg-orange-500/10 border border-orange-500/30' : ''}`}>
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <img 
@@ -88,18 +108,38 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                       </svg>
                     </div>
                   )}
-                  {!isPlaying && (
+                  {!isPlaying && !showScores && (
                     <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-neutral-950"></div>
                   )}
                 </div>
-                <div>
-                  <span className="font-medium">{p.name}{p.uid === currentUserId ? ' (Tú)' : ''}</span>
-                  {isEliminated && <span className="text-xs text-neutral-500 ml-2">(Eliminado)</span>}
+                <div className="flex items-center gap-2">
+                  {/* Medallas en game_over */}
+                  {isGameOver && index === 0 && <span className="text-xl">🏆</span>}
+                  {isGameOver && index === 1 && <span className="text-xl">🥈</span>}
+                  {isGameOver && index === 2 && <span className="text-xl">🥉</span>}
+                  
+                  <div>
+                    <span className={`font-medium ${isGameOver && index === 0 ? 'text-orange-400' : ''}`}>
+                      {p.name.split(' ')[0]}{p.uid === currentUserId ? ' (Tú)' : ''}
+                    </span>
+                    {isEliminated && <span className="text-xs text-neutral-500 ml-2">(Eliminado)</span>}
+                  </div>
                 </div>
               </div>
               
-              {/* Botón de votar */}
-              {(showVoteButton || iVotedForThisPlayer) && (
+              {/* Mostrar puntos o botón de votar según fase */}
+              {showScores ? (
+                <div className="text-right">
+                  <span className={`font-medium ${isGameOver && index === 0 ? 'text-orange-400' : 'text-neutral-300'}`}>
+                    {score} pts
+                  </span>
+                  {isRoundResult && scoreGained > 0 && (
+                    <div className="text-xs text-green-400 font-medium mt-0.5">
+                      +{scoreGained}
+                    </div>
+                  )}
+                </div>
+              ) : (showVoteButton || iVotedForThisPlayer) && (
                 <Button
                   onClick={() => onVote(p.uid)}
                   variant="outline"
@@ -380,54 +420,14 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           </div>
         </div>
         
-        {/* Puntos ganados en esta ronda */}
-        <div className="w-full max-w-sm mx-auto bg-white/5 rounded-lg p-4 border border-white/10 mb-6">
-          <h3 className="text-sm font-semibold text-neutral-300 mb-3 text-center">Puntos ganados</h3>
-          <div className="space-y-2">
-            {state.players.map(p => {
-              const scoreGained = state.lastRoundScores[p.uid] || 0;
-              return (
-                <div key={p.uid} className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    {p.uid === state.impostorId && (
-                      <svg className="w-4 h-4 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                      </svg>
-                    )}
-                    <span className={`${p.uid === user.uid ? 'font-semibold text-white' : 'text-neutral-400'}`}>
-                      {p.name.split(' ')[0]}{p.uid === user.uid ? ' (Tú)' : ''}
-                    </span>
-                  </div>
-                  <span className={`font-mono ${scoreGained > 0 ? 'text-green-400 font-bold' : 'text-neutral-500'}`}>
-                    {scoreGained > 0 ? '+' : ''}{scoreGained} pts
-                  </span>
-                </div>
-              );
-            })}
+        {/* Info de progreso */}
+        {state.roundCount && state.maxRounds && (
+          <div className="w-full max-w-sm mx-auto bg-white/5 rounded-lg p-3 border border-white/10 mb-6">
+            <p className="text-center text-sm text-neutral-400">
+              Ronda {state.roundCount}/{state.maxRounds} • Objetivo: {state.targetScore} puntos
+            </p>
           </div>
-        </div>
-        
-        {/* Puntuación total actualizada */}
-        <div className="w-full max-w-sm mx-auto bg-white/5 rounded-lg p-4 border border-white/10 mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-neutral-300">Puntuación Total</h3>
-            <span className="text-xs text-neutral-500">Ronda {state.roundCount}/{state.maxRounds}</span>
-          </div>
-          <div className="space-y-2">
-            {[...state.players]
-              .sort((a, b) => (state.playerScores[b.uid] || 0) - (state.playerScores[a.uid] || 0))
-              .map(p => (
-                <div key={p.uid} className="flex items-center justify-between text-sm">
-                  <span className={`${p.uid === user.uid ? 'font-semibold text-white' : 'text-neutral-400'}`}>
-                    {p.name.split(' ')[0]}{p.uid === user.uid ? ' (Tú)' : ''}
-                  </span>
-                  <span className={`font-mono ${p.uid === user.uid ? 'font-bold text-white' : 'text-neutral-400'}`}>
-                    {state.playerScores[p.uid] || 0} pts
-                  </span>
-                </div>
-              ))}
-          </div>
-        </div>
+        )}
         
         {isHost && (
           <div className="w-full max-w-sm mx-auto">
@@ -447,34 +447,14 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         <div className="w-full max-w-sm mx-auto text-center mb-5">
           <h2 className="text-3xl font-bold text-neutral-50 mb-2" style={{fontFamily: 'Trocchi, serif'}}>¡Partida Terminada!</h2>
           {state.winner && (
-            <p className="text-xl text-yellow-400 font-semibold">
+            <p className="text-xl text-orange-400 font-semibold">
               🏆 Ganador: {state.winner}
             </p>
           )}
         </div>
         
-        {/* Puntuación final */}
-        <div className="w-full max-w-sm mx-auto bg-white/5 rounded-lg p-4 border border-yellow-500/30 mb-6">
-          <h3 className="text-sm font-semibold text-neutral-300 mb-3 text-center">Puntuación Final</h3>
-          <div className="space-y-3">
-            {[...state.players]
-              .sort((a, b) => (state.playerScores[b.uid] || 0) - (state.playerScores[a.uid] || 0))
-              .map((p, index) => (
-                <div key={p.uid} className={`flex items-center justify-between p-2 rounded ${index === 0 ? 'bg-yellow-500/10' : ''}`}>
-                  <div className="flex items-center gap-2">
-                    {index === 0 && <span className="text-xl">🏆</span>}
-                    {index === 1 && <span className="text-xl">🥈</span>}
-                    {index === 2 && <span className="text-xl">🥉</span>}
-                    <span className={`${p.uid === user.uid ? 'font-bold text-white' : index === 0 ? 'font-semibold text-yellow-400' : 'text-neutral-400'}`}>
-                      {p.name}{p.uid === user.uid ? ' (Tú)' : ''}
-                    </span>
-                  </div>
-                  <span className={`font-mono text-lg ${index === 0 ? 'font-bold text-yellow-400' : 'text-neutral-400'}`}>
-                    {state.playerScores[p.uid] || 0} pts
-                  </span>
-                </div>
-              ))}
-          </div>
+        <div className="w-full max-w-sm mx-auto mt-4">
+          <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
         </div>
         
         {isHost && (
@@ -482,10 +462,6 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             <Button onClick={onPlayAgain} variant="primary" size="md">Nueva Partida</Button>
           </div>
         )}
-        
-        <div className="w-full max-w-sm mx-auto mt-4">
-          <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
-        </div>
         {/* Footer único y consistente */}
         <div className="w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5">
           <div className="space-y-4">
