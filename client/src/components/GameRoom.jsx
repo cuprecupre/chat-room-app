@@ -506,7 +506,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               </div>
             )}
           </div>
-          )}
+        )}
         </div>
       )}
       
@@ -570,7 +570,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               </Button>
             </div>
           </div>
-          )}
+        )}
         </div>
       )}
       
