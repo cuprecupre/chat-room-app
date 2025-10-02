@@ -12,6 +12,16 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   const votedPlayers = gameState?.votedPlayers || [];
   const eliminatedPlayers = gameState?.eliminatedInRound || [];
   const activePlayers = gameState?.activePlayers || [];
+  const myVote = gameState?.myVote || null; // A quién voté yo
+  const prevMyVoteRef = useRef(null);
+  
+  // Debug: verificar myVote solo cuando cambie
+  useEffect(() => {
+    if (isPlaying && myVote !== prevMyVoteRef.current) {
+      console.log('🗳️ Mi voto cambió:', prevMyVoteRef.current, '→', myVote);
+      prevMyVoteRef.current = myVote;
+    }
+  }, [myVote, isPlaying]);
   
   // Ordenar jugadores para que el usuario actual aparezca primero
   const sortedPlayers = [...players].sort((a, b) => {
@@ -36,6 +46,10 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
            !eliminatedPlayers.includes(playerId) &&
            activePlayers.includes(playerId);
   };
+  
+  const isMyVote = (playerId) => {
+    return myVote === playerId;
+  };
 
   return (
     <div className="w-full rounded-lg">
@@ -45,6 +59,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
           const isEliminated = eliminatedPlayers.includes(p.uid);
           const hasVoted = votedPlayers.includes(p.uid);
           const showVoteButton = canVoteFor(p.uid);
+          const iVotedForThisPlayer = isMyVote(p.uid);
           
           return (
             <li key={p.uid} className={`flex items-center justify-between bg-white/5 p-4 rounded-md ${isEliminated ? 'opacity-50' : ''}`}>
@@ -66,14 +81,15 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                   >
                     {p.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                   </div>
-                  {/* Check indicator si ha votado, sino bullet de estado */}
-                  {isPlaying && hasVoted ? (
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-blue-500 rounded-full border-2 border-neutral-950 flex items-center justify-center">
+                  {/* Check verde solo si este usuario ya votó (todos lo ven) */}
+                  {isPlaying && hasVoted && (
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-neutral-950 flex items-center justify-center">
                       <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     </div>
-                  ) : (
+                  )}
+                  {!isPlaying && (
                     <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-neutral-950"></div>
                   )}
                 </div>
@@ -84,21 +100,23 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
               </div>
               
               {/* Botón de votar */}
-              {showVoteButton && (
-                <button
+              {(showVoteButton || iVotedForThisPlayer) && (
+                <Button
                   onClick={() => onVote(p.uid)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:text-white hover:bg-white/10 active:bg-white/20 rounded-md transition-all duration-150 active:scale-95"
+                  variant="outline"
+                  size="sm"
+                  disabled={iVotedForThisPlayer}
+                  className={`!w-auto gap-2 px-4 ${
+                    iVotedForThisPlayer 
+                      ? 'border-green-500 text-green-400 bg-green-500/10 hover:bg-green-500/10' 
+                      : ''
+                  }`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" strokeWidth="2"/>
-                    <circle cx="12" cy="12" r="3" fill="currentColor"/>
-                    <line x1="12" y1="2" x2="12" y2="4" strokeWidth="2"/>
-                    <line x1="12" y1="20" x2="12" y2="22" strokeWidth="2"/>
-                    <line x1="2" y1="12" x2="4" y2="12" strokeWidth="2"/>
-                    <line x1="20" y1="12" x2="22" y1="12" strokeWidth="2"/>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
                   </svg>
-                  <span>Votar</span>
-                </button>
+                  <span>{iVotedForThisPlayer ? 'Votado' : 'Votar'}</span>
+                </Button>
               )}
             </li>
           );

@@ -358,6 +358,7 @@ class Game {
         baseState.eliminatedInRound = this.eliminatedInRound;
         baseState.hasVoted = this.hasVoted(userId);
         baseState.votedPlayers = Object.keys(this.votes);
+        baseState.myVote = this.votes[userId] || null; // A quién votó este usuario
         baseState.activePlayers = this.getActivePlayers();
         baseState.canVote = !this.eliminatedInRound.includes(userId);
       }
