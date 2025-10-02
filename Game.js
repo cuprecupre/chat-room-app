@@ -108,10 +108,17 @@ class Game {
   playAgain(userId) {
     if (userId !== this.hostId) throw new Error('Solo el host puede empezar una nueva ronda.');
     
-    // Check if game is over (someone reached target score or max rounds)
-    const winner = this.checkGameOver();
-    if (winner) {
-      throw new Error('La partida ha terminado. Inicia una nueva partida desde el lobby.');
+    // Si el juego está en game_over, reiniciar completamente
+    if (this.phase === 'game_over') {
+      // Resetear todos los puntos y contadores
+      this.playerScores = {};
+      this.players.forEach(p => {
+        this.playerScores[p.uid] = 0;
+      });
+      this.roundCount = 0;
+      this.initialPlayerCount = this.players.length;
+      this.maxRounds = this.initialPlayerCount * 2;
+      console.log(`[Game ${this.gameId}] Nueva partida iniciada. Jugadores: ${this.initialPlayerCount}, Max rondas: ${this.maxRounds}`);
     }
     
     this.startNewRound();

@@ -477,6 +477,12 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           </div>
         </div>
         
+        {isHost && (
+          <div className="w-full max-w-sm mx-auto mt-6">
+            <Button onClick={onPlayAgain} variant="primary" size="md">Nueva Partida</Button>
+          </div>
+        )}
+        
         <div className="w-full max-w-sm mx-auto mt-4">
           <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
         </div>
