@@ -166,7 +166,6 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   const [showCardEntrance, setShowCardEntrance] = useState(false);
   const revealTimeoutRef = useRef(null);
   const turnOverlayTimeoutRef = useRef(null);
-  const hasShownCardRef = useRef(false);
 
   useEffect(() => {
     const previousPlayers = prevPlayersRef.current;
@@ -233,10 +232,11 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
     if (currentPhase === 'playing' && prevPhase !== 'playing') {
       setReveal(false);
       
-      // Mostrar animación de entrada solo la primera vez
-      if (!hasShownCardRef.current) {
+      // Mostrar animación de entrada si viene del lobby o game_over
+      const shouldShowAnimation = prevPhase === 'lobby' || prevPhase === 'game_over';
+      
+      if (shouldShowAnimation) {
         setShowCardEntrance(true);
-        hasShownCardRef.current = true;
         
         // Quitar la animación después de que termine
         setTimeout(() => {
