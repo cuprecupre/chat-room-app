@@ -196,3 +196,18 @@ h1, h2, h3, h4, h5, h6 {
   animation-delay: 500ms;
   animation-fill-mode: both;
 }
+
+.animate-delay-600 {
+  animation-delay: 600ms;
+  animation-fill-mode: both;
+}
+
+.animate-delay-800 {
+  animation-delay: 800ms;
+  animation-fill-mode: both;
+}
+
+.animate-delay-1000 {
+  animation-delay: 1000ms;
+  animation-fill-mode: both;
+}
