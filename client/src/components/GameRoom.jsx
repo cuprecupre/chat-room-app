@@ -398,10 +398,14 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                       {state.role === 'impostor' ? (
                         <>
                           {state.secretCategory && (
-                            <p className="text-sm text-gray-200">
-                              La pista para descubrir la palabra secreta es:<br />
-                              <span className="text-white font-semibold uppercase" style={{fontFamily: 'Trocchi, serif'}}>{state.secretCategory}</span>
-                            </p>
+                            <div>
+                              <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-200">
+                                <span>Pista</span>
+                              </div>
+                              <p className="font-semibold text-xl mt-1 text-white" style={{fontFamily: 'Trocchi, serif'}}>
+                                {capitalize(state.secretCategory)}
+                              </p>
+                            </div>
                           )}
                         </>
                       ) : (
