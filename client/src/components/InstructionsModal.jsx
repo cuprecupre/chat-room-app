@@ -50,13 +50,13 @@ export function InstructionsModal({ isOpen, onClose }) {
         <section className="mb-8">
           <h3 className="text-xl font-semibold text-orange-400 mb-4">Objetivo del juego</h3>
           
-          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">🎯 Como jugador</h4>
+          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">Como jugador</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><span className="text-white"><strong>Amigo</strong></span>: descubrir quién es el impostor y ganar puntos por ello.</li>
             <li><span className="text-orange-400"><strong>Impostor</strong></span>: <strong>fingir</strong> que conoces la palabra secreta para <strong>no ser descubierto y ganar puntos por ello.</strong></li>
           </ul>
 
-          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">🏆 Para ganar la partida</h4>
+          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">Para ganar la partida</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li>Acumula <strong>15 puntos</strong> a lo largo de varias rondas.</li>
             <li>La partida continúa hasta que <strong>alguien alcance</strong> ese total o hasta que se juegue el número máximo de rondas.</li>
@@ -83,7 +83,7 @@ export function InstructionsModal({ isOpen, onClose }) {
         <section className="mb-8">
           <h3 className="text-xl font-semibold text-orange-400 mb-4">Desarrollo del juego</h3>
           
-          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">🔄 Estructura general</h4>
+          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">Estructura general</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li>Una <strong>partida</strong> se compone de <strong>varias rondas</strong>.</li>
             <li>Cada <strong>ronda</strong> puede tener <strong>hasta 3 vueltas</strong>.</li>
@@ -100,8 +100,8 @@ export function InstructionsModal({ isOpen, onClose }) {
             Al empezar una ronda, cada jugador recibe una carta en la app:
           </p>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li><span className="text-white">⚪ <strong>Amigos</strong></span>: ven la <strong>palabra secreta</strong> (ej.: "Lavadora").</li>
-            <li><span className="text-orange-400">🟠 <strong>Impostor</strong></span>: recibe <strong>una pista orientativa</strong> (ej.: "Electrodomésticos"). <strong>No</strong> ve la palabra exacta.</li>
+            <li><span className="text-white"><strong>Amigos</strong></span>: ven la <strong>palabra secreta</strong> (ej.: "Lavadora").</li>
+            <li><span className="text-orange-400"><strong>Impostor</strong></span>: recibe <strong>una pista orientativa</strong> (ej.: "Electrodomésticos"). <strong>No</strong> ve la palabra exacta.</li>
           </ul>
           <div className="mt-3 p-3 bg-white/5 border border-white/10 rounded-lg">
             <p className="text-sm text-neutral-400 italic">
@@ -185,13 +185,13 @@ export function InstructionsModal({ isOpen, onClose }) {
         <section className="mb-8">
           <h3 className="text-xl font-semibold text-orange-400 mb-4">Sistema de puntos</h3>
           
-          <h4 className="text-lg font-semibold text-neutral-200 mb-2 mt-4"><span className="text-white">⚪ Amigos</span></h4>
+          <h4 className="text-lg font-semibold text-neutral-200 mb-2 mt-4"><span className="text-white">Amigos</span></h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><strong>+1</strong> punto por <strong>votar correctamente</strong> al impostor (aunque no sea expulsado) en cada vuelta.</li>
             <li><strong>+1</strong> punto adicional si el impostor es <strong>expulsado</strong>.</li>
           </ul>
 
-          <h4 className="text-lg font-semibold text-neutral-200 mb-2 mt-4"><span className="text-orange-400">🟠 Impostor</span></h4>
+          <h4 className="text-lg font-semibold text-neutral-200 mb-2 mt-4"><span className="text-orange-400">Impostor</span></h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><strong>+2</strong> puntos por <strong>sobrevivir cada vuelta</strong>.</li>
             <li><strong>+4</strong> puntos extra si <strong>gana la ronda</strong> (no lo descubren tras 3 vueltas).</li>
