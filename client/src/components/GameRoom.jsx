@@ -483,7 +483,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 </div>
                 <div className="pt-4 border-t border-white/10">
                   <span className="text-xs tracking-wider uppercase text-neutral-400">Palabra secreta</span>
-                  <p className="font-semibold text-3xl text-blue-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
+                  <p className="font-semibold text-2xl text-white mt-2" style={{fontFamily: 'Trocchi, serif'}}>
                     {capitalize(state.secretWord)}
                   </p>
                 </div>
