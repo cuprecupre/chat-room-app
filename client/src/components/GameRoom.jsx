@@ -321,8 +321,17 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         </div>
       )}
 
-      {state.phase === 'playing' && (
+      {(state.phase === 'playing' || 
+        (state.phase === 'round_result' && (!state.impostorName || !state.secretWord)) ||
+        (state.phase === 'game_over' && state.winner === undefined)) && (
         <>
+        {/* Overlay de carga cuando estamos esperando datos de resultado */}
+        {(state.phase === 'round_result' || state.phase === 'game_over') && (
+          <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm animate-fadeIn">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-400"></div>
+          </div>
+        )}
+        
         {/* Indicador de ronda y vuelta */}
         <div className="w-full max-w-sm mx-auto mb-4">
           <p className="text-center text-xs text-neutral-500 mb-3">
@@ -458,13 +467,8 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       )}
 
       {/* Resultado de ronda */}
-      {state.phase === 'round_result' && (
+      {state.phase === 'round_result' && state.impostorName && state.secretWord && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm p-4 overflow-y-auto animate-fadeIn">
-          {!state.impostorName || !state.secretWord ? (
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-400"></div>
-            </div>
-          ) : (
           <div className="w-full max-w-sm mx-auto space-y-6 my-8">
             <div className="text-center space-y-2 animate-scaleIn animate-delay-200">
               <h2 className="text-4xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
@@ -506,18 +510,12 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               </div>
             )}
           </div>
-        )}
         </div>
       )}
       
       {/* Fin de la partida */}
-      {state.phase === 'game_over' && (
+      {state.phase === 'game_over' && state.winner !== undefined && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm p-4 overflow-y-auto animate-fadeIn">
-          {state.winner === undefined ? (
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-400"></div>
-            </div>
-          ) : (
           <div className="w-full max-w-sm mx-auto space-y-6 my-8">
             <div className="text-center space-y-3 animate-scaleIn animate-delay-200">
               <h2 className="text-5xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
@@ -570,7 +568,6 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               </Button>
             </div>
           </div>
-        )}
         </div>
       )}
       
