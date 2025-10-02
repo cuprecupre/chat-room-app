@@ -113,11 +113,6 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  {/* Medallas en game_over */}
-                  {isGameOver && index === 0 && <span className="text-xl">🏆</span>}
-                  {isGameOver && index === 1 && <span className="text-xl">🥈</span>}
-                  {isGameOver && index === 2 && <span className="text-xl">🥉</span>}
-                  
                   <div>
                     <span className={`font-medium ${isGameOver && index === 0 ? 'text-orange-400' : ''}`}>
                       {p.name.split(' ')[0]}{p.uid === currentUserId ? ' (Tú)' : ''}
@@ -362,15 +357,16 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             </button>
           </div>
         </div>
-        {isHost && (
-          <div className="w-full max-w-sm mx-auto">
-            <Button onClick={onEndGame} variant="outline" size="md" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20">Terminar Partida</Button>
-          </div>
-        )}
         
         <div className="w-full max-w-sm mx-auto mt-4">
           <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
         </div>
+        
+        {isHost && (
+          <div className="w-full max-w-sm mx-auto mt-6">
+            <Button onClick={onEndGame} variant="outline" size="md" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20">Terminar Partida</Button>
+          </div>
+        )}
         {/* Footer único y consistente */}
         <div className="w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5">
           <div className="space-y-4">
@@ -448,7 +444,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           <h2 className="text-3xl font-bold text-neutral-50 mb-2" style={{fontFamily: 'Trocchi, serif'}}>¡Partida Terminada!</h2>
           {state.winner && (
             <p className="text-xl text-orange-400 font-semibold">
-              🏆 Ganador: {state.winner}
+              Ganador: {state.winner}
             </p>
           )}
         </div>
@@ -459,7 +455,16 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         
         {isHost && (
           <div className="w-full max-w-sm mx-auto mt-6">
-            <Button onClick={onPlayAgain} variant="primary" size="md">Nueva Partida</Button>
+            <Button 
+              onClick={() => {
+                console.log('🎮 Click en Nueva Partida', { gameId: state.gameId, isHost });
+                onPlayAgain();
+              }} 
+              variant="primary" 
+              size="md"
+            >
+              Nueva Partida
+            </Button>
           </div>
         )}
         {/* Footer único y consistente */}

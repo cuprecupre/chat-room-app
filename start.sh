@@ -5,6 +5,12 @@
 
 echo "🚀 Iniciando El Impostor..."
 
+# Matar procesos existentes en los puertos 3000 y 5173
+echo "🧹 Limpiando procesos existentes..."
+lsof -ti:3000 | xargs kill -9 2>/dev/null
+lsof -ti:5173 | xargs kill -9 2>/dev/null
+sleep 1
+
 # Función para limpiar procesos al salir
 cleanup() {
     echo "🛑 Deteniendo servidores..."

@@ -319,16 +319,26 @@ class Game {
     if (this.roundCount >= this.maxRounds) {
       // Encontrar al jugador con más puntos
       let maxScore = 0;
-      let winner = null;
+      const playersWithMaxScore = [];
       
       Object.entries(this.playerScores).forEach(([playerId, score]) => {
         if (score > maxScore) {
           maxScore = score;
-          winner = playerId;
+          playersWithMaxScore.length = 0; // Limpiar array
+          playersWithMaxScore.push(playerId);
+        } else if (score === maxScore) {
+          playersWithMaxScore.push(playerId);
         }
       });
       
-      return winner;
+      // Solo declarar ganador si hay uno claro (no empate)
+      if (playersWithMaxScore.length === 1) {
+        return playersWithMaxScore[0];
+      }
+      
+      // Si hay empate, continuar jugando
+      console.log(`[Game ${this.gameId}] Empate con ${maxScore} puntos. Continuando...`);
+      return null;
     }
     
     return null;
