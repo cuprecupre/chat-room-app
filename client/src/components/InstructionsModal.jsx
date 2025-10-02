@@ -8,7 +8,7 @@ export function InstructionsModal({ isOpen, onClose }) {
         
         {/* ¿Qué es El impostor? */}
         <section className="mb-8">
-          <h3 className="text-xl font-semibold text-neutral-50 mb-4">¿Qué es <em>El impostor</em>?</h3>
+          <h3 className="text-xl font-semibold text-orange-400 mb-4">¿Qué es <em>El impostor</em>?</h3>
           <p className="text-neutral-300 leading-relaxed text-base">
             <em>El impostor</em> es un juego social de deducción que combina una <strong>app web</strong> con dinámica <strong>presencial</strong>.
           </p>
@@ -21,18 +21,22 @@ export function InstructionsModal({ isOpen, onClose }) {
           </p>
         </section>
 
+        <div className="my-8 h-px bg-white/10" />
+
         {/* Qué necesitas */}
         <section className="mb-8">
-          <h3 className="text-xl font-semibold text-neutral-50 mb-4">Qué necesitas</h3>
+          <h3 className="text-xl font-semibold text-orange-400 mb-4">Qué necesitas</h3>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><strong>Un dispositivo</strong> con conexión por jugador.</li>
             <li><strong>Espacio para jugar</strong> juntos (mesa/sofá) o <strong>videollamada</strong>.</li>
           </ul>
         </section>
 
+        <div className="my-8 h-px bg-white/10" />
+
         {/* Componentes del juego */}
         <section className="mb-8">
-          <h3 className="text-xl font-semibold text-neutral-50 mb-4">Componentes del juego</h3>
+          <h3 className="text-xl font-semibold text-orange-400 mb-4">Componentes del juego</h3>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><strong>App web</strong>: gestiona <strong>roles, cartas, votos y puntos</strong>.</li>
             <li><strong>Interacción presencial</strong>: <strong>turnos y pistas</strong> se realizan <strong>fuera de la app</strong>, hablando en voz alta.</li>
@@ -40,14 +44,16 @@ export function InstructionsModal({ isOpen, onClose }) {
           </ul>
         </section>
 
+        <div className="my-8 h-px bg-white/10" />
+
         {/* Objetivo del juego */}
         <section className="mb-8">
-          <h3 className="text-xl font-semibold text-neutral-50 mb-4">Objetivo del juego</h3>
+          <h3 className="text-xl font-semibold text-orange-400 mb-4">Objetivo del juego</h3>
           
           <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">🎯 Como jugador</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li><strong>Amigo</strong>: descubrir quién es el impostor y ganar puntos por ello.</li>
-            <li><strong>Impostor</strong>: <strong>fingir</strong> que conoces la palabra secreta para <strong>no ser descubierto y ganar puntos por ello.</strong></li>
+            <li><span className="text-white"><strong>Amigo</strong></span>: descubrir quién es el impostor y ganar puntos por ello.</li>
+            <li><span className="text-orange-400"><strong>Impostor</strong></span>: <strong>fingir</strong> que conoces la palabra secreta para <strong>no ser descubierto y ganar puntos por ello.</strong></li>
           </ul>
 
           <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">🏆 Para ganar la partida</h4>
@@ -58,9 +64,11 @@ export function InstructionsModal({ isOpen, onClose }) {
           </ul>
         </section>
 
+        <div className="my-8 h-px bg-white/10" />
+
         {/* Preparación */}
         <section className="mb-8">
-          <h3 className="text-xl font-semibold text-neutral-50 mb-4">Preparación</h3>
+          <h3 className="text-xl font-semibold text-orange-400 mb-4">Preparación</h3>
           <ol className="list-decimal list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li>Abre la <strong>app web</strong> en tu dispositivo.</li>
             <li><strong>Inicia sesión</strong>.</li>
@@ -69,9 +77,11 @@ export function InstructionsModal({ isOpen, onClose }) {
           </ol>
         </section>
 
+        <div className="my-8 h-px bg-white/10" />
+
         {/* Desarrollo del juego */}
         <section className="mb-8">
-          <h3 className="text-xl font-semibold text-neutral-50 mb-4">Desarrollo del juego</h3>
+          <h3 className="text-xl font-semibold text-orange-400 mb-4">Desarrollo del juego</h3>
           
           <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">🔄 Estructura general</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
@@ -81,15 +91,17 @@ export function InstructionsModal({ isOpen, onClose }) {
           </ul>
         </section>
 
+        <div className="my-8 h-px bg-white/10" />
+
         {/* Roles y cartas */}
         <section className="mb-8">
-          <h3 className="text-xl font-semibold text-neutral-50 mb-4">Roles y cartas</h3>
+          <h3 className="text-xl font-semibold text-orange-400 mb-4">Roles y cartas</h3>
           <p className="text-neutral-300 leading-relaxed mb-3 text-base">
             Al empezar una ronda, cada jugador recibe una carta en la app:
           </p>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li>🟦 <strong>Amigos</strong>: ven la <strong>palabra secreta</strong> (ej.: "Lavadora").</li>
-            <li>🟥 <strong>Impostor</strong>: recibe <strong>una pista orientativa</strong> (ej.: "Electrodomésticos"). <strong>No</strong> ve la palabra exacta.</li>
+            <li><span className="text-white">⚪ <strong>Amigos</strong></span>: ven la <strong>palabra secreta</strong> (ej.: "Lavadora").</li>
+            <li><span className="text-orange-400">🟠 <strong>Impostor</strong></span>: recibe <strong>una pista orientativa</strong> (ej.: "Electrodomésticos"). <strong>No</strong> ve la palabra exacta.</li>
           </ul>
           <div className="mt-3 p-3 bg-white/5 border border-white/10 rounded-lg">
             <p className="text-sm text-neutral-400 italic">
@@ -98,9 +110,11 @@ export function InstructionsModal({ isOpen, onClose }) {
           </div>
         </section>
 
+        <div className="my-8 h-px bg-white/10" />
+
         {/* Dinámica presencial */}
         <section className="mb-8">
-          <h3 className="text-xl font-semibold text-neutral-50 mb-4">Dinámica presencial</h3>
+          <h3 className="text-xl font-semibold text-orange-400 mb-4">Dinámica presencial</h3>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li>La app <strong>no</strong> gestiona turnos.</li>
             <li>Los <strong>turnos</strong> se organizan <strong>en persona</strong>: cada jugador dice <strong>una pista breve</strong> en voz alta cuando el grupo lo indique.</li>
@@ -109,9 +123,11 @@ export function InstructionsModal({ isOpen, onClose }) {
           </ul>
         </section>
 
+        <div className="my-8 h-px bg-white/10" />
+
         {/* Una ronda, paso a paso */}
         <section className="mb-8">
-          <h3 className="text-xl font-semibold text-neutral-50 mb-4">Una ronda, paso a paso</h3>
+          <h3 className="text-xl font-semibold text-orange-400 mb-4">Una ronda, paso a paso</h3>
           
           <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">1) Primera vuelta de pistas</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base mb-3">
@@ -163,17 +179,19 @@ export function InstructionsModal({ isOpen, onClose }) {
           </ul>
         </section>
 
+        <div className="my-8 h-px bg-white/10" />
+
         {/* Sistema de puntos */}
         <section className="mb-8">
-          <h3 className="text-xl font-semibold text-neutral-50 mb-4">Sistema de puntos</h3>
+          <h3 className="text-xl font-semibold text-orange-400 mb-4">Sistema de puntos</h3>
           
-          <h4 className="text-lg font-semibold text-blue-400 mb-2 mt-4">🟦 Amigos</h4>
+          <h4 className="text-lg font-semibold text-neutral-200 mb-2 mt-4"><span className="text-white">⚪ Amigos</span></h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><strong>+1</strong> punto por <strong>votar correctamente</strong> al impostor (aunque no sea expulsado) en cada vuelta.</li>
             <li><strong>+1</strong> punto adicional si el impostor es <strong>expulsado</strong>.</li>
           </ul>
 
-          <h4 className="text-lg font-semibold text-red-400 mb-2 mt-4">🟥 Impostor</h4>
+          <h4 className="text-lg font-semibold text-neutral-200 mb-2 mt-4"><span className="text-orange-400">🟠 Impostor</span></h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><strong>+2</strong> puntos por <strong>sobrevivir cada vuelta</strong>.</li>
             <li><strong>+4</strong> puntos extra si <strong>gana la ronda</strong> (no lo descubren tras 3 vueltas).</li>
@@ -186,21 +204,25 @@ export function InstructionsModal({ isOpen, onClose }) {
           </div>
         </section>
 
+        <div className="my-8 h-px bg-white/10" />
+
         {/* Reglas adicionales */}
         <section className="mb-8">
-          <h3 className="text-xl font-semibold text-neutral-50 mb-4">Reglas adicionales</h3>
+          <h3 className="text-xl font-semibold text-orange-400 mb-4">Reglas adicionales</h3>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><strong>Empate</strong> en la votación: si hay empate se juega otra vuelta.</li>
             <li><strong>Desconexiones</strong>: quien se desconecte puede <strong>reingresar</strong> pero no podrá votar hasta que termine la ronda. Los puntos que había ganado no los pierde.</li>
           </ul>
         </section>
 
+        <div className="my-8 h-px bg-white/10" />
+
         {/* Consejos */}
         <section className="mb-8">
-          <h3 className="text-xl font-semibold text-neutral-50 mb-4">Consejos</h3>
+          <h3 className="text-xl font-semibold text-orange-400 mb-4">Consejos</h3>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li><strong>Amigos</strong>: buscar pistas para que las entiendan <strong>los amigos</strong>, pero que <strong>no regalen</strong> la palabra.</li>
-            <li><strong>Impostor</strong>: escuchad antes de hablar; <strong>coherencia y brillantez</strong>.</li>
+            <li><span className="text-white"><strong>Amigos</strong></span>: buscar pistas para que las entiendan <strong>los amigos</strong>, pero que <strong>no regalen</strong> la palabra.</li>
+            <li><span className="text-orange-400"><strong>Impostor</strong></span>: escuchad antes de hablar; <strong>coherencia y brillantez</strong>.</li>
             <li>La <strong>votación</strong> es tan importante como la pista: una sospecha bien argumentada <strong>mueve</strong> a todo el grupo.</li>
           </ul>
         </section>
