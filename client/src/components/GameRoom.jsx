@@ -159,11 +159,14 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   const capitalize = (s) => (typeof s === 'string' && s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s);
   const prevPlayersRef = useRef(state.players);
   const prevTurnRef = useRef(state.currentTurn);
+  const prevPhaseRef = useRef(state.phase);
   const [reveal, setReveal] = useState(false);
   const [showTurnOverlay, setShowTurnOverlay] = useState(false);
   const [eliminatedPlayerInfo, setEliminatedPlayerInfo] = useState(null);
+  const [showCardEntrance, setShowCardEntrance] = useState(false);
   const revealTimeoutRef = useRef(null);
   const turnOverlayTimeoutRef = useRef(null);
+  const hasShownCardRef = useRef(false);
 
   useEffect(() => {
     const previousPlayers = prevPlayersRef.current;
@@ -193,8 +196,11 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
     const prevTurn = prevTurnRef.current;
     const currentTurn = state.currentTurn;
     
-    // Si la vuelta cambió y es vuelta 2 o superior (nueva vuelta), mostrar overlay
+    // Si la vuelta cambió y es vuelta 2 o superior (nueva vuelta), mostrar overlay y resetear carta
     if (state.phase === 'playing' && prevTurn && currentTurn > prevTurn && currentTurn > 1) {
+      // Resetear carta al estado frontal
+      setReveal(false);
+      
       // Buscar al último jugador eliminado
       const eliminatedIds = state.eliminatedInRound || [];
       if (eliminatedIds.length > 0) {
@@ -217,6 +223,30 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
     
     prevTurnRef.current = currentTurn;
   }, [state.currentTurn, state.phase, state.eliminatedInRound, state.players]);
+  
+  // Resetear carta cuando empieza una nueva ronda (playing)
+  useEffect(() => {
+    const prevPhase = prevPhaseRef.current;
+    const currentPhase = state.phase;
+    
+    // Si pasamos a playing desde otra fase, resetear carta
+    if (currentPhase === 'playing' && prevPhase !== 'playing') {
+      setReveal(false);
+      
+      // Mostrar animación de entrada solo la primera vez
+      if (!hasShownCardRef.current) {
+        setShowCardEntrance(true);
+        hasShownCardRef.current = true;
+        
+        // Quitar la animación después de que termine
+        setTimeout(() => {
+          setShowCardEntrance(false);
+        }, 800);
+      }
+    }
+    
+    prevPhaseRef.current = currentPhase;
+  }, [state.phase]);
 
   useEffect(() => {
     return () => {
@@ -311,7 +341,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           <h2 className="text-2xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>Tu carta</h2>
         </div>
         <div className="w-full max-w-sm mx-auto space-y-3">
-          <div className="flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full">
+          <div className={`flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full ${showCardEntrance ? 'animate-cardEntrance' : ''}`}>
             <div className={`flip-card-inner h-full ${reveal ? 'is-flipped' : ''}`}>
               {/* Frente completo (card completa con imagen) */}
               <div className="flip-card-front">
@@ -374,15 +404,15 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           </div>
           {/* Botón Girar carta */}
           <div className="flex justify-center">
-            <button
-              onClick={triggerReveal}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm text-neutral-400 hover:text-neutral-300 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150 border border-neutral-600/30 hover:border-neutral-500/50"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span>Girar carta</span>
-            </button>
+              <button
+                onClick={triggerReveal}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm text-neutral-400 hover:text-neutral-300 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150 border border-neutral-600/30 hover:border-neutral-500/50"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Voltear carta</span>
+              </button>
           </div>
         </div>
         
