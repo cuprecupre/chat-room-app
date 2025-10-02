@@ -88,6 +88,11 @@ export default function App() {
     window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Código copiado' }));
   }, [gameState]);
 
+  const castVote = useCallback((targetId) => {
+    if (!gameState?.gameId) return;
+    emit('cast-vote', { gameId: gameState.gameId, targetId });
+  }, [emit, gameState]);
+
   const handleLogout = useCallback(async () => {
     try {
       // Close dropdown first
@@ -303,6 +308,7 @@ export default function App() {
           onLeaveGame={leaveGame}
           onCopyLink={copyLink}
           onCopyGameCode={copyGameCode}
+          onVote={castVote}
         />
       );
     }
