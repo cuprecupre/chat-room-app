@@ -56,7 +56,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   };
 
   // Determinar qué título mostrar
-  let headerText = `Jugadores Conectados: ${players.length}`;
+  let headerText = isPlaying ? 'Vota quien creas impostor:' : `Jugadores Conectados: ${players.length}`;
   if (showScores) {
     headerText = isGameOver ? 'Puntuación Final' : 'Puntuación';
   }
