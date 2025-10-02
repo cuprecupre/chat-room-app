@@ -326,9 +326,8 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         (state.phase === 'round_result' && (!state.impostorName || !state.secretWord)) ||
         (state.phase === 'game_over' && state.winner === undefined)) && (
         <>
-        {/* Overlay de carga cuando estamos esperando datos */}
-        {((state.phase === 'round_result' || state.phase === 'game_over') || 
-          (state.phase === 'playing' && (!state.role || !state.currentTurn))) && (
+        {/* Overlay de carga cuando estamos esperando datos (solo si estamos en playing cargando datos) */}
+        {(state.phase === 'playing' && (!state.role || !state.currentTurn)) && (
           <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm animate-fadeIn">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-400"></div>
           </div>
