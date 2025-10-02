@@ -56,14 +56,14 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   };
 
   // Determinar qué título mostrar
-  let headerText = isPlaying ? 'Vota quien creas impostor:' : `Jugadores Conectados: ${players.length}`;
+  let headerText = isPlaying ? '¿Quién es el impostor?' : `Jugadores Conectados: ${players.length}`;
   if (showScores) {
     headerText = isGameOver ? 'Puntuación Final' : 'Puntuación';
   }
 
   return (
     <div className="w-full rounded-lg">
-      <p className={`mb-3 ${isPlaying || showScores ? 'text-base font-regular text-neutral-200' : 'text-sm font-regular text-neutral-500'}`}>
+      <p className={`mb-3 ${isPlaying || showScores ? 'text-base font-regular text-neutral-200 text-center' : 'text-sm font-regular text-neutral-500'}`}>
         {headerText}
       </p>
       <ul className="space-y-2">
