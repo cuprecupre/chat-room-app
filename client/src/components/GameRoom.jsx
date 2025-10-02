@@ -477,7 +477,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               <div className="space-y-6 text-center">
                 <div>
                   <span className="text-xs tracking-wider uppercase text-neutral-400">El impostor era</span>
-                  <p className="font-semibold text-2xl text-red-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
+                  <p className="font-semibold text-2xl text-orange-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
                     {state.impostorName}
                   </p>
                 </div>
