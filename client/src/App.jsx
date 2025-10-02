@@ -163,7 +163,7 @@ export default function App() {
           <img 
             src={heroImg} 
             alt="El Impostor" 
-            className="w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10 animate-pulse" 
+            className="w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10" 
           />
           <div className="flex flex-col items-center gap-3">
             <Spinner size="md" />
@@ -218,7 +218,7 @@ export default function App() {
           <img 
             src={heroImg} 
             alt="El Impostor" 
-            className="w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10 animate-pulse" 
+            className="w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10" 
           />
           <div className="flex flex-col items-center gap-3">
             <Spinner size="md" />
