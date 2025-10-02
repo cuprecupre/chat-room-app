@@ -82,9 +82,14 @@ class Game {
     this.lastRoundScores = {};
     this.roundCount++;
 
-    // Seleccionar impostor
-    const impostorIndex = Math.floor(Math.random() * this.roundPlayers.length);
-    this.impostorId = this.roundPlayers[impostorIndex];
+    // Seleccionar impostor con mejor aleatoriedad
+    // Mezclar el array usando Fisher-Yates shuffle antes de seleccionar
+    const shuffledPlayers = [...this.roundPlayers];
+    for (let i = shuffledPlayers.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledPlayers[i], shuffledPlayers[j]] = [shuffledPlayers[j], shuffledPlayers[i]];
+    }
+    this.impostorId = shuffledPlayers[0];
 
     // Seleccionar palabra
     const { word, category } = getRandomWordWithCategory();
