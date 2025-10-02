@@ -150,19 +150,22 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         <div className="w-full max-w-sm mx-auto text-center space-y-4">
           <img src={dualImpostorImg} alt="Esperando jugadores" className="mx-auto w-48 h-48 sm:w-48 sm:h-48 rounded-full object-cover shadow-lg ring-1 ring-white/10" loading="lazy" />
           <h2 className="text-3xl sm:text-4xl font-bold text-neutral-50">Invita a tus amigos<br />para empezar</h2>
-          <p className="text-lg text-neutral-400 mt-2">Se necesitan al menos 4 jugadores.</p>
+          <p className="text-lg text-neutral-400 mt-2">Esperando a que se unan los jugadores.</p>
           <div className="w-full space-y-3">
             {isHost && (
-              <div className="relative" title={state.players.length < 2 ? 'Se necesitan al menos 2 jugadores' : ''}>
-                <Button 
-                  onClick={onStartGame} 
-                  disabled={state.players.length < 2}
-                  variant="primary"
-                  size="md"
-                >
-                  Comenzar partida
-                </Button>
-              </div>
+              <>
+                <div className="relative" title={state.players.length < 2 ? 'Se necesitan al menos 2 jugadores' : ''}>
+                  <Button 
+                    onClick={onStartGame} 
+                    disabled={state.players.length < 2}
+                    variant="primary"
+                    size="md"
+                  >
+                    Comenzar partida
+                  </Button>
+                </div>
+                <Button onClick={onCopyLink} variant="outline" size="md">Copiar enlace</Button>
+              </>
             )}
           </div>
           <div className="w-full mt-6">
