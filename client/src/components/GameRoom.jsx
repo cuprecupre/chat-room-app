@@ -13,22 +13,19 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   const eliminatedPlayers = gameState?.eliminatedInRound || [];
   const activePlayers = gameState?.activePlayers || [];
   const myVote = gameState?.myVote || null; // A quién voté yo
-  const prevMyVoteRef = useRef(null);
   
-  // Debug: verificar myVote solo cuando cambie
-  useEffect(() => {
-    if (isPlaying && myVote !== prevMyVoteRef.current) {
-      console.log('🗳️ Mi voto cambió:', prevMyVoteRef.current, '→', myVote);
-      prevMyVoteRef.current = myVote;
-    }
-  }, [myVote, isPlaying]);
-  
-  // Ordenar jugadores para que el usuario actual aparezca primero
-  const sortedPlayers = [...players].sort((a, b) => {
-    if (a.uid === currentUserId) return -1;
-    if (b.uid === currentUserId) return 1;
-    return 0;
-  });
+  // Filtrar al usuario actual solo durante el juego (playing)
+  const sortedPlayers = [...players]
+    .filter(p => isPlaying ? p.uid !== currentUserId : true)
+    .sort((a, b) => {
+      // En lobby, usuario actual primero
+      if (!isPlaying) {
+        if (a.uid === currentUserId) return -1;
+        if (b.uid === currentUserId) return 1;
+      }
+      // Ordenar por nombre
+      return a.name.localeCompare(b.name);
+    });
 
   const handleImageError = (e) => {
     console.log('❌ Error cargando imagen:', e.target.src);
@@ -53,7 +50,9 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
 
   return (
     <div className="w-full rounded-lg">
-      <p className="text-sm font-regular mb-3 text-neutral-500">Jugadores Conectados: {players.length}</p>
+      <p className={`mb-3 ${isPlaying ? 'text-base font-regular text-neutral-200' : 'text-sm font-regular text-neutral-500'}`}>
+        {isPlaying ? 'Vota al impostor de esta lista' : `Jugadores Conectados: ${players.length}`}
+      </p>
       <ul className="space-y-2">
         {sortedPlayers.map(p => {
           const isEliminated = eliminatedPlayers.includes(p.uid);
@@ -108,7 +107,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                   disabled={iVotedForThisPlayer}
                   className={`!w-auto gap-2 px-4 ${
                     iVotedForThisPlayer 
-                      ? 'border-green-500 text-green-400 bg-green-500/10 hover:bg-green-500/10' 
+                      ? '!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed' 
                       : ''
                   }`}
                 >
