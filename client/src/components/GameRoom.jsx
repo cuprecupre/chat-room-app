@@ -473,9 +473,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {/* Resultado de ronda */}
       {state.phase === 'round_result' && state.impostorName && state.secretWord && (
-        <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm overflow-y-auto animate-fadeIn">
-          <div className="min-h-full flex items-start justify-center p-4 py-8">
-            <div className="w-full max-w-sm mx-auto space-y-6 my-4">
+        <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm overflow-y-auto animate-fadeIn" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div className="min-h-full flex items-start justify-center px-4 pt-6 pb-20">
+            <div className="w-full max-w-sm mx-auto space-y-6">
             <div className="text-center space-y-2 animate-scaleIn animate-delay-200">
               <h2 className="text-4xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
                 Resultado de la ronda
@@ -535,9 +535,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       
       {/* Fin de la partida */}
       {state.phase === 'game_over' && state.winner !== undefined && (
-        <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm overflow-y-auto animate-fadeIn">
-          <div className="min-h-full flex items-start justify-center p-4 py-8">
-            <div className="w-full max-w-sm mx-auto space-y-6 my-4">
+        <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm overflow-y-auto animate-fadeIn" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div className="min-h-full flex items-start justify-center px-4 pt-6 pb-20">
+            <div className="w-full max-w-sm mx-auto space-y-6">
             <div className="text-center space-y-3 animate-scaleIn animate-delay-200">
               <h2 className="text-5xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
                 ¡Partida Terminada!
