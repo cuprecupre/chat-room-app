@@ -30,7 +30,10 @@ export function useSocket(user) {
         if (!isMounted) return; 
 
         console.log('Connecting socket...');
-        const socketURL = process.env.NODE_ENV === 'production' ? window.location.origin : 'http://localhost:3000';
+        // En desarrollo, usar el mismo host que la URL actual pero puerto 3000
+        const socketURL = process.env.NODE_ENV === 'production' 
+          ? window.location.origin 
+          : `${window.location.protocol}//${window.location.hostname}:3000`;
         const socket = io(socketURL, {
           auth: { token, name: user.displayName, photoURL: user.photoURL },
           reconnection: true,
