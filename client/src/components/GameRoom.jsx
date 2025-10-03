@@ -444,7 +444,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         
         {isHost && (
           <div className="w-full max-w-sm mx-auto mt-6">
-            <Button onClick={onEndGame} variant="outline" size="md" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20">Terminar Juego</Button>
+            <Button onClick={onEndGame} variant="outline" size="md" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20">Terminar juego</Button>
           </div>
         )}
         {/* Footer único y consistente */}
@@ -525,7 +525,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             
             {isHost && (
               <div className="animate-fadeIn animate-delay-800">
-                <Button onClick={onPlayAgain} variant="primary" size="md">Siguiente Partida</Button>
+                <Button onClick={onPlayAgain} variant="primary" size="md">Siguiente partida</Button>
               </div>
             )}
             </div>
@@ -540,7 +540,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             <div className="w-full max-w-sm mx-auto space-y-6">
             <div className="text-center space-y-3 animate-scaleIn animate-delay-200">
               <h2 className="text-5xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
-                ¡Juego Terminado!
+                ¡Juego terminado!
               </h2>
               {state.winner && (
                 <p className="text-2xl text-orange-400 font-semibold">
@@ -564,7 +564,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   variant="primary" 
                   size="md"
                 >
-                  Nuevo Juego
+                  Nuevo juego
                 </Button>
               </div>
             )}

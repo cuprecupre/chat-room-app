@@ -23,7 +23,7 @@ export function Lobby({ onCreateGame, onJoinGame }) {
         <p className="text-lg text-gray-400 mt-2">Crea un nuevo juego o únete a uno existente.</p>
       </div>
       <div className="max-w-sm mx-auto space-y-4">
-        <Button onClick={onCreateGame} variant="primary" size="md">Crear Nuevo Juego</Button>
+        <Button onClick={onCreateGame} variant="primary" size="md">Crear nuevo juego</Button>
         <div className="relative flex items-center justify-center text-gray-400"><span className="absolute bg-neutral-950 px-2">o</span><div className="w-full h-px bg-neutral-700"></div></div>
         <div className="space-y-2">
           <input 
@@ -34,7 +34,7 @@ export function Lobby({ onCreateGame, onJoinGame }) {
             maxLength="5"
             className="w-full h-12 px-4 rounded-md bg-white/10 border border-transparent focus:border-neutral-500 focus:ring-neutral-500 focus:outline-none text-center uppercase tracking-widest text-sm"
           />
-          <Button onClick={handleJoin} variant="outline" size="md">Unirse a Juego</Button>
+          <Button onClick={handleJoin} variant="outline" size="md">Unirse a juego</Button>
           {error && <p className="text-red-400 text-center pt-2">{error}</p>}
         </div>
       </div>
