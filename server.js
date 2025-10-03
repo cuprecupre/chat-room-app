@@ -66,9 +66,25 @@ const defaultDevOrigins = [
   'http://localhost:5174',
   'http://localhost:5175'
 ];
+
+// En desarrollo, permitir conexiones desde la red local para testing móvil
+const corsOrigin = process.env.NODE_ENV === 'production' 
+  ? [...defaultDevOrigins, ...dynamicOrigins]
+  : (origin, callback) => {
+      // Permitir localhost y IPs de red local (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
+      if (!origin || 
+          origin.includes('localhost') || 
+          /^https?:\/\/(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(origin) ||
+          dynamicOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    };
+
 const io = socketIo(server, {
   cors: {
-    origin: [...defaultDevOrigins, ...dynamicOrigins],
+    origin: corsOrigin,
     methods: ['GET', 'POST']
   }
 });
