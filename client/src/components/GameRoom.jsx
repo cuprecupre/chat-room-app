@@ -473,8 +473,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {/* Resultado de ronda */}
       {state.phase === 'round_result' && state.impostorName && state.secretWord && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm p-4 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-sm mx-auto space-y-6 my-8">
+        <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm overflow-y-auto animate-fadeIn">
+          <div className="min-h-full flex items-start justify-center p-4 py-8">
+            <div className="w-full max-w-sm mx-auto space-y-6 my-4">
             <div className="text-center space-y-2 animate-scaleIn animate-delay-200">
               <h2 className="text-4xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
                 Resultado de la ronda
@@ -527,14 +528,16 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 <Button onClick={onPlayAgain} variant="primary" size="md">Siguiente Ronda</Button>
               </div>
             )}
+            </div>
           </div>
         </div>
       )}
       
       {/* Fin de la partida */}
       {state.phase === 'game_over' && state.winner !== undefined && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm p-4 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-sm mx-auto space-y-6 my-8">
+        <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm overflow-y-auto animate-fadeIn">
+          <div className="min-h-full flex items-start justify-center p-4 py-8">
+            <div className="w-full max-w-sm mx-auto space-y-6 my-4">
             <div className="text-center space-y-3 animate-scaleIn animate-delay-200">
               <h2 className="text-5xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
                 ¡Partida Terminada!
@@ -584,6 +587,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
               </Button>
+            </div>
             </div>
           </div>
         </div>
