@@ -177,7 +177,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         !currentPlayers.some(cp => cp.uid === p.uid)
       );
       if (leftPlayer) {
-        window.dispatchEvent(new CustomEvent('app:toast', { detail: `${leftPlayer.name} ha abandonado la partida.` }));
+        window.dispatchEvent(new CustomEvent('app:toast', { detail: `${leftPlayer.name} ha abandonado el juego.` }));
       }
     }
 
@@ -191,12 +191,12 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   };
 
 
-  // Detectar cambio de vuelta y mostrar overlay
+  // Detectar cambio de ronda y mostrar overlay
   useEffect(() => {
     const prevTurn = prevTurnRef.current;
     const currentTurn = state.currentTurn;
     
-    // Si la vuelta cambió y es vuelta 2 o superior (nueva vuelta), mostrar overlay y resetear carta
+    // Si la ronda cambió y es ronda 2 o superior (nueva ronda), mostrar overlay y resetear carta
     if (state.phase === 'playing' && prevTurn && currentTurn > prevTurn && currentTurn > 1) {
       // Resetear carta al estado frontal
       setReveal(false);
@@ -231,7 +231,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
     prevTurnRef.current = currentTurn;
   }, [state.currentTurn, state.phase, state.eliminatedInRound, state.players]);
   
-  // Resetear carta cuando empieza una nueva ronda (playing)
+  // Resetear carta cuando empieza una nueva partida (playing)
   useEffect(() => {
     const prevPhase = prevPhaseRef.current;
     const currentPhase = state.phase;
@@ -281,7 +281,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                     variant="primary"
                     size="md"
                   >
-                    Comenzar partida
+                    Comenzar juego
                   </Button>
                 </div>
                 <Button onClick={onCopyLink} variant="outline" size="md">Copiar enlace</Button>
@@ -311,7 +311,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 </svg>
               </button>
               <Button onClick={onLeaveGame} variant="ghost" size="md" className="gap-2">
-                <span>Abandonar partida</span>
+                <span>Abandonar juego</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
@@ -333,12 +333,12 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           </div>
         )}
         
-        {/* Indicador de ronda y vuelta */}
+        {/* Indicador de partida y ronda */}
         <div className="w-full max-w-sm mx-auto mb-4">
           <p className="text-center text-xs text-neutral-500 mb-3">
-            Ronda {state.roundCount || 1} • Vuelta {state.currentTurn} de {state.maxTurns}
+            Partida {state.roundCount || 1} • Ronda {state.currentTurn} de {state.maxTurns}
           </p>
-          {/* Stepper de vueltas */}
+          {/* Stepper de rondas */}
           <div className="flex items-center justify-center gap-1.5">
             {[1, 2, 3].map((turn) => (
               <div 
@@ -444,7 +444,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         
         {isHost && (
           <div className="w-full max-w-sm mx-auto mt-6">
-            <Button onClick={onEndGame} variant="outline" size="md" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20">Terminar Partida</Button>
+            <Button onClick={onEndGame} variant="outline" size="md" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20">Terminar Juego</Button>
           </div>
         )}
         {/* Footer único y consistente */}
@@ -461,7 +461,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               </svg>
             </button>
             <Button onClick={onLeaveGame} variant="ghost" size="md" className="gap-2">
-              <span>Abandonar partida</span>
+              <span>Abandonar juego</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
@@ -471,18 +471,18 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         </>
       )}
 
-      {/* Resultado de ronda */}
+      {/* Resultado de partida */}
       {state.phase === 'round_result' && state.impostorName && state.secretWord && (
         <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm overflow-y-auto animate-fadeIn" style={{ WebkitOverflowScrolling: 'touch' }}>
           <div className="min-h-full flex items-start justify-center px-4 pt-6 pb-20">
             <div className="w-full max-w-sm mx-auto space-y-6">
             <div className="text-center space-y-2 animate-scaleIn animate-delay-200">
               <h2 className="text-4xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
-                Resultado de la ronda
+                Resultado de la partida
               </h2>
               {state.roundCount && state.maxRounds && (
                 <p className="text-sm text-neutral-400">
-                  Ronda {state.roundCount}/{state.maxRounds} • Objetivo: {state.targetScore} puntos
+                  Partida {state.roundCount}/{state.maxRounds} • Objetivo: {state.targetScore} puntos
                 </p>
               )}
             </div>
@@ -525,7 +525,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             
             {isHost && (
               <div className="animate-fadeIn animate-delay-800">
-                <Button onClick={onPlayAgain} variant="primary" size="md">Siguiente Ronda</Button>
+                <Button onClick={onPlayAgain} variant="primary" size="md">Siguiente Partida</Button>
               </div>
             )}
             </div>
@@ -533,14 +533,14 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         </div>
       )}
       
-      {/* Fin de la partida */}
+      {/* Fin del juego */}
       {state.phase === 'game_over' && state.winner !== undefined && (
         <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm overflow-y-auto animate-fadeIn" style={{ WebkitOverflowScrolling: 'touch' }}>
           <div className="min-h-full flex items-start justify-center px-4 pt-6 pb-20">
             <div className="w-full max-w-sm mx-auto space-y-6">
             <div className="text-center space-y-3 animate-scaleIn animate-delay-200">
               <h2 className="text-5xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
-                ¡Partida Terminada!
+                ¡Juego Terminado!
               </h2>
               {state.winner && (
                 <p className="text-2xl text-orange-400 font-semibold">
@@ -558,13 +558,13 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               <div className="animate-fadeIn animate-delay-600">
                 <Button 
                   onClick={() => {
-                    console.log('🎮 Click en Nueva Partida', { gameId: state.gameId, isHost });
+                    console.log('🎮 Click en Nuevo Juego', { gameId: state.gameId, isHost });
                     onPlayAgain();
                   }} 
                   variant="primary" 
                   size="md"
                 >
-                  Nueva Partida
+                  Nuevo Juego
                 </Button>
               </div>
             )}
@@ -582,7 +582,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 </svg>
               </button>
               <Button onClick={onLeaveGame} variant="ghost" size="md" className="gap-2">
-                <span>Abandonar partida</span>
+                <span>Abandonar juego</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
@@ -593,12 +593,12 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         </div>
       )}
       
-      {/* Overlay de nueva vuelta */}
+      {/* Overlay de nueva ronda */}
       {showTurnOverlay && (
         <div className={`fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm px-4 transition-opacity duration-300 ${isOverlayClosing ? 'opacity-0' : 'animate-fadeIn'}`}>
           <div className={`text-center space-y-6 max-w-sm transition-all duration-300 ${isOverlayClosing ? 'opacity-0 scale-95' : 'animate-scaleIn'}`}>
             <h2 className="text-6xl font-bold text-orange-400" style={{fontFamily: 'Trocchi, serif'}}>
-              Vuelta {state.currentTurn}
+              Ronda {state.currentTurn}
             </h2>
             
             {eliminatedPlayerInfo && (
@@ -633,7 +633,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             
             {!eliminatedPlayerInfo && (
               <p className="text-xl text-neutral-300">
-                {state.currentTurn === state.maxTurns ? '¡Última vuelta!' : 'Continúa votando'}
+                {state.currentTurn === state.maxTurns ? '¡Última ronda!' : 'Continúa votando'}
               </p>
             )}
           </div>

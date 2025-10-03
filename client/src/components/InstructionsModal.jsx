@@ -13,7 +13,7 @@ export function InstructionsModal({ isOpen, onClose }) {
             <em>El impostor</em> es un juego social de deducción que combina una <strong>app web</strong> con dinámica <strong>presencial</strong>.
           </p>
           <p className="text-neutral-300 leading-relaxed text-base mt-3">
-            En cada <strong>ronda</strong>, un jugador es el <strong>Impostor</strong> y el resto son <strong>Amigos.</strong> Se reparten las cartas. Los Amigos ven una <strong>palabra secreta</strong>; el Impostor no la conoce, pero recibe <strong>una pista orientativa</strong>.
+            En cada <strong>partida</strong>, un jugador es el <strong>Impostor</strong> y el resto son <strong>Amigos.</strong> Se reparten las cartas. Los Amigos ven una <strong>palabra secreta</strong>; el Impostor no la conoce, pero recibe <strong>una pista orientativa</strong>.
             Cada jugador solo ha visto su carta y debe desconfiar de todo lo que sucede a su alrededor.
           </p>
           <p className="text-neutral-300 leading-relaxed text-base mt-3">
@@ -56,11 +56,11 @@ export function InstructionsModal({ isOpen, onClose }) {
             <li><span className="text-orange-400"><strong>Impostor</strong></span>: <strong>fingir</strong> que conoces la palabra secreta para <strong>no ser descubierto y ganar puntos por ello.</strong></li>
           </ul>
 
-          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">Para ganar la partida</h4>
+          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">Para ganar el juego</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li>Acumula <strong>15 puntos</strong> a lo largo de varias rondas.</li>
-            <li>La partida continúa hasta que <strong>alguien alcance</strong> ese total o hasta que se juegue el número máximo de rondas.</li>
-            <li>El número máximo de rondas será equivalente al número de jugadores que iniciaron la partida multiplicado por dos. (Ejemplo: Si la partida la inician 5 jugadores el número máximo de rondas es 10).</li>
+            <li>Acumula <strong>15 puntos</strong> a lo largo de varias partidas.</li>
+            <li>El juego continúa hasta que <strong>alguien alcance</strong> ese total o hasta que se juegue el número máximo de partidas.</li>
+            <li>El número máximo de partidas será equivalente al número de jugadores que iniciaron el juego multiplicado por dos. (Ejemplo: Si el juego lo inician 5 jugadores el número máximo de partidas es 10).</li>
           </ul>
         </section>
 
@@ -72,8 +72,8 @@ export function InstructionsModal({ isOpen, onClose }) {
           <ol className="list-decimal list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li>Abre la <strong>app web</strong> en tu dispositivo.</li>
             <li><strong>Inicia sesión</strong>.</li>
-            <li>Un jugador crea la partida como <strong>anfitrión</strong> y comparte <strong>enlace o código con el resto de jugadores.</strong></li>
-            <li>Con todos conectados, el anfitrión pulsa <strong>"Iniciar ronda"</strong>.</li>
+            <li>Un jugador crea el juego como <strong>anfitrión</strong> y comparte <strong>enlace o código con el resto de jugadores.</strong></li>
+            <li>Con todos conectados, el anfitrión pulsa <strong>"Comenzar juego"</strong>.</li>
           </ol>
         </section>
 
@@ -85,9 +85,9 @@ export function InstructionsModal({ isOpen, onClose }) {
           
           <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">Estructura general</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li>Una <strong>partida</strong> se compone de <strong>varias rondas</strong>.</li>
-            <li>Cada <strong>ronda</strong> puede tener <strong>hasta 3 vueltas</strong>.</li>
-            <li>En cada <strong>vuelta</strong>, todos los jugadores realizan <strong>su turno oral</strong> para dar <strong>una pista</strong>.</li>
+            <li>Un <strong>juego</strong> se compone de <strong>varias partidas</strong>.</li>
+            <li>Cada <strong>partida</strong> puede tener <strong>hasta 3 rondas</strong>.</li>
+            <li>En cada <strong>ronda</strong>, todos los jugadores realizan <strong>su turno oral</strong> para dar <strong>una pista</strong>.</li>
           </ul>
         </section>
 
@@ -97,7 +97,7 @@ export function InstructionsModal({ isOpen, onClose }) {
         <section className="mb-8">
           <h3 className="text-xl font-semibold text-orange-400 mb-4">Roles y cartas</h3>
           <p className="text-neutral-300 leading-relaxed mb-3 text-base">
-            Al empezar una ronda, cada jugador recibe una carta en la app:
+            Al empezar una partida, cada jugador recibe una carta en la app:
           </p>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><span className="text-white"><strong>Amigos</strong></span>: ven la <strong>palabra secreta</strong> (ej.: "Lavadora").</li>
@@ -118,18 +118,18 @@ export function InstructionsModal({ isOpen, onClose }) {
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li>La app <strong>no</strong> gestiona turnos.</li>
             <li>Los <strong>turnos</strong> se organizan <strong>en persona</strong>: cada jugador dice <strong>una pista breve</strong> en voz alta cuando el grupo lo indique.</li>
-            <li>El jugador que empieza la primera ronda es el anfitrión, a partir de ese momento los turnos van en sentido horario.</li>
-            <li>Cuando se lanza una nueva ronda el jugador que comienza es el que está en el sentido horario del anfitrión.</li>
+            <li>El jugador que empieza la primera partida es el anfitrión, a partir de ese momento los turnos van en sentido horario.</li>
+            <li>Cuando se lanza una nueva partida el jugador que comienza es el que está en el sentido horario del anfitrión.</li>
           </ul>
         </section>
 
         <div className="my-8 h-px bg-white/10" />
 
-        {/* Una ronda, paso a paso */}
+        {/* Una partida, paso a paso */}
         <section className="mb-8">
-          <h3 className="text-xl font-semibold text-orange-400 mb-4">Una ronda, paso a paso</h3>
+          <h3 className="text-xl font-semibold text-orange-400 mb-4">Una partida, paso a paso</h3>
           
-          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">1) Primera vuelta de pistas</h4>
+          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">1) Primera ronda de pistas</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base mb-3">
             <li>En orden (sentido horario), <strong>cada jugador</strong> da <strong>una pista</strong> relacionada con la palabra secreta.</li>
             <li>Si eres amigo: La pista que das debe ayudarte a que tus amigos sepan que eres amigo pero <strong>sin delatar</strong> la palabra.</li>
@@ -145,29 +145,29 @@ export function InstructionsModal({ isOpen, onClose }) {
             </p>
           </div>
 
-          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">2) Votación (abierta durante la ronda)</h4>
+          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">2) Votación (abierta durante la partida)</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li><strong>En cualquier momento</strong> de la ronda, puedes <strong>votar en la app</strong> a quien creas impostor.</li>
+            <li><strong>En cualquier momento</strong> de la partida, puedes <strong>votar en la app</strong> a quien creas impostor.</li>
             <li><strong>No</strong> puedes votarte a ti mismo.</li>
             <li>La app <strong>no</strong> muestra por quién votó cada uno; solo indica <strong>quién ya votó</strong>.</li>
             <li><strong>Cuando todos han votado</strong>, se revela el resultado: el jugador <strong>con más votos es expulsado</strong>.</li>
           </ul>
 
-          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">3) Resultado y vueltas siguientes</h4>
+          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">3) Resultado y rondas siguientes</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li>Si el expulsado <strong>era el impostor</strong>, <strong>termina la ronda</strong> y se reparten puntos.</li>
+            <li>Si el expulsado <strong>era el impostor</strong>, <strong>termina la partida</strong> y se reparten puntos.</li>
             <li>Si <strong>no era</strong> el impostor:
               <ul className="list-disc list-outside ml-10 mt-2 space-y-1 text-base">
-                <li>El expulsado <strong>ya no participa</strong> en la ronda (ni pistas ni voto).</li>
-                <li>Se <strong>desbloquea</strong> una <strong>nueva vuelta</strong>: los jugadores restantes vuelven a dar <strong>una pista</strong> y pueden <strong>votar cuando quieran</strong>.</li>
+                <li>El expulsado <strong>ya no participa</strong> en la partida (ni pistas ni voto).</li>
+                <li>Se <strong>desbloquea</strong> una <strong>nueva ronda</strong>: los jugadores restantes vuelven a dar <strong>una pista</strong> y pueden <strong>votar cuando quieran</strong>.</li>
               </ul>
             </li>
-            <li>El ciclo puede repetirse hasta una <strong>tercera vuelta</strong>.</li>
+            <li>El ciclo puede repetirse hasta una <strong>tercera ronda</strong>.</li>
           </ul>
 
-          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">4) Fin de la ronda</h4>
+          <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">4) Fin de la partida</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li>La ronda termina cuando <strong>expulsan al impostor</strong>, <strong>o</strong> cuando, tras <strong>3 vueltas</strong>, <strong>no lo han descubierto</strong> → en ese caso, <strong>gana el impostor</strong> y obtiene la mayor cantidad de puntos.</li>
+            <li>La partida termina cuando <strong>expulsan al impostor</strong>, <strong>o</strong> cuando, tras <strong>3 rondas</strong>, <strong>no lo han descubierto</strong> → en ese caso, <strong>gana el impostor</strong> y obtiene la mayor cantidad de puntos.</li>
             <li>La app muestra:
               <ul className="list-disc list-outside ml-10 mt-2 space-y-1 text-base">
                 <li>Quién era el impostor.</li>
@@ -175,7 +175,7 @@ export function InstructionsModal({ isOpen, onClose }) {
                 <li>Puntos ganados por cada jugador.</li>
               </ul>
             </li>
-            <li>El anfitrión puede <strong>iniciar una nueva ronda</strong>, salvo que alguien ya tenga <strong>15 puntos</strong>.</li>
+            <li>El anfitrión puede <strong>iniciar una nueva partida</strong>, salvo que alguien ya tenga <strong>15 puntos</strong>.</li>
           </ul>
         </section>
 
@@ -187,19 +187,19 @@ export function InstructionsModal({ isOpen, onClose }) {
           
           <h4 className="text-lg font-semibold text-neutral-200 mb-2 mt-4"><span className="text-white">Amigos</span></h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li><strong>+1</strong> punto por <strong>votar correctamente</strong> al impostor (aunque no sea expulsado) en cada vuelta.</li>
+            <li><strong>+1</strong> punto por <strong>votar correctamente</strong> al impostor (aunque no sea expulsado) en cada ronda.</li>
             <li><strong>+1</strong> punto adicional si el impostor es <strong>expulsado</strong>.</li>
           </ul>
 
           <h4 className="text-lg font-semibold text-neutral-200 mb-2 mt-4"><span className="text-orange-400">Impostor</span></h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li><strong>+2</strong> puntos por <strong>sobrevivir cada vuelta</strong>.</li>
-            <li><strong>+4</strong> puntos extra si <strong>gana la ronda</strong> (no lo descubren tras 3 vueltas).</li>
+            <li><strong>+2</strong> puntos por <strong>sobrevivir cada ronda</strong>.</li>
+            <li><strong>+4</strong> puntos extra si <strong>gana la partida</strong> (no lo descubren tras 3 rondas).</li>
           </ul>
 
           <div className="mt-3 p-3 bg-white/5 border border-white/10 rounded-lg">
             <p className="text-sm text-neutral-400 italic">
-              Los puntos se acumulan entre rondas.
+              Los puntos se acumulan entre partidas.
             </p>
           </div>
         </section>
@@ -210,8 +210,8 @@ export function InstructionsModal({ isOpen, onClose }) {
         <section className="mb-8">
           <h3 className="text-xl font-semibold text-orange-400 mb-4">Reglas adicionales</h3>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li><strong>Empate</strong> en la votación: si hay empate se juega otra vuelta.</li>
-            <li><strong>Desconexiones</strong>: quien se desconecte puede <strong>reingresar</strong> pero no podrá votar hasta que termine la ronda. Los puntos que había ganado no los pierde.</li>
+            <li><strong>Empate</strong> en la votación: si hay empate se juega otra ronda.</li>
+            <li><strong>Desconexiones</strong>: quien se desconecte puede <strong>reingresar</strong> pero no podrá votar hasta que termine la partida. Los puntos que había ganado no los pierde.</li>
           </ul>
         </section>
 

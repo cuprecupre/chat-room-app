@@ -8,7 +8,7 @@ export function Lobby({ onCreateGame, onJoinGame }) {
 
   const handleJoin = () => {
     if (!gameId.trim()) {
-      setError('Por favor, introduce un código de partida.');
+      setError('Por favor, introduce un código de juego.');
       return;
     }
     setError('');
@@ -19,22 +19,22 @@ export function Lobby({ onCreateGame, onJoinGame }) {
     <div className="w-full space-y-8">
       <div className="text-center space-y-4">
         <img src={homeImg} alt="Impostor" className="mx-auto w-48 h-48 sm:w-48 sm:h-48 rounded-full object-cover shadow-lg ring-1 ring-white/10" loading="lazy" />
-        <h2 className="text-3xl sm:text-4xl font-bold text-neutral-50">Empezar una partida</h2>
-        <p className="text-lg text-gray-400 mt-2">Crea una nueva partida o únete a una existente.</p>
+        <h2 className="text-3xl sm:text-4xl font-bold text-neutral-50">Empezar un juego</h2>
+        <p className="text-lg text-gray-400 mt-2">Crea un nuevo juego o únete a uno existente.</p>
       </div>
       <div className="max-w-sm mx-auto space-y-4">
-        <Button onClick={onCreateGame} variant="primary" size="md">Crear Nueva Partida</Button>
+        <Button onClick={onCreateGame} variant="primary" size="md">Crear Nuevo Juego</Button>
         <div className="relative flex items-center justify-center text-gray-400"><span className="absolute bg-neutral-950 px-2">o</span><div className="w-full h-px bg-neutral-700"></div></div>
         <div className="space-y-2">
           <input 
             type="text" 
             value={gameId}
             onChange={(e) => setGameId(e.target.value)}
-            placeholder="Introduce el código de la partida"
+            placeholder="Introduce el código del juego"
             maxLength="5"
             className="w-full h-12 px-4 rounded-md bg-white/10 border border-transparent focus:border-neutral-500 focus:ring-neutral-500 focus:outline-none text-center uppercase tracking-widest text-sm"
           />
-          <Button onClick={handleJoin} variant="outline" size="md">Unirse a Partida</Button>
+          <Button onClick={handleJoin} variant="outline" size="md">Unirse a Juego</Button>
           {error && <p className="text-red-400 text-center pt-2">{error}</p>}
         </div>
       </div>
