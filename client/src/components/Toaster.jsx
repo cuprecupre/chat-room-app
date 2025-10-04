@@ -3,10 +3,31 @@ import React, { useState, useEffect } from 'react';
 export function Toaster() {
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     const handleToast = (e) => {
-      setMessage(e.detail);
+      const msg = e.detail;
+      setMessage(msg);
+      
+      // Detectar si es un mensaje de error
+      const errorKeywords = [
+        'no puedes',
+        'no existe',
+        'no perteneces',
+        'partida en curso',
+        'error',
+        'eliminado',
+        'no está',
+        'no se puede',
+        'solo el host'
+      ];
+      
+      const isErrorMessage = errorKeywords.some(keyword => 
+        msg.toLowerCase().includes(keyword.toLowerCase())
+      );
+      
+      setIsError(isErrorMessage);
       setVisible(true);
       setTimeout(() => {
         setVisible(false);
@@ -18,7 +39,9 @@ export function Toaster() {
   }, []);
 
   return (
-    <div className={`fixed top-5 left-1/2 -translate-x-1/2 bg-green-800 text-white px-6 py-3 rounded-full shadow-lg text-center transition-all duration-300 ease-out transform z-[9999] ${
+    <div className={`fixed top-5 left-1/2 -translate-x-1/2 ${
+      isError ? 'bg-red-600' : 'bg-green-800'
+    } text-white px-6 py-3 rounded-full shadow-lg text-center transition-all duration-300 ease-out transform z-[9999] ${
       visible 
         ? 'opacity-100 translate-y-0' 
         : 'opacity-0 -translate-y-2'
