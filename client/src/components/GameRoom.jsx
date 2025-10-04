@@ -119,7 +119,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                 <div className="flex items-center gap-2">
                   <div>
                     <span className={`font-medium ${isWinner ? 'text-orange-400' : ''}`}>
-                      {p.name.split(' ')[0]}{p.uid === currentUserId ? ' (Tú)' : ''}
+                      {p.name}{p.uid === currentUserId ? ' (Tú)' : ''}
                     </span>
                     {isEliminated && <span className="text-xs text-neutral-500 ml-2">(Eliminado)</span>}
                   </div>
@@ -549,7 +549,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         const playerScores = state.playerScores || {};
         const maxScore = Math.max(...Object.values(playerScores));
         const winnerPlayers = state.players.filter(player => (playerScores[player.uid] || 0) === maxScore);
-        const winnerNames = winnerPlayers.map(p => p.name.split(' ')[0]).join(' y ');
+        const winnerNames = winnerPlayers.map(p => p.name).join(' y ');
         
         return (
         <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm overflow-y-auto animate-fadeIn" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -642,7 +642,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                     </div>
                   </div>
                   <p className="text-lg text-neutral-300">
-                    <span className="font-semibold text-red-400">{eliminatedPlayerInfo.name.split(' ')[0]}</span> fue eliminado
+                    <span className="font-semibold text-red-400">{eliminatedPlayerInfo.name}</span> fue eliminado
                   </p>
                 </div>
                 <p className="text-xl text-neutral-200 font-medium">
