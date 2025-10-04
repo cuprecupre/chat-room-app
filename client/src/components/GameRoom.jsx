@@ -134,7 +134,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
               
               {/* Mostrar puntos o botón de votar según fase */}
               <div className="flex items-center gap-3">
-                {isEliminated && !isGameOver && (
+                {isEliminated && isPlaying && (
                   <span className="text-xs text-red-400 font-medium">Eliminado</span>
                 )}
                 {showScores ? (
