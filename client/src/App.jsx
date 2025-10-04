@@ -77,18 +77,51 @@ export default function App() {
     }
   }, [emit, gameState]);
 
+  const copyToClipboard = useCallback(async (text, successMessage) => {
+    try {
+      // Intentar con la API moderna primero
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        window.dispatchEvent(new CustomEvent('app:toast', { detail: successMessage }));
+        return;
+      }
+      
+      // Fallback para Safari mobile y otros navegadores
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      if (successful) {
+        window.dispatchEvent(new CustomEvent('app:toast', { detail: successMessage }));
+      } else {
+        // Si falla, mostrar el texto para que el usuario lo copie manualmente
+        window.dispatchEvent(new CustomEvent('app:toast', { detail: `Texto: ${text}` }));
+      }
+    } catch (err) {
+      console.error('Error copying to clipboard:', err);
+      // Mostrar el texto como fallback
+      window.dispatchEvent(new CustomEvent('app:toast', { detail: `Texto: ${text}` }));
+    }
+  }, []);
+
   const copyLink = useCallback(async () => {
     if (!gameState?.gameId) return;
     const url = `${window.location.origin}?gameId=${gameState.gameId}`;
-    await navigator.clipboard.writeText(url);
-    window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Enlace copiado' }));
-  }, [gameState]);
+    await copyToClipboard(url, 'Enlace copiado');
+  }, [gameState, copyToClipboard]);
 
   const copyGameCode = useCallback(async () => {
     if (!gameState?.gameId) return;
-    await navigator.clipboard.writeText(gameState.gameId);
-    window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Código copiado' }));
-  }, [gameState]);
+    await copyToClipboard(gameState.gameId, 'Código copiado');
+  }, [gameState, copyToClipboard]);
 
   const castVote = useCallback((targetId) => {
     if (!gameState?.gameId) return;
