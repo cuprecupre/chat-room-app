@@ -49,7 +49,8 @@ class Game {
     this.eliminatedInRound = this.eliminatedInRound.filter(uid => uid !== userId);
     this.eliminatedInRound = this.eliminatedInRound.filter(uid => uid !== userId);
     delete this.votes[userId];
-    delete this.playerScores[userId];
+    // NO eliminar playerScores - mantener puntos aunque el jugador abandone
+    // delete this.playerScores[userId];
 
     if (this.hostId === userId && this.players.length > 0) {
       this.hostId = this.players[0].uid;

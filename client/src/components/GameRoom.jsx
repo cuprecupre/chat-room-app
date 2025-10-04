@@ -596,11 +596,29 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       
       {/* Fin del juego */}
       {state.phase === 'game_over' && state.winner !== undefined && (() => {
-        // Calcular ganadores
+        // Calcular ganadores - buscar entre TODOS los jugadores que tienen puntos, no solo los conectados
         const isTie = state.winner === 'Empate';
         const playerScores = state.playerScores || {};
         const maxScore = Math.max(...Object.values(playerScores));
-        const winnerPlayers = state.players.filter(player => (playerScores[player.uid] || 0) === maxScore);
+        
+        // Crear lista de todos los jugadores (conectados + desconectados con puntos)
+        const allPlayerUids = new Set([
+          ...state.players.map(p => p.uid),
+          ...Object.keys(playerScores)
+        ]);
+        
+        const allPlayers = Array.from(allPlayerUids).map(uid => {
+          const connectedPlayer = state.players.find(p => p.uid === uid);
+          if (connectedPlayer) return connectedPlayer;
+          // Si no está conectado, crear objeto básico con la info que tenemos
+          return {
+            uid,
+            name: 'Jugador desconectado',
+            photoURL: null
+          };
+        });
+        
+        const winnerPlayers = allPlayers.filter(player => (playerScores[player.uid] || 0) === maxScore);
         const winnerNames = winnerPlayers.map(p => p.name).join(' y ');
         
         return (
@@ -670,10 +688,10 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             </div>
             
             {/* Puntuación final - solo mostrar si hay jugadores además de los ganadores */}
-            {state.players.filter(p => !winnerPlayers.some(w => w.uid === p.uid)).length > 0 && (
+            {allPlayers.filter(p => !winnerPlayers.some(w => w.uid === p.uid)).length > 0 && (
               <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
                 <PlayerList 
-                  players={state.players.filter(p => !winnerPlayers.some(w => w.uid === p.uid))} 
+                  players={allPlayers.filter(p => !winnerPlayers.some(w => w.uid === p.uid))} 
                   currentUserId={user.uid} 
                   isHost={isHost} 
                   onCopyLink={onCopyLink} 
