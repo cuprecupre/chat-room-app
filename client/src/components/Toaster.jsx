@@ -40,7 +40,7 @@ export function Toaster() {
 
   return (
     <div className={`fixed top-5 left-1/2 -translate-x-1/2 ${
-      isError ? 'bg-red-600' : 'bg-green-800'
+      isError ? 'bg-red-900/90' : 'bg-green-800'
     } text-white px-6 py-3 rounded-full shadow-lg text-center transition-all duration-300 ease-out transform z-[9999] ${
       visible 
         ? 'opacity-100 translate-y-0' 
