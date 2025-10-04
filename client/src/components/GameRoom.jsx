@@ -537,7 +537,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               </div>
             ) : (
               <div className="text-center text-neutral-400 text-sm animate-fadeIn animate-delay-800">
-                Esperando a <span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'anfitrión'}</span> que lance la siguiente partida
+                Esperando a <span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'anfitrión'}</span> que lance la siguiente partida<span className="animate-ellipsis"></span>
               </div>
             )}
             </div>
