@@ -59,8 +59,8 @@ export function InstructionsModal({ isOpen, onClose }) {
           <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">Para ganar el juego</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li>Acumula <strong>15 puntos</strong> a lo largo de varias partidas.</li>
-            <li>El juego continúa hasta que <strong>alguien alcance</strong> ese total o hasta que se juegue el número máximo de partidas.</li>
-            <li>El número máximo de partidas será equivalente al número de jugadores que iniciaron el juego multiplicado por dos. (Ejemplo: Si el juego lo inician 5 jugadores el número máximo de partidas es 10).</li>
+            <li>El juego continúa hasta que <strong>alguien alcance</strong> ese total o hasta que se completen <strong>3 partidas</strong>.</li>
+            <li>Si se completan las 3 partidas sin que nadie llegue a 15 puntos, <strong>gana quien tenga más puntos</strong>.</li>
           </ul>
         </section>
 
@@ -148,9 +148,11 @@ export function InstructionsModal({ isOpen, onClose }) {
           <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">2) Votación (abierta durante la partida)</h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><strong>En cualquier momento</strong> de la partida, puedes <strong>votar en la app</strong> a quien creas impostor.</li>
-            <li><strong>No</strong> puedes votarte a ti mismo.</li>
+            <li><strong>No</strong> puedes votarte a ti mismo ni votar a jugadores ya eliminados.</li>
             <li>La app <strong>no</strong> muestra por quién votó cada uno; solo indica <strong>quién ya votó</strong>.</li>
+            <li><strong>Puedes cambiar tu voto</strong> pulsando de nuevo sobre el jugador que votaste, pero <strong>solo antes de que el último jugador vote</strong>.</li>
             <li><strong>Cuando todos han votado</strong>, se revela el resultado: el jugador <strong>con más votos es expulsado</strong>.</li>
+            <li>Si hay <strong>empate</strong> o nadie es eliminado, se inicia automáticamente una nueva ronda de pistas.</li>
           </ul>
 
           <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">3) Resultado y rondas siguientes</h4>
@@ -158,11 +160,12 @@ export function InstructionsModal({ isOpen, onClose }) {
             <li>Si el expulsado <strong>era el impostor</strong>, <strong>termina la partida</strong> y se reparten puntos.</li>
             <li>Si <strong>no era</strong> el impostor:
               <ul className="list-disc list-outside ml-10 mt-2 space-y-1 text-base">
-                <li>El expulsado <strong>ya no participa</strong> en la partida (ni pistas ni voto).</li>
+                <li>El expulsado <strong>ya no participa</strong> en esa partida (ni pistas ni voto).</li>
                 <li>Se <strong>desbloquea</strong> una <strong>nueva ronda</strong>: los jugadores restantes vuelven a dar <strong>una pista</strong> y pueden <strong>votar cuando quieran</strong>.</li>
               </ul>
             </li>
             <li>El ciclo puede repetirse hasta una <strong>tercera ronda</strong>.</li>
+            <li><strong>Importante:</strong> Los jugadores eliminados solo están fuera de <strong>esa partida</strong>. Cuando empieza una <strong>nueva partida</strong>, todos vuelven a jugar desde cero.</li>
           </ul>
 
           <h4 className="text-lg font-semibold text-neutral-200 mb-3 mt-4">4) Fin de la partida</h4>
@@ -210,8 +213,10 @@ export function InstructionsModal({ isOpen, onClose }) {
         <section className="mb-8">
           <h3 className="text-xl font-semibold text-orange-400 mb-4">Reglas adicionales</h3>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li><strong>Empate</strong> en la votación: si hay empate se juega otra ronda.</li>
-            <li><strong>Desconexiones</strong>: quien se desconecte puede <strong>reingresar</strong> pero no podrá votar hasta que termine la partida. Los puntos que había ganado no los pierde.</li>
+            <li><strong>Empate</strong> en la votación: si hay empate, nadie es eliminado y se juega automáticamente otra ronda de pistas.</li>
+            <li><strong>Cambio de voto:</strong> Puedes desmarcar tu voto y votar a otro jugador, pero solo antes de que el último jugador vote. Una vez todos han votado, se procesan los resultados.</li>
+            <li><strong>Jugadores eliminados:</strong> Solo permanecen eliminados durante esa partida. En la siguiente partida, todos vuelven a participar.</li>
+            <li><strong>Desconexiones:</strong> Quien se desconecte puede <strong>reingresar</strong>, pero los puntos acumulados se mantienen. La partida continúa sin esperar.</li>
           </ul>
         </section>
 
