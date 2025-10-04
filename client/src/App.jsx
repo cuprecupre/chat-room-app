@@ -19,6 +19,7 @@ export default function App() {
   const [token, setToken] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
+  const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
   
   // Check if user is accessing showcase route
   const isShowcaseRoute = window.location.pathname === '/ui-showcase';
@@ -80,6 +81,16 @@ export default function App() {
       }, 100); // Small delay to ensure the leave-game event is processed
     }
   }, [emit, gameState]);
+
+  const handleTitleClick = useCallback(() => {
+    // Si está en una partida (lobby o jugando), mostrar modal de confirmación
+    if (gameState?.gameId) {
+      setShowLeaveGameModal(true);
+    } else {
+      // Si no está en partida, ir directamente al home
+      window.location.href = '/';
+    }
+  }, [gameState]);
 
   const isMobile = useMemo(() => {
     return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -475,7 +486,12 @@ export default function App() {
       <div className={containerClasses}>
         {showHeader && (
           <header className="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
-            <h1 className="text-xl sm:text-2xl font-bold text-neutral-50">El impostor</h1>
+            <button 
+              onClick={handleTitleClick}
+              className="text-xl sm:text-2xl font-bold text-neutral-50 hover:text-orange-400 transition-colors active:scale-95 cursor-pointer"
+            >
+              El impostor
+            </button>
             <div className="flex items-center gap-3 sm:gap-4">
               <span className="text-sm sm:text-base font-medium hidden sm:inline flex items-center">{user.displayName}</span>
               <div className="relative" ref={menuRef}>
@@ -555,6 +571,35 @@ export default function App() {
       </div>
       
       {user && connected && <Footer onOpenInstructions={() => setInstructionsOpen(true)} />}
+
+      {/* Modal de confirmación para abandonar juego */}
+      {showLeaveGameModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full">
+            <div className="text-center space-y-4">
+              <h3 className="text-xl font-bold text-neutral-50">¿Abandonar la partida?</h3>
+              <p className="text-neutral-400">Si abandonas, perderás tu progreso en esta partida.</p>
+              <div className="space-y-2 pt-2">
+                <Button
+                  onClick={() => {
+                    setShowLeaveGameModal(false);
+                    leaveGame();
+                  }}
+                  variant="danger"
+                >
+                  Sí, abandonar
+                </Button>
+                <Button
+                  onClick={() => setShowLeaveGameModal(false)}
+                  variant="outline"
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
