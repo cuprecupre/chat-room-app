@@ -561,7 +561,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               </h2>
               {state.winner && (
                 <p className="text-2xl text-orange-400 font-semibold">
-                  {isTie ? `Ganadores: ${winnerNames}` : `Ganador: ${state.winner}`}
+                  {winnerPlayers.length > 1 ? 'Ganadores:' : 'Ganador:'}
+                  <br />
+                  {winnerNames}
                 </p>
               )}
             </div>
