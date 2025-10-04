@@ -63,16 +63,15 @@ h1, h2, h3, h4, h5, h6 {
   will-change: transform;
 }
 
-/* Card floating animation - Subtle Y-axis rotation */
+/* Card floating animation - Subtle Z-axis rotation (2D pendulum) */
 @keyframes cardFloat {
-  0% { transform: rotateY(-6deg); }
-  50% { transform: rotateY(6deg); }
-  100% { transform: rotateY(-6deg); }
+  0% { transform: rotateZ(-3deg); }
+  50% { transform: rotateZ(3deg); }
+  100% { transform: rotateZ(-3deg); }
 }
 
 .animate-card-float {
   animation: cardFloat 4s ease-in-out infinite;
-  transform-style: preserve-3d;
   will-change: transform;
 }
 
