@@ -529,7 +529,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               </div>
               
               {/* Revelar impostor y palabra */}
-              <div className="bg-white/10 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400">
+              <div className="bg-white/5 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400">
                 <div className="space-y-6 text-center">
                   <div>
                     <span className="text-xs tracking-wider uppercase text-neutral-400">El impostor era</span>
