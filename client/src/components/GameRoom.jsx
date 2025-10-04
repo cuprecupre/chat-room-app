@@ -15,7 +15,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   const canVote = isPlaying && gameState?.canVote;
   const hasVoted = gameState?.hasVoted;
   const votedPlayers = gameState?.votedPlayers || [];
-  const eliminatedPlayers = gameState?.allEliminatedPlayers || [];
+  const eliminatedPlayers = gameState?.eliminatedInRound || [];
   const activePlayers = gameState?.activePlayers || [];
   const myVote = gameState?.myVote || null; // A quién voté yo
   const playerScores = gameState?.playerScores || {};

@@ -14,8 +14,7 @@ class Game {
     // Sistema de vueltas
     this.currentTurn = 1; // Vuelta actual (1, 2, 3)
     this.maxTurns = 3;
-    this.eliminatedInRound = []; // Jugadores expulsados en esta ronda
-    this.allEliminatedPlayers = []; // Todos los jugadores eliminados durante toda la partida
+    this.eliminatedInRound = []; // Jugadores expulsados en esta ronda (acumulado de todas las vueltas)
     this.lastEliminatedInTurn = null; // Último jugador eliminado en la vuelta anterior
     
     // Sistema de votación
@@ -48,7 +47,7 @@ class Game {
     this.players = this.players.filter(p => p.uid !== userId);
     this.roundPlayers = this.roundPlayers.filter(uid => uid !== userId);
     this.eliminatedInRound = this.eliminatedInRound.filter(uid => uid !== userId);
-    this.allEliminatedPlayers = this.allEliminatedPlayers.filter(uid => uid !== userId);
+    this.eliminatedInRound = this.eliminatedInRound.filter(uid => uid !== userId);
     delete this.votes[userId];
     delete this.playerScores[userId];
 
@@ -76,7 +75,7 @@ class Game {
   }
 
   startNewRound() {
-    // Reiniciar estado de ronda
+    // Reiniciar estado de ronda - todos vuelven a jugar
     this.roundPlayers = this.players.map(p => p.uid);
     this.currentTurn = 1;
     this.eliminatedInRound = [];
@@ -124,7 +123,6 @@ class Game {
       this.roundCount = 0;
       this.initialPlayerCount = this.players.length;
       this.maxRounds = this.initialPlayerCount * 2;
-      this.allEliminatedPlayers = []; // Resetear jugadores eliminados para nuevo juego
       this.phase = 'lobby'; // Cambiar fase para evitar checks de game_over
       console.log(`[Game ${this.gameId}] ✅ Nueva partida iniciada desde game_over. Jugadores: ${this.initialPlayerCount}, Max rondas: ${this.maxRounds}`);
     } else {
@@ -141,7 +139,7 @@ class Game {
       throw new Error('Solo puedes votar durante una ronda activa.');
     }
     
-    if (this.allEliminatedPlayers.includes(voterId)) {
+    if (this.eliminatedInRound.includes(voterId)) {
       throw new Error('Los jugadores eliminados no pueden votar.');
     }
     
@@ -162,7 +160,7 @@ class Game {
       throw new Error('No puedes votarte a ti mismo.');
     }
     
-    if (this.allEliminatedPlayers.includes(targetId)) {
+    if (this.eliminatedInRound.includes(targetId)) {
       throw new Error('No puedes votar a un jugador eliminado.');
     }
     
@@ -180,7 +178,7 @@ class Game {
   }
 
   checkIfAllVoted() {
-    const activePlayers = this.roundPlayers.filter(uid => !this.allEliminatedPlayers.includes(uid));
+    const activePlayers = this.roundPlayers.filter(uid => !this.eliminatedInRound.includes(uid));
     const votedPlayers = Object.keys(this.votes).filter(uid => activePlayers.includes(uid));
     
     if (votedPlayers.length === activePlayers.length) {
@@ -192,7 +190,7 @@ class Game {
   processVotingResults() {
     // Contar votos
     const voteCount = {};
-    const activePlayers = this.roundPlayers.filter(uid => !this.allEliminatedPlayers.includes(uid));
+    const activePlayers = this.roundPlayers.filter(uid => !this.eliminatedInRound.includes(uid));
     
     console.log(`[Game ${this.gameId}] Procesando resultados. Jugadores activos:`, activePlayers);
     console.log(`[Game ${this.gameId}] Votos registrados:`, this.votes);
@@ -252,7 +250,7 @@ class Game {
     // Expulsar al más votado
     const eliminatedId = mostVoted[0];
     this.eliminatedInRound.push(eliminatedId);
-    this.allEliminatedPlayers.push(eliminatedId);
+    this.eliminatedInRound.push(eliminatedId);
     console.log(`[Game ${this.gameId}] ${eliminatedId} ha sido eliminado.`);
 
     // Verificar si era el impostor
@@ -312,7 +310,7 @@ class Game {
       // Amigos ganaron: dar puntos a quienes votaron correctamente
       this.turnHistory.forEach(turn => {
         Object.entries(turn.votes).forEach(([voter, target]) => {
-          if (target === this.impostorId && !this.allEliminatedPlayers.includes(voter)) {
+          if (target === this.impostorId && !this.eliminatedInRound.includes(voter)) {
             this.playerScores[voter] = (this.playerScores[voter] || 0) + 1;
             this.lastRoundScores[voter] = (this.lastRoundScores[voter] || 0) + 1;
           }
@@ -321,7 +319,7 @@ class Game {
       
       // +1 punto adicional por expulsar al impostor
       this.roundPlayers.forEach(uid => {
-        if (uid !== this.impostorId && !this.allEliminatedPlayers.includes(uid)) {
+        if (uid !== this.impostorId && !this.eliminatedInRound.includes(uid)) {
           this.playerScores[uid] = (this.playerScores[uid] || 0) + 1;
           this.lastRoundScores[uid] = (this.lastRoundScores[uid] || 0) + 1;
         }
@@ -385,7 +383,7 @@ class Game {
   }
 
   getActivePlayers() {
-    return this.roundPlayers.filter(uid => !this.allEliminatedPlayers.includes(uid));
+    return this.roundPlayers.filter(uid => !this.eliminatedInRound.includes(uid));
   }
 
   hasVoted(playerId) {
@@ -423,13 +421,13 @@ class Game {
         baseState.currentTurn = this.currentTurn;
         baseState.maxTurns = this.maxTurns;
         baseState.eliminatedInRound = this.eliminatedInRound;
-        baseState.allEliminatedPlayers = this.allEliminatedPlayers;
+        baseState.eliminatedInRound = this.eliminatedInRound;
         baseState.lastEliminatedInTurn = this.lastEliminatedInTurn;
         baseState.hasVoted = this.hasVoted(userId);
         baseState.votedPlayers = Object.keys(this.votes);
         baseState.myVote = this.votes[userId] || null; // A quién votó este usuario
         baseState.activePlayers = this.getActivePlayers();
-        baseState.canVote = !this.allEliminatedPlayers.includes(userId);
+        baseState.canVote = !this.eliminatedInRound.includes(userId);
       }
     } else if (this.phase === 'round_result' || this.phase === 'game_over') {
       const impostor = this.players.find(p => p.uid === this.impostorId);
@@ -437,7 +435,7 @@ class Game {
       baseState.impostorId = this.impostorId;
       baseState.secretWord = this.secretWord;
       baseState.lastRoundScores = this.lastRoundScores;
-      baseState.allEliminatedPlayers = this.allEliminatedPlayers;
+      baseState.eliminatedInRound = this.eliminatedInRound;
       
       if (this.phase === 'game_over') {
         const winnerId = this.checkGameOver();
