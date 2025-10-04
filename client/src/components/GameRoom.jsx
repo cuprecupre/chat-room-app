@@ -139,13 +139,21 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                 )}
                 {showScores ? (
                   <div className="text-right">
-                    <span className={`font-medium ${isWinner ? 'text-orange-400' : 'text-neutral-300'}`}>
-                      {score} pts
-                    </span>
-                    {isRoundResult && scoreGained > 0 && (
-                      <div className="text-xs text-green-400 font-medium mt-0.5">
-                        +{scoreGained}
+                    {isRoundResult && scoreGained > 0 ? (
+                      // Mostrar puntos ganados y total en resultado de ronda
+                      <div className="flex flex-col items-end gap-0.5">
+                        <div className="text-xs text-green-400 font-medium">
+                          +{scoreGained} pts
+                        </div>
+                        <div className={`text-sm ${isWinner ? 'text-orange-400' : 'text-neutral-400'}`}>
+                          Total: {score}
+                        </div>
                       </div>
+                    ) : (
+                      // Solo mostrar total en game over
+                      <span className={`font-medium ${isWinner ? 'text-orange-400' : 'text-neutral-300'}`}>
+                        {score} pts
+                      </span>
                     )}
                   </div>
                 ) : isPlaying && canVote && (
