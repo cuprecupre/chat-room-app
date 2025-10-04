@@ -82,10 +82,9 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
           const score = playerScores[p.uid] || 0;
           const scoreGained = lastRoundScores[p.uid] || 0;
           const isWinner = isGameOver && (index === 0 || (isTie && winners.some(w => w.uid === p.uid)));
-          const isCurrentUser = p.uid === currentUserId;
           
           return (
-            <li key={p.uid} className={`flex items-center justify-between bg-white/5 p-4 rounded-md ${isEliminated ? 'opacity-50' : ''} ${isWinner ? 'bg-orange-500/10' : ''} ${isWinner && isCurrentUser ? 'border border-orange-500/30' : ''}`}>
+            <li key={p.uid} className={`flex items-center justify-between bg-white/5 p-4 rounded-md ${isEliminated ? 'opacity-50' : ''} ${isWinner ? 'bg-orange-500/10' : ''}`}>
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <img 
