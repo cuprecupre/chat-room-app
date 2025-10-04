@@ -367,26 +367,30 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           )}
           
           {/* Footer con código de sala */}
-          <div className="w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5">
-            <div className="space-y-4">
-              <button
-                onClick={() => onCopyGameCode()}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150"
-                title="Copiar código"
-              >
-                <span>Código de sala: <span className="font-mono font-semibold text-neutral-300">{state.gameId}</span></span>
-                {!isMobile && (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          <div className="w-full max-w-sm mx-auto mt-6 border-t border-white/5">
+            <div className="space-y-0 divide-y divide-white/5">
+              <div className="py-3">
+                <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="gap-2 w-full">
+                  <span>Abandonar juego</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
-                )}
-              </button>
-              <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="gap-2">
-                <span>Abandonar juego</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-              </Button>
+                </Button>
+              </div>
+              <div className="pt-3">
+                <button
+                  onClick={() => onCopyGameCode()}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150"
+                  title="Copiar código"
+                >
+                  <span>Código de sala: <span className="font-mono font-semibold text-neutral-500">{state.gameId}</span></span>
+                  {!isMobile && (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -525,26 +529,30 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           </div>
         )}
         {/* Footer único y consistente */}
-        <div className={`w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5 ${showRestOfUI ? 'animate-fadeIn animate-delay-1000' : 'opacity-0 pointer-events-none'}`}>
-          <div className="space-y-4">
-            <button
-              onClick={() => onCopyGameCode()}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150"
-              title="Copiar código"
-            >
-              <span>Código de sala: <span className="font-mono font-semibold text-neutral-300">{state.gameId}</span></span>
-              {!isMobile && (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        <div className={`w-full max-w-sm mx-auto mt-6 border-t border-white/5 ${showRestOfUI ? 'animate-fadeIn animate-delay-1000' : 'opacity-0 pointer-events-none'}`}>
+          <div className="space-y-0 divide-y divide-white/5">
+            <div className="py-3">
+              <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="gap-2 w-full">
+                <span>Abandonar juego</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-              )}
-            </button>
-            <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="gap-2">
-              <span>Abandonar juego</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-            </Button>
+              </Button>
+            </div>
+            <div className="pt-3">
+              <button
+                onClick={() => onCopyGameCode()}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150"
+                title="Copiar código"
+              >
+                <span>Código de sala: <span className="font-mono font-semibold text-neutral-500">{state.gameId}</span></span>
+                {!isMobile && (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
         </div>
         </>
@@ -744,25 +752,29 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             )}
             
             {/* Footer */}
-            <div className="pt-4 border-t border-white/10 space-y-3 animate-fadeIn animate-delay-800">
-              <button
-                onClick={() => onCopyGameCode()}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150"
-                title="Copiar código"
-              >
-                <span>Código de sala: <span className="font-mono font-semibold text-neutral-300">{state.gameId}</span></span>
-                {!isMobile && (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            <div className="border-t border-white/10 space-y-0 divide-y divide-white/10 animate-fadeIn animate-delay-800">
+              <div className="py-3">
+                <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="gap-2 w-full">
+                  <span>Abandonar juego</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
-                )}
-              </button>
-              <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="gap-2">
-                <span>Abandonar juego</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-              </Button>
+                </Button>
+              </div>
+              <div className="pt-3">
+                <button
+                  onClick={() => onCopyGameCode()}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150"
+                  title="Copiar código"
+                >
+                  <span>Código de sala: <span className="font-mono font-semibold text-neutral-500">{state.gameId}</span></span>
+                  {!isMobile && (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
             </div>
           </div>
@@ -823,7 +835,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       {/* Modal de confirmación para terminar juego */}
       {showEndGameModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full border border-neutral-700">
+          <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full">
             <div className="text-center space-y-4">
               <h3 className="text-xl font-bold text-neutral-50">¿Terminar juego?</h3>
               <p className="text-neutral-400">
@@ -858,7 +870,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       {/* Modal de confirmación para abandonar juego */}
       {showLeaveGameModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full border border-neutral-700">
+          <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full">
             <div className="text-center space-y-4">
               <h3 className="text-xl font-bold text-neutral-50">¿Abandonar juego?</h3>
               <p className="text-neutral-400">
