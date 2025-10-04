@@ -541,7 +541,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span>
-                  Esperando a <span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'anfitrión'}</span> que lance la siguiente partida
+                  Esperando a que <span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'el anfitrión'}</span> inicie la siguiente partida
                 </span>
               </div>
             )}
