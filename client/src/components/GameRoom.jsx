@@ -408,6 +408,10 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                         </div>
                         <p className="text-xl font-semibold mt-1 text-white" style={{fontFamily: 'Trocchi, serif'}}>{capitalize(state.role)}</p>
                       </div>
+                      
+                      {/* Línea separadora */}
+                      <div className="w-full h-px bg-white/20"></div>
+                      
                       {state.role === 'impostor' ? (
                         <>
                           {state.secretCategory && (
@@ -565,7 +569,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             <div className="min-h-full w-full max-w-sm mx-auto px-4 py-6 space-y-6">
             <div className="text-center space-y-4 animate-scaleIn animate-delay-200">
               <h2 className="text-4xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
-                ¡Juego terminado!
+                Resultado final
               </h2>
             </div>
             
