@@ -669,17 +669,19 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               </div>
             </div>
             
-            {/* Puntuación final */}
-            <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
-              <PlayerList 
-                players={state.players.filter(p => !winnerPlayers.some(w => w.uid === p.uid))} 
-                currentUserId={user.uid} 
-                isHost={isHost} 
-                onCopyLink={onCopyLink} 
-                gameState={state} 
-                onVote={onVote} 
-              />
-            </div>
+            {/* Puntuación final - solo mostrar si hay jugadores además de los ganadores */}
+            {state.players.filter(p => !winnerPlayers.some(w => w.uid === p.uid)).length > 0 && (
+              <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
+                <PlayerList 
+                  players={state.players.filter(p => !winnerPlayers.some(w => w.uid === p.uid))} 
+                  currentUserId={user.uid} 
+                  isHost={isHost} 
+                  onCopyLink={onCopyLink} 
+                  gameState={state} 
+                  onVote={onVote} 
+                />
+              </div>
+            )}
             
             {isHost && (
               <div className="animate-fadeIn animate-delay-600">
