@@ -561,27 +561,60 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm animate-fadeIn">
           <div className="absolute inset-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
             <div className="min-h-full w-full max-w-sm mx-auto px-4 py-6 space-y-6">
-            <div className="text-center space-y-3 animate-scaleIn animate-delay-200">
-              <h2 className="text-5xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
+            <div className="text-center space-y-4 animate-scaleIn animate-delay-200">
+              <h2 className="text-4xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
                 ¡Juego terminado!
               </h2>
-              {state.winner && (
-                <p className="text-2xl text-orange-400 font-semibold">
-                  {winnerPlayers.length >= 3 ? (
-                    <>
+            </div>
+            
+            {/* Caja de ganadores */}
+            <div className="bg-white/10 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400">
+              <div className="space-y-6 text-center">
+                {winnerPlayers.length >= 3 ? (
+                  // Sin ganadores (empate triple o mayor)
+                  <div>
+                    <span className="text-xs tracking-wider uppercase text-neutral-400">Resultado</span>
+                    <p className="font-semibold text-2xl text-orange-400 mt-4" style={{fontFamily: 'Trocchi, serif'}}>
                       No hay ganadores
-                      <br />
-                      <span className="text-lg">¡Empieza otro juego!</span>
-                    </>
-                  ) : (
-                    <>
-                      {winnerPlayers.length > 1 ? 'Ganadores:' : 'Ganador:'}
-                      <br />
-                      {winnerNames}
-                    </>
-                  )}
-                </p>
-              )}
+                    </p>
+                    <p className="text-lg text-neutral-300 mt-2">¡Empieza otro juego!</p>
+                  </div>
+                ) : winnerPlayers.length === 2 ? (
+                  // Dos ganadores
+                  <div>
+                    <span className="text-xs tracking-wider uppercase text-neutral-400">Ganadores</span>
+                    <div className="flex justify-center gap-6 my-4">
+                      {winnerPlayers.map(winner => (
+                        <div key={winner.uid} className="flex flex-col items-center">
+                          <img 
+                            src={winner.photoURL} 
+                            alt={winner.name}
+                            className="w-20 h-20 rounded-full object-cover ring-4 ring-orange-400/50 shadow-lg"
+                          />
+                          <p className="font-semibold text-lg text-orange-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
+                            {winner.name}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : winnerPlayers.length === 1 ? (
+                  // Un ganador
+                  <div>
+                    <span className="text-xs tracking-wider uppercase text-neutral-400">Ganador</span>
+                    <div className="flex justify-center my-4">
+                      <img 
+                        src={winnerPlayers[0].photoURL} 
+                        alt={winnerPlayers[0].name}
+                        className="w-20 h-20 rounded-full object-cover ring-4 ring-orange-400/50 shadow-lg"
+                      />
+                    </div>
+                    <p className="font-semibold text-2xl text-orange-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
+                      {winnerPlayers[0].name}
+                    </p>
+                  </div>
+                ) : null}
+              </div>
             </div>
             
             {/* Puntuación final */}
