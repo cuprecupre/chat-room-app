@@ -582,7 +582,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 ) : winnerPlayers.length === 2 ? (
                   // Dos ganadores
                   <div>
-                    <span className="text-xs tracking-wider uppercase text-orange-400">Ganadores</span>
+                    <span className="text-xs tracking-wider uppercase text-white">Ganadores</span>
                     <div className="flex justify-center gap-6 my-4">
                       {winnerPlayers.map(winner => (
                         <div key={winner.uid} className="flex flex-col items-center">
@@ -601,7 +601,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 ) : winnerPlayers.length === 1 ? (
                   // Un ganador
                   <div>
-                    <span className="text-xs tracking-wider uppercase text-orange-400">Ganador</span>
+                    <span className="text-xs tracking-wider uppercase text-white">Ganador</span>
                     <div className="flex justify-center my-4">
                       <img 
                         src={winnerPlayers[0].photoURL} 
