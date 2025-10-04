@@ -543,7 +543,15 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       )}
       
       {/* Fin del juego */}
-      {state.phase === 'game_over' && state.winner !== undefined && (
+      {state.phase === 'game_over' && state.winner !== undefined && (() => {
+        // Calcular ganadores
+        const isTie = state.winner === 'Empate';
+        const playerScores = state.playerScores || {};
+        const maxScore = Math.max(...Object.values(playerScores));
+        const winnerPlayers = state.players.filter(player => (playerScores[player.uid] || 0) === maxScore);
+        const winnerNames = winnerPlayers.map(p => p.name.split(' ')[0]).join(' y ');
+        
+        return (
         <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm overflow-y-auto animate-fadeIn" style={{ WebkitOverflowScrolling: 'touch' }}>
           <div className="min-h-full flex items-start justify-center px-4 pt-6 pb-20">
             <div className="w-full max-w-sm mx-auto space-y-6">
@@ -553,7 +561,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               </h2>
               {state.winner && (
                 <p className="text-2xl text-orange-400 font-semibold">
-                  {state.winner === 'Empate' ? 'Ganadores:' : `Ganador: ${state.winner}`}
+                  {isTie ? `Ganadores: ${winnerNames}` : `Ganador: ${state.winner}`}
                 </p>
               )}
             </div>
@@ -600,7 +608,8 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
       
       {/* Overlay de nueva ronda */}
       {showTurnOverlay && (
