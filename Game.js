@@ -15,6 +15,7 @@ class Game {
     this.currentTurn = 1; // Vuelta actual (1, 2, 3)
     this.maxTurns = 3;
     this.eliminatedInRound = []; // Jugadores expulsados en esta ronda
+    this.allEliminatedPlayers = []; // Todos los jugadores eliminados durante toda la partida
     
     // Sistema de votación
     this.votes = {}; // { [playerId]: votedForPlayerId }
@@ -46,6 +47,7 @@ class Game {
     this.players = this.players.filter(p => p.uid !== userId);
     this.roundPlayers = this.roundPlayers.filter(uid => uid !== userId);
     this.eliminatedInRound = this.eliminatedInRound.filter(uid => uid !== userId);
+    this.allEliminatedPlayers = this.allEliminatedPlayers.filter(uid => uid !== userId);
     delete this.votes[userId];
     delete this.playerScores[userId];
 
@@ -136,7 +138,7 @@ class Game {
       throw new Error('Solo puedes votar durante una ronda activa.');
     }
     
-    if (this.eliminatedInRound.includes(voterId)) {
+    if (this.allEliminatedPlayers.includes(voterId)) {
       throw new Error('Los jugadores eliminados no pueden votar.');
     }
     
@@ -157,7 +159,7 @@ class Game {
       throw new Error('No puedes votarte a ti mismo.');
     }
     
-    if (this.eliminatedInRound.includes(targetId)) {
+    if (this.allEliminatedPlayers.includes(targetId)) {
       throw new Error('No puedes votar a un jugador eliminado.');
     }
     
@@ -175,7 +177,7 @@ class Game {
   }
 
   checkIfAllVoted() {
-    const activePlayers = this.roundPlayers.filter(uid => !this.eliminatedInRound.includes(uid));
+    const activePlayers = this.roundPlayers.filter(uid => !this.allEliminatedPlayers.includes(uid));
     const votedPlayers = Object.keys(this.votes).filter(uid => activePlayers.includes(uid));
     
     if (votedPlayers.length === activePlayers.length) {
@@ -187,7 +189,7 @@ class Game {
   processVotingResults() {
     // Contar votos
     const voteCount = {};
-    const activePlayers = this.roundPlayers.filter(uid => !this.eliminatedInRound.includes(uid));
+    const activePlayers = this.roundPlayers.filter(uid => !this.allEliminatedPlayers.includes(uid));
     
     Object.entries(this.votes).forEach(([voter, target]) => {
       if (activePlayers.includes(voter)) {
@@ -238,6 +240,7 @@ class Game {
     // Expulsar al más votado
     const eliminatedId = mostVoted[0];
     this.eliminatedInRound.push(eliminatedId);
+    this.allEliminatedPlayers.push(eliminatedId);
     console.log(`[Game ${this.gameId}] ${eliminatedId} ha sido eliminado.`);
 
     // Verificar si era el impostor
@@ -293,7 +296,7 @@ class Game {
       // Amigos ganaron: dar puntos a quienes votaron correctamente
       this.turnHistory.forEach(turn => {
         Object.entries(turn.votes).forEach(([voter, target]) => {
-          if (target === this.impostorId && !this.eliminatedInRound.includes(voter)) {
+          if (target === this.impostorId && !this.allEliminatedPlayers.includes(voter)) {
             this.playerScores[voter] = (this.playerScores[voter] || 0) + 1;
             this.lastRoundScores[voter] = (this.lastRoundScores[voter] || 0) + 1;
           }
@@ -302,7 +305,7 @@ class Game {
       
       // +1 punto adicional por expulsar al impostor
       this.roundPlayers.forEach(uid => {
-        if (uid !== this.impostorId && !this.eliminatedInRound.includes(uid)) {
+        if (uid !== this.impostorId && !this.allEliminatedPlayers.includes(uid)) {
           this.playerScores[uid] = (this.playerScores[uid] || 0) + 1;
           this.lastRoundScores[uid] = (this.lastRoundScores[uid] || 0) + 1;
         }
@@ -366,7 +369,7 @@ class Game {
   }
 
   getActivePlayers() {
-    return this.roundPlayers.filter(uid => !this.eliminatedInRound.includes(uid));
+    return this.roundPlayers.filter(uid => !this.allEliminatedPlayers.includes(uid));
   }
 
   hasVoted(playerId) {
@@ -404,11 +407,12 @@ class Game {
         baseState.currentTurn = this.currentTurn;
         baseState.maxTurns = this.maxTurns;
         baseState.eliminatedInRound = this.eliminatedInRound;
+        baseState.allEliminatedPlayers = this.allEliminatedPlayers;
         baseState.hasVoted = this.hasVoted(userId);
         baseState.votedPlayers = Object.keys(this.votes);
         baseState.myVote = this.votes[userId] || null; // A quién votó este usuario
         baseState.activePlayers = this.getActivePlayers();
-        baseState.canVote = !this.eliminatedInRound.includes(userId);
+        baseState.canVote = !this.allEliminatedPlayers.includes(userId);
       }
     } else if (this.phase === 'round_result' || this.phase === 'game_over') {
       const impostor = this.players.find(p => p.uid === this.impostorId);

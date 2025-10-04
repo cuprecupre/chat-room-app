@@ -15,7 +15,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   const canVote = isPlaying && gameState?.canVote;
   const hasVoted = gameState?.hasVoted;
   const votedPlayers = gameState?.votedPlayers || [];
-  const eliminatedPlayers = gameState?.eliminatedInRound || [];
+  const eliminatedPlayers = gameState?.allEliminatedPlayers || [];
   const activePlayers = gameState?.activePlayers || [];
   const myVote = gameState?.myVote || null; // A quién voté yo
   const playerScores = gameState?.playerScores || {};
@@ -71,8 +71,8 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   };
 
   // Determinar qué título mostrar
-  let headerText = isPlaying ? 'Vota por un jugador' : `Jugadores Conectados: ${players.length}`;
-  if (showScores) {
+  let headerText = isPlaying ? 'Vota a un jugador para elminarlo' : `Jugadores Conectados: ${players.length}`;
+  if (showScores) { 
     headerText = isGameOver ? 'Puntuación Final' : 'Puntuación';
   }
 
