@@ -419,7 +419,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                               <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-gray-200">
                                 <span>Pista</span>
                               </div>
-                              <p className="font-semibold text-xl mt-1 text-white underline decoration-wavy underline-offset-4" style={{fontFamily: 'Trocchi, serif'}}>
+                              <p className="font-semibold text-xl mt-1 text-white" style={{fontFamily: 'Trocchi, serif'}}>
                                 {capitalize(state.secretCategory)}
                               </p>
                             </div>
