@@ -536,13 +536,8 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 <Button onClick={onPlayAgain} variant="primary" size="md">Siguiente partida</Button>
               </div>
             ) : (
-              <div className="flex items-center justify-center gap-2 text-neutral-400 text-sm animate-fadeIn animate-delay-800">
-                <svg className="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>
-                  Esperando a que <span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'el anfitrión'}</span> inicie la siguiente partida
-                </span>
+              <div className="text-center text-neutral-400 text-sm animate-fadeIn animate-delay-800 animate-pulse">
+                Esperando a que <span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'el anfitrión'}</span> inicie la siguiente partida
               </div>
             )}
             </div>
