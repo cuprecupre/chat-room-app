@@ -92,12 +92,23 @@ export default function App() {
       textArea.style.position = 'fixed';
       textArea.style.left = '-999999px';
       textArea.style.top = '-999999px';
+      textArea.style.opacity = '0';
+      textArea.style.pointerEvents = 'none';
+      textArea.setAttribute('readonly', '');
       document.body.appendChild(textArea);
-      textArea.focus();
+      
+      // Guardar la posición actual del scroll
+      const scrollY = window.scrollY;
+      const scrollX = window.scrollX;
+      
       textArea.select();
+      textArea.setSelectionRange(0, 99999); // Para dispositivos móviles
       
       const successful = document.execCommand('copy');
       document.body.removeChild(textArea);
+      
+      // Restaurar la posición del scroll
+      window.scrollTo(scrollX, scrollY);
       
       if (successful) {
         window.dispatchEvent(new CustomEvent('app:toast', { detail: successMessage }));
