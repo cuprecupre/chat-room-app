@@ -24,8 +24,8 @@ class Game {
     // Sistema de puntos
     this.playerScores = {}; // { [playerId]: totalScore }
     this.roundCount = 0; // Contador de rondas jugadas
-    this.initialPlayerCount = 0; // Para calcular máximo de rondas
-    this.maxRounds = 0; // Máximo de rondas (jugadores iniciales × 2)
+    this.initialPlayerCount = 0; // Guardado para referencia
+    this.maxRounds = 0; // Máximo de rondas (3 partidas fijas)
     this.targetScore = 15; // Puntos para ganar
     this.lastRoundScores = {}; // Puntos ganados en la última ronda
 
@@ -68,7 +68,7 @@ class Game {
     // Establecer máximo de rondas en el primer inicio
     if (this.initialPlayerCount === 0) {
       this.initialPlayerCount = this.players.length;
-      this.maxRounds = this.initialPlayerCount * 2;
+      this.maxRounds = 3; // Máximo 3 partidas por juego
     }
 
     this.startNewRound();
@@ -122,7 +122,7 @@ class Game {
       });
       this.roundCount = 0;
       this.initialPlayerCount = this.players.length;
-      this.maxRounds = this.initialPlayerCount * 2;
+      this.maxRounds = 3; // Máximo 3 partidas por juego
       this.phase = 'lobby'; // Cambiar fase para evitar checks de game_over
       console.log(`[Game ${this.gameId}] ✅ Nueva partida iniciada desde game_over. Jugadores: ${this.initialPlayerCount}, Max rondas: ${this.maxRounds}`);
     } else {
