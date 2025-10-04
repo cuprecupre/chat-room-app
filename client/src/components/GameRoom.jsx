@@ -481,8 +481,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {/* Resultado de partida */}
       {state.phase === 'round_result' && state.impostorName && state.secretWord && (
-        <div className="fixed inset-0 z-40 overflow-y-scroll bg-neutral-950/95 backdrop-blur-sm animate-fadeIn" style={{ WebkitOverflowScrolling: 'touch' }}>
-          <div className="w-full max-w-sm mx-auto px-4 py-6 space-y-6">
+        <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm animate-fadeIn">
+          <div className="absolute inset-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="min-h-full w-full max-w-sm mx-auto px-4 py-6 space-y-6">
             <div className="text-center space-y-2 animate-scaleIn animate-delay-200">
               <h2 className="text-4xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
                 Resultado de la partida
@@ -535,6 +536,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 <Button onClick={onPlayAgain} variant="primary" size="md">Siguiente partida</Button>
               </div>
             )}
+            </div>
           </div>
         </div>
       )}
@@ -549,8 +551,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         const winnerNames = winnerPlayers.map(p => p.name).join(' y ');
         
         return (
-        <div className="fixed inset-0 z-40 overflow-y-scroll bg-neutral-950/95 backdrop-blur-sm animate-fadeIn" style={{ WebkitOverflowScrolling: 'touch' }}>
-          <div className="w-full max-w-sm mx-auto px-4 py-6 space-y-6">
+        <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm animate-fadeIn">
+          <div className="absolute inset-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="min-h-full w-full max-w-sm mx-auto px-4 py-6 space-y-6">
             <div className="text-center space-y-3 animate-scaleIn animate-delay-200">
               <h2 className="text-5xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
                 ¡Juego terminado!
@@ -602,6 +605,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
               </Button>
+            </div>
             </div>
           </div>
         </div>
