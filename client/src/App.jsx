@@ -10,6 +10,7 @@ import { Spinner } from './components/ui/Spinner';
 import { Button } from './components/ui/Button';
 import { Footer } from './components/Footer';
 import { InstructionsModal } from './components/InstructionsModal';
+import { CopyModal } from './components/CopyModal';
 import bellImg from './assets/bell.png';
 import heroImg from './assets/impostor-home.png';
 
@@ -18,6 +19,9 @@ export default function App() {
   const [token, setToken] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
+  const [copyModalOpen, setCopyModalOpen] = useState(false);
+  const [copyModalText, setCopyModalText] = useState('');
+  const [copyModalTitle, setCopyModalTitle] = useState('');
   
   // Precargar assets de la app
   const { isLoading: assetsLoading } = useAppAssetsPreloader();
@@ -77,45 +81,36 @@ export default function App() {
     }
   }, [emit, gameState]);
 
-  const copyToClipboard = useCallback(async (text, successMessage) => {
+  const copyToClipboard = useCallback(async (text, successMessage, title) => {
+    // Detectar Safari/iOS
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || 
+                     navigator.userAgent.match(/ipad|ipod|iphone/i);
+    
+    // En Safari/iOS, mostrar modal para copia manual
+    if (isSafari) {
+      setCopyModalText(text);
+      setCopyModalTitle(title);
+      setCopyModalOpen(true);
+      return;
+    }
+    
+    // Para otros navegadores, intentar copiar al portapapeles
     try {
-      // Intentar con la API moderna primero
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(text);
         window.dispatchEvent(new CustomEvent('app:toast', { detail: successMessage }));
         return;
       }
       
-      // Fallback con document.execCommand para navegadores que no soportan clipboard API
+      // Fallback con document.execCommand
       const textArea = document.createElement('textarea');
       textArea.value = text;
-      
-      // Hacer el textarea invisible pero accesible
-      textArea.style.position = 'absolute';
-      textArea.style.left = '-9999px';
-      textArea.style.top = '0';
-      textArea.style.opacity = '0';
-      textArea.contentEditable = 'true';
-      textArea.readOnly = false;
-      
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
       document.body.appendChild(textArea);
+      textArea.select();
       
-      // Seleccionar el texto
-      if (navigator.userAgent.match(/ipad|ipod|iphone/i)) {
-        // Para iOS
-        const range = document.createRange();
-        range.selectNodeContents(textArea);
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-        textArea.setSelectionRange(0, 999999);
-      } else {
-        // Para otros navegadores
-        textArea.select();
-        textArea.setSelectionRange(0, text.length);
-      }
-      
-      // Ejecutar el comando de copia
       const successful = document.execCommand('copy');
       document.body.removeChild(textArea);
       
@@ -133,12 +128,12 @@ export default function App() {
   const copyLink = useCallback(async () => {
     if (!gameState?.gameId) return;
     const url = `${window.location.origin}?gameId=${gameState.gameId}`;
-    await copyToClipboard(url, 'Enlace copiado');
+    await copyToClipboard(url, 'Enlace copiado', 'Enlace de invitación');
   }, [gameState, copyToClipboard]);
 
   const copyGameCode = useCallback(async () => {
     if (!gameState?.gameId) return;
-    await copyToClipboard(gameState.gameId, 'Código copiado');
+    await copyToClipboard(gameState.gameId, 'Código copiado', 'Código de sala');
   }, [gameState, copyToClipboard]);
 
   const castVote = useCallback((targetId) => {
@@ -489,6 +484,14 @@ export default function App() {
       </div>
       
       {user && connected && <Footer onOpenInstructions={() => setInstructionsOpen(true)} />}
+      
+      {/* Modal para copiar en Safari */}
+      <CopyModal 
+        isOpen={copyModalOpen} 
+        onClose={() => setCopyModalOpen(false)}
+        text={copyModalText}
+        title={copyModalTitle}
+      />
     </div>
   );
 }
