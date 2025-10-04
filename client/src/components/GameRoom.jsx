@@ -209,10 +209,12 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   const [isOverlayClosing, setIsOverlayClosing] = useState(false);
   const [eliminatedPlayerInfo, setEliminatedPlayerInfo] = useState(null);
   const [showCardEntrance, setShowCardEntrance] = useState(false);
+  const [showRestOfUI, setShowRestOfUI] = useState(true);
   const [showEndGameModal, setShowEndGameModal] = useState(false);
   const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
   const revealTimeoutRef = useRef(null);
   const turnOverlayTimeoutRef = useRef(null);
+  const restUITimeoutRef = useRef(null);
 
   useEffect(() => {
     const previousPlayers = prevPlayersRef.current;
@@ -295,16 +297,27 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
     if (currentPhase === 'playing' && prevPhase !== 'playing') {
       setReveal(false);
       
-      // Mostrar animación de entrada si viene del lobby o game_over
-      const shouldShowAnimation = prevPhase === 'lobby' || prevPhase === 'game_over';
+      // Mostrar animación de entrada si viene del lobby, game_over o round_result
+      const shouldShowAnimation = prevPhase === 'lobby' || prevPhase === 'game_over' || prevPhase === 'round_result';
       
       if (shouldShowAnimation) {
+        // Ocultar el resto de la UI hasta que termine la animación de la carta
+        setShowRestOfUI(false);
         setShowCardEntrance(true);
+        
+        // Después de 800ms (duración de animate-cardEntrance), mostrar el resto de elementos
+        if (restUITimeoutRef.current) clearTimeout(restUITimeoutRef.current);
+        restUITimeoutRef.current = setTimeout(() => {
+          setShowRestOfUI(true);
+        }, 800);
         
         // Quitar la animación después de que termine
         setTimeout(() => {
           setShowCardEntrance(false);
         }, 800);
+      } else {
+        // Si no hay animación, mostrar todo inmediatamente
+        setShowRestOfUI(true);
       }
     }
     
@@ -315,6 +328,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
     return () => {
       if (revealTimeoutRef.current) clearTimeout(revealTimeoutRef.current);
       if (turnOverlayTimeoutRef.current) clearTimeout(turnOverlayTimeoutRef.current);
+      if (restUITimeoutRef.current) clearTimeout(restUITimeoutRef.current);
     };
   }, []);
 
@@ -391,7 +405,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         )}
         
         {/* Indicador de partida y ronda */}
-        <div className="w-full max-w-sm mx-auto mb-4">
+        <div className={`w-full max-w-sm mx-auto mb-4 ${showRestOfUI ? 'animate-fadeIn animate-delay-200' : 'opacity-0 pointer-events-none'}`}>
           <p className="text-center text-xs text-neutral-500 mb-3">
             Partida {state.roundCount || 1} • Ronda {state.currentTurn} de {state.maxTurns}
           </p>
@@ -412,12 +426,13 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           </div>
         </div>
         
-        <div className="w-full max-w-sm mx-auto text-center mb-5">
+        <div className={`w-full max-w-sm mx-auto text-center mb-5 ${showRestOfUI ? 'animate-fadeIn animate-delay-400' : 'opacity-0 pointer-events-none'}`}>
           <h2 className="text-2xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>Tu carta</h2>
         </div>
         <div className="w-full max-w-sm mx-auto space-y-3">
-          <div className={`flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full ${showCardEntrance ? 'animate-cardEntrance' : 'animate-card-float'}`}>
-            <div className={`flip-card-inner h-full ${reveal ? 'is-flipped' : ''}`}>
+          <div className={`${showCardEntrance ? 'animate-cardEntrance' : ''}`}>
+            <div className="flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full animate-card-float">
+              <div className={`flip-card-inner h-full ${reveal ? 'is-flipped' : ''}`}>
               {/* Frente completo (card completa con imagen) */}
               <div className="flip-card-front">
                 <div className="h-full flex items-center justify-center">
@@ -483,10 +498,11 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   </div>
                 </div>
               </div>
+              </div>
             </div>
           </div>
           {/* Botón Girar carta */}
-          <div className="flex justify-center mt-6">
+          <div className={`flex justify-center mt-6 ${showRestOfUI ? 'animate-fadeIn animate-delay-600' : 'opacity-0 pointer-events-none'}`}>
               <button
                 onClick={triggerReveal}
                 className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm text-neutral-400 hover:text-neutral-300 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150 border border-neutral-600/30 hover:border-neutral-500/50"
@@ -499,17 +515,17 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           </div>
         </div>
         
-        <div className="w-full max-w-sm mx-auto mt-4">
+        <div className={`w-full max-w-sm mx-auto mt-4 ${showRestOfUI ? 'animate-fadeIn animate-delay-800' : 'opacity-0 pointer-events-none'}`}>
           <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
         </div>
         
         {isHost && (
-          <div className="w-full max-w-sm mx-auto mt-6">
+          <div className={`w-full max-w-sm mx-auto mt-6 ${showRestOfUI ? 'animate-fadeIn animate-delay-1000' : 'opacity-0 pointer-events-none'}`}>
             <Button onClick={() => setShowEndGameModal(true)} variant="outline" size="md" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20">Terminar juego</Button>
           </div>
         )}
         {/* Footer único y consistente */}
-        <div className="w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5">
+        <div className={`w-full max-w-sm mx-auto mt-6 pt-4 border-t border-white/5 ${showRestOfUI ? 'animate-fadeIn animate-delay-1000' : 'opacity-0 pointer-events-none'}`}>
           <div className="space-y-4">
             <button
               onClick={() => onCopyGameCode()}
