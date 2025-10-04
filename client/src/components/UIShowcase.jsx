@@ -20,7 +20,7 @@ export function UIShowcase() {
 
         {/* Tipografía */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/5" style={{fontFamily: 'Trocchi, serif'}}>
+          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/10" style={{fontFamily: 'Trocchi, serif'}}>
             Tipografía
           </h2>
           
@@ -64,7 +64,7 @@ export function UIShowcase() {
 
         {/* Colores */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/5" style={{fontFamily: 'Trocchi, serif'}}>
+          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/10" style={{fontFamily: 'Trocchi, serif'}}>
             Paleta de Colores
           </h2>
           
@@ -121,7 +121,7 @@ export function UIShowcase() {
 
         {/* Botones */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/5" style={{fontFamily: 'Trocchi, serif'}}>
+          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/10" style={{fontFamily: 'Trocchi, serif'}}>
             Botones
           </h2>
           
@@ -207,7 +207,7 @@ export function UIShowcase() {
 
         {/* Spinners */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/5" style={{fontFamily: 'Trocchi, serif'}}>
+          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/10" style={{fontFamily: 'Trocchi, serif'}}>
             Spinners
           </h2>
           
@@ -231,7 +231,7 @@ export function UIShowcase() {
 
         {/* Badges */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/5" style={{fontFamily: 'Trocchi, serif'}}>
+          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/10" style={{fontFamily: 'Trocchi, serif'}}>
             Badges
           </h2>
           
@@ -268,7 +268,7 @@ export function UIShowcase() {
 
         {/* Cards */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/5" style={{fontFamily: 'Trocchi, serif'}}>
+          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/10" style={{fontFamily: 'Trocchi, serif'}}>
             Cards
           </h2>
           
@@ -309,37 +309,27 @@ export function UIShowcase() {
 
         {/* Dividers */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/5" style={{fontFamily: 'Trocchi, serif'}}>
+          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/10" style={{fontFamily: 'Trocchi, serif'}}>
             Divisores
           </h2>
           
           <div className="space-y-6 bg-white/5 rounded-xl p-6">
             <div className="space-y-4">
               <p className="text-neutral-300">Contenido superior</p>
-              <div className="border-t border-white/5"></div>
-              <p className="text-neutral-300">Divisor sutil (white/5)</p>
-              <code className="block text-xs text-neutral-500">border-t border-white/5</code>
-            </div>
-            
-            <div className="space-y-4">
-              <p className="text-neutral-300">Contenido superior</p>
               <div className="border-t border-white/10"></div>
-              <p className="text-neutral-300">Divisor medio (white/10)</p>
+              <p className="text-neutral-300">Contenido inferior</p>
               <code className="block text-xs text-neutral-500">border-t border-white/10</code>
             </div>
             
             <div className="space-y-4">
-              <p className="text-neutral-300">Contenido superior</p>
-              <div className="border-t border-neutral-700"></div>
-              <p className="text-neutral-300">Divisor visible (neutral-700)</p>
-              <code className="block text-xs text-neutral-500">border-t border-neutral-700</code>
+              <p className="text-sm text-neutral-400">Este es el divisor estándar que usamos en toda la aplicación</p>
             </div>
           </div>
         </section>
 
         {/* Modal */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/5" style={{fontFamily: 'Trocchi, serif'}}>
+          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/10" style={{fontFamily: 'Trocchi, serif'}}>
             Modal
           </h2>
           
@@ -368,7 +358,7 @@ export function UIShowcase() {
 
         {/* Inputs y Forms */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/5" style={{fontFamily: 'Trocchi, serif'}}>
+          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/10" style={{fontFamily: 'Trocchi, serif'}}>
             Inputs
           </h2>
           
@@ -398,7 +388,7 @@ export function UIShowcase() {
 
         {/* Animaciones */}
         <section className="space-y-6">
-          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/5" style={{fontFamily: 'Trocchi, serif'}}>
+          <h2 className="text-3xl font-bold text-neutral-50 pb-2 border-b border-white/10" style={{fontFamily: 'Trocchi, serif'}}>
             Animaciones
           </h2>
           
@@ -438,7 +428,7 @@ export function UIShowcase() {
         </section>
 
         {/* Footer */}
-        <div className="text-center text-neutral-500 text-sm pt-8 border-t border-white/5">
+        <div className="text-center text-neutral-500 text-sm pt-8 border-t border-white/10">
           <p>UI Showcase - El Impostor © 2025</p>
           <p className="mt-2">Acceso exclusivo para desarrollo</p>
         </div>

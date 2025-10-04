@@ -489,6 +489,7 @@ export default function App() {
             <button 
               onClick={handleTitleClick}
               className="text-xl sm:text-2xl font-bold text-neutral-50 hover:text-orange-400 transition-colors active:scale-95 cursor-pointer"
+              style={{fontFamily: 'Trocchi, serif'}}
             >
               El impostor
             </button>

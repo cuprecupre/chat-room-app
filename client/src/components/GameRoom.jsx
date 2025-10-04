@@ -367,7 +367,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           )}
           
           {/* Footer con código de sala */}
-          <div className="w-full max-w-sm mx-auto mt-6 border-t border-white/5">
+          <div className="w-full max-w-sm mx-auto mt-6 border-t border-white/10">
             <div className="space-y-0 divide-y divide-white/5">
               <div className="py-3">
                 <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="gap-2 w-full">
@@ -529,7 +529,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           </div>
         )}
         {/* Footer único y consistente */}
-        <div className={`w-full max-w-sm mx-auto mt-6 border-t border-white/5 ${showRestOfUI ? 'animate-fadeIn animate-delay-1000' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`w-full max-w-sm mx-auto mt-6 border-t border-white/10 ${showRestOfUI ? 'animate-fadeIn animate-delay-1000' : 'opacity-0 pointer-events-none'}`}>
           <div className="space-y-0 divide-y divide-white/5">
             <div className="py-3">
               <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="gap-2 w-full">
