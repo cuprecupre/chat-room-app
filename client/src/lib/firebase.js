@@ -27,10 +27,16 @@ provider.setCustomParameters({
 
 async function ensurePersistence() {
   try {
+    console.log('🔧 Configurando persistencia browserLocalPersistence...');
     await setPersistence(auth, browserLocalPersistence);
+    console.log('✅ Persistencia configurada exitosamente');
   } catch (e) {
     // no-op UI here; components will render error toast if needed
-    console.error('Auth persistence error:', e);
+    console.error('❌ Error al configurar persistencia:', {
+      code: e?.code,
+      message: e?.message,
+      stack: e?.stack,
+    });
   }
 }
 

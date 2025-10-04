@@ -29,9 +29,18 @@ export default function App() {
   const menuRef = useRef(null);
 
   useEffect(() => {
+    console.log('📋 App - useEffect [user] disparado:', user ? `Usuario: ${user.displayName} (${user.email})` : 'Sin usuario');
     if (user) {
-      user.getIdToken().then(setToken);
+      console.log('🔑 App - Obteniendo token para usuario:', user.uid);
+      user.getIdToken().then((token) => {
+        console.log('✅ App - Token obtenido exitosamente, length:', token?.length);
+        setToken(token);
+      }).catch((err) => {
+        console.error('❌ App - Error obteniendo token:', err);
+        setToken(null);
+      });
     } else {
+      console.log('🚫 App - No hay usuario, limpiando token');
       setToken(null);
     }
   }, [user]);
@@ -257,6 +266,7 @@ export default function App() {
   }, [menuOpen]);
 
   if (loading) {
+    console.log('⏳ App - Renderizando estado de carga (loading=true)');
     return (
       <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
         <div className="flex flex-col items-center gap-6 text-center">
@@ -360,11 +370,19 @@ export default function App() {
     const urlGameId = url.searchParams.get('gameId');
 
     if (error) {
-       return <LoginScreen onLogin={login} error={error} onOpenInstructions={() => setInstructionsOpen(true)} />;
-    }
-    if (!user) {
+      console.log('❌ App - Renderizando LoginScreen debido a error:', error);
       return <LoginScreen onLogin={login} error={error} onOpenInstructions={() => setInstructionsOpen(true)} />;
     }
+    if (!user) {
+      console.log('🚫 App - Renderizando LoginScreen porque no hay usuario');
+      return <LoginScreen onLogin={login} error={error} onOpenInstructions={() => setInstructionsOpen(true)} />;
+    }
+    
+    console.log('✅ App - Usuario autenticado:', {
+      displayName: user.displayName,
+      email: user.email,
+      uid: user.uid,
+    });
 
     // Case 1: URL has a gameId but session is in another game → offer switch
     if (urlGameId && gameState?.gameId && urlGameId !== gameState.gameId) {

@@ -8,9 +8,11 @@ export function useSocket(user) {
   const attemptedResumeRef = useRef(false);
 
   useEffect(() => {
+    console.log('🔌 useSocket - useEffect [user] disparado:', user ? `Usuario: ${user.displayName}` : 'Sin usuario');
+    
     if (!user) {
       if (socketRef.current) {
-        console.log('Disconnecting socket...');
+        console.log('🔌 useSocket - Desconectando socket porque no hay usuario...');
         socketRef.current.disconnect();
         socketRef.current = null;
       }
@@ -23,26 +25,46 @@ export function useSocket(user) {
     let isMounted = true;
 
     const connectSocket = async () => {
-      if (socketRef.current || !isMounted) return;
+      if (socketRef.current || !isMounted) {
+        console.log('🔌 useSocket - Socket ya existe o componente desmontado, saltando conectSocket');
+        return;
+      }
 
       try {
+        console.log('🔑 useSocket - Obteniendo token del usuario para socket...');
         const token = await user.getIdToken();
-        if (!isMounted) return; 
-
-        console.log('Connecting socket...');
+        if (!isMounted) {
+          console.log('🔌 useSocket - Componente desmontado después de obtener token');
+          return;
+        }
+        
+        console.log('🔑 useSocket - Token obtenido, length:', token?.length);
+        console.log('🔌 useSocket - Conectando socket...');
+        
         // En desarrollo, usar el mismo host que la URL actual pero puerto 3000
         const socketURL = process.env.NODE_ENV === 'production' 
           ? window.location.origin 
           : `${window.location.protocol}//${window.location.hostname}:3000`;
+        
+        console.log('🔌 useSocket - Socket URL:', socketURL);
+        console.log('🔌 useSocket - Socket auth:', {
+          hasToken: !!token,
+          tokenLength: token?.length,
+          name: user.displayName,
+          hasPhotoURL: !!user.photoURL,
+        });
+        
         const socket = io(socketURL, {
           auth: { token, name: user.displayName, photoURL: user.photoURL },
           reconnection: true,
           reconnectionAttempts: 5
         });
         socketRef.current = socket;
+        console.log('🔌 useSocket - Socket instance creado');
 
         socket.on('connect', () => {
-          console.log('Socket connected');
+          console.log('✅ useSocket - Socket conectado exitosamente');
+          console.log('✅ useSocket - Socket ID:', socket.id);
           if (isMounted) setConnected(true);
           attemptedResumeRef.current = false; // fresh session
           const urlParams = new URLSearchParams(window.location.search);
@@ -74,13 +96,22 @@ export function useSocket(user) {
           socket.heartbeatInterval = heartbeatInterval;
         });
 
-        socket.on('disconnect', () => {
-          console.log('Socket disconnected');
+        socket.on('disconnect', (reason) => {
+          console.log('🔌 useSocket - Socket desconectado. Razón:', reason);
           if (isMounted) {
             setConnected(false);
             // Don't clear gameState on disconnect - keep it for reconnection
             attemptedResumeRef.current = false;
           }
+        });
+
+        socket.on('connect_error', (error) => {
+          console.error('❌ useSocket - Error de conexión del socket:', {
+            message: error.message,
+            type: error.type,
+            description: error.description,
+            context: error.context,
+          });
         });
 
         socket.on('game-state', (newState) => {
@@ -142,7 +173,11 @@ export function useSocket(user) {
         });
 
       } catch (error) {
-        console.error('Failed to get Firebase token for socket connection:', error);
+        console.error('❌ useSocket - Error al obtener token de Firebase para socket:', {
+          message: error.message,
+          code: error.code,
+          stack: error.stack,
+        });
       }
     };
 
