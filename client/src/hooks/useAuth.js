@@ -105,29 +105,53 @@ export function useAuth() {
       
       // Detectar si es dispositivo móvil
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
       console.log('🔍 Detección de dispositivo:', {
         isMobile,
+        isIOS,
         userAgent: navigator.userAgent,
         platform: navigator.platform,
       });
       
-      if (isMobile) {
-        console.log('📱 Dispositivo móvil detectado, usando signInWithRedirect...');
-        console.log('📱 Provider config:', {
-          scopes: provider.getScopes(),
-          customParameters: provider.getCustomParameters(),
-        });
-        // En móvil, usar redirect que es más confiable
+      console.log('📱 Provider config:', {
+        scopes: provider.getScopes(),
+        customParameters: provider.getCustomParameters(),
+      });
+      
+      // En iOS, intentar popup primero porque redirect tiene problemas con localStorage
+      // En otros móviles, usar redirect
+      // En desktop, usar popup
+      if (isIOS) {
+        console.log('📱 iOS detectado, intentando signInWithPopup primero...');
+        try {
+          const loginPromise = signInWithPopup(auth, provider);
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('POPUP_TIMEOUT')), 30000);
+          });
+          
+          console.log('📱 Esperando resultado del popup en iOS...');
+          const result = await Promise.race([loginPromise, timeoutPromise]);
+          console.log('✅ Login exitoso con popup en iOS:', {
+            displayName: result.user?.displayName,
+            email: result.user?.email,
+            uid: result.user?.uid,
+          });
+        } catch (popupError) {
+          console.warn('⚠️ Popup falló en iOS, intentando redirect como fallback:', popupError.code);
+          if (popupError.code === 'auth/popup-blocked' || popupError.message === 'POPUP_TIMEOUT') {
+            console.log('📱 Usando signInWithRedirect como fallback...');
+            await signInWithRedirect(auth, provider);
+            console.log('📱 signInWithRedirect llamado - redirigiendo...');
+          } else {
+            throw popupError;
+          }
+        }
+      } else if (isMobile) {
+        console.log('📱 Dispositivo móvil (no iOS) detectado, usando signInWithRedirect...');
         await signInWithRedirect(auth, provider);
         console.log('📱 signInWithRedirect llamado - redirigiendo...');
-        // El resultado se manejará en getRedirectResult al cargar la página
       } else {
         console.log('🖥️ Dispositivo desktop, usando signInWithPopup...');
-        console.log('🖥️ Provider config:', {
-          scopes: provider.getScopes(),
-          customParameters: provider.getCustomParameters(),
-        });
-        // En desktop, usar popup
         const loginPromise = signInWithPopup(auth, provider);
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(() => reject(new Error('TIMEOUT')), 30000); // 30 segundos
