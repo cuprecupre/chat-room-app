@@ -18,7 +18,7 @@ export function Lobby({ onCreateGame, onJoinGame }) {
   return (
     <div className="w-full space-y-8">
       <div className="text-center space-y-4">
-        <img src={homeImg} alt="Impostor" className="mx-auto w-48 h-48 sm:w-48 sm:h-48 rounded-full object-cover shadow-lg ring-1 ring-white/10" loading="lazy" />
+        <img src={homeImg} alt="Impostor" className="mx-auto w-56 h-56 rounded-full object-cover shadow-lg ring-1 ring-white/10" loading="lazy" />
         <h2 className="text-3xl sm:text-4xl font-bold text-neutral-50">Empezar a jugar</h2>
         <p className="text-lg text-neutral-400 mt-2">Crea un nuevo juego o únete a uno existente.</p>
       </div>

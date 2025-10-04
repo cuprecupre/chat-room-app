@@ -9,7 +9,7 @@ export function LoginScreen({ onLogin, error, isLoading, onOpenInstructions }) {
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md text-center space-y-4 sm:space-y-6">
           <div className="perspective-1000 animate-scaleIn animate-delay-200">
-            <img src={heroImg} alt="El Impostor" className="mx-auto w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 rounded-full object-cover shadow-xl ring-1 ring-white/10 animate-tilt-oscillate" loading="lazy" />
+            <img src={heroImg} alt="El Impostor" className="mx-auto w-56 h-56 rounded-full object-cover shadow-xl ring-1 ring-white/10 animate-tilt-oscillate" loading="lazy" />
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-neutral-50 animate-fadeIn animate-delay-500">El impostor</h1>
           <p className="text-lg sm:text-xl text-neutral-300 animate-fadeIn animate-delay-600">Alguien no dice la verdad.<br />¿Lo vas a descubrir?</p>
