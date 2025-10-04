@@ -16,6 +16,7 @@ class Game {
     this.maxTurns = 3;
     this.eliminatedInRound = []; // Jugadores expulsados en esta ronda
     this.allEliminatedPlayers = []; // Todos los jugadores eliminados durante toda la partida
+    this.lastEliminatedInTurn = null; // Último jugador eliminado en la vuelta anterior
     
     // Sistema de votación
     this.votes = {}; // { [playerId]: votedForPlayerId }
@@ -79,6 +80,7 @@ class Game {
     this.roundPlayers = this.players.map(p => p.uid);
     this.currentTurn = 1;
     this.eliminatedInRound = [];
+    this.lastEliminatedInTurn = null;
     this.votes = {};
     this.turnHistory = [];
     this.lastRoundScores = {};
@@ -233,6 +235,7 @@ class Game {
         this.endRound(false); // Impostor gana
       } else {
         console.log(`[Game ${this.gameId}] Siguiente vuelta.`);
+        this.lastEliminatedInTurn = null; // No hubo eliminación por empate
         this.startNextTurn();
       }
       return;
@@ -255,6 +258,7 @@ class Game {
         this.endRound(false); // Impostor gana
       } else {
         // Siguiente vuelta
+        this.lastEliminatedInTurn = eliminatedId; // Guardar quién fue eliminado
         this.startNextTurn();
       }
     }
@@ -409,6 +413,7 @@ class Game {
         baseState.maxTurns = this.maxTurns;
         baseState.eliminatedInRound = this.eliminatedInRound;
         baseState.allEliminatedPlayers = this.allEliminatedPlayers;
+        baseState.lastEliminatedInTurn = this.lastEliminatedInTurn;
         baseState.hasVoted = this.hasVoted(userId);
         baseState.votedPlayers = Object.keys(this.votes);
         baseState.myVote = this.votes[userId] || null; // A quién votó este usuario

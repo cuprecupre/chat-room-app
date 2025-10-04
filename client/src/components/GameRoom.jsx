@@ -238,13 +238,13 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       // Resetear carta al estado frontal
       setReveal(false);
       
-      // Buscar al último jugador eliminado
-      const eliminatedIds = state.eliminatedInRound || [];
-      if (eliminatedIds.length > 0) {
-        const lastEliminatedId = eliminatedIds[eliminatedIds.length - 1];
+      // Buscar al jugador eliminado en la vuelta anterior
+      const lastEliminatedId = state.lastEliminatedInTurn;
+      if (lastEliminatedId) {
         const eliminatedPlayer = state.players.find(p => p.uid === lastEliminatedId);
         setEliminatedPlayerInfo(eliminatedPlayer || null);
       } else {
+        // No hubo eliminación (empate)
         setEliminatedPlayerInfo(null);
       }
       
