@@ -78,8 +78,11 @@ export default function App() {
   }, [emit, gameState]);
 
   const copyToClipboard = useCallback(async (text, successMessage) => {
+    // Detectar Safari específicamente (no Chrome en iOS)
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    
     // Para Safari, siempre mostrar el texto para copia manual
-    if (navigator.userAgent.includes('Safari')) {
+    if (isSafari) {
       window.dispatchEvent(new CustomEvent('app:toast', { detail: `${successMessage}: ${text}` }));
       return;
     }
