@@ -75,13 +75,16 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   if (showScores) { 
     headerText = isGameOver ? 'Resto de jugadores' : 'Puntuación';
   }
+  
+  // Estilo diferente para lobby vs resto del juego
+  const isLobby = !isPlaying && !showScores;
 
   return (
     <div className="w-full rounded-lg">
       <p className={`mb-3 ${isPlaying || showScores ? 'text-base font-regular text-neutral-200 text-center' : 'text-sm font-regular text-neutral-500'}`}>
         {headerText}
       </p>
-      <ul className="space-y-2">
+      <ul className={isLobby ? "space-y-3" : "space-y-2"}>
         {sortedPlayers.map((p, index) => {
           const isEliminated = eliminatedPlayers.includes(p.uid);
           const hasVoted = votedPlayers.includes(p.uid);
@@ -93,13 +96,17 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
           const isWinner = false;
           
           return (
-            <li key={p.uid} className={`flex items-center justify-between bg-white/5 p-4 rounded-md ${isWinner ? 'bg-orange-500/10' : ''}`}>
-              <div className="flex items-center gap-3">
+            <li key={p.uid} className={
+              isLobby 
+                ? `flex items-center gap-4 bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/10 ${isHost && p.uid === currentUserId ? 'ring-2 ring-orange-500/30' : ''}`
+                : `flex items-center justify-between bg-white/5 p-4 rounded-md ${isWinner ? 'bg-orange-500/10' : ''}`
+            }>
+              <div className={`flex items-center ${isLobby ? 'gap-4 flex-1' : 'gap-3'}`}>
                 <div className="relative">
                   <img 
                     src={p.photoURL} 
                     alt={p.name} 
-                    className="w-8 h-8 rounded-full object-cover" 
+                    className={isLobby ? "w-12 h-12 rounded-full object-cover ring-2 ring-white/20" : "w-8 h-8 rounded-full object-cover"}
                     onError={handleImageError}
                     onLoad={(e) => {
                       console.log('✅ Imagen cargada:', e.target.src);
@@ -108,7 +115,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                     }}
                   />
                   <div 
-                    className="w-8 h-8 rounded-full bg-neutral-600 flex items-center justify-center text-white text-xs font-semibold"
+                    className={isLobby ? "w-12 h-12 rounded-full bg-neutral-600 flex items-center justify-center text-white text-sm font-semibold" : "w-8 h-8 rounded-full bg-neutral-600 flex items-center justify-center text-white text-xs font-semibold"}
                   >
                     {p.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                   </div>
@@ -120,15 +127,18 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                       </svg>
                     </div>
                   )}
-                  {!isPlaying && !showScores && (
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-neutral-950"></div>
+                  {isLobby && (
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-neutral-950"></div>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <div>
-                    <span className={`font-medium ${isWinner ? 'text-orange-400' : ''}`}>
+                <div className="flex items-center gap-2 flex-1">
+                  <div className="flex-1">
+                    <div className={`font-medium ${isWinner ? 'text-orange-400' : ''} ${isLobby ? 'text-base text-neutral-100' : ''}`}>
                       {p.name}{p.uid === currentUserId ? ' (Tú)' : ''}
-                    </span>
+                    </div>
+                    {isLobby && isHost && p.uid === currentUserId && (
+                      <div className="text-xs text-orange-400 font-medium mt-0.5">Anfitrión</div>
+                    )}
                   </div>
                 </div>
               </div>
