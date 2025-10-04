@@ -694,7 +694,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               Ronda {state.currentTurn}
             </h2>
             
-            {eliminatedPlayerInfo && (
+            {eliminatedPlayerInfo ? (
               <div className="space-y-4">
                 <div className="flex flex-col items-center gap-3">
                   <div className="relative">
@@ -722,12 +722,15 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   El impostor sigue entre nosotros
                 </p>
               </div>
-            )}
-            
-            {!eliminatedPlayerInfo && (
-              <p className="text-xl text-neutral-300">
-                {state.currentTurn === state.maxTurns ? '¡Última ronda!' : 'Continúa votando'}
-              </p>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-xl text-neutral-200 font-medium">
+                  Nadie ha sido eliminado
+                </p>
+                <p className="text-lg text-neutral-400">
+                  Nueva ronda de pistas
+                </p>
+              </div>
             )}
           </div>
         </div>
