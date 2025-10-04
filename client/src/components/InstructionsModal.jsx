@@ -40,7 +40,7 @@ export function InstructionsModal({ isOpen, onClose }) {
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><strong>App web</strong>: gestiona <strong>roles, cartas, votos y puntos</strong>.</li>
             <li><strong>Interacción presencial</strong>: <strong>turnos y pistas</strong> se realizan <strong>fuera de la app</strong>, hablando en voz alta.</li>
-            <li><strong>Jugadores</strong>: Mínimo 2 (recomendado 4+). Sin límite.</li>
+            <li><strong>Jugadores</strong>: Mínimo 4. Sin límite.</li>
           </ul>
         </section>
 
