@@ -266,7 +266,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
     }
     
     prevTurnRef.current = currentTurn;
-  }, [state.currentTurn, state.phase, state.eliminatedInRound, state.players]);
+  }, [state.currentTurn, state.phase, state.lastEliminatedInTurn, state.players]);
   
   // Resetear carta cuando empieza una nueva partida (playing)
   useEffect(() => {
