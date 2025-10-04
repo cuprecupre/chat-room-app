@@ -639,6 +639,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                           <p className="font-semibold text-lg text-orange-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
                             {winner.name}
                           </p>
+                          <p className="text-sm text-neutral-400 mt-1">
+                            {playerScores[winner.uid] || 0} pts
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -657,6 +660,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                     <p className="font-semibold text-2xl text-orange-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
                       {winnerPlayers[0].name}
                     </p>
+                    <p className="text-lg text-neutral-400 mt-2">
+                      {playerScores[winnerPlayers[0].uid] || 0} pts
+                    </p>
                   </div>
                 ) : null}
               </div>
@@ -664,7 +670,14 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             
             {/* Puntuación final */}
             <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
-              <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
+              <PlayerList 
+                players={state.players.filter(p => !winnerPlayers.some(w => w.uid === p.uid))} 
+                currentUserId={user.uid} 
+                isHost={isHost} 
+                onCopyLink={onCopyLink} 
+                gameState={state} 
+                onVote={onVote} 
+              />
             </div>
             
             {isHost && (
