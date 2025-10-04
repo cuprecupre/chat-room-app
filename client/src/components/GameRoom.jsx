@@ -260,7 +260,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       setShowTurnOverlay(true);
       setIsOverlayClosing(false);
       
-      // Iniciar animación de salida después de 1.7 segundos
+      // Iniciar animación de salida después de 2.7 segundos
       if (turnOverlayTimeoutRef.current) clearTimeout(turnOverlayTimeoutRef.current);
       turnOverlayTimeoutRef.current = setTimeout(() => {
         setIsOverlayClosing(true);
@@ -271,7 +271,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           setIsOverlayClosing(false);
           setEliminatedPlayerInfo(null);
         }, 300);
-      }, 1700);
+      }, 2700);
     }
     
     prevTurnRef.current = currentTurn;
