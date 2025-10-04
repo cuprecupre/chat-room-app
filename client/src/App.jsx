@@ -78,43 +78,55 @@ export default function App() {
   }, [emit, gameState]);
 
   const copyToClipboard = useCallback(async (text, successMessage) => {
-    // Detectar Safari específicamente (no Chrome en iOS)
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    
-    // Para Safari, mostrar el texto directamente en el toast
-    if (isSafari) {
-      window.dispatchEvent(new CustomEvent('app:toast', { detail: `${text}` }));
-      return;
-    }
-    
-    // Para otros navegadores, intentar copiar al portapapeles
     try {
+      // Intentar con la API moderna primero
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(text);
         window.dispatchEvent(new CustomEvent('app:toast', { detail: successMessage }));
         return;
       }
       
-      // Fallback con document.execCommand
+      // Fallback con document.execCommand para navegadores que no soportan clipboard API
       const textArea = document.createElement('textarea');
       textArea.value = text;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      textArea.style.top = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.select();
       
+      // Hacer el textarea invisible pero accesible
+      textArea.style.position = 'absolute';
+      textArea.style.left = '-9999px';
+      textArea.style.top = '0';
+      textArea.style.opacity = '0';
+      textArea.contentEditable = 'true';
+      textArea.readOnly = false;
+      
+      document.body.appendChild(textArea);
+      
+      // Seleccionar el texto
+      if (navigator.userAgent.match(/ipad|ipod|iphone/i)) {
+        // Para iOS
+        const range = document.createRange();
+        range.selectNodeContents(textArea);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        textArea.setSelectionRange(0, 999999);
+      } else {
+        // Para otros navegadores
+        textArea.select();
+        textArea.setSelectionRange(0, text.length);
+      }
+      
+      // Ejecutar el comando de copia
       const successful = document.execCommand('copy');
       document.body.removeChild(textArea);
       
       if (successful) {
         window.dispatchEvent(new CustomEvent('app:toast', { detail: successMessage }));
       } else {
-        window.dispatchEvent(new CustomEvent('app:toast', { detail: `${text}` }));
+        window.dispatchEvent(new CustomEvent('app:toast', { detail: 'No se pudo copiar' }));
       }
     } catch (err) {
       console.error('Error copying to clipboard:', err);
-      window.dispatchEvent(new CustomEvent('app:toast', { detail: `${text}` }));
+      window.dispatchEvent(new CustomEvent('app:toast', { detail: 'No se pudo copiar' }));
     }
   }, []);
 
