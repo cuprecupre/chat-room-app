@@ -10,7 +10,6 @@ import { Spinner } from './components/ui/Spinner';
 import { Button } from './components/ui/Button';
 import { Footer } from './components/Footer';
 import { InstructionsModal } from './components/InstructionsModal';
-import { CopyModal } from './components/CopyModal';
 import bellImg from './assets/bell.png';
 import heroImg from './assets/impostor-home.png';
 
@@ -19,9 +18,6 @@ export default function App() {
   const [token, setToken] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
-  const [copyModalOpen, setCopyModalOpen] = useState(false);
-  const [copyModalText, setCopyModalText] = useState('');
-  const [copyModalTitle, setCopyModalTitle] = useState('');
   
   // Precargar assets de la app
   const { isLoading: assetsLoading } = useAppAssetsPreloader();
@@ -89,7 +85,7 @@ export default function App() {
     if (!gameState?.gameId) return;
     const url = `${window.location.origin}?gameId=${gameState.gameId}`;
     
-    // En móvil, intentar usar la API de compartir nativa (funciona solo en HTTPS)
+    // En móvil, usar la API de compartir nativa (requiere HTTPS en producción)
     if (isMobile && navigator.share) {
       try {
         await navigator.share({
@@ -103,27 +99,18 @@ export default function App() {
         if (err.name === 'AbortError') {
           return;
         }
-        // Si hay otro error, continuar con el fallback
         console.error('Error sharing:', err);
+        window.dispatchEvent(new CustomEvent('app:toast', { detail: 'No se pudo compartir' }));
+        return;
       }
     }
     
-    // Fallback para móvil sin Web Share (desarrollo local) o desktop
-    if (isMobile && !navigator.share) {
-      // En móvil sin Web Share, mostrar modal
-      setCopyModalText(url);
-      setCopyModalTitle('Enlace de invitación');
-      setCopyModalOpen(true);
-      return;
-    }
-    
-    // En desktop, copiar al portapapeles
+    // En desktop o móvil sin Web Share, copiar al portapapeles
     try {
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(url);
         window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Enlace copiado' }));
       } else {
-        // Fallback
         const textArea = document.createElement('textarea');
         textArea.value = url;
         textArea.style.position = 'fixed';
@@ -145,7 +132,7 @@ export default function App() {
   const copyGameCode = useCallback(async () => {
     if (!gameState?.gameId) return;
     
-    // En móvil, intentar usar la API de compartir nativa (funciona solo en HTTPS)
+    // En móvil, usar la API de compartir nativa (requiere HTTPS en producción)
     if (isMobile && navigator.share) {
       try {
         await navigator.share({
@@ -158,27 +145,18 @@ export default function App() {
         if (err.name === 'AbortError') {
           return;
         }
-        // Si hay otro error, continuar con el fallback
         console.error('Error sharing:', err);
+        window.dispatchEvent(new CustomEvent('app:toast', { detail: 'No se pudo compartir' }));
+        return;
       }
     }
     
-    // Fallback para móvil sin Web Share (desarrollo local) o desktop
-    if (isMobile && !navigator.share) {
-      // En móvil sin Web Share, mostrar modal
-      setCopyModalText(gameState.gameId);
-      setCopyModalTitle('Código de sala');
-      setCopyModalOpen(true);
-      return;
-    }
-    
-    // En desktop, copiar al portapapeles
+    // En desktop o móvil sin Web Share, copiar al portapapeles
     try {
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(gameState.gameId);
         window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Código copiado' }));
       } else {
-        // Fallback
         const textArea = document.createElement('textarea');
         textArea.value = gameState.gameId;
         textArea.style.position = 'fixed';
@@ -546,14 +524,6 @@ export default function App() {
       </div>
       
       {user && connected && <Footer onOpenInstructions={() => setInstructionsOpen(true)} />}
-      
-      {/* Modal para copiar en móvil (solo en desarrollo local sin HTTPS) */}
-      <CopyModal 
-        isOpen={copyModalOpen} 
-        onClose={() => setCopyModalOpen(false)}
-        text={copyModalText}
-        title={copyModalTitle}
-      />
     </div>
   );
 }
