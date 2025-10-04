@@ -81,57 +81,40 @@ export default function App() {
     // Detectar Safari específicamente (no Chrome en iOS)
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     
+    // Para Safari, mostrar el texto directamente en el toast
+    if (isSafari) {
+      window.dispatchEvent(new CustomEvent('app:toast', { detail: `${text}` }));
+      return;
+    }
+    
+    // Para otros navegadores, intentar copiar al portapapeles
     try {
-      // Intentar primero con la API moderna
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(text);
         window.dispatchEvent(new CustomEvent('app:toast', { detail: successMessage }));
         return;
       }
-    } catch (err) {
-      console.log('Clipboard API failed, trying fallback:', err);
-    }
-    
-    // Fallback para Safari y otros navegadores
-    try {
+      
+      // Fallback con document.execCommand
       const textArea = document.createElement('textarea');
       textArea.value = text;
       textArea.style.position = 'fixed';
-      textArea.style.top = '0';
-      textArea.style.left = '0';
-      textArea.style.width = '2em';
-      textArea.style.height = '2em';
-      textArea.style.padding = '0';
-      textArea.style.border = 'none';
-      textArea.style.outline = 'none';
-      textArea.style.boxShadow = 'none';
-      textArea.style.background = 'transparent';
-      textArea.style.zIndex = '-1';
-      textArea.setAttribute('readonly', '');
-      
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
       document.body.appendChild(textArea);
-      
-      // Forzar foco y selección
-      textArea.focus();
       textArea.select();
-      textArea.setSelectionRange(0, text.length);
       
-      // Ejecutar comando de copia
       const successful = document.execCommand('copy');
-      
-      // Limpiar
       document.body.removeChild(textArea);
       
       if (successful) {
         window.dispatchEvent(new CustomEvent('app:toast', { detail: successMessage }));
       } else {
-        // Si falla, mostrar el texto en el toast para copia manual
-        window.dispatchEvent(new CustomEvent('app:toast', { detail: `${successMessage}: ${text}` }));
+        window.dispatchEvent(new CustomEvent('app:toast', { detail: `${text}` }));
       }
     } catch (err) {
       console.error('Error copying to clipboard:', err);
-      // Fallback final: mostrar el texto en el toast
-      window.dispatchEvent(new CustomEvent('app:toast', { detail: `${successMessage}: ${text}` }));
+      window.dispatchEvent(new CustomEvent('app:toast', { detail: `${text}` }));
     }
   }, []);
 
