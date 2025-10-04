@@ -176,6 +176,8 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   const [isOverlayClosing, setIsOverlayClosing] = useState(false);
   const [eliminatedPlayerInfo, setEliminatedPlayerInfo] = useState(null);
   const [showCardEntrance, setShowCardEntrance] = useState(false);
+  const [showEndGameModal, setShowEndGameModal] = useState(false);
+  const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
   const revealTimeoutRef = useRef(null);
   const turnOverlayTimeoutRef = useRef(null);
 
@@ -321,7 +323,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
               </button>
-              <Button onClick={onLeaveGame} variant="ghost" size="md" className="gap-2">
+              <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="gap-2">
                 <span>Abandonar juego</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -455,7 +457,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         
         {isHost && (
           <div className="w-full max-w-sm mx-auto mt-6">
-            <Button onClick={onEndGame} variant="outline" size="md" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20">Terminar juego</Button>
+            <Button onClick={() => setShowEndGameModal(true)} variant="outline" size="md" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20">Terminar juego</Button>
           </div>
         )}
         {/* Footer único y consistente */}
@@ -471,7 +473,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
             </button>
-            <Button onClick={onLeaveGame} variant="ghost" size="md" className="gap-2">
+            <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="gap-2">
               <span>Abandonar juego</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -649,7 +651,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
               </button>
-              <Button onClick={onLeaveGame} variant="ghost" size="md" className="gap-2">
+              <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="gap-2">
                 <span>Abandonar juego</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -705,6 +707,76 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 {state.currentTurn === state.maxTurns ? '¡Última ronda!' : 'Continúa votando'}
               </p>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para terminar juego */}
+      {showEndGameModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full border border-neutral-700">
+            <div className="text-center space-y-4">
+              <h3 className="text-xl font-bold text-neutral-50">¿Terminar juego?</h3>
+              <p className="text-neutral-400">
+                Esta acción finalizará el juego para todos los jugadores. ¿Estás seguro?
+              </p>
+              <div className="flex gap-3 pt-2">
+                <Button 
+                  onClick={() => setShowEndGameModal(false)} 
+                  variant="outline" 
+                  size="md" 
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setShowEndGameModal(false);
+                    onEndGame();
+                  }} 
+                  variant="primary" 
+                  size="md" 
+                  className="flex-1"
+                >
+                  Terminar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para abandonar juego */}
+      {showLeaveGameModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full border border-neutral-700">
+            <div className="text-center space-y-4">
+              <h3 className="text-xl font-bold text-neutral-50">¿Abandonar juego?</h3>
+              <p className="text-neutral-400">
+                Saldrás del juego y volverás al lobby. ¿Estás seguro?
+              </p>
+              <div className="flex gap-3 pt-2">
+                <Button 
+                  onClick={() => setShowLeaveGameModal(false)} 
+                  variant="outline" 
+                  size="md" 
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setShowLeaveGameModal(false);
+                    onLeaveGame();
+                  }} 
+                  variant="primary" 
+                  size="md" 
+                  className="flex-1"
+                >
+                  Abandonar
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}
