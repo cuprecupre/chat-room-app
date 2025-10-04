@@ -21,10 +21,29 @@ export function useAuth() {
         setLoading(false);
       }
     });
-    // Manejar posible flujo de redirect en navegadores con partitioned storage
-    getRedirectResult(auth).catch((err) => {
-      console.warn('⚠️ Redirect result error:', err?.code || err?.message || err);
-    });
+    
+    // Manejar posible flujo de redirect en navegadores móviles
+    const handleRedirect = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          console.log('✅ Redirect result exitoso:', result.user?.displayName);
+          authResolved = true;
+          if (isMounted) {
+            setUser(result.user);
+            setLoading(false);
+          }
+        }
+      } catch (err) {
+        console.error('❌ Error en redirect result:', err?.code || err?.message || err);
+        if (isMounted) {
+          setError(err?.message || 'Error al procesar autenticación');
+          setLoading(false);
+        }
+      }
+    };
+    
+    handleRedirect();
 
     // Timeout de seguridad solo si la autenticación no se resuelve
     const timeout = setTimeout(() => {
@@ -50,16 +69,25 @@ export function useAuth() {
       console.log('📝 Configurando persistencia...');
       await ensurePersistence();
       
-      console.log('🚀 Abriendo popup de Google...');
+      // Detectar si es dispositivo móvil
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       
-      // Crear una promesa con timeout para evitar que se quede colgado
-      const loginPromise = signInWithPopup(auth, provider);
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('TIMEOUT')), 30000); // 30 segundos
-      });
-      
-      const result = await Promise.race([loginPromise, timeoutPromise]);
-      console.log('✅ Login exitoso:', result.user?.displayName);
+      if (isMobile) {
+        console.log('📱 Dispositivo móvil detectado, usando signInWithRedirect...');
+        // En móvil, usar redirect que es más confiable
+        await signInWithRedirect(auth, provider);
+        // El resultado se manejará en getRedirectResult al cargar la página
+      } else {
+        console.log('🖥️ Dispositivo desktop, usando signInWithPopup...');
+        // En desktop, usar popup
+        const loginPromise = signInWithPopup(auth, provider);
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('TIMEOUT')), 30000); // 30 segundos
+        });
+        
+        const result = await Promise.race([loginPromise, timeoutPromise]);
+        console.log('✅ Login exitoso:', result.user?.displayName);
+      }
       
       // setLoading will be set to false by onAuthStateChanged
     } catch (err) {
