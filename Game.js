@@ -402,7 +402,7 @@ class Game {
       }
     } else if (this.phase === 'round_result' || this.phase === 'game_over') {
       const impostor = this.players.find(p => p.uid === this.impostorId);
-      baseState.impostorName = impostor ? impostor.name : 'N/A';
+      baseState.impostorName = impostor ? impostor.name : 'Jugador desconectado';
       baseState.impostorId = this.impostorId;
       baseState.secretWord = this.secretWord;
       baseState.lastRoundScores = this.lastRoundScores;
