@@ -125,7 +125,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                 </div>
                 <div className="flex items-center gap-2">
                   <div>
-                    <span className={`font-medium ${isWinner ? 'text-orange-400' : ''} ${isEliminated ? 'line-through opacity-60' : ''}`}>
+                    <span className={`font-medium ${isWinner ? 'text-orange-400' : ''} ${isEliminated ? 'line-through' : ''}`}>
                       {p.name}{p.uid === currentUserId ? ' (Tú)' : ''}
                     </span>
                   </div>
