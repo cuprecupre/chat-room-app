@@ -166,7 +166,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   );
 }
 
-export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAgain, onLeaveGame, onCopyLink, onCopyGameCode, onVote }) {
+export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAgain, onLeaveGame, onCopyLink, onCopyGameCode, onVote, isMobile }) {
   const capitalize = (s) => (typeof s === 'string' && s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s);
   const prevPlayersRef = useRef(state.players);
   const prevTurnRef = useRef(state.currentTurn);
@@ -297,7 +297,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                     Comenzar juego
                   </Button>
                 </div>
-                <Button onClick={onCopyLink} variant="outline" size="md">Copiar enlace</Button>
+                <Button onClick={onCopyLink} variant="outline" size="md">{isMobile ? 'Compartir enlace' : 'Copiar enlace'}</Button>
               </>
             )}
           </div>
@@ -306,7 +306,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           </div>
           {!isHost && (
             <div className="w-full mt-4">
-              <Button onClick={onCopyLink} variant={state.players.length === 1 ? "primary" : "outline"} size="md">Copiar enlace</Button>
+              <Button onClick={onCopyLink} variant={state.players.length === 1 ? "primary" : "outline"} size="md">{isMobile ? 'Compartir enlace' : 'Copiar enlace'}</Button>
             </div>
           )}
           

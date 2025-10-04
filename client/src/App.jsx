@@ -10,7 +10,6 @@ import { Spinner } from './components/ui/Spinner';
 import { Button } from './components/ui/Button';
 import { Footer } from './components/Footer';
 import { InstructionsModal } from './components/InstructionsModal';
-import { CopyModal } from './components/CopyModal';
 import bellImg from './assets/bell.png';
 import heroImg from './assets/impostor-home.png';
 
@@ -19,9 +18,6 @@ export default function App() {
   const [token, setToken] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
-  const [copyModalOpen, setCopyModalOpen] = useState(false);
-  const [copyModalText, setCopyModalText] = useState('');
-  const [copyModalTitle, setCopyModalTitle] = useState('');
   
   // Precargar assets de la app
   const { isLoading: assetsLoading } = useAppAssetsPreloader();
@@ -81,60 +77,99 @@ export default function App() {
     }
   }, [emit, gameState]);
 
-  const copyToClipboard = useCallback(async (text, successMessage, title) => {
-    // Detectar Safari/iOS
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || 
-                     navigator.userAgent.match(/ipad|ipod|iphone/i);
-    
-    // En Safari/iOS, mostrar modal para copia manual
-    if (isSafari) {
-      setCopyModalText(text);
-      setCopyModalTitle(title);
-      setCopyModalOpen(true);
-      return;
-    }
-    
-    // Para otros navegadores, intentar copiar al portapapeles
-    try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
-        window.dispatchEvent(new CustomEvent('app:toast', { detail: successMessage }));
-        return;
-      }
-      
-      // Fallback con document.execCommand
-      const textArea = document.createElement('textarea');
-      textArea.value = text;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      textArea.style.top = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.select();
-      
-      const successful = document.execCommand('copy');
-      document.body.removeChild(textArea);
-      
-      if (successful) {
-        window.dispatchEvent(new CustomEvent('app:toast', { detail: successMessage }));
-      } else {
-        window.dispatchEvent(new CustomEvent('app:toast', { detail: 'No se pudo copiar' }));
-      }
-    } catch (err) {
-      console.error('Error copying to clipboard:', err);
-      window.dispatchEvent(new CustomEvent('app:toast', { detail: 'No se pudo copiar' }));
-    }
+  const isMobile = useMemo(() => {
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   }, []);
 
   const copyLink = useCallback(async () => {
     if (!gameState?.gameId) return;
     const url = `${window.location.origin}?gameId=${gameState.gameId}`;
-    await copyToClipboard(url, 'Enlace copiado', 'Enlace de invitación');
-  }, [gameState, copyToClipboard]);
+    
+    // En móvil, usar la API de compartir nativa
+    if (isMobile && navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Únete a mi juego de El Impostor',
+          text: `¡Juega conmigo! Usa el código: ${gameState.gameId}`,
+          url: url
+        });
+      } catch (err) {
+        // Si el usuario cancela, no mostrar error
+        if (err.name !== 'AbortError') {
+          console.error('Error sharing:', err);
+        }
+      }
+      return;
+    }
+    
+    // En desktop, copiar al portapapeles
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+        window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Enlace copiado' }));
+      } else {
+        // Fallback
+        const textArea = document.createElement('textarea');
+        textArea.value = url;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        if (successful) {
+          window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Enlace copiado' }));
+        }
+      }
+    } catch (err) {
+      console.error('Error copying:', err);
+    }
+  }, [gameState, isMobile]);
 
   const copyGameCode = useCallback(async () => {
     if (!gameState?.gameId) return;
-    await copyToClipboard(gameState.gameId, 'Código copiado', 'Código de sala');
-  }, [gameState, copyToClipboard]);
+    
+    // En móvil, usar la API de compartir nativa
+    if (isMobile && navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Código de sala - El Impostor',
+          text: `Código de sala: ${gameState.gameId}`
+        });
+      } catch (err) {
+        // Si el usuario cancela, no mostrar error
+        if (err.name !== 'AbortError') {
+          console.error('Error sharing:', err);
+        }
+      }
+      return;
+    }
+    
+    // En desktop, copiar al portapapeles
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(gameState.gameId);
+        window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Código copiado' }));
+      } else {
+        // Fallback
+        const textArea = document.createElement('textarea');
+        textArea.value = gameState.gameId;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        if (successful) {
+          window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Código copiado' }));
+        }
+      }
+    } catch (err) {
+      console.error('Error copying:', err);
+    }
+  }, [gameState, isMobile]);
 
   const castVote = useCallback((targetId) => {
     if (!gameState?.gameId) return;
@@ -398,6 +433,7 @@ export default function App() {
           onCopyLink={copyLink}
           onCopyGameCode={copyGameCode}
           onVote={castVote}
+          isMobile={isMobile}
         />
       );
     }
@@ -484,14 +520,6 @@ export default function App() {
       </div>
       
       {user && connected && <Footer onOpenInstructions={() => setInstructionsOpen(true)} />}
-      
-      {/* Modal para copiar en Safari */}
-      <CopyModal 
-        isOpen={copyModalOpen} 
-        onClose={() => setCopyModalOpen(false)}
-        text={copyModalText}
-        title={copyModalTitle}
-      />
     </div>
   );
 }
