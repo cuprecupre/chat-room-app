@@ -10,6 +10,7 @@ import { Spinner } from './components/ui/Spinner';
 import { Button } from './components/ui/Button';
 import { Footer } from './components/Footer';
 import { InstructionsModal } from './components/InstructionsModal';
+import { UIShowcase } from './components/UIShowcase';
 import bellImg from './assets/bell.png';
 import heroImg from './assets/impostor-home.png';
 
@@ -18,6 +19,9 @@ export default function App() {
   const [token, setToken] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
+  
+  // Check if user is accessing showcase route
+  const isShowcaseRoute = window.location.pathname === '/ui-showcase';
   
   // Precargar assets de la app
   const { isLoading: assetsLoading } = useAppAssetsPreloader();
@@ -254,7 +258,7 @@ export default function App() {
             <Spinner size="md" />
             <div>
               <p>Autenticando</p>
-              <p className="text-sm text-gray-400 mt-1">Verificando sesión...</p>
+              <p className="text-sm text-neutral-400 mt-1">Verificando sesión...</p>
             </div>
           </div>
         </div>
@@ -276,7 +280,7 @@ export default function App() {
           </div>
           <div>
               <h2 className="text-2xl font-bold text-neutral-50 mb-2">Conexión perdida</h2>
-              <p className="text-gray-400">No se puede conectar al servidor. Esto puede deberse a problemas de red o el servidor está inactivo.</p>
+              <p className="text-neutral-400">No se puede conectar al servidor. Esto puede deberse a problemas de red o el servidor está inactivo.</p>
             </div>
             <div className="space-y-3 px-6">
               <Button
@@ -309,7 +313,7 @@ export default function App() {
             <Spinner size="md" />
             <div>
               <p>Conectando al servidor</p>
-              <p className="text-sm text-gray-400 mt-1">Estableciendo conexión...</p>
+              <p className="text-sm text-neutral-400 mt-1">Estableciendo conexión...</p>
             </div>
           </div>
         </div>
@@ -318,6 +322,28 @@ export default function App() {
   }
 
   const renderContent = () => {
+    // Handle showcase route with access control
+    if (isShowcaseRoute) {
+      if (!user) {
+        return <LoginScreen onLogin={login} error={error} onOpenInstructions={() => setInstructionsOpen(false)} />;
+      }
+      
+      // Check if user is authorized (only leandrovegasb@gmail.com)
+      if (user.email !== 'leandrovegasb@gmail.com') {
+        return (
+          <div className="w-full h-screen flex items-center justify-center">
+            <div className="text-center space-y-4 max-w-md px-4">
+              <h1 className="text-3xl font-bold text-red-400">Acceso Denegado</h1>
+              <p className="text-neutral-400">No tienes permisos para acceder a esta página.</p>
+              <Button onClick={() => window.location.href = '/'}>Volver al inicio</Button>
+            </div>
+          </div>
+        );
+      }
+      
+      return <UIShowcase />;
+    }
+    
     // Detect URL vs session mismatch and provide safe recovery UI
     const url = new URL(window.location);
     const urlGameId = url.searchParams.get('gameId');
@@ -343,7 +369,7 @@ export default function App() {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-neutral-50 mb-2">¿Cambiar de sala?</h2>
-              <p className="text-gray-400">
+              <p className="text-neutral-400">
                 Estás en la sala <span className="font-mono font-semibold text-neutral-300">{gameState.gameId}</span>, pero la URL apunta a <span className="font-mono font-semibold text-neutral-300">{urlGameId}</span>.
               </p>
             </div>
@@ -390,7 +416,7 @@ export default function App() {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-neutral-50 mb-3">Unirse a sala</h2>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-neutral-400">
                 ¿Quieres unirte a la sala <span className="font-mono font-semibold text-neutral-300">{urlGameId}</span>?
               </p>
             </div>
@@ -493,13 +519,13 @@ export default function App() {
                 {menuOpen && (
                   <div className="absolute right-0 mt-2 w-56 rounded-xl border border-white/10 bg-neutral-950/95 backdrop-blur-md shadow-2xl ring-1 ring-white/10 p-2 z-20">
                     <div className="px-3 py-2">
-                      <p className="text-sm font-semibold text-gray-200 truncate">{user.displayName}</p>
-                      {user.email && <p className="text-xs text-gray-400 truncate">{user.email}</p>}
+                      <p className="text-sm font-semibold text-neutral-200 truncate">{user.displayName}</p>
+                      {user.email && <p className="text-xs text-neutral-400 truncate">{user.email}</p>}
                     </div>
                     <div className="my-1 h-px bg-white/10" />
                     <button
                       onClick={handleLogout}
-                      className="block w-full text-left px-3 py-2 text-gray-200 hover:text-white hover:bg-white/10 rounded-md"
+                      className="block w-full text-left px-3 py-2 text-neutral-200 hover:text-white hover:bg-white/10 rounded-md"
                     >
                       Cerrar sesión
                     </button>
