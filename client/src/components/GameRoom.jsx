@@ -125,7 +125,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                 </div>
                 <div className="flex items-center gap-2">
                   <div>
-                    <span className={`font-medium ${isWinner ? 'text-orange-400' : ''} ${isEliminated ? 'line-through' : ''}`}>
+                    <span className={`font-medium ${isWinner ? 'text-orange-400' : ''} ${isEliminated && !isGameOver ? 'line-through' : ''}`}>
                       {p.name}{p.uid === currentUserId ? ' (Tú)' : ''}
                     </span>
                   </div>
@@ -134,7 +134,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
               
               {/* Mostrar puntos o botón de votar según fase */}
               <div className="flex items-center gap-3">
-                {isEliminated && (
+                {isEliminated && !isGameOver && (
                   <span className="text-xs text-red-400 font-medium">Eliminado</span>
                 )}
                 {showScores ? (
