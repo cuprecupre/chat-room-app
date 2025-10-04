@@ -407,7 +407,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           <h2 className="text-2xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>Tu carta</h2>
         </div>
         <div className="w-full max-w-sm mx-auto space-y-3">
-          <div className={`flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full ${showCardEntrance ? 'animate-cardEntrance' : ''}`}>
+          <div className={`flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full ${showCardEntrance ? 'animate-cardEntrance' : 'animate-card-float'}`}>
             <div className={`flip-card-inner h-full ${reveal ? 'is-flipped' : ''}`}>
               {/* Frente completo (card completa con imagen) */}
               <div className="flip-card-front">
