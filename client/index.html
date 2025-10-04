@@ -30,5 +30,26 @@
   <body class="bg-neutral-950">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Eruda mobile console for debugging - Only loads when ?debug=true is in URL -->
+    <script>
+      (function() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('debug') === 'true') {
+          console.log('🔧 Eruda debug mode activado - Cargando consola móvil...');
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/eruda';
+          script.onload = function() {
+            eruda.init();
+            console.log('✅ Eruda cargado exitosamente');
+            console.log('📱 Para ver los logs, toca el ícono de Eruda en la esquina inferior derecha');
+          };
+          script.onerror = function() {
+            console.error('❌ Error al cargar Eruda desde CDN');
+          };
+          document.body.appendChild(script);
+        }
+      })();
+    </script>
   </body>
 </html>
