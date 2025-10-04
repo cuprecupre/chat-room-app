@@ -380,7 +380,7 @@ export default function App() {
     if (urlGameId && !gameState?.gameId) {
       return (
         <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
-          <div className="w-full max-w-sm mx-auto text-center space-y-6">
+          <div className="w-full max-w-sm mx-auto text-center space-y-6 px-6">
             <div className="flex justify-center">
               <img 
                 src={bellImg} 
@@ -389,33 +389,18 @@ export default function App() {
               />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-neutral-50 mb-2">Unirse a sala</h2>
-              <p className="text-gray-400">
-                ¿Quieres unirte a la sala <span className="font-mono font-semibold text-neutral-300">{urlGameId}</span>?
+              <h2 className="text-2xl font-bold text-neutral-50 mb-3">No puedes unirte</h2>
+              <p className="text-sm text-gray-400">
+                No puedes acceder a la sala <span className="font-mono font-semibold text-neutral-300">{urlGameId}</span> porque la partida está en marcha.
               </p>
             </div>
-            <div className="space-y-3 px-6">
+            <div className="pt-2">
               <Button
-                onClick={() => emit('join-game', urlGameId)}
+                onClick={() => { url.searchParams.delete('gameId'); window.history.replaceState({}, '', url.toString()); window.dispatchEvent(new Event('popstate')); }}
                 variant="primary"
                 size="md"
               >
-                Unirme ahora
-              </Button>
-              <Button
-                onClick={() => { url.searchParams.delete('gameId'); window.history.replaceState({}, '', url.toString()); window.dispatchEvent(new Event('popstate')); }}
-                variant="outline"
-                size="md"
-              >
                 Volver al lobby
-              </Button>
-              <Button
-                onClick={forceExit}
-                variant="outline"
-                size="md"
-                className="border-orange-500/30 text-orange-400 hover:text-orange-300 hover:bg-orange-500/10"
-              >
-                Forzar salida
               </Button>
             </div>
           </div>

@@ -117,9 +117,14 @@ export function useSocket(user) {
 
         socket.on('error-message', (message) => {
           console.error('Server error:', message);
-          window.dispatchEvent(new CustomEvent('app:toast', { detail: message }));
-          // Si la sala no existe o no perteneces, limpiar estado y URL para evitar quedar bloqueado
-          if (/no existe|no perteneces/i.test(message)) {
+          
+          // Para errores de "partida en curso", no mostrar toast - dejar que App.jsx maneje la UI
+          if (!/partida en curso/i.test(message)) {
+            window.dispatchEvent(new CustomEvent('app:toast', { detail: message }));
+          }
+          
+          // Si la sala no existe, no perteneces, o partida en curso, limpiar estado y URL para evitar quedar bloqueado
+          if (/no existe|no perteneces|partida en curso/i.test(message)) {
             const url = new URL(window.location);
             url.searchParams.delete('gameId');
             window.history.replaceState({}, '', url.toString());
