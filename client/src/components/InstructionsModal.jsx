@@ -40,7 +40,7 @@ export function InstructionsModal({ isOpen, onClose }) {
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><strong>App web</strong>: gestiona <strong>roles, cartas, votos y puntos</strong>.</li>
             <li><strong>Interacción presencial</strong>: <strong>turnos y pistas</strong> se realizan <strong>fuera de la app</strong>, hablando en voz alta.</li>
-            <li><strong>Jugadores</strong>: Mínimo 4. Sin límite.</li>
+            <li><strong>Jugadores</strong>: Mínimo 2 (recomendado 4+). Sin límite.</li>
           </ul>
         </section>
 
@@ -196,7 +196,7 @@ export function InstructionsModal({ isOpen, onClose }) {
 
           <h4 className="text-lg font-semibold text-neutral-200 mb-2 mt-4"><span className="text-orange-400">Impostor</span></h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li><strong>+2</strong> puntos por <strong>sobrevivir cada ronda</strong>.</li>
+            <li><strong>+2</strong> puntos cada vez que <strong>se inicia una nueva ronda</strong> sin haber sido expulsado en la anterior.</li>
             <li><strong>+4</strong> puntos extra si <strong>gana la partida</strong> (no lo descubren tras 3 rondas).</li>
           </ul>
 
