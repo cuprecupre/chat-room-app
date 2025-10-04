@@ -233,7 +233,16 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   // Reveal helpers
   const triggerReveal = () => {
     if (revealTimeoutRef.current) clearTimeout(revealTimeoutRef.current);
-    setReveal(!reveal); // Toggle entre mostrar/ocultar
+    
+    const newRevealState = !reveal;
+    setReveal(newRevealState);
+    
+    // Si voltea la carta (muestra el dorso), iniciar temporizador para volver al frente después de 5 segundos
+    if (newRevealState) {
+      revealTimeoutRef.current = setTimeout(() => {
+        setReveal(false);
+      }, 5000);
+    }
   };
 
 
