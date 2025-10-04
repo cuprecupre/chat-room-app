@@ -4,6 +4,18 @@ import { Spinner } from './ui/Spinner';
 import heroImg from '../assets/impostor-home.png';
 
 export function LoginScreen({ onLogin, error, isLoading, onOpenInstructions }) {
+  const handleLoginClick = () => {
+    console.log('🖱️ [LoginScreen] Usuario hizo clic en el botón de "Continuar con Google"');
+    console.log('🖱️ [LoginScreen] isLoading:', isLoading);
+    console.log('🖱️ [LoginScreen] onLogin es una función:', typeof onLogin === 'function');
+    try {
+      onLogin();
+      console.log('✅ [LoginScreen] Función onLogin ejecutada');
+    } catch (err) {
+      console.error('❌ [LoginScreen] Error al ejecutar onLogin:', err);
+    }
+  };
+
   return (
     <div className="w-full h-dvh flex flex-col">
       <div className="flex-1 flex items-center justify-center p-4">
@@ -16,7 +28,7 @@ export function LoginScreen({ onLogin, error, isLoading, onOpenInstructions }) {
 
           <div className="animate-fadeIn animate-delay-800">
             <Button 
-              onClick={onLogin} 
+              onClick={handleLoginClick} 
               disabled={isLoading}
               variant="outline"
               size="md"
