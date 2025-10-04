@@ -194,11 +194,16 @@ class Game {
     const voteCount = {};
     const activePlayers = this.roundPlayers.filter(uid => !this.allEliminatedPlayers.includes(uid));
     
+    console.log(`[Game ${this.gameId}] Procesando resultados. Jugadores activos:`, activePlayers);
+    console.log(`[Game ${this.gameId}] Votos registrados:`, this.votes);
+    
     Object.entries(this.votes).forEach(([voter, target]) => {
       if (activePlayers.includes(voter)) {
         voteCount[target] = (voteCount[target] || 0) + 1;
       }
     });
+
+    console.log(`[Game ${this.gameId}] Conteo de votos:`, voteCount);
 
     // Encontrar el más votado
     let maxVotes = 0;
@@ -212,6 +217,8 @@ class Game {
         mostVoted.push(playerId);
       }
     });
+    
+    console.log(`[Game ${this.gameId}] Más votados:`, mostVoted, `con ${maxVotes} votos`);
 
     // Guardar historial de esta vuelta
     this.turnHistory.push({
@@ -219,16 +226,17 @@ class Game {
       votes: { ...this.votes },
       voteCount: { ...voteCount },
       eliminated: mostVoted.length === 1 ? mostVoted[0] : null,
-      tie: mostVoted.length > 1
+      tie: mostVoted.length > 1 || mostVoted.length === 0
     });
 
-    // Manejar empate
-    if (mostVoted.length > 1) {
-      console.log(`[Game ${this.gameId}] Empate entre: ${mostVoted.join(', ')}.`);
+    // Manejar empate o sin votos
+    if (mostVoted.length !== 1) {
+      const reason = mostVoted.length === 0 ? 'sin votos' : `empate entre: ${mostVoted.join(', ')}`;
+      console.log(`[Game ${this.gameId}] No hay eliminación (${reason}).`);
       
       // Si ya estamos en la vuelta 3, el impostor gana
       if (this.currentTurn >= this.maxTurns) {
-        console.log(`[Game ${this.gameId}] Vuelta 3 completada con empate. ¡El impostor gana!`);
+        console.log(`[Game ${this.gameId}] Vuelta 3 completada sin eliminación. ¡El impostor gana!`);
         // Dar puntos al impostor por sobrevivir la última vuelta
         this.playerScores[this.impostorId] = (this.playerScores[this.impostorId] || 0) + 2;
         this.lastRoundScores[this.impostorId] = (this.lastRoundScores[this.impostorId] || 0) + 2;
@@ -265,6 +273,9 @@ class Game {
   }
 
   startNextTurn() {
+    console.log(`[Game ${this.gameId}] 🔄 startNextTurn llamado. Vuelta actual: ${this.currentTurn} → ${this.currentTurn + 1}`);
+    console.log(`[Game ${this.gameId}] lastEliminatedInTurn antes de cambiar vuelta:`, this.lastEliminatedInTurn);
+    
     this.currentTurn++;
     this.votes = {}; // Resetear votos para la nueva vuelta
     
@@ -275,7 +286,7 @@ class Game {
       console.log(`[Game ${this.gameId}] Impostor sobrevivió vuelta ${this.currentTurn - 1}: +2 puntos`);
     }
     
-    console.log(`[Game ${this.gameId}] Iniciando vuelta ${this.currentTurn}`);
+    console.log(`[Game ${this.gameId}] ✅ Vuelta ${this.currentTurn} iniciada. lastEliminatedInTurn:`, this.lastEliminatedInTurn);
   }
 
   endRound(friendsWon) {
