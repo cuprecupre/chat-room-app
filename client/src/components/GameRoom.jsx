@@ -464,7 +464,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             </div>
           </div>
           {/* Botón Girar carta */}
-          <div className="flex justify-center">
+          <div className="flex justify-center mt-6">
               <button
                 onClick={triggerReveal}
                 className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm text-neutral-400 hover:text-neutral-300 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150 border border-neutral-600/30 hover:border-neutral-500/50"
@@ -564,22 +564,13 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
               </div>
               
-              {/* Espacio adicional para que el contenido no quede tapado por el botón fijo */}
-              <div className="h-20"></div>
-            </div>
-          </div>
-          
-          {/* Botón fijo en la parte inferior con gradiente */}
-          <div className="fixed bottom-0 left-0 right-0 z-50">
-            {/* Gradiente de fondo */}
-            <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent h-20"></div>
-            
-            {/* Botón */}
-            <div className="relative px-4 pb-6 pt-4">
+              {/* Botón o mensaje de espera */}
               {isHost ? (
-                <Button onClick={onPlayAgain} variant="primary" size="md" className="w-full animate-fadeIn animate-delay-800">
-                  Siguiente partida
-                </Button>
+                <div className="animate-fadeIn animate-delay-800">
+                  <Button onClick={onPlayAgain} variant="primary" size="md" className="w-full">
+                    Siguiente partida
+                  </Button>
+                </div>
               ) : (
                 <div className="text-center text-neutral-400 text-sm animate-text-pulse animate-fadeIn animate-delay-800">
                   Esperando a que <span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'el anfitrión'}</span> (anfitrión) <br />inicie la siguiente partida
