@@ -85,23 +85,33 @@ export default function App() {
     if (!gameState?.gameId) return;
     const url = `${window.location.origin}?gameId=${gameState.gameId}`;
     
+    console.log('isMobile:', isMobile);
+    console.log('navigator.share available:', !!navigator.share);
+    console.log('navigator.canShare:', navigator.canShare ? navigator.canShare({ url }) : 'canShare not available');
+    
     // En móvil, usar la API de compartir nativa
     if (isMobile && navigator.share) {
+      console.log('Intentando compartir con Web Share API...');
       try {
         await navigator.share({
           title: 'Únete a mi juego de El Impostor',
           text: `¡Juega conmigo! Usa el código: ${gameState.gameId}`,
           url: url
         });
+        console.log('Compartido exitosamente');
+        return;
       } catch (err) {
+        console.error('Error en Web Share API:', err);
         // Si el usuario cancela, no mostrar error
         if (err.name !== 'AbortError') {
           console.error('Error sharing:', err);
+          window.dispatchEvent(new CustomEvent('app:toast', { detail: 'No se pudo compartir' }));
         }
+        return;
       }
-      return;
     }
     
+    console.log('Usando clipboard en desktop...');
     // En desktop, copiar al portapapeles
     try {
       if (navigator.clipboard && window.isSecureContext) {
