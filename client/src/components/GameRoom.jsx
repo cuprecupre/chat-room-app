@@ -73,7 +73,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   // Determinar qué título mostrar
   let headerText = isPlaying ? 'Vota a un jugador para elminarlo' : `Jugadores Conectados: ${players.length}`;
   if (showScores) { 
-    headerText = isGameOver ? 'Puntuación Final' : 'Puntuación';
+    headerText = isGameOver ? 'Resto de jugadores' : 'Puntuación';
   }
 
   return (
