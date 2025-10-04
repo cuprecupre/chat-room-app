@@ -223,3 +223,17 @@ h1, h2, h3, h4, h5, h6 {
   animation-delay: 1000ms;
   animation-fill-mode: both;
 }
+
+/* Animación pulse personalizada para texto */
+@keyframes textPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-text-pulse {
+  animation: textPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

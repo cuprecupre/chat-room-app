@@ -535,11 +535,11 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               <div className="animate-fadeIn animate-delay-800">
                 <Button onClick={onPlayAgain} variant="primary" size="md">Siguiente partida</Button>
               </div>
-            ) : (
-              <div className="text-center text-neutral-400 text-sm animate-pulse animate-fadeIn animate-delay-800">
-                Esperando a que <span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'el anfitrión'}</span> inicie<br />la siguiente partida
-              </div>
-            )}
+              ) : (
+                <div className="text-center text-neutral-400 text-sm animate-text-pulse animate-fadeIn animate-delay-800">
+                  Esperando a que <span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'el anfitrión'}</span> (anfitrión) <br />inicie la siguiente partida
+                </div>
+              )}
             </div>
           </div>
         </div>
