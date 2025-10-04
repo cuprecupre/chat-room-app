@@ -79,47 +79,65 @@ export default function App() {
 
   const copyToClipboard = useCallback(async (text, successMessage) => {
     try {
-      // Intentar con la API moderna primero
-      if (navigator.clipboard && window.isSecureContext) {
+      // Intentar con la API moderna primero (solo en contextos seguros)
+      if (navigator.clipboard && window.isSecureContext && !navigator.userAgent.includes('Safari')) {
         await navigator.clipboard.writeText(text);
         window.dispatchEvent(new CustomEvent('app:toast', { detail: successMessage }));
         return;
       }
       
-      // Fallback para Safari mobile y otros navegadores
+      // Método específico para Safari y otros navegadores
       const textArea = document.createElement('textarea');
       textArea.value = text;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      textArea.style.top = '-999999px';
-      textArea.style.opacity = '0';
-      textArea.style.pointerEvents = 'none';
+      
+      // Estilos para hacer el textarea invisible pero funcional
+      textArea.style.position = 'absolute';
+      textArea.style.left = '-9999px';
+      textArea.style.top = '0';
+      textArea.style.width = '2em';
+      textArea.style.height = '2em';
+      textArea.style.padding = '0';
+      textArea.style.border = 'none';
+      textArea.style.outline = 'none';
+      textArea.style.boxShadow = 'none';
+      textArea.style.background = 'transparent';
+      textArea.style.fontSize = '16px'; // Prevenir zoom en iOS
       textArea.setAttribute('readonly', '');
+      
       document.body.appendChild(textArea);
       
-      // Guardar la posición actual del scroll
+      // Guardar la posición del scroll
       const scrollY = window.scrollY;
       const scrollX = window.scrollX;
       
+      // Método más agresivo para Safari
+      textArea.focus();
       textArea.select();
-      textArea.setSelectionRange(0, 99999); // Para dispositivos móviles
       
+      // Intentar seleccionar todo el texto
+      if (textArea.setSelectionRange) {
+        textArea.setSelectionRange(0, text.length);
+      }
+      
+      // Ejecutar el comando de copia
       const successful = document.execCommand('copy');
+      
+      // Limpiar
       document.body.removeChild(textArea);
       
-      // Restaurar la posición del scroll
+      // Restaurar scroll
       window.scrollTo(scrollX, scrollY);
       
       if (successful) {
         window.dispatchEvent(new CustomEvent('app:toast', { detail: successMessage }));
       } else {
-        // Si falla, mostrar el texto para que el usuario lo copie manualmente
-        window.dispatchEvent(new CustomEvent('app:toast', { detail: `Texto: ${text}` }));
+        // Fallback: mostrar el texto en el toast
+        window.dispatchEvent(new CustomEvent('app:toast', { detail: `Copia manual: ${text}` }));
       }
     } catch (err) {
       console.error('Error copying to clipboard:', err);
-      // Mostrar el texto como fallback
-      window.dispatchEvent(new CustomEvent('app:toast', { detail: `Texto: ${text}` }));
+      // Fallback final: mostrar el texto
+      window.dispatchEvent(new CustomEvent('app:toast', { detail: `Copia manual: ${text}` }));
     }
   }, []);
 
