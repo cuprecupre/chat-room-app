@@ -241,9 +241,9 @@ class Game {
         this.lastRoundScores[this.impostorId] = (this.lastRoundScores[this.impostorId] || 0) + 4;
         this.endRound(false); // Impostor gana
       } else {
-        console.log(`[Game ${this.gameId}] Siguiente vuelta.`);
+        console.log(`[Game ${this.gameId}] Empate: siguiente vuelta sin puntos.`);
         this.lastEliminatedInTurn = null; // No hubo eliminación por empate
-        this.startNextTurn();
+        this.startNextTurn(true); // Pasar true para indicar que fue empate (no dar puntos)
       }
       return;
     }
@@ -271,23 +271,26 @@ class Game {
     }
   }
 
-  startNextTurn() {
+  startNextTurn(wasTie = false) {
     console.log(`[Game ${this.gameId}] 🔄 startNextTurn llamado. Vuelta actual: ${this.currentTurn} → ${this.currentTurn + 1}`);
     console.log(`[Game ${this.gameId}] lastEliminatedInTurn antes de cambiar vuelta:`, this.lastEliminatedInTurn);
+    console.log(`[Game ${this.gameId}] Fue empate:`, wasTie);
     
     this.currentTurn++;
     this.votes = {}; // Resetear votos para la nueva vuelta
     
-    // Dar puntos al impostor por sobrevivir la vuelta
+    // Dar puntos al impostor por sobrevivir la vuelta SOLO si hubo eliminación (no empate)
     // Vuelta 1 completada: +2 puntos
     // Vuelta 2 completada: +3 puntos
     // Vuelta 3 completada: +4 puntos
-    if (this.currentTurn > 1) { // No en la primera transición
+    if (this.currentTurn > 1 && !wasTie) { // No dar puntos si fue empate
       const previousTurn = this.currentTurn - 1;
       const points = previousTurn + 1; // Vuelta 1 = 2 pts, Vuelta 2 = 3 pts, Vuelta 3 = 4 pts
       this.playerScores[this.impostorId] = (this.playerScores[this.impostorId] || 0) + points;
       this.lastRoundScores[this.impostorId] = (this.lastRoundScores[this.impostorId] || 0) + points;
       console.log(`[Game ${this.gameId}] Impostor sobrevivió vuelta ${previousTurn}: +${points} puntos`);
+    } else if (wasTie) {
+      console.log(`[Game ${this.gameId}] Empate: no se otorgan puntos al impostor`);
     }
     
     console.log(`[Game ${this.gameId}] ✅ Vuelta ${this.currentTurn} iniciada. lastEliminatedInTurn:`, this.lastEliminatedInTurn);
