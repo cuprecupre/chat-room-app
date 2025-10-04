@@ -65,9 +65,9 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Card floating animation - Subtle Z-axis rotation (2D pendulum) */
 @keyframes cardFloat {
-  0% { transform: rotateZ(-3deg); }
-  50% { transform: rotateZ(3deg); }
-  100% { transform: rotateZ(-3deg); }
+  0% { transform: rotateZ(-2deg); }
+  50% { transform: rotateZ(2deg); }
+  100% { transform: rotateZ(-2deg); }
 }
 
 .animate-card-float {
