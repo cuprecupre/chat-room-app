@@ -556,14 +556,16 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           <div className="absolute inset-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
             <div className="min-h-full w-full max-w-sm mx-auto px-4 pt-6 pb-24 space-y-6">
               <div className="text-center space-y-4 animate-scaleIn animate-delay-200">
-                <h2 className="text-4xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
+                {state.roundCount && state.maxRounds && (
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 rounded-full">
+                    <span className="text-sm font-semibold text-orange-400">
+                      Partida {state.roundCount} de {state.maxRounds}
+                    </span>
+                  </div>
+                )}
+                <h2 className="text-3xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
                   Resultado de la partida
                 </h2>
-                {state.roundCount && state.maxRounds && (
-                  <p className="text-sm text-neutral-400">
-                    Partida {state.roundCount}/{state.maxRounds} • Objetivo: {state.targetScore} puntos
-                  </p>
-                )}
               </div>
               
               {/* Revelar impostor y palabra */}
@@ -771,45 +773,45 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       {/* Overlay de nueva ronda */}
       {showTurnOverlay && (
         <div className={`fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm px-4 transition-opacity duration-300 ${isOverlayClosing ? 'opacity-0' : 'animate-fadeIn'}`}>
-          <div className={`text-center space-y-6 max-w-sm transition-all duration-300 ${isOverlayClosing ? 'opacity-0 scale-95' : 'animate-scaleIn'}`}>
-            <h2 className="text-6xl font-bold text-orange-400" style={{fontFamily: 'Trocchi, serif'}}>
+          <div className={`text-center space-y-8 max-w-md transition-all duration-300 ${isOverlayClosing ? 'opacity-0 scale-95' : 'animate-scaleIn'}`}>
+            <h2 className="text-4xl font-bold text-orange-400" style={{fontFamily: 'Trocchi, serif'}}>
               Ronda {state.currentTurn}
             </h2>
             
             {eliminatedPlayerInfo ? (
-              <div className="space-y-4">
-                <div className="flex flex-col items-center gap-3">
+              <div className="space-y-7">
+                <div className="flex flex-col items-center gap-4">
                   <div className="relative">
                     <img 
                       src={eliminatedPlayerInfo.photoURL} 
                       alt={eliminatedPlayerInfo.name}
-                      className="w-20 h-20 rounded-full object-cover ring-4 ring-red-500/50"
+                      className="w-28 h-28 rounded-full object-cover ring-4 ring-red-500/50"
                       onError={(e) => {
                         e.target.style.display = 'none';
                         e.target.nextSibling.style.display = 'flex';
                       }}
                     />
                     <div 
-                      className="w-20 h-20 rounded-full bg-neutral-600 flex items-center justify-center text-white text-lg font-semibold ring-4 ring-red-500/50"
+                      className="w-28 h-28 rounded-full bg-neutral-600 flex items-center justify-center text-white text-xl font-semibold ring-4 ring-red-500/50"
                       style={{display: 'none'}}
                     >
                       {eliminatedPlayerInfo.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                     </div>
                   </div>
-                  <p className="text-lg text-neutral-300">
-                    <span className="font-semibold text-red-400">{eliminatedPlayerInfo.name}</span> fue eliminado
+                  <p className="text-2xl text-neutral-300">
+                    <span className="text-red-400">{eliminatedPlayerInfo.name}</span> fue eliminado
                   </p>
                 </div>
-                <p className="text-xl text-neutral-200 font-medium">
+                <p className="text-3xl text-neutral-200">
                   El impostor sigue entre nosotros
                 </p>
               </div>
             ) : (
-              <div className="space-y-4">
-                <p className="text-xl text-neutral-200 font-medium">
+              <div className="space-y-7">
+                <p className="text-3xl text-neutral-200">
                   Nadie ha sido eliminado
                 </p>
-                <p className="text-lg text-neutral-400">
+                <p className="text-2xl text-neutral-400">
                   Nueva ronda de pistas
                 </p>
               </div>
