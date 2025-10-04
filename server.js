@@ -297,6 +297,12 @@ io.on('connection', (socket) => {
         const gameToJoin = games[gameId];
         if (!gameToJoin) return socket.emit('error-message', 'La partida no existe.');
         
+        // No permitir unirse si la partida ya empezó (salvo que ya seas parte del juego)
+        const isAlreadyInGame = gameToJoin.players.some(p => p.uid === user.uid);
+        if (gameToJoin.phase === 'playing' && !isAlreadyInGame) {
+            return socket.emit('error-message', 'No puedes unirte a una partida en curso.');
+        }
+        
         // Allow switching games - leave current game first if in one
         const userGame = findUserGame(user.uid);
         if (userGame && userGame.gameId !== gameId) {
