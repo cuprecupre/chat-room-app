@@ -78,51 +78,39 @@ export default function App() {
   }, [emit, gameState]);
 
   const copyToClipboard = useCallback(async (text, successMessage) => {
+    // Para Safari, siempre mostrar el texto para copia manual
+    if (navigator.userAgent.includes('Safari')) {
+      window.dispatchEvent(new CustomEvent('app:toast', { detail: `${successMessage}: ${text}` }));
+      return;
+    }
+    
     try {
-      // Intentar con la API moderna primero (solo en contextos seguros)
-      if (navigator.clipboard && window.isSecureContext && !navigator.userAgent.includes('Safari')) {
+      // Intentar con la API moderna para otros navegadores
+      if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(text);
         window.dispatchEvent(new CustomEvent('app:toast', { detail: successMessage }));
         return;
       }
       
-      // Método específico para Safari y otros navegadores
+      // Fallback para otros navegadores
       const textArea = document.createElement('textarea');
       textArea.value = text;
-      
-      // Estilos para hacer el textarea invisible pero funcional
-      textArea.style.position = 'absolute';
-      textArea.style.left = '-9999px';
-      textArea.style.top = '0';
-      textArea.style.width = '2em';
-      textArea.style.height = '2em';
-      textArea.style.padding = '0';
-      textArea.style.border = 'none';
-      textArea.style.outline = 'none';
-      textArea.style.boxShadow = 'none';
-      textArea.style.background = 'transparent';
-      textArea.style.fontSize = '16px'; // Prevenir zoom en iOS
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      textArea.style.opacity = '0';
+      textArea.style.pointerEvents = 'none';
       textArea.setAttribute('readonly', '');
-      
       document.body.appendChild(textArea);
       
       // Guardar la posición del scroll
       const scrollY = window.scrollY;
       const scrollX = window.scrollX;
       
-      // Método más agresivo para Safari
-      textArea.focus();
       textArea.select();
+      textArea.setSelectionRange(0, 99999);
       
-      // Intentar seleccionar todo el texto
-      if (textArea.setSelectionRange) {
-        textArea.setSelectionRange(0, text.length);
-      }
-      
-      // Ejecutar el comando de copia
       const successful = document.execCommand('copy');
-      
-      // Limpiar
       document.body.removeChild(textArea);
       
       // Restaurar scroll
@@ -131,13 +119,11 @@ export default function App() {
       if (successful) {
         window.dispatchEvent(new CustomEvent('app:toast', { detail: successMessage }));
       } else {
-        // Fallback: mostrar el texto en el toast
-        window.dispatchEvent(new CustomEvent('app:toast', { detail: `Copia manual: ${text}` }));
+        window.dispatchEvent(new CustomEvent('app:toast', { detail: `${successMessage}: ${text}` }));
       }
     } catch (err) {
       console.error('Error copying to clipboard:', err);
-      // Fallback final: mostrar el texto
-      window.dispatchEvent(new CustomEvent('app:toast', { detail: `Copia manual: ${text}` }));
+      window.dispatchEvent(new CustomEvent('app:toast', { detail: `${successMessage}: ${text}` }));
     }
   }, []);
 
