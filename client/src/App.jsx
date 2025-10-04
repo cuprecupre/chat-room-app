@@ -10,6 +10,7 @@ import { Spinner } from './components/ui/Spinner';
 import { Button } from './components/ui/Button';
 import { Footer } from './components/Footer';
 import { InstructionsModal } from './components/InstructionsModal';
+import { CopyModal } from './components/CopyModal';
 import bellImg from './assets/bell.png';
 import heroImg from './assets/impostor-home.png';
 
@@ -18,6 +19,9 @@ export default function App() {
   const [token, setToken] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
+  const [copyModalOpen, setCopyModalOpen] = useState(false);
+  const [copyModalText, setCopyModalText] = useState('');
+  const [copyModalTitle, setCopyModalTitle] = useState('');
   
   // Precargar assets de la app
   const { isLoading: assetsLoading } = useAppAssetsPreloader();
@@ -85,10 +89,7 @@ export default function App() {
     if (!gameState?.gameId) return;
     const url = `${window.location.origin}?gameId=${gameState.gameId}`;
     
-    // Debug info
-    const debugInfo = `isMobile: ${isMobile}\nnavigator.share: ${!!navigator.share}\nUA: ${navigator.userAgent.substring(0, 50)}`;
-    
-    // En móvil, usar la API de compartir nativa
+    // En móvil, intentar usar la API de compartir nativa (funciona solo en HTTPS)
     if (isMobile && navigator.share) {
       try {
         await navigator.share({
@@ -98,17 +99,21 @@ export default function App() {
         });
         return;
       } catch (err) {
-        // Si el usuario cancela, no mostrar error
-        if (err.name !== 'AbortError') {
-          alert(`Error compartiendo: ${err.message}\n\n${debugInfo}`);
+        // Si el usuario cancela, no hacer nada
+        if (err.name === 'AbortError') {
+          return;
         }
-        return;
+        // Si hay otro error, continuar con el fallback
+        console.error('Error sharing:', err);
       }
     }
     
-    // Si no está disponible Web Share, mostrar info
+    // Fallback para móvil sin Web Share (desarrollo local) o desktop
     if (isMobile && !navigator.share) {
-      alert(`Web Share no disponible\n\n${debugInfo}`);
+      // En móvil sin Web Share, mostrar modal
+      setCopyModalText(url);
+      setCopyModalTitle('Enlace de invitación');
+      setCopyModalOpen(true);
       return;
     }
     
@@ -140,19 +145,30 @@ export default function App() {
   const copyGameCode = useCallback(async () => {
     if (!gameState?.gameId) return;
     
-    // En móvil, usar la API de compartir nativa
+    // En móvil, intentar usar la API de compartir nativa (funciona solo en HTTPS)
     if (isMobile && navigator.share) {
       try {
         await navigator.share({
           title: 'Código de sala - El Impostor',
           text: `Código de sala: ${gameState.gameId}`
         });
+        return;
       } catch (err) {
-        // Si el usuario cancela, no mostrar error
-        if (err.name !== 'AbortError') {
-          console.error('Error sharing:', err);
+        // Si el usuario cancela, no hacer nada
+        if (err.name === 'AbortError') {
+          return;
         }
+        // Si hay otro error, continuar con el fallback
+        console.error('Error sharing:', err);
       }
+    }
+    
+    // Fallback para móvil sin Web Share (desarrollo local) o desktop
+    if (isMobile && !navigator.share) {
+      // En móvil sin Web Share, mostrar modal
+      setCopyModalText(gameState.gameId);
+      setCopyModalTitle('Código de sala');
+      setCopyModalOpen(true);
       return;
     }
     
@@ -530,6 +546,14 @@ export default function App() {
       </div>
       
       {user && connected && <Footer onOpenInstructions={() => setInstructionsOpen(true)} />}
+      
+      {/* Modal para copiar en móvil (solo en desarrollo local sin HTTPS) */}
+      <CopyModal 
+        isOpen={copyModalOpen} 
+        onClose={() => setCopyModalOpen(false)}
+        text={copyModalText}
+        title={copyModalTitle}
+      />
     </div>
   );
 }
