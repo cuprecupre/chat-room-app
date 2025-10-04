@@ -90,7 +90,6 @@ export default function App() {
       try {
         await navigator.share({
           title: 'Únete a mi juego de El Impostor',
-          text: `¡Juega conmigo! Usa el código: ${gameState.gameId}`,
           url: url
         });
         return;
