@@ -27,6 +27,9 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
     return players.filter(player => (playerScores[player.uid] || 0) === maxScore);
   })() : [];
   
+  // Si hay 3 o más ganadores, no hay ganadores reales
+  const hasNoWinners = winners.length >= 3;
+  
   // Ordenar jugadores: usuario actual siempre primero (excepto en scores)
   const sortedPlayers = [...players]
     .sort((a, b) => {
@@ -81,7 +84,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
           const iVotedForThisPlayer = isMyVote(p.uid);
           const score = playerScores[p.uid] || 0;
           const scoreGained = lastRoundScores[p.uid] || 0;
-          const isWinner = isGameOver && (index === 0 || (isTie && winners.some(w => w.uid === p.uid)));
+          const isWinner = isGameOver && !hasNoWinners && (index === 0 || (isTie && winners.some(w => w.uid === p.uid)));
           
           return (
             <li key={p.uid} className={`flex items-center justify-between bg-white/5 p-4 rounded-md ${isEliminated ? 'opacity-50' : ''} ${isWinner ? 'bg-orange-500/10' : ''}`}>
@@ -564,9 +567,19 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               </h2>
               {state.winner && (
                 <p className="text-2xl text-orange-400 font-semibold">
-                  {winnerPlayers.length > 1 ? 'Ganadores:' : 'Ganador:'}
-                  <br />
-                  {winnerNames}
+                  {winnerPlayers.length >= 3 ? (
+                    <>
+                      No hay ganadores
+                      <br />
+                      <span className="text-lg">¡Empieza otro juego!</span>
+                    </>
+                  ) : (
+                    <>
+                      {winnerPlayers.length > 1 ? 'Ganadores:' : 'Ganador:'}
+                      <br />
+                      {winnerNames}
+                    </>
+                  )}
                 </p>
               )}
             </div>

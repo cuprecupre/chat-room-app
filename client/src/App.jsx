@@ -224,7 +224,7 @@ export default function App() {
           <div className="flex flex-col items-center gap-3">
             <Spinner size="md" />
             <div>
-              <p>Conectando al servidor...</p>
+              <p>Conectando al servidor</p>
               <p className="text-sm text-gray-400 mt-1">Estableciendo conexión...</p>
             </div>
           </div>
