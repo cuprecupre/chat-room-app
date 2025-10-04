@@ -12,13 +12,18 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   const isGameOver = gameState?.phase === 'game_over';
   const showScores = isRoundResult || isGameOver;
   
-  const canVote = isPlaying && gameState?.canVote && !gameState?.hasVoted;
+  const canVote = isPlaying && gameState?.canVote;
+  const hasVoted = gameState?.hasVoted;
   const votedPlayers = gameState?.votedPlayers || [];
   const eliminatedPlayers = gameState?.eliminatedInRound || [];
   const activePlayers = gameState?.activePlayers || [];
   const myVote = gameState?.myVote || null; // A quién voté yo
   const playerScores = gameState?.playerScores || {};
   const lastRoundScores = gameState?.lastRoundScores || {};
+  
+  // Permitir cambiar voto solo si no todos han votado aún
+  const allVoted = votedPlayers.length === activePlayers.length;
+  const canChangeVote = hasVoted && !allVoted;
   
   // Detectar ganadores en caso de empate
   const isTie = gameState?.winner === 'Empate';
@@ -141,22 +146,39 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                   )}
                 </div>
               ) : (showVoteButton || iVotedForThisPlayer) && (
-                <Button
-                  onClick={() => onVote(p.uid)}
-                  variant="outline"
-                  size="sm"
-                  disabled={iVotedForThisPlayer}
-                  className={`!w-auto gap-2 px-4 ${
-                    iVotedForThisPlayer 
-                      ? '!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed' 
-                      : ''
-                  }`}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
-                  </svg>
-                  <span>{iVotedForThisPlayer ? 'Votado' : 'Votar'}</span>
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => onVote(p.uid)}
+                    variant="outline"
+                    size="sm"
+                    disabled={iVotedForThisPlayer && !canChangeVote}
+                    className={`!w-auto gap-2 px-4 ${
+                      iVotedForThisPlayer 
+                        ? canChangeVote
+                          ? '!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20' 
+                          : '!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed'
+                        : ''
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
+                    </svg>
+                    <span>{iVotedForThisPlayer ? 'Votado' : 'Votar'}</span>
+                  </Button>
+                  {iVotedForThisPlayer && canChangeVote && (
+                    <Button
+                      onClick={() => onVote(null)}
+                      variant="ghost"
+                      size="sm"
+                      className="!w-auto !text-neutral-400 hover:!text-neutral-200"
+                      title="Cambiar voto"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </Button>
+                  )}
+                </div>
               )}
             </li>
           );

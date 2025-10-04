@@ -144,6 +144,15 @@ class Game {
       throw new Error('No estás participando en esta ronda.');
     }
     
+    // Si targetId es null, el jugador está desmarcando su voto
+    if (targetId === null) {
+      if (this.votes[voterId]) {
+        delete this.votes[voterId];
+        console.log(`[Game ${this.gameId}] ${voterId} desmarcó su voto`);
+      }
+      return; // No verificar si todos votaron cuando se desmarca
+    }
+    
     if (voterId === targetId) {
       throw new Error('No puedes votarte a ti mismo.');
     }
@@ -156,9 +165,10 @@ class Game {
       throw new Error('Ese jugador no está en esta ronda.');
     }
 
-    // Registrar voto
+    // Registrar o cambiar voto
+    const isChangingVote = this.votes[voterId] !== undefined;
     this.votes[voterId] = targetId;
-    console.log(`[Game ${this.gameId}] ${voterId} votó a ${targetId}`);
+    console.log(`[Game ${this.gameId}] ${voterId} ${isChangingVote ? 'cambió su voto a' : 'votó a'} ${targetId}`);
 
     // Verificar si todos han votado
     this.checkIfAllVoted();
