@@ -389,15 +389,22 @@ export default function App() {
               />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-neutral-50 mb-3">No puedes unirte</h2>
+              <h2 className="text-2xl font-bold text-neutral-50 mb-3">Unirse a sala</h2>
               <p className="text-sm text-gray-400">
-                No puedes acceder a la sala <span className="font-mono font-semibold text-neutral-300">{urlGameId}</span> porque la partida está en marcha.
+                ¿Quieres unirte a la sala <span className="font-mono font-semibold text-neutral-300">{urlGameId}</span>?
               </p>
             </div>
-            <div className="pt-2">
+            <div className="space-y-3">
+              <Button
+                onClick={() => emit('join-game', urlGameId)}
+                variant="primary"
+                size="md"
+              >
+                Unirme ahora
+              </Button>
               <Button
                 onClick={() => { url.searchParams.delete('gameId'); window.history.replaceState({}, '', url.toString()); window.dispatchEvent(new Event('popstate')); }}
-                variant="primary"
+                variant="outline"
                 size="md"
               >
                 Volver al lobby
