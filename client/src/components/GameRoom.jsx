@@ -81,9 +81,11 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
           const iVotedForThisPlayer = isMyVote(p.uid);
           const score = playerScores[p.uid] || 0;
           const scoreGained = lastRoundScores[p.uid] || 0;
+          const isWinner = isGameOver && (index === 0 || (isTie && winners.some(w => w.uid === p.uid)));
+          const isCurrentUser = p.uid === currentUserId;
           
           return (
-            <li key={p.uid} className={`flex items-center justify-between bg-white/5 p-4 rounded-md ${isEliminated ? 'opacity-50' : ''} ${isGameOver && index === 0 ? 'bg-orange-500/10 border border-orange-500/30' : ''}`}>
+            <li key={p.uid} className={`flex items-center justify-between bg-white/5 p-4 rounded-md ${isEliminated ? 'opacity-50' : ''} ${isWinner ? 'bg-orange-500/10' : ''} ${isWinner && isCurrentUser ? 'border border-orange-500/30' : ''}`}>
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <img 
@@ -116,7 +118,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                 </div>
                 <div className="flex items-center gap-2">
                   <div>
-                    <span className={`font-medium ${isGameOver && (index === 0 || (isTie && winners.some(w => w.uid === p.uid))) ? 'text-orange-400' : ''}`}>
+                    <span className={`font-medium ${isWinner ? 'text-orange-400' : ''}`}>
                       {p.name.split(' ')[0]}{p.uid === currentUserId ? ' (Tú)' : ''}
                     </span>
                     {isEliminated && <span className="text-xs text-neutral-500 ml-2">(Eliminado)</span>}
@@ -127,7 +129,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
               {/* Mostrar puntos o botón de votar según fase */}
               {showScores ? (
                 <div className="text-right">
-                  <span className={`font-medium ${isGameOver && index === 0 ? 'text-orange-400' : 'text-neutral-300'}`}>
+                  <span className={`font-medium ${isWinner ? 'text-orange-400' : 'text-neutral-300'}`}>
                     {score} pts
                   </span>
                   {isRoundResult && scoreGained > 0 && (
