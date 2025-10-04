@@ -601,7 +601,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             </div>
             
             {/* Caja de ganadores */}
-            <div className="bg-white/10 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400">
+            <div className="bg-white/5 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400">
               <div className="space-y-6 text-center">
                 {winnerPlayers.length >= 3 ? (
                   // Sin ganadores (empate triple o mayor)
