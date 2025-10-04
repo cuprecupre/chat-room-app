@@ -92,7 +92,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
           const isWinner = isGameOver && !hasNoWinners && (index === 0 || (isTie && winners.some(w => w.uid === p.uid)));
           
           return (
-            <li key={p.uid} className={`flex items-center justify-between bg-white/5 p-4 rounded-md ${isEliminated ? 'opacity-50' : ''} ${isWinner ? 'bg-orange-500/10' : ''}`}>
+            <li key={p.uid} className={`flex items-center justify-between bg-white/5 p-4 rounded-md ${isWinner ? 'bg-orange-500/10' : ''}`}>
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <img 
@@ -128,56 +128,60 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                     <span className={`font-medium ${isWinner ? 'text-orange-400' : ''}`}>
                       {p.name}{p.uid === currentUserId ? ' (Tú)' : ''}
                     </span>
-                    {isEliminated && <span className="text-xs text-neutral-500 ml-2">(Eliminado)</span>}
                   </div>
                 </div>
               </div>
               
               {/* Mostrar puntos o botón de votar según fase */}
-              {showScores ? (
-                <div className="text-right">
-                  <span className={`font-medium ${isWinner ? 'text-orange-400' : 'text-neutral-300'}`}>
-                    {score} pts
-                  </span>
-                  {isRoundResult && scoreGained > 0 && (
-                    <div className="text-xs text-green-400 font-medium mt-0.5">
-                      +{scoreGained}
-                    </div>
-                  )}
-                </div>
-              ) : isPlaying && canVote && (
-                // Mostrar botón solo si:
-                // 1. No he votado aún (mostrar todos los botones)
-                // 2. Ya voté por este jugador (mostrar solo este botón)
-                (myVote === null || iVotedForThisPlayer) && showVoteButton && (
-                  <Button
-                    onClick={() => {
-                      // Si ya voté por este jugador y puedo cambiar voto, quitar el voto
-                      if (iVotedForThisPlayer && canChangeVote) {
-                        onVote(null);
-                      } else {
-                        // Votar por este jugador
-                        onVote(p.uid);
-                      }
-                    }}
-                    variant="outline"
-                    size="sm"
-                    disabled={iVotedForThisPlayer && !canChangeVote}
-                    className={`!w-auto gap-2 px-4 ${
-                      iVotedForThisPlayer 
-                        ? canChangeVote
-                          ? '!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20' 
-                          : '!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed'
-                        : ''
-                    }`}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
-                    </svg>
-                    <span>{iVotedForThisPlayer ? 'Votado' : 'Votar'}</span>
-                  </Button>
-                )
-              )}
+              <div className="flex items-center gap-3">
+                {isEliminated && (
+                  <span className="text-xs text-red-400 font-medium">Eliminado</span>
+                )}
+                {showScores ? (
+                  <div className="text-right">
+                    <span className={`font-medium ${isWinner ? 'text-orange-400' : 'text-neutral-300'}`}>
+                      {score} pts
+                    </span>
+                    {isRoundResult && scoreGained > 0 && (
+                      <div className="text-xs text-green-400 font-medium mt-0.5">
+                        +{scoreGained}
+                      </div>
+                    )}
+                  </div>
+                ) : isPlaying && canVote && (
+                  // Mostrar botón solo si:
+                  // 1. No he votado aún (mostrar todos los botones)
+                  // 2. Ya voté por este jugador (mostrar solo este botón)
+                  (myVote === null || iVotedForThisPlayer) && showVoteButton && (
+                    <Button
+                      onClick={() => {
+                        // Si ya voté por este jugador y puedo cambiar voto, quitar el voto
+                        if (iVotedForThisPlayer && canChangeVote) {
+                          onVote(null);
+                        } else {
+                          // Votar por este jugador
+                          onVote(p.uid);
+                        }
+                      }}
+                      variant="outline"
+                      size="sm"
+                      disabled={iVotedForThisPlayer && !canChangeVote}
+                      className={`!w-auto gap-2 px-4 ${
+                        iVotedForThisPlayer 
+                          ? canChangeVote
+                            ? '!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20' 
+                            : '!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed'
+                          : ''
+                      }`}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
+                      </svg>
+                      <span>{iVotedForThisPlayer ? 'Votado' : 'Votar'}</span>
+                    </Button>
+                  )
+                )}
+              </div>
             </li>
           );
         })}
