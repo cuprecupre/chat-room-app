@@ -540,7 +540,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                     {/* Avatar del impostor */}
                     <div className="flex justify-center my-4">
                       {state.players && (() => {
-                        const impostor = state.players.find(p => p.name === state.impostorName);
+                        const impostor = state.players.find(p => p.uid === state.impostorId);
                         return impostor ? (
                           <img 
                             src={impostor.photoURL} 
