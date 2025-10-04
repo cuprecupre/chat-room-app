@@ -144,8 +144,8 @@ class Game {
       throw new Error('No estás participando en esta ronda.');
     }
     
-    // Si targetId es null, el jugador está desmarcando su voto
-    if (targetId === null) {
+    // Si targetId es null o undefined, el jugador está desmarcando su voto
+    if (targetId === null || targetId === undefined) {
       if (this.votes[voterId]) {
         delete this.votes[voterId];
         console.log(`[Game ${this.gameId}] ${voterId} desmarcó su voto`);
