@@ -20,6 +20,13 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   const playerScores = gameState?.playerScores || {};
   const lastRoundScores = gameState?.lastRoundScores || {};
   
+  // Detectar ganadores en caso de empate
+  const isTie = gameState?.winner === 'Empate';
+  const winners = isTie ? (() => {
+    const maxScore = Math.max(...Object.values(playerScores));
+    return players.filter(player => (playerScores[player.uid] || 0) === maxScore);
+  })() : [];
+  
   // Ordenar jugadores: usuario actual siempre primero (excepto en scores)
   const sortedPlayers = [...players]
     .sort((a, b) => {
@@ -109,7 +116,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                 </div>
                 <div className="flex items-center gap-2">
                   <div>
-                    <span className={`font-medium ${isGameOver && index === 0 ? 'text-orange-400' : ''}`}>
+                    <span className={`font-medium ${isGameOver && (index === 0 || (isTie && winners.some(w => w.uid === p.uid))) ? 'text-orange-400' : ''}`}>
                       {p.name.split(' ')[0]}{p.uid === currentUserId ? ' (Tú)' : ''}
                     </span>
                     {isEliminated && <span className="text-xs text-neutral-500 ml-2">(Eliminado)</span>}
@@ -544,7 +551,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               </h2>
               {state.winner && (
                 <p className="text-2xl text-orange-400 font-semibold">
-                  Ganador: {state.winner}
+                  {state.winner === 'Empate' ? 'Ganadores:' : `Ganador: ${state.winner}`}
                 </p>
               )}
             </div>
