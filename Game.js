@@ -122,6 +122,7 @@ class Game {
       this.roundCount = 0;
       this.initialPlayerCount = this.players.length;
       this.maxRounds = this.initialPlayerCount * 2;
+      this.allEliminatedPlayers = []; // Resetear jugadores eliminados para nuevo juego
       this.phase = 'lobby'; // Cambiar fase para evitar checks de game_over
       console.log(`[Game ${this.gameId}] ✅ Nueva partida iniciada desde game_over. Jugadores: ${this.initialPlayerCount}, Max rondas: ${this.maxRounds}`);
     } else {
@@ -420,6 +421,7 @@ class Game {
       baseState.impostorId = this.impostorId;
       baseState.secretWord = this.secretWord;
       baseState.lastRoundScores = this.lastRoundScores;
+      baseState.allEliminatedPlayers = this.allEliminatedPlayers;
       
       if (this.phase === 'game_over') {
         const winnerId = this.checkGameOver();
