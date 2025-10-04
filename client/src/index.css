@@ -63,13 +63,11 @@ h1, h2, h3, h4, h5, h6 {
   will-change: transform;
 }
 
-/* Card floating animation - More noticeable than home image */
+/* Card floating animation - Rotation around center only */
 @keyframes cardFloat {
-  0% { transform: rotateY(-8deg) rotateX(2deg) translateY(0) scale(1.01); }
-  25% { transform: rotateY(0deg) rotateX(-2deg) translateY(-6px) scale(1.015); }
-  50% { transform: rotateY(8deg) rotateX(2deg) translateY(0) scale(1.01); }
-  75% { transform: rotateY(0deg) rotateX(-2deg) translateY(-6px) scale(1.015); }
-  100% { transform: rotateY(-8deg) rotateX(2deg) translateY(0) scale(1.01); }
+  0% { transform: rotateY(-8deg) rotateX(-2deg); }
+  50% { transform: rotateY(8deg) rotateX(2deg); }
+  100% { transform: rotateY(-8deg) rotateX(-2deg); }
 }
 
 .animate-card-float {
