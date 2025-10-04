@@ -492,58 +492,70 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       {state.phase === 'round_result' && state.impostorName && state.secretWord && (
         <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm animate-fadeIn">
           <div className="absolute inset-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <div className="min-h-full w-full max-w-sm mx-auto px-4 py-6 space-y-6">
-            <div className="text-center space-y-4 animate-scaleIn animate-delay-200">
-              <h2 className="text-4xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
-                Resultado de la partida
-              </h2>
-              {state.roundCount && state.maxRounds && (
-                <p className="text-sm text-neutral-400">
-                  Partida {state.roundCount}/{state.maxRounds} • Objetivo: {state.targetScore} puntos
-                </p>
-              )}
-            </div>
-            
-            {/* Revelar impostor y palabra */}
-            <div className="bg-white/10 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400">
-              <div className="space-y-6 text-center">
-                <div>
-                  <span className="text-xs tracking-wider uppercase text-neutral-400">El impostor era</span>
-                  {/* Avatar del impostor */}
-                  <div className="flex justify-center my-4">
-                    {state.players && (() => {
-                      const impostor = state.players.find(p => p.name === state.impostorName);
-                      return impostor ? (
-                        <img 
-                          src={impostor.photoURL} 
-                          alt={impostor.name}
-                          className="w-20 h-20 rounded-full object-cover ring-4 ring-orange-400/50 shadow-lg"
-                        />
-                      ) : null;
-                    })()}
+            <div className="min-h-full w-full max-w-sm mx-auto px-4 pt-6 pb-24 space-y-6">
+              <div className="text-center space-y-4 animate-scaleIn animate-delay-200">
+                <h2 className="text-4xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
+                  Resultado de la partida
+                </h2>
+                {state.roundCount && state.maxRounds && (
+                  <p className="text-sm text-neutral-400">
+                    Partida {state.roundCount}/{state.maxRounds} • Objetivo: {state.targetScore} puntos
+                  </p>
+                )}
+              </div>
+              
+              {/* Revelar impostor y palabra */}
+              <div className="bg-white/10 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400">
+                <div className="space-y-6 text-center">
+                  <div>
+                    <span className="text-xs tracking-wider uppercase text-neutral-400">El impostor era</span>
+                    {/* Avatar del impostor */}
+                    <div className="flex justify-center my-4">
+                      {state.players && (() => {
+                        const impostor = state.players.find(p => p.name === state.impostorName);
+                        return impostor ? (
+                          <img 
+                            src={impostor.photoURL} 
+                            alt={impostor.name}
+                            className="w-20 h-20 rounded-full object-cover ring-4 ring-orange-400/50 shadow-lg"
+                          />
+                        ) : null;
+                      })()}
+                    </div>
+                    <p className="font-semibold text-2xl text-orange-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
+                      {state.impostorName}
+                    </p>
                   </div>
-                  <p className="font-semibold text-2xl text-orange-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
-                    {state.impostorName}
-                  </p>
-                </div>
-                <div className="pt-4 border-t border-white/10">
-                  <span className="text-xs tracking-wider uppercase text-neutral-400">Palabra secreta</span>
-                  <p className="font-semibold text-2xl text-white mt-2" style={{fontFamily: 'Trocchi, serif'}}>
-                    {capitalize(state.secretWord)}
-                  </p>
+                  <div className="pt-4 border-t border-white/10">
+                    <span className="text-xs tracking-wider uppercase text-neutral-400">Palabra secreta</span>
+                    <p className="font-semibold text-2xl text-white mt-2" style={{fontFamily: 'Trocchi, serif'}}>
+                      {capitalize(state.secretWord)}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            {/* Puntuación */}
-            <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-600">
-              <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
-            </div>
-            
-            {isHost ? (
-              <div className="animate-fadeIn animate-delay-800">
-                <Button onClick={onPlayAgain} variant="primary" size="md">Siguiente partida</Button>
+              
+              {/* Puntuación */}
+              <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-600">
+                <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
               </div>
+              
+              {/* Espacio adicional para que el contenido no quede tapado por el botón fijo */}
+              <div className="h-20"></div>
+            </div>
+          </div>
+          
+          {/* Botón fijo en la parte inferior con gradiente */}
+          <div className="fixed bottom-0 left-0 right-0 z-50">
+            {/* Gradiente de fondo */}
+            <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent h-20"></div>
+            
+            {/* Botón */}
+            <div className="relative px-4 pb-6 pt-4">
+              {isHost ? (
+                <Button onClick={onPlayAgain} variant="primary" size="md" className="w-full animate-fadeIn animate-delay-800">
+                  Siguiente partida
+                </Button>
               ) : (
                 <div className="text-center text-neutral-400 text-sm animate-text-pulse animate-fadeIn animate-delay-800">
                   Esperando a que <span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'el anfitrión'}</span> (anfitrión) <br />inicie la siguiente partida
