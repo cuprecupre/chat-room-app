@@ -34,7 +34,7 @@ export function Lobby({ onCreateGame, onJoinGame }) {
             maxLength="5"
             className="w-full h-12 px-4 rounded-md bg-white/10 border border-transparent focus:border-neutral-500 focus:ring-neutral-500 focus:outline-none text-center uppercase tracking-widest text-sm"
           />
-          <Button onClick={handleJoin} variant="outline" size="md">Unirse a juego</Button>
+          <Button onClick={handleJoin} variant="outline" size="md">Unirse a un juego</Button>
           {error && <p className="text-red-400 text-center pt-2">{error}</p>}
         </div>
       </div>
