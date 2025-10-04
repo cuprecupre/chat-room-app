@@ -236,9 +236,9 @@ class Game {
       // Si ya estamos en la vuelta 3, el impostor gana
       if (this.currentTurn >= this.maxTurns) {
         console.log(`[Game ${this.gameId}] Vuelta 3 completada sin eliminación. ¡El impostor gana!`);
-        // Dar puntos al impostor por sobrevivir la última vuelta
-        this.playerScores[this.impostorId] = (this.playerScores[this.impostorId] || 0) + 2;
-        this.lastRoundScores[this.impostorId] = (this.lastRoundScores[this.impostorId] || 0) + 2;
+        // Dar puntos al impostor por sobrevivir la última vuelta (vuelta 3 = 4 puntos)
+        this.playerScores[this.impostorId] = (this.playerScores[this.impostorId] || 0) + 4;
+        this.lastRoundScores[this.impostorId] = (this.lastRoundScores[this.impostorId] || 0) + 4;
         this.endRound(false); // Impostor gana
       } else {
         console.log(`[Game ${this.gameId}] Siguiente vuelta.`);
@@ -279,10 +279,15 @@ class Game {
     this.votes = {}; // Resetear votos para la nueva vuelta
     
     // Dar puntos al impostor por sobrevivir la vuelta
+    // Vuelta 1 completada: +2 puntos
+    // Vuelta 2 completada: +3 puntos
+    // Vuelta 3 completada: +4 puntos
     if (this.currentTurn > 1) { // No en la primera transición
-      this.playerScores[this.impostorId] = (this.playerScores[this.impostorId] || 0) + 2;
-      this.lastRoundScores[this.impostorId] = (this.lastRoundScores[this.impostorId] || 0) + 2;
-      console.log(`[Game ${this.gameId}] Impostor sobrevivió vuelta ${this.currentTurn - 1}: +2 puntos`);
+      const previousTurn = this.currentTurn - 1;
+      const points = previousTurn + 1; // Vuelta 1 = 2 pts, Vuelta 2 = 3 pts, Vuelta 3 = 4 pts
+      this.playerScores[this.impostorId] = (this.playerScores[this.impostorId] || 0) + points;
+      this.lastRoundScores[this.impostorId] = (this.lastRoundScores[this.impostorId] || 0) + points;
+      console.log(`[Game ${this.gameId}] Impostor sobrevivió vuelta ${previousTurn}: +${points} puntos`);
     }
     
     console.log(`[Game ${this.gameId}] ✅ Vuelta ${this.currentTurn} iniciada. lastEliminatedInTurn:`, this.lastEliminatedInTurn);
@@ -327,10 +332,8 @@ class Game {
       });
     } else {
       // Impostor ganó
-      // +2 puntos por cada vuelta sobrevivida (ya dados durante el juego)
-      // +4 puntos extra por ganar la ronda
-      this.playerScores[this.impostorId] = (this.playerScores[this.impostorId] || 0) + 4;
-      this.lastRoundScores[this.impostorId] = (this.lastRoundScores[this.impostorId] || 0) + 4;
+      // Los puntos por sobrevivir cada vuelta ya fueron dados durante el juego (2, 3, 4 puntos)
+      // No hay puntos adicionales
       
       // Dar puntos a amigos que votaron correctamente (aunque no ganaron)
       this.turnHistory.forEach(turn => {

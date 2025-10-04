@@ -196,8 +196,9 @@ export function InstructionsModal({ isOpen, onClose }) {
 
           <h4 className="text-lg font-semibold text-neutral-200 mb-2 mt-4"><span className="text-orange-400">Impostor</span></h4>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li><strong>+2</strong> puntos cada vez que <strong>se inicia una nueva ronda</strong> sin haber sido expulsado en la anterior.</li>
-            <li><strong>+4</strong> puntos extra si <strong>gana la partida</strong> (no lo descubren tras 3 rondas).</li>
+            <li><strong>+2</strong> puntos por terminar la <strong>primera ronda</strong> sin ser descubierto.</li>
+            <li><strong>+3</strong> puntos por terminar la <strong>segunda ronda</strong> sin ser descubierto.</li>
+            <li><strong>+4</strong> puntos por terminar la <strong>tercera ronda</strong> sin ser descubierto.</li>
           </ul>
 
           <div className="mt-3 p-3 bg-white/5 border border-white/10 rounded-lg">
