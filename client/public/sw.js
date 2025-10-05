@@ -1,7 +1,7 @@
 // Service Worker para cacheo de assets
 const CACHE_NAME = 'impostor-v1';
+// No caches index.html to avoid serving stale app shell during auth redirects
 const ASSETS_TO_CACHE = [
-  '/',
   '/src/assets/card.png',
   '/src/assets/card-back.png',
   '/src/assets/dual-impostor.png',
@@ -43,8 +43,13 @@ self.addEventListener('activate', (event) => {
 
 // Interceptar requests
 self.addEventListener('fetch', (event) => {
+  // Nunca interceptar navegación de documentos (para no romper auth redirects)
+  if (event.request.mode === 'navigate') {
+    return; // Dejar que el navegador maneje la navegación
+  }
+
   // Solo cachear requests de assets estáticos
-  if (event.request.destination === 'image' || 
+  if (event.request.destination === 'image' ||
       event.request.url.includes('/assets/') ||
       event.request.url.includes('/src/assets/')) {
     
