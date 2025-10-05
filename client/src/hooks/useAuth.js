@@ -9,25 +9,10 @@ export function useAuth() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log('🔧 Inicializando listener de autenticación...');
-    console.log('🔍 Usuario actual al inicializar:', auth.currentUser);
-    console.log('🌐 User Agent:', navigator.userAgent);
-    console.log('🔗 URL actual:', window.location.href);
-    console.log('🔗 URL params:', new URLSearchParams(window.location.search).toString());
-    
     let isMounted = true;
     let authResolved = false;
     
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
-      console.log('🔄 Estado de autenticación cambió:', u ? `Usuario: ${u.displayName} (${u.email})` : 'Sin usuario');
-      console.log('🔄 Detalles del usuario:', u ? {
-        uid: u.uid,
-        email: u.email,
-        displayName: u.displayName,
-        photoURL: u.photoURL,
-        emailVerified: u.emailVerified,
-        providerId: u.providerId,
-      } : null);
       authResolved = true;
       if (isMounted) {
         setUser(u);
@@ -37,45 +22,22 @@ export function useAuth() {
     
     // Manejar posible flujo de redirect en navegadores móviles
     const handleRedirect = async () => {
-      console.log('🔄 Iniciando handleRedirect...');
       try {
-        console.log('🔄 Esperando getRedirectResult...');
         const result = await getRedirectResult(auth);
-        console.log('🔄 getRedirectResult completado:', result ? 'Con resultado' : 'Sin resultado');
         if (result) {
-          console.log('✅ Redirect result exitoso:', result.user?.displayName);
-          console.log('✅ Detalles completos del redirect:', {
-            user: {
-              uid: result.user?.uid,
-              email: result.user?.email,
-              displayName: result.user?.displayName,
-              photoURL: result.user?.photoURL,
-              emailVerified: result.user?.emailVerified,
-            },
-            operationType: result.operationType,
-            providerId: result.providerId,
-          });
           authResolved = true;
           if (isMounted) {
             setUser(result.user);
             setLoading(false);
           }
-        } else {
-          console.log('ℹ️ No hay resultado de redirect (normal si no vino de redirect)');
         }
       } catch (err) {
-        console.error('❌ Error en redirect result:', {
-          code: err?.code,
-          message: err?.message,
-          stack: err?.stack,
-          customData: err?.customData,
-        });
+        console.error('Error en redirect:', err?.message);
         if (isMounted) {
           setError(err?.message || 'Error al procesar autenticación');
           setLoading(false);
         }
       }
-      // Siempre limpiar el flag de redirect al terminar
       try { sessionStorage.removeItem('auth:redirect'); } catch (_) {}
     };
     
@@ -84,7 +46,6 @@ export function useAuth() {
     // Timeout de seguridad solo si la autenticación no se resuelve
     const timeout = setTimeout(() => {
       if (!authResolved && isMounted) {
-        console.warn('⚠️ Timeout de inicialización de Firebase Auth');
         setLoading(false);
       }
     }, 5000);
@@ -99,8 +60,6 @@ export function useAuth() {
   const login = useCallback(async () => {
     setLoading(true);
     setError(null);
-    console.log('🔄 Iniciando proceso de login...');
-    console.log('🔄 Estado inicial - auth.currentUser:', auth.currentUser);
     
     try {
       // Detectar si es dispositivo móvil e iOS
@@ -111,98 +70,49 @@ export function useAuth() {
         (navigator.userAgent.match(/OS (\d+)_(\d+)/) || [])[2]
       ) : 0;
       
-      console.log('🔍 Detección de dispositivo:', {
-        isMobile,
-        isIOS,
-        iOSVersion,
-        userAgent: navigator.userAgent,
-        platform: navigator.platform,
-      });
-      
       // En iOS < 18, NO configurar persistencia antes del redirect
       // Safari iOS 17 tiene problemas con setPersistence antes de signInWithRedirect
       if (!(isIOS && iOSVersion < 18)) {
-        console.log('📝 Configurando persistencia...');
         await ensurePersistence();
-        console.log('✅ Persistencia configurada correctamente');
-      } else {
-        console.log('📝 iOS < 18: Saltando configuración de persistencia para compatibilidad con redirect');
       }
-      
-      console.log('📱 Provider config:', {
-        scopes: provider.getScopes(),
-        customParameters: provider.getCustomParameters(),
-      });
       
       // iOS 17 tiene problemas con popup, usar redirect directamente
       // iOS 18+ funciona bien con popup
       // En otros móviles, usar redirect
       // En desktop, usar popup
       if (isIOS && iOSVersion < 18) {
-        console.log('📱 iOS < 18 detectado, usando signInWithRedirect directamente...');
-        console.log('📱 (iOS 17 tiene problemas conocidos con popups de Firebase)');
         try {
-          // Marcar que vamos a redirect para mostrar loader al volver
           try { sessionStorage.setItem('auth:redirect', '1'); } catch (_) {}
           await signInWithRedirect(auth, provider);
-          console.log('📱 signInWithRedirect llamado - redirigiendo...');
         } catch (redirectError) {
-          console.error('❌ Error en signInWithRedirect:', {
-            code: redirectError?.code,
-            message: redirectError?.message,
-            stack: redirectError?.stack,
-          });
+          console.error('Error en signInWithRedirect:', redirectError?.message);
           throw redirectError;
         }
       } else if (isIOS && iOSVersion >= 18) {
-        console.log('📱 iOS 18+ detectado, usando signInWithPopup...');
         try {
           const loginPromise = signInWithPopup(auth, provider);
           const timeoutPromise = new Promise((_, reject) => {
             setTimeout(() => reject(new Error('POPUP_TIMEOUT')), 30000);
           });
-          
-          console.log('📱 Esperando resultado del popup en iOS...');
-          const result = await Promise.race([loginPromise, timeoutPromise]);
-          console.log('✅ Login exitoso con popup en iOS:', {
-            displayName: result.user?.displayName,
-            email: result.user?.email,
-            uid: result.user?.uid,
-          });
+          await Promise.race([loginPromise, timeoutPromise]);
         } catch (popupError) {
-          console.warn('⚠️ Popup falló en iOS 18+, usando redirect como fallback:', popupError.code);
           try { sessionStorage.setItem('auth:redirect', '1'); } catch (_) {}
           await signInWithRedirect(auth, provider);
-          console.log('📱 signInWithRedirect llamado - redirigiendo...');
         }
       } else if (isMobile) {
-        console.log('📱 Dispositivo móvil (no iOS) detectado, usando signInWithRedirect...');
         try { sessionStorage.setItem('auth:redirect', '1'); } catch (_) {}
         await signInWithRedirect(auth, provider);
-        console.log('📱 signInWithRedirect llamado - redirigiendo...');
       } else {
-        console.log('🖥️ Dispositivo desktop, usando signInWithPopup...');
         const loginPromise = signInWithPopup(auth, provider);
         const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('TIMEOUT')), 30000); // 30 segundos
+          setTimeout(() => reject(new Error('TIMEOUT')), 30000);
         });
-        
-        console.log('🖥️ Esperando resultado del popup...');
-        const result = await Promise.race([loginPromise, timeoutPromise]);
-        console.log('✅ Login exitoso con popup:', {
-          displayName: result.user?.displayName,
-          email: result.user?.email,
-          uid: result.user?.uid,
-        });
+        await Promise.race([loginPromise, timeoutPromise]);
       }
       
       // setLoading will be set to false by onAuthStateChanged
     } catch (err) {
-      console.error('❌ Error en login:', err);
-      console.error('❌ Código de error:', err?.code);
-      console.error('❌ Mensaje:', err?.message);
-      console.error('❌ Stack:', err?.stack);
-      console.error('❌ Objeto completo:', JSON.stringify(err, null, 2));
+      console.error('Error en login:', err?.code || err?.message);
       
       let errorMessage = 'No se pudo iniciar sesión.';
       
@@ -233,13 +143,11 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      console.log('📧 Iniciando sesión con email...');
       const { signInWithEmailAndPassword: signInEmail } = await import('../lib/firebase');
-      const result = await signInEmail(auth, email, password);
-      console.log('✅ Login con email exitoso:', result.user.email);
+      await signInEmail(auth, email, password);
       setLoading(false);
     } catch (err) {
-      console.error('❌ Error login con email:', err);
+      console.error('Error login con email:', err?.code);
       let errorMessage = 'Error al iniciar sesión.';
       if (err.code === 'auth/user-not-found') {
         errorMessage = 'No existe una cuenta con ese email.';

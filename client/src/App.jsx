@@ -28,23 +28,20 @@ export default function App() {
   // Precargar assets de la app
   const { isLoading: assetsLoading } = useAppAssetsPreloader();
   const menuRef = useRef(null);
+  const lastLoggedUid = useRef(null); // Para evitar logs duplicados
 
   useEffect(() => {
-    console.log('📋 App - useEffect [user] disparado:', user ? `Usuario: ${user.displayName} (${user.email})` : 'Sin usuario');
     if (user) {
-      console.log('🔑 App - Obteniendo token para usuario:', user.uid);
       user.getIdToken().then((token) => {
-        console.log('✅ App - Token obtenido exitosamente, length:', token?.length);
         setToken(token);
       }).catch((err) => {
-        console.error('❌ App - Error obteniendo token:', err);
+        console.error('Error obteniendo token:', err);
         setToken(null);
       });
     } else {
-      console.log('🚫 App - No hay usuario, limpiando token');
       setToken(null);
     }
-  }, [user]);
+  }, [user?.uid]); // Solo re-ejecutar si cambia el UID, no el objeto completo
 
   const { connected, gameState, emit } = useSocket(user);
   const [isStuck, setIsStuck] = useState(false);
@@ -379,11 +376,15 @@ export default function App() {
       return <LoginScreen onLogin={login} onLoginWithEmail={loginWithEmail} onRegisterWithEmail={registerWithEmail} error={error} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} />;
     }
     
-    console.log('✅ App - Usuario autenticado:', {
-      displayName: user.displayName,
-      email: user.email,
-      uid: user.uid,
-    });
+    // Log solo cuando cambia el usuario (no en cada render)
+    if (lastLoggedUid.current !== user.uid) {
+      console.log('✅ App - Usuario autenticado:', {
+        displayName: user.displayName,
+        email: user.email,
+        uid: user.uid,
+      });
+      lastLoggedUid.current = user.uid;
+    }
 
     // Case 1: URL has a gameId but session is in another game → offer switch
     if (urlGameId && gameState?.gameId && urlGameId !== gameState.gameId) {
