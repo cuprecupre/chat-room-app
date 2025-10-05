@@ -97,22 +97,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
             <li key={p.uid} className={`flex items-center justify-between bg-white/5 p-4 rounded-md ${isWinner ? 'bg-orange-500/10' : ''}`}>
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <img 
-                    src={p.photoURL} 
-                    alt={p.name} 
-                    className="w-8 h-8 rounded-full object-cover" 
-                    onError={handleImageError}
-                    onLoad={(e) => {
-                      console.log('✅ Imagen cargada:', e.target.src);
-                      // Ocultar placeholder cuando la imagen se carga
-                      e.target.nextSibling.style.display = 'none';
-                    }}
-                  />
-                  <div 
-                    className="w-8 h-8 rounded-full bg-neutral-600 flex items-center justify-center text-white text-xs font-semibold"
-                  >
-                    {p.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-                  </div>
+                  <Avatar photoURL={p.photoURL} displayName={p.name} size="sm" />
                   {/* Check verde solo si este usuario ya votó (todos lo ven) */}
                   {isPlaying && hasVoted && (
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-neutral-950 flex items-center justify-center">
