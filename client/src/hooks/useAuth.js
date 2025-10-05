@@ -171,6 +171,7 @@ export function useAuth() {
           });
         } catch (popupError) {
           console.warn('⚠️ Popup falló en iOS 18+, usando redirect como fallback:', popupError.code);
+          try { sessionStorage.setItem('auth:redirect', '1'); } catch (_) {}
           await signInWithRedirect(auth, provider);
           console.log('📱 signInWithRedirect llamado - redirigiendo...');
         }
@@ -228,9 +229,6 @@ export function useAuth() {
     }
   }, []);
 
-  const logout = useCallback(async () => {
-    try {
-
   const loginWithEmail = useCallback(async (email, password) => {
     setLoading(true);
     setError(null);
@@ -283,6 +281,9 @@ export function useAuth() {
       setLoading(false);
     }
   }, []);
+
+  const logout = useCallback(async () => {
+    try {
       await signOut(auth);
     } catch (err) {
       console.error('Logout Error:', err);
