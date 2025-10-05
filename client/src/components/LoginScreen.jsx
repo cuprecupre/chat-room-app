@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/Button';
 import { Spinner } from './ui/Spinner';
 import { EmailAuthModal } from './EmailAuthModal';
@@ -6,16 +6,38 @@ import heroImg from '../assets/impostor-home.png';
 
 export function LoginScreen({ onLogin, onLoginWithEmail, onRegisterWithEmail, error, isLoading, clearError, onOpenInstructions }) {
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const wasLoadingRef = useRef(false);
+  const hadModalOpenRef = useRef(false);
+
+  // Mantener el modal abierto si hay un error después de intentar login/registro
+  useEffect(() => {
+    // Si el modal estaba abierto, estábamos cargando, y ahora hay un error
+    // entonces el usuario intentó hacer login/registro y falló
+    // Mantener el modal abierto para mostrar el error
+    if (hadModalOpenRef.current && wasLoadingRef.current && !isLoading && error) {
+      console.log('⚠️ Error detectado después de carga, manteniendo modal abierto');
+      setShowEmailModal(true);
+    }
+    
+    wasLoadingRef.current = isLoading;
+  }, [isLoading, error]);
+
+  // Rastrear cuando el modal está abierto
+  useEffect(() => {
+    hadModalOpenRef.current = showEmailModal;
+  }, [showEmailModal]);
 
   const handleCloseModal = () => {
     console.log('🔴 Modal cerrado manualmente');
     setShowEmailModal(false);
+    hadModalOpenRef.current = false;
     if (clearError) clearError();
   };
 
   const handleOpenModal = () => {
     console.log('🟢 Modal abierto');
     setShowEmailModal(true);
+    hadModalOpenRef.current = true;
   };
 
   // Debug: mostrar estado del modal
