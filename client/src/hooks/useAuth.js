@@ -99,32 +99,36 @@ export function useAuth() {
     console.log('🔄 Estado inicial - auth.currentUser:', auth.currentUser);
     
     try {
-      console.log('📝 Configurando persistencia...');
-      await ensurePersistence();
-      console.log('✅ Persistencia configurada correctamente');
-      
-      // Detectar si es dispositivo móvil
+      // Detectar si es dispositivo móvil e iOS
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-      console.log('🔍 Detección de dispositivo:', {
-        isMobile,
-        isIOS,
-        userAgent: navigator.userAgent,
-        platform: navigator.platform,
-      });
-      
-      console.log('📱 Provider config:', {
-        scopes: provider.getScopes(),
-        customParameters: provider.getCustomParameters(),
-      });
-      
-      // Detectar versión específica de iOS
       const iOSVersion = isIOS ? parseFloat(
         (navigator.userAgent.match(/OS (\d+)_(\d+)/) || [])[1] + '.' + 
         (navigator.userAgent.match(/OS (\d+)_(\d+)/) || [])[2]
       ) : 0;
       
-      console.log('📱 Versión iOS detectada:', iOSVersion);
+      console.log('🔍 Detección de dispositivo:', {
+        isMobile,
+        isIOS,
+        iOSVersion,
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+      });
+      
+      // En iOS < 18, NO configurar persistencia antes del redirect
+      // Safari iOS 17 tiene problemas con setPersistence antes de signInWithRedirect
+      if (!(isIOS && iOSVersion < 18)) {
+        console.log('📝 Configurando persistencia...');
+        await ensurePersistence();
+        console.log('✅ Persistencia configurada correctamente');
+      } else {
+        console.log('📝 iOS < 18: Saltando configuración de persistencia para compatibilidad con redirect');
+      }
+      
+      console.log('📱 Provider config:', {
+        scopes: provider.getScopes(),
+        customParameters: provider.getCustomParameters(),
+      });
       
       // iOS 17 tiene problemas con popup, usar redirect directamente
       // iOS 18+ funciona bien con popup
