@@ -3,7 +3,9 @@ import { auth, provider, ensurePersistence, signInWithPopup, signInWithRedirect,
 
 export function useAuth() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Mostrar loading solo si venimos de un redirect de login
+  const initialLoading = typeof window !== 'undefined' && sessionStorage.getItem('auth:redirect') === '1';
+  const [loading, setLoading] = useState(Boolean(initialLoading));
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -73,6 +75,8 @@ export function useAuth() {
           setLoading(false);
         }
       }
+      // Siempre limpiar el flag de redirect al terminar
+      try { sessionStorage.removeItem('auth:redirect'); } catch (_) {}
     };
     
     handleRedirect();
@@ -138,6 +142,8 @@ export function useAuth() {
         console.log('📱 iOS < 18 detectado, usando signInWithRedirect directamente...');
         console.log('📱 (iOS 17 tiene problemas conocidos con popups de Firebase)');
         try {
+          // Marcar que vamos a redirect para mostrar loader al volver
+          try { sessionStorage.setItem('auth:redirect', '1'); } catch (_) {}
           await signInWithRedirect(auth, provider);
           console.log('📱 signInWithRedirect llamado - redirigiendo...');
         } catch (redirectError) {
@@ -170,6 +176,7 @@ export function useAuth() {
         }
       } else if (isMobile) {
         console.log('📱 Dispositivo móvil (no iOS) detectado, usando signInWithRedirect...');
+        try { sessionStorage.setItem('auth:redirect', '1'); } catch (_) {}
         await signInWithRedirect(auth, provider);
         console.log('📱 signInWithRedirect llamado - redirigiendo...');
       } else {
