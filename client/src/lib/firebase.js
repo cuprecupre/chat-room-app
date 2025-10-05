@@ -21,9 +21,10 @@ provider.addScope('profile');
 provider.addScope('email');
 
 // Configurar parámetros adicionales para mejorar la experiencia
-provider.setCustomParameters({
-  prompt: 'select_account'
-});
+// Nota: 'prompt: select_account' removido porque causa problemas en iOS 17
+// provider.setCustomParameters({
+//   prompt: 'select_account'
+// });
 
 async function ensurePersistence() {
   try {
