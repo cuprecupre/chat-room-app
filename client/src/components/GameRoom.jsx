@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 // removed icons from labels
 import { Button } from './ui/Button';
+import { Avatar } from './ui/Avatar';
 import keyImg from '../assets/llave.png';
 import dualImpostorImg from '../assets/dual-impostor.png';
 import cardImg from '../assets/card.png';
@@ -586,11 +587,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                       {state.players && (() => {
                         const impostor = state.players.find(p => p.uid === state.impostorId);
                         return impostor ? (
-                          <img 
-                            src={impostor.photoURL} 
-                            alt={impostor.name}
-                            className="w-20 h-20 rounded-full object-cover ring-4 ring-orange-400/50 shadow-lg"
-                          />
+                          <Avatar photoURL={impostor.photoURL} displayName={impostor.name} size="lg" className="ring-4 ring-orange-400/50 shadow-lg" />
                         ) : null;
                       })()}
                     </div>
@@ -685,11 +682,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                     <div className="flex justify-center gap-6 my-4">
                       {winnerPlayers.map(winner => (
                         <div key={winner.uid} className="flex flex-col items-center">
-                          <img 
-                            src={winner.photoURL} 
-                            alt={winner.name}
-                            className="w-20 h-20 rounded-full object-cover ring-4 ring-orange-400/50 shadow-lg"
-                          />
+                          <Avatar photoURL={winner.photoURL} displayName={winner.name} size="lg" className="ring-4 ring-orange-400/50 shadow-lg" />
                           <p className="font-semibold text-lg text-orange-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
                             {winner.name}
                           </p>
@@ -705,11 +698,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   <div>
                     <span className="text-xs tracking-wider uppercase text-white">Ganador</span>
                     <div className="flex justify-center my-4">
-                      <img 
-                        src={winnerPlayers[0].photoURL} 
-                        alt={winnerPlayers[0].name}
-                        className="w-20 h-20 rounded-full object-cover ring-4 ring-orange-400/50 shadow-lg"
-                      />
+                      <Avatar photoURL={winner.photoURL} displayName={winner.name} size="lg" className="ring-4 ring-orange-400/50 shadow-lg" />
                     </div>
                     <p className="font-semibold text-2xl text-orange-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
                       {winnerPlayers[0].name}
@@ -793,23 +782,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             {eliminatedPlayerInfo ? (
               <div className="space-y-7">
                 <div className="flex flex-col items-center gap-4">
-                  <div className="relative">
-                    <img 
-                      src={eliminatedPlayerInfo.photoURL} 
-                      alt={eliminatedPlayerInfo.name}
-                      className="w-28 h-28 rounded-full object-cover ring-4 ring-red-500/50"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
-                      }}
-                    />
-                    <div 
-                      className="w-28 h-28 rounded-full bg-neutral-600 flex items-center justify-center text-white text-xl font-semibold ring-4 ring-red-500/50"
-                      style={{display: 'none'}}
-                    >
-                      {eliminatedPlayerInfo.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-                    </div>
-                  </div>
+                  <Avatar photoURL={eliminatedPlayerInfo.photoURL} displayName={eliminatedPlayerInfo.name} size="xl" className="ring-4 ring-red-500/50" />
                   <p className="text-2xl text-neutral-300">
                     <span className="text-red-400">{eliminatedPlayerInfo.name}</span> fue eliminado
                   </p>

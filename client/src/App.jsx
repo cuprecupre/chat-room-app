@@ -11,6 +11,7 @@ import { Button } from './components/ui/Button';
 import { Footer } from './components/Footer';
 import { InstructionsModal } from './components/InstructionsModal';
 import { UIShowcase } from './components/UIShowcase';
+import { Avatar } from './components/ui/Avatar';
 import bellImg from './assets/bell.png';
 import heroImg from './assets/impostor-home.png';
 
@@ -528,27 +529,11 @@ export default function App() {
                     userSelect: 'none'
                   }}
                 >
-                  <div className="relative">
-                    <img 
-                      src={user.photoURL} 
-                      alt={user.displayName} 
-                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover block" 
-                      onError={(e) => {
-                        console.log('❌ Error cargando imagen del header:', e.target.src);
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
-                      }}
-                      onLoad={(e) => {
-                        e.target.nextSibling.style.display = 'none';
-                      }}
-                    />
-                    <div 
-                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-neutral-600 flex items-center justify-center text-white text-xs font-semibold"
-                      style={{ display: 'none' }}
-                    >
-                      {user.displayName?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U'}
-                    </div>
-                  </div>
+                  <Avatar
+                    photoURL={user.photoURL}
+                    displayName={user.displayName}
+                    size="md"
+                  />
                   <span className="pointer-events-none absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>
                 {menuOpen && (
