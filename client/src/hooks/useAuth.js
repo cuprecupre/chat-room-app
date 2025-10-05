@@ -133,8 +133,17 @@ export function useAuth() {
       if (isIOS && iOSVersion < 18) {
         console.log('📱 iOS < 18 detectado, usando signInWithRedirect directamente...');
         console.log('📱 (iOS 17 tiene problemas conocidos con popups de Firebase)');
-        await signInWithRedirect(auth, provider);
-        console.log('📱 signInWithRedirect llamado - redirigiendo...');
+        try {
+          await signInWithRedirect(auth, provider);
+          console.log('📱 signInWithRedirect llamado - redirigiendo...');
+        } catch (redirectError) {
+          console.error('❌ Error en signInWithRedirect:', {
+            code: redirectError?.code,
+            message: redirectError?.message,
+            stack: redirectError?.stack,
+          });
+          throw redirectError;
+        }
       } else if (isIOS && iOSVersion >= 18) {
         console.log('📱 iOS 18+ detectado, usando signInWithPopup...');
         try {
