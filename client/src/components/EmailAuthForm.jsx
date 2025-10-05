@@ -36,6 +36,7 @@ export function EmailAuthForm({ onLoginWithEmail, onRegisterWithEmail, isLoading
               onChange={(e) => setDisplayName(e.target.value)}
               required
               disabled={isLoading}
+              autoComplete="name"
               className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
               placeholder="Ej: Juan Pérez"
             />
@@ -53,6 +54,7 @@ export function EmailAuthForm({ onLoginWithEmail, onRegisterWithEmail, isLoading
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={isLoading}
+            autoComplete="email"
             className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
             placeholder="tu@email.com"
           />
@@ -62,17 +64,18 @@ export function EmailAuthForm({ onLoginWithEmail, onRegisterWithEmail, isLoading
           <label htmlFor="password" className="block text-sm font-medium text-neutral-300 mb-2">
             Contraseña
           </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={isLoading}
-            minLength={6}
-            className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
-            placeholder="••••••••"
-          />
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={isLoading}
+                minLength={6}
+                autoComplete="new-password"
+                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
+                placeholder="••••••••"
+              />
           {mode === 'register' && (
             <p className="text-xs text-neutral-400 mt-1">Mínimo 6 caracteres</p>
           )}
