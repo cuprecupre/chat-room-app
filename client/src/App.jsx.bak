@@ -371,11 +371,11 @@ export default function App() {
 
     if (error) {
       console.log('❌ App - Renderizando LoginScreen debido a error:', error);
-      return <LoginScreen onLogin={login} onLoginWithEmail={loginWithEmail} onRegisterWithEmail={registerWithEmail} error={error} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} />;
+      return <LoginScreen onLogin={login} error={error} onOpenInstructions={() => setInstructionsOpen(true)} />;
     }
     if (!user) {
       console.log('🚫 App - Renderizando LoginScreen porque no hay usuario');
-      return <LoginScreen onLogin={login} onLoginWithEmail={loginWithEmail} onRegisterWithEmail={registerWithEmail} error={error} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} />;
+      return <LoginScreen onLogin={login} error={error} onOpenInstructions={() => setInstructionsOpen(true)} />;
     }
     
     console.log('✅ App - Usuario autenticado:', {
