@@ -17,7 +17,6 @@ export function useSocket(user) {
     
     if (!user) {
       if (socketRef.current) {
-        console.log('🔌 useSocket - Desconectando socket porque no hay usuario...');
         socketRef.current.disconnect();
         socketRef.current = null;
       }
@@ -31,33 +30,17 @@ export function useSocket(user) {
 
     const connectSocket = async () => {
       if (socketRef.current || !isMounted) {
-        console.log('🔌 useSocket - Socket ya existe o componente desmontado, saltando conectSocket');
         return;
       }
 
       try {
-        console.log('🔑 useSocket - Obteniendo token del usuario para socket...');
         const token = await user.getIdToken();
-        if (!isMounted) {
-          console.log('🔌 useSocket - Componente desmontado después de obtener token');
-          return;
-        }
-        
-        console.log('🔑 useSocket - Token obtenido, length:', token?.length);
-        console.log('🔌 useSocket - Conectando socket...');
+        if (!isMounted) return;
         
         // En desarrollo, usar el mismo host que la URL actual pero puerto 3000
         const socketURL = process.env.NODE_ENV === 'production' 
           ? window.location.origin 
           : `${window.location.protocol}//${window.location.hostname}:3000`;
-        
-        console.log('🔌 useSocket - Socket URL:', socketURL);
-        console.log('🔌 useSocket - Socket auth:', {
-          hasToken: !!token,
-          tokenLength: token?.length,
-          name: user.displayName,
-          hasPhotoURL: !!user.photoURL,
-        });
         
         const socket = io(socketURL, {
           auth: { token, name: user.displayName, photoURL: user.photoURL },
@@ -65,11 +48,9 @@ export function useSocket(user) {
           reconnectionAttempts: 5
         });
         socketRef.current = socket;
-        console.log('🔌 useSocket - Socket instance creado');
 
         socket.on('connect', () => {
-          console.log('✅ useSocket - Socket conectado exitosamente');
-          console.log('✅ useSocket - Socket ID:', socket.id);
+          console.log('✅ Socket conectado:', user.displayName);
           if (isMounted) setConnected(true);
           attemptedResumeRef.current = false; // fresh session
           const urlParams = new URLSearchParams(window.location.search);

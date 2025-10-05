@@ -29,6 +29,7 @@ export default function App() {
   const { isLoading: assetsLoading } = useAppAssetsPreloader();
   const menuRef = useRef(null);
   const lastLoggedUid = useRef(null); // Para evitar logs duplicados
+  const hasLoggedNoUser = useRef(false); // Para evitar log infinito de "no hay usuario"
 
   useEffect(() => {
     if (user) {
@@ -368,15 +369,22 @@ export default function App() {
     const urlGameId = url.searchParams.get('gameId');
 
     if (error) {
-      console.log('❌ App - Renderizando LoginScreen debido a error:', error);
+      if (!hasLoggedNoUser.current) {
+        console.log('❌ App - Error de autenticación:', error);
+        hasLoggedNoUser.current = true;
+      }
       return <LoginScreen onLogin={login} onLoginWithEmail={loginWithEmail} onRegisterWithEmail={registerWithEmail} error={error} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} />;
     }
     if (!user) {
-      console.log('🚫 App - Renderizando LoginScreen porque no hay usuario');
+      if (!hasLoggedNoUser.current) {
+        console.log('🚫 App - Sin usuario autenticado, mostrando login');
+        hasLoggedNoUser.current = true;
+      }
       return <LoginScreen onLogin={login} onLoginWithEmail={loginWithEmail} onRegisterWithEmail={registerWithEmail} error={error} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} />;
     }
     
-    // Log solo cuando cambia el usuario (no en cada render)
+    // Usuario autenticado - resetear flag de "no user" y loguear si es un usuario nuevo
+    hasLoggedNoUser.current = false;
     if (lastLoggedUid.current !== user.uid) {
       console.log('✅ App - Usuario autenticado:', {
         displayName: user.displayName,
