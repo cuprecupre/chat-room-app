@@ -10,7 +10,11 @@ export function EmailAuthModal({ isOpen, onClose, onLoginWithEmail, onRegisterWi
   const [displayName, setDisplayName] = useState('');
   const [localError, setLocalError] = useState('');
 
+  // Debug: mostrar estado del modal
+  console.log('📧 EmailAuthModal render:', { isOpen, step, error, localError, isLoading });
+
   const handleClose = () => {
+    console.log('📧 EmailAuthModal handleClose llamado');
     setStep('select');
     setEmail('');
     setPassword('');

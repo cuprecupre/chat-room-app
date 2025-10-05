@@ -7,6 +7,20 @@ import heroImg from '../assets/impostor-home.png';
 export function LoginScreen({ onLogin, onLoginWithEmail, onRegisterWithEmail, error, isLoading, clearError, onOpenInstructions }) {
   const [showEmailModal, setShowEmailModal] = useState(false);
 
+  const handleCloseModal = () => {
+    console.log('🔴 Modal cerrado manualmente');
+    setShowEmailModal(false);
+    if (clearError) clearError();
+  };
+
+  const handleOpenModal = () => {
+    console.log('🟢 Modal abierto');
+    setShowEmailModal(true);
+  };
+
+  // Debug: mostrar estado del modal
+  console.log('🔍 LoginScreen render:', { showEmailModal, error, isLoading });
+
   return (
     <div className="w-full h-dvh flex flex-col">
       <div className="flex-1 flex items-center justify-center p-4">
@@ -61,7 +75,7 @@ export function LoginScreen({ onLogin, onLoginWithEmail, onRegisterWithEmail, er
 
           <div className="animate-fadeIn animate-delay-1000">
             <Button
-              onClick={() => setShowEmailModal(true)}
+              onClick={handleOpenModal}
               disabled={isLoading}
               variant="outline"
               size="md"
@@ -98,7 +112,7 @@ export function LoginScreen({ onLogin, onLoginWithEmail, onRegisterWithEmail, er
 
       <EmailAuthModal
         isOpen={showEmailModal}
-        onClose={() => setShowEmailModal(false)}
+        onClose={handleCloseModal}
         onLoginWithEmail={onLoginWithEmail}
         onRegisterWithEmail={onRegisterWithEmail}
         isLoading={isLoading}
