@@ -56,39 +56,28 @@ export function Avatar({
 
   const initials = getInitials(displayName);
   const bgColor = getColorFromName(displayName);
-
-  // Si hay photoURL, intentar mostrar imagen con fallback
-  if (photoURL) {
+  
+  // Estado para controlar si la imagen falló
+  const [imageError, setImageError] = React.useState(false);
+  
+  // Si no hay photoURL o la imagen falló, mostrar iniciales
+  if (!photoURL || imageError) {
     return (
-      <div className={`relative ${sizeClass} rounded-full overflow-hidden ${className}`}>
-        <img
-          src={photoURL}
-          alt={displayName || 'User'}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            // Si falla, ocultar la imagen y mostrar el fallback
-            e.target.style.display = 'none';
-            const fallback = e.target.nextElementSibling;
-            if (fallback) {
-              fallback.style.display = 'flex';
-            }
-          }}
-        />
-        {/* Fallback con iniciales */}
-        <div
-          className={`absolute inset-0 ${bgColor} flex items-center justify-center text-white font-semibold`}
-          style={{ display: 'none' }}
-        >
-          {initials}
-        </div>
+      <div className={`${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold ${className}`}>
+        {initials}
       </div>
     );
   }
 
-  // Sin photoURL, mostrar directamente las iniciales
+  // Intentar mostrar imagen
   return (
-    <div className={`${sizeClass} rounded-full overflow-hidden ${bgColor} flex items-center justify-center text-white font-semibold ${className}`}>
-      {initials}
+    <div className={`${sizeClass} rounded-full overflow-hidden ${className}`}>
+      <img
+        src={photoURL}
+        alt={displayName || 'User'}
+        className="w-full h-full object-cover"
+        onError={() => setImageError(true)}
+      />
     </div>
   );
 }
