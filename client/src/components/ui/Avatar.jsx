@@ -17,13 +17,15 @@ export function Avatar({
   
   // Generar iniciales del nombre
   const getInitials = (name) => {
-    if (!name) return 'U';
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+    if (!name) return '?';
+    const words = name.trim().split(/\s+/).filter(w => w.length > 0);
+    if (words.length === 0) return '?';
+    if (words.length === 1) {
+      // Una sola palabra: usar primera letra
+      return words[0][0].toUpperCase();
+    }
+    // Dos o más palabras: usar primeras dos iniciales
+    return (words[0][0] + words[1][0]).toUpperCase();
   };
   
   // Generar color basado en el nombre (consistente)

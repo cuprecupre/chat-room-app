@@ -262,11 +262,22 @@ export function useAuth() {
       console.log('📧 Registrando usuario con email...');
       const { createUserWithEmailAndPassword: createUser, updateProfile: updateProf } = await import('../lib/firebase');
       const result = await createUser(auth, email, password);
+      
+      // Actualizar displayName y esperar a que se complete
       if (displayName) {
+        console.log('📝 Actualizando displayName:', displayName);
         await updateProf(result.user, { displayName });
+        // Forzar recarga del usuario para obtener el displayName actualizado
+        await result.user.reload();
+        console.log('✅ DisplayName actualizado:', auth.currentUser?.displayName);
       }
-      console.log('✅ Registro exitoso:', result.user.email);
-      setLoading(false);
+      
+      console.log('✅ Registro exitoso:', {
+        email: result.user.email,
+        displayName: auth.currentUser?.displayName,
+        uid: result.user.uid
+      });
+      // setLoading se pondrá en false por onAuthStateChanged
     } catch (err) {
       console.error('❌ Error registro con email:', err);
       let errorMessage = 'Error al registrar usuario.';
