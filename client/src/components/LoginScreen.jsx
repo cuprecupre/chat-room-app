@@ -4,7 +4,7 @@ import { Spinner } from './ui/Spinner';
 import { EmailAuthModal } from './EmailAuthModal';
 import heroImg from '../assets/impostor-home.png';
 
-export function LoginScreen({ onLogin, onLoginWithEmail, onRegisterWithEmail, error, isLoading, onOpenInstructions }) {
+export function LoginScreen({ onLogin, onLoginWithEmail, onRegisterWithEmail, error, isLoading, clearError, onOpenInstructions }) {
   const [showEmailModal, setShowEmailModal] = useState(false);
 
   return (
@@ -103,6 +103,7 @@ export function LoginScreen({ onLogin, onLoginWithEmail, onRegisterWithEmail, er
         onRegisterWithEmail={onRegisterWithEmail}
         isLoading={isLoading}
         error={error}
+        clearError={clearError}
       />
     </div>
   );

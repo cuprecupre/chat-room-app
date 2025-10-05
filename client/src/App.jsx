@@ -16,7 +16,7 @@ import bellImg from './assets/bell.png';
 import heroImg from './assets/impostor-home.png';
 
 export default function App() {
-  const { user, loading, error, login, loginWithEmail, registerWithEmail, logout } = useAuth();
+  const { user, loading, error, login, loginWithEmail, registerWithEmail, logout, clearError } = useAuth();
   const [token, setToken] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
@@ -345,7 +345,7 @@ export default function App() {
     // Handle showcase route with access control
     if (isShowcaseRoute) {
       if (!user) {
-        return <LoginScreen onLogin={login} error={error} onOpenInstructions={() => setInstructionsOpen(false)} />;
+        return <LoginScreen onLogin={login} onLoginWithEmail={loginWithEmail} onRegisterWithEmail={registerWithEmail} error={error} isLoading={loading} clearError={clearError} onOpenInstructions={() => setInstructionsOpen(false)} />;
       }
       
       // Check if user is authorized (only leandrovegasb@gmail.com)
@@ -373,14 +373,14 @@ export default function App() {
         console.log('❌ App - Error de autenticación:', error);
         hasLoggedNoUser.current = true;
       }
-      return <LoginScreen onLogin={login} onLoginWithEmail={loginWithEmail} onRegisterWithEmail={registerWithEmail} error={error} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} />;
+      return <LoginScreen onLogin={login} onLoginWithEmail={loginWithEmail} onRegisterWithEmail={registerWithEmail} error={error} isLoading={loading} clearError={clearError} onOpenInstructions={() => setInstructionsOpen(true)} />;
     }
     if (!user) {
       if (!hasLoggedNoUser.current) {
         console.log('🚫 App - Sin usuario autenticado, mostrando login');
         hasLoggedNoUser.current = true;
       }
-      return <LoginScreen onLogin={login} onLoginWithEmail={loginWithEmail} onRegisterWithEmail={registerWithEmail} error={error} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} />;
+      return <LoginScreen onLogin={login} onLoginWithEmail={loginWithEmail} onRegisterWithEmail={registerWithEmail} error={error} isLoading={loading} clearError={clearError} onOpenInstructions={() => setInstructionsOpen(true)} />;
     }
     
     // Usuario autenticado - resetear flag de "no user" y loguear si es un usuario nuevo

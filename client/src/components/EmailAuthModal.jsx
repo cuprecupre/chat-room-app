@@ -3,17 +3,20 @@ import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { Spinner } from './ui/Spinner';
 
-export function EmailAuthModal({ isOpen, onClose, onLoginWithEmail, onRegisterWithEmail, isLoading, error }) {
+export function EmailAuthModal({ isOpen, onClose, onLoginWithEmail, onRegisterWithEmail, isLoading, error, clearError }) {
   const [step, setStep] = useState('select'); // 'select' | 'login' | 'register'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [localError, setLocalError] = useState('');
 
   const handleClose = () => {
     setStep('select');
     setEmail('');
     setPassword('');
     setDisplayName('');
+    setLocalError('');
+    if (clearError) clearError();
     onClose();
   };
 
@@ -22,17 +25,22 @@ export function EmailAuthModal({ isOpen, onClose, onLoginWithEmail, onRegisterWi
     setEmail('');
     setPassword('');
     setDisplayName('');
+    setLocalError('');
+    if (clearError) clearError();
   };
 
   const handleLogin = (e) => {
     e.preventDefault();
+    setLocalError('');
     onLoginWithEmail(email, password);
   };
 
   const handleRegister = (e) => {
     e.preventDefault();
+    setLocalError('');
+    
     if (!displayName.trim()) {
-      alert('Ingresa tu nombre y apellido');
+      setLocalError('Por favor, ingresa tu nombre y apellido.');
       return;
     }
     onRegisterWithEmail(email, password, displayName);
@@ -116,9 +124,9 @@ export function EmailAuthModal({ isOpen, onClose, onLoginWithEmail, onRegisterWi
             />
           </div>
 
-          {error && (
+          {(error || localError) && (
             <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 text-red-400 text-sm">
-              {error}
+              {localError || error}
             </div>
           )}
 
@@ -208,9 +216,9 @@ export function EmailAuthModal({ isOpen, onClose, onLoginWithEmail, onRegisterWi
             <p className="text-xs text-neutral-400 mt-1">Mínimo 6 caracteres</p>
           </div>
 
-          {error && (
+          {(error || localError) && (
             <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 text-red-400 text-sm">
-              {error}
+              {localError || error}
             </div>
           )}
 

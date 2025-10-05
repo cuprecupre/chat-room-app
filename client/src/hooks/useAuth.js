@@ -226,5 +226,9 @@ export function useAuth() {
     }
   }, []);
 
-  return { user, loading, error, login, loginWithEmail, registerWithEmail, logout };
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
+  return { user, loading, error, login, loginWithEmail, registerWithEmail, logout, clearError };
 }
