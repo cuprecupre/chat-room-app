@@ -36,7 +36,6 @@ export function EmailAuthForm({ onLoginWithEmail, onRegisterWithEmail, isLoading
               onChange={(e) => setDisplayName(e.target.value)}
               required
               disabled={isLoading}
-              autoComplete="name"
               className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
               placeholder="Ej: Juan Pérez"
             />
@@ -54,7 +53,6 @@ export function EmailAuthForm({ onLoginWithEmail, onRegisterWithEmail, isLoading
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={isLoading}
-            autoComplete="email"
             className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
             placeholder="tu@email.com"
           />
@@ -72,7 +70,6 @@ export function EmailAuthForm({ onLoginWithEmail, onRegisterWithEmail, isLoading
                 required
                 disabled={isLoading}
                 minLength={6}
-                autoComplete="new-password"
                 className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
                 placeholder="••••••••"
               />
