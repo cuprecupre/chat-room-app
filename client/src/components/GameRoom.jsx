@@ -683,7 +683,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   <div>
                     <span className="text-xs tracking-wider uppercase text-white">Ganador</span>
                     <div className="flex justify-center my-4">
-                      <Avatar photoURL={winner.photoURL} displayName={winner.name} size="lg" className="ring-4 ring-orange-400/50 shadow-lg" />
+                      <Avatar photoURL={winnerPlayers[0].photoURL} displayName={winnerPlayers[0].name} size="lg" className="ring-4 ring-orange-400/50 shadow-lg" />
                     </div>
                     <p className="font-semibold text-2xl text-orange-400 mt-2" style={{fontFamily: 'Trocchi, serif'}}>
                       {winnerPlayers[0].name}
