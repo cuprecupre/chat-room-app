@@ -263,12 +263,22 @@ export function useAuth() {
       const { createUserWithEmailAndPassword: createUser, updateProfile: updateProf } = await import('../lib/firebase');
       const result = await createUser(auth, email, password);
       
-      // Actualizar displayName y esperar a que se complete
+      // Actualizar displayName ANTES de que onAuthStateChanged propague el usuario
       if (displayName) {
         console.log('📝 Actualizando displayName:', displayName);
         await updateProf(result.user, { displayName });
-        // Forzar recarga del usuario para obtener el displayName actualizado
+        // Forzar recarga del usuario
         await result.user.reload();
+        
+        // Esperar a que el currentUser tenga el displayName actualizado
+        let retries = 0;
+        while (!auth.currentUser?.displayName && retries < 10) {
+          console.log('⏳ Esperando a que displayName se actualice...');
+          await new Promise(resolve => setTimeout(resolve, 100));
+          await auth.currentUser?.reload();
+          retries++;
+        }
+        
         console.log('✅ DisplayName actualizado:', auth.currentUser?.displayName);
       }
       
