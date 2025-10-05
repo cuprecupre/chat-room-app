@@ -10,6 +10,13 @@ export function useSocket(user) {
   useEffect(() => {
     console.log('🔌 useSocket - useEffect [user] disparado:', user ? `Usuario: ${user.displayName}` : 'Sin usuario');
     
+    // No conectar socket si el usuario no tiene displayName
+    // (puede pasar al registrarse con email mientras se actualiza el perfil)
+    if (user && !user.displayName) {
+      console.log('⏳ useSocket - Usuario sin displayName aún, esperando...');
+      return;
+    }
+    
     if (!user) {
       if (socketRef.current) {
         console.log('🔌 useSocket - Desconectando socket porque no hay usuario...');
