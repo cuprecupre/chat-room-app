@@ -75,7 +75,7 @@ export function Avatar({
         />
         {/* Fallback con iniciales (oculto por defecto) */}
         <div
-          className={`${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold`}
+          className={`absolute inset-0 ${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold`}
           style={{ display: 'none' }}
         >
           {initials}
@@ -84,10 +84,12 @@ export function Avatar({
     );
   }
 
-  // Si no hay photoURL, mostrar directamente el fallback
+  // Si no hay photoURL, mostrar con contenedor wrapper para que ring/shadow funcionen igual
   return (
-    <div className={`${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold ${className}`}>
-      {initials}
+    <div className={`relative ${sizeClass} ${className}`}>
+      <div className={`${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold`}>
+        {initials}
+      </div>
     </div>
   );
 }
