@@ -59,29 +59,28 @@ export function Avatar({
 
   // Ambos casos usan la misma estructura para consistencia
   return (
-    <div className={`${sizeClass} rounded-full overflow-hidden ${className}`}>
+    <div className={`relative ${sizeClass} rounded-full overflow-hidden ${className}`}>
       {photoURL ? (
         <>
           <img
             src={photoURL}
             alt={displayName || 'User'}
-            className={`w-full h-full object-cover`}
+            className="w-full h-full object-cover"
             onError={(e) => {
+              console.log('❌ Avatar - Error cargando imagen:', photoURL);
               // Si la imagen falla al cargar, ocultar y mostrar fallback
               e.target.style.display = 'none';
-              const parent = e.target.parentElement;
-              if (parent) {
-                parent.style.backgroundColor = '';
-                parent.classList.add(bgColor);
-              }
               if (e.target.nextSibling) {
                 e.target.nextSibling.style.display = 'flex';
               }
             }}
+            onLoad={() => {
+              console.log('✅ Avatar - Imagen cargada:', displayName);
+            }}
           />
           {/* Fallback con iniciales (oculto por defecto) */}
           <div
-            className={`absolute inset-0 flex items-center justify-center text-white font-semibold`}
+            className={`absolute inset-0 ${bgColor} flex items-center justify-center text-white font-semibold`}
             style={{ display: 'none' }}
           >
             {initials}
