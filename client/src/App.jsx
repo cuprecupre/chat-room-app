@@ -3,6 +3,7 @@ import { useAuth } from './hooks/useAuth';
 import { useSocket } from './hooks/useSocket';
 import { useAppAssetsPreloader } from './hooks/useImagePreloader';
 import { LoginScreen } from './components/LoginScreen';
+import { EmailAuthScreen } from './components/EmailAuthScreen';
 import { Lobby } from './components/Lobby';
 import { GameRoom } from './components/GameRoom';
 import { Toaster } from './components/Toaster';
@@ -21,6 +22,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
   const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
+  const [showEmailAuthScreen, setShowEmailAuthScreen] = useState(false);
   
   // Check if user is accessing showcase route
   const isShowcaseRoute = window.location.pathname === '/ui-showcase';
@@ -39,6 +41,8 @@ export default function App() {
         console.error('Error obteniendo token:', err);
         setToken(null);
       });
+      // Cerrar pantalla de email auth cuando el usuario se autentica
+      setShowEmailAuthScreen(false);
     } else {
       setToken(null);
     }
@@ -342,10 +346,27 @@ export default function App() {
   }
 
   const renderContent = () => {
+    // Mostrar pantalla de autenticación con email si está activada
+    if (showEmailAuthScreen && !user) {
+      return (
+        <EmailAuthScreen
+          onLoginWithEmail={loginWithEmail}
+          onRegisterWithEmail={registerWithEmail}
+          onBack={() => {
+            setShowEmailAuthScreen(false);
+            clearError();
+          }}
+          isLoading={loading}
+          error={error}
+          clearError={clearError}
+        />
+      );
+    }
+
     // Handle showcase route with access control
     if (isShowcaseRoute) {
       if (!user) {
-        return <LoginScreen onLogin={login} onLoginWithEmail={loginWithEmail} onRegisterWithEmail={registerWithEmail} error={error} isLoading={loading} clearError={clearError} onOpenInstructions={() => setInstructionsOpen(false)} />;
+        return <LoginScreen onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(false)} />;
       }
       
       // Check if user is authorized (only leandrovegasb@gmail.com)
@@ -373,14 +394,14 @@ export default function App() {
         console.log('❌ App - Error de autenticación:', error);
         hasLoggedNoUser.current = true;
       }
-      return <LoginScreen onLogin={login} onLoginWithEmail={loginWithEmail} onRegisterWithEmail={registerWithEmail} error={error} isLoading={loading} clearError={clearError} onOpenInstructions={() => setInstructionsOpen(true)} />;
+      return <LoginScreen onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} />;
     }
     if (!user) {
       if (!hasLoggedNoUser.current) {
         console.log('🚫 App - Sin usuario autenticado, mostrando login');
         hasLoggedNoUser.current = true;
       }
-      return <LoginScreen onLogin={login} onLoginWithEmail={loginWithEmail} onRegisterWithEmail={registerWithEmail} error={error} isLoading={loading} clearError={clearError} onOpenInstructions={() => setInstructionsOpen(true)} />;
+      return <LoginScreen onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} />;
     }
     
     // Usuario autenticado - resetear flag de "no user" y loguear si es un usuario nuevo
