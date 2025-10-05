@@ -57,40 +57,38 @@ export function Avatar({
   const initials = getInitials(displayName);
   const bgColor = getColorFromName(displayName);
 
-  // Ambos casos usan la misma estructura para consistencia
-  return (
-    <div className={`relative ${sizeClass} rounded-full overflow-hidden ${className}`}>
-      {photoURL ? (
-        <>
-          <img
-            src={photoURL}
-            alt={displayName || 'User'}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              console.log('❌ Avatar - Error cargando imagen:', photoURL);
-              // Si la imagen falla al cargar, ocultar y mostrar fallback
-              e.target.style.display = 'none';
-              if (e.target.nextSibling) {
-                e.target.nextSibling.style.display = 'flex';
-              }
-            }}
-            onLoad={() => {
-              console.log('✅ Avatar - Imagen cargada:', displayName);
-            }}
-          />
-          {/* Fallback con iniciales (oculto por defecto) */}
-          <div
-            className={`absolute inset-0 ${bgColor} flex items-center justify-center text-white font-semibold`}
-            style={{ display: 'none' }}
-          >
-            {initials}
-          </div>
-        </>
-      ) : (
-        <div className={`w-full h-full ${bgColor} flex items-center justify-center text-white font-semibold`}>
+  // Si hay photoURL, intentar mostrar imagen con fallback
+  if (photoURL) {
+    return (
+      <div className={`relative ${sizeClass} rounded-full overflow-hidden ${className}`}>
+        <img
+          src={photoURL}
+          alt={displayName || 'User'}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            // Si falla, ocultar la imagen y mostrar el fallback
+            e.target.style.display = 'none';
+            const fallback = e.target.nextElementSibling;
+            if (fallback) {
+              fallback.style.display = 'flex';
+            }
+          }}
+        />
+        {/* Fallback con iniciales */}
+        <div
+          className={`absolute inset-0 ${bgColor} flex items-center justify-center text-white font-semibold`}
+          style={{ display: 'none' }}
+        >
           {initials}
         </div>
-      )}
+      </div>
+    );
+  }
+
+  // Sin photoURL, mostrar directamente las iniciales
+  return (
+    <div className={`${sizeClass} rounded-full overflow-hidden ${bgColor} flex items-center justify-center text-white font-semibold ${className}`}>
+      {initials}
     </div>
   );
 }
