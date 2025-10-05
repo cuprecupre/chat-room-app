@@ -21,14 +21,12 @@ export function Avatar({
     const words = name.trim().split(/\s+/).filter(w => w.length > 0);
     if (words.length === 0) return '?';
     if (words.length === 1) {
-      // Una sola palabra: usar primera letra
       return words[0][0].toUpperCase();
     }
-    // Dos o más palabras: usar primeras dos iniciales
     return (words[0][0] + words[1][0]).toUpperCase();
   };
   
-  // Generar color basado en el nombre (consistente)
+  // Generar color basado en el nombre
   const getColorFromName = (name) => {
     if (!name) return 'bg-neutral-600';
     const colors = [
@@ -56,28 +54,25 @@ export function Avatar({
 
   const initials = getInitials(displayName);
   const bgColor = getColorFromName(displayName);
-  
-  // Estado para controlar si la imagen falló
-  const [imageError, setImageError] = React.useState(false);
-  
-  // Si no hay photoURL o la imagen falló, mostrar iniciales
-  if (!photoURL || imageError) {
+
+  // Usuario de Google (tiene foto)
+  if (photoURL) {
     return (
-      <div className={`${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold ${className}`}>
-        {initials}
+      <div className={`${sizeClass} rounded-full overflow-hidden ${className}`} style={{ backgroundColor: '#e5e7eb' }}>
+        <img
+          src={photoURL}
+          alt={displayName}
+          className="w-full h-full object-cover"
+          style={{ display: 'block' }}
+        />
       </div>
     );
   }
 
-  // Intentar mostrar imagen
+  // Usuario de email (sin foto) - mostrar iniciales
   return (
-    <div className={`${sizeClass} rounded-full overflow-hidden ${className}`}>
-      <img
-        src={photoURL}
-        alt={displayName || 'User'}
-        className="w-full h-full object-cover"
-        onError={() => setImageError(true)}
-      />
+    <div className={`${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold ${className}`}>
+      {initials}
     </div>
   );
 }
