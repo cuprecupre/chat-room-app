@@ -3,14 +3,32 @@ import { Button } from './ui/Button';
 import { Spinner } from './ui/Spinner';
 import heroImg from '../assets/impostor-home.png';
 
+const STORAGE_KEY = 'emailAuth:state';
+
 export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack, isLoading, error, clearError }) {
-  const [mode, setMode] = useState('select'); // 'select' | 'login' | 'register'
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  // Restaurar estado desde sessionStorage al montar
+  const getInitialState = () => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        console.log('📦 Restaurando estado de autenticación:', parsed);
+        return parsed;
+      }
+    } catch (err) {
+      console.error('Error restaurando estado:', err);
+    }
+    return { mode: 'select', email: '', displayName: '' };
+  };
+
+  const initialState = getInitialState();
+  const [mode, setMode] = useState(initialState.mode);
+  const [email, setEmail] = useState(initialState.email);
+  const [password, setPassword] = useState(''); // Nunca persistir contraseña
+  const [displayName, setDisplayName] = useState(initialState.displayName);
   const [localError, setLocalError] = useState('');
   const wasLoadingRef = useRef(false);
-  const lastModeRef = useRef('select');
+  const lastModeRef = useRef(initialState.mode);
 
   // Mantener el modo activo cuando hay un error después de intentar login/registro
   useEffect(() => {
@@ -29,6 +47,13 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
     }
   }, [mode]);
 
+  // Persistir estado en sessionStorage cada vez que cambia
+  useEffect(() => {
+    const state = { mode, email, displayName };
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    console.log('💾 Guardando estado de autenticación:', state);
+  }, [mode, email, displayName]);
+
   const handleBack = () => {
     setEmail('');
     setPassword('');
@@ -36,6 +61,9 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
     setLocalError('');
     if (clearError) clearError();
     if (mode === 'select') {
+      // Limpiar estado persistido al volver a LoginScreen
+      sessionStorage.removeItem(STORAGE_KEY);
+      console.log('🧹 Estado de autenticación limpiado (volver atrás)');
       onBack();
     } else {
       setMode('select');

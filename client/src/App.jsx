@@ -22,7 +22,28 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
   const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
-  const [showEmailAuthScreen, setShowEmailAuthScreen] = useState(false);
+  
+  // Restaurar estado de EmailAuthScreen si había un intento de login/registro en curso
+  const getInitialEmailAuthState = () => {
+    try {
+      const saved = sessionStorage.getItem('emailAuth:state');
+      if (saved) {
+        if (!user) {
+          console.log('📦 Detectado intento de autenticación previo, restaurando EmailAuthScreen');
+          return true;
+        } else {
+          // Si hay usuario autenticado pero quedó estado guardado, limpiarlo
+          sessionStorage.removeItem('emailAuth:state');
+          console.log('🧹 Limpiando estado obsoleto (usuario ya autenticado)');
+        }
+      }
+    } catch (err) {
+      console.error('Error verificando estado de auth:', err);
+    }
+    return false;
+  };
+  
+  const [showEmailAuthScreen, setShowEmailAuthScreen] = useState(getInitialEmailAuthState());
   
   // Check if user is accessing showcase route
   const isShowcaseRoute = window.location.pathname === '/ui-showcase';
@@ -43,6 +64,9 @@ export default function App() {
       });
       // Cerrar pantalla de email auth cuando el usuario se autentica
       setShowEmailAuthScreen(false);
+      // Limpiar estado persistido de autenticación con email
+      sessionStorage.removeItem('emailAuth:state');
+      console.log('🧹 Estado de autenticación limpiado (login exitoso)');
     } else {
       setToken(null);
     }
