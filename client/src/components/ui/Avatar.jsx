@@ -52,11 +52,12 @@ export function Avatar({
     return colors[hash % colors.length];
   };
 
+  const [imgError, setImgError] = React.useState(false);
   const initials = getInitials(displayName);
   const bgColor = getColorFromName(displayName);
 
-  // Usuario de Google (tiene foto)
-  if (photoURL) {
+  // Si tiene foto de Google Y no ha fallado → mostrar imagen
+  if (photoURL && !imgError) {
     return (
       <div className={`${sizeClass} rounded-full overflow-hidden ${className}`} style={{ backgroundColor: '#e5e7eb' }}>
         <img
@@ -64,12 +65,13 @@ export function Avatar({
           alt={displayName}
           className="w-full h-full object-cover"
           style={{ display: 'block' }}
+          onError={() => setImgError(true)}
         />
       </div>
     );
   }
 
-  // Usuario de email (sin foto) - mostrar iniciales
+  // Si NO tiene foto O la imagen falló → mostrar iniciales
   return (
     <div className={`${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold ${className}`}>
       {initials}
