@@ -118,11 +118,25 @@ export function useAuth() {
         customParameters: provider.getCustomParameters(),
       });
       
-      // En iOS, intentar popup primero porque redirect tiene problemas con localStorage
+      // Detectar versión específica de iOS
+      const iOSVersion = isIOS ? parseFloat(
+        (navigator.userAgent.match(/OS (\d+)_(\d+)/) || [])[1] + '.' + 
+        (navigator.userAgent.match(/OS (\d+)_(\d+)/) || [])[2]
+      ) : 0;
+      
+      console.log('📱 Versión iOS detectada:', iOSVersion);
+      
+      // iOS 17 tiene problemas con popup, usar redirect directamente
+      // iOS 18+ funciona bien con popup
       // En otros móviles, usar redirect
       // En desktop, usar popup
-      if (isIOS) {
-        console.log('📱 iOS detectado, intentando signInWithPopup primero...');
+      if (isIOS && iOSVersion < 18) {
+        console.log('📱 iOS < 18 detectado, usando signInWithRedirect directamente...');
+        console.log('📱 (iOS 17 tiene problemas conocidos con popups de Firebase)');
+        await signInWithRedirect(auth, provider);
+        console.log('📱 signInWithRedirect llamado - redirigiendo...');
+      } else if (isIOS && iOSVersion >= 18) {
+        console.log('📱 iOS 18+ detectado, usando signInWithPopup...');
         try {
           const loginPromise = signInWithPopup(auth, provider);
           const timeoutPromise = new Promise((_, reject) => {
@@ -137,14 +151,9 @@ export function useAuth() {
             uid: result.user?.uid,
           });
         } catch (popupError) {
-          console.warn('⚠️ Popup falló en iOS, intentando redirect como fallback:', popupError.code);
-          if (popupError.code === 'auth/popup-blocked' || popupError.message === 'POPUP_TIMEOUT') {
-            console.log('📱 Usando signInWithRedirect como fallback...');
-            await signInWithRedirect(auth, provider);
-            console.log('📱 signInWithRedirect llamado - redirigiendo...');
-          } else {
-            throw popupError;
-          }
+          console.warn('⚠️ Popup falló en iOS 18+, usando redirect como fallback:', popupError.code);
+          await signInWithRedirect(auth, provider);
+          console.log('📱 signInWithRedirect llamado - redirigiendo...');
         }
       } else if (isMobile) {
         console.log('📱 Dispositivo móvil (no iOS) detectado, usando signInWithRedirect...');
