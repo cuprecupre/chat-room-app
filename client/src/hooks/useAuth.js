@@ -267,8 +267,13 @@ export function useAuth() {
       if (displayName) {
         console.log('📝 Actualizando displayName:', displayName);
         await updateProf(result.user, { displayName });
-        // Forzar recarga del usuario
+        
+        // Forzar recarga del usuario para obtener el displayName actualizado
         await result.user.reload();
+        
+        // IMPORTANTE: Forzar actualización del token para que incluya el displayName
+        // El token JWT original no tiene el displayName, necesitamos uno nuevo
+        await result.user.getIdToken(true); // true = force refresh
         
         // Esperar a que el currentUser tenga el displayName actualizado
         let retries = 0;
@@ -280,6 +285,7 @@ export function useAuth() {
         }
         
         console.log('✅ DisplayName actualizado:', auth.currentUser?.displayName);
+        console.log('✅ Token actualizado con nuevo displayName');
       }
       
       console.log('✅ Registro exitoso:', {
