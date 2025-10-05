@@ -60,11 +60,11 @@ export function Avatar({
   // Si hay photoURL, mostrar imagen
   if (photoURL) {
     return (
-      <div className={`relative ${sizeClass} ${className}`}>
+      <div className="relative inline-block">
         <img
           src={photoURL}
           alt={displayName || 'User'}
-          className={`${sizeClass} rounded-full object-cover`}
+          className={`${sizeClass} rounded-full object-cover ${className}`}
           onError={(e) => {
             // Si la imagen falla al cargar, ocultar y mostrar fallback
             e.target.style.display = 'none';
@@ -75,7 +75,7 @@ export function Avatar({
         />
         {/* Fallback con iniciales (oculto por defecto) */}
         <div
-          className={`absolute inset-0 ${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold`}
+          className={`${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold ${className}`}
           style={{ display: 'none' }}
         >
           {initials}
@@ -84,12 +84,10 @@ export function Avatar({
     );
   }
 
-  // Si no hay photoURL, mostrar con contenedor wrapper para que ring/shadow funcionen igual
+  // Si no hay photoURL, mostrar directamente las iniciales con todos los estilos
   return (
-    <div className={`relative ${sizeClass} ${className}`}>
-      <div className={`${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold`}>
-        {initials}
-      </div>
+    <div className={`${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold ${className}`}>
+      {initials}
     </div>
   );
 }
