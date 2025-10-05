@@ -57,37 +57,41 @@ export function Avatar({
   const initials = getInitials(displayName);
   const bgColor = getColorFromName(displayName);
 
-  // Si hay photoURL, mostrar imagen
-  if (photoURL) {
-    return (
-      <div className="relative inline-block">
-        <img
-          src={photoURL}
-          alt={displayName || 'User'}
-          className={`${sizeClass} rounded-full object-cover ${className}`}
-          onError={(e) => {
-            // Si la imagen falla al cargar, ocultar y mostrar fallback
-            e.target.style.display = 'none';
-            if (e.target.nextSibling) {
-              e.target.nextSibling.style.display = 'flex';
-            }
-          }}
-        />
-        {/* Fallback con iniciales (oculto por defecto) */}
-        <div
-          className={`${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold ${className}`}
-          style={{ display: 'none' }}
-        >
+  // Ambos casos usan la misma estructura para consistencia
+  return (
+    <div className={`${sizeClass} rounded-full overflow-hidden ${className}`}>
+      {photoURL ? (
+        <>
+          <img
+            src={photoURL}
+            alt={displayName || 'User'}
+            className={`w-full h-full object-cover`}
+            onError={(e) => {
+              // Si la imagen falla al cargar, ocultar y mostrar fallback
+              e.target.style.display = 'none';
+              const parent = e.target.parentElement;
+              if (parent) {
+                parent.style.backgroundColor = '';
+                parent.classList.add(bgColor);
+              }
+              if (e.target.nextSibling) {
+                e.target.nextSibling.style.display = 'flex';
+              }
+            }}
+          />
+          {/* Fallback con iniciales (oculto por defecto) */}
+          <div
+            className={`absolute inset-0 flex items-center justify-center text-white font-semibold`}
+            style={{ display: 'none' }}
+          >
+            {initials}
+          </div>
+        </>
+      ) : (
+        <div className={`w-full h-full ${bgColor} flex items-center justify-center text-white font-semibold`}>
           {initials}
         </div>
-      </div>
-    );
-  }
-
-  // Si no hay photoURL, mostrar directamente las iniciales con todos los estilos
-  return (
-    <div className={`${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold ${className}`}>
-      {initials}
+      )}
     </div>
   );
 }
