@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/Button';
 import { Spinner } from './ui/Spinner';
 import heroImg from '../assets/impostor-home.png';
@@ -9,6 +9,25 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [localError, setLocalError] = useState('');
+  const wasLoadingRef = useRef(false);
+  const lastModeRef = useRef('select');
+
+  // Mantener el modo activo cuando hay un error después de intentar login/registro
+  useEffect(() => {
+    // Si estábamos cargando y ahora hay un error, mantener el último modo activo
+    if (wasLoadingRef.current && !isLoading && error && lastModeRef.current !== 'select') {
+      console.log('⚠️ Error detectado, manteniendo modo:', lastModeRef.current);
+      setMode(lastModeRef.current);
+    }
+    wasLoadingRef.current = isLoading;
+  }, [isLoading, error]);
+
+  // Rastrear el modo actual
+  useEffect(() => {
+    if (mode !== 'select') {
+      lastModeRef.current = mode;
+    }
+  }, [mode]);
 
   const handleBack = () => {
     setEmail('');
@@ -20,12 +39,14 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
       onBack();
     } else {
       setMode('select');
+      lastModeRef.current = 'select';
     }
   };
 
   const handleLogin = (e) => {
     e.preventDefault();
     setLocalError('');
+    lastModeRef.current = 'login';
     onLoginWithEmail(email, password);
   };
 
@@ -37,6 +58,7 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
       setLocalError('Por favor, ingresa tu nombre y apellido.');
       return;
     }
+    lastModeRef.current = 'register';
     onRegisterWithEmail(email, password, displayName);
   };
 
@@ -71,7 +93,11 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
               </p>
               
               <Button
-                onClick={() => setMode('login')}
+                onClick={() => {
+                  setMode('login');
+                  setLocalError('');
+                  if (clearError) clearError();
+                }}
                 variant="primary"
                 size="lg"
                 className="w-full"
@@ -80,7 +106,11 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
               </Button>
               
               <Button
-                onClick={() => setMode('register')}
+                onClick={() => {
+                  setMode('register');
+                  setLocalError('');
+                  if (clearError) clearError();
+                }}
                 variant="outline"
                 size="lg"
                 className="w-full"
