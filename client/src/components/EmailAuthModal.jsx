@@ -65,12 +65,14 @@ export function EmailAuthModal({ isOpen, onClose, onLoginWithEmail, onRegisterWi
             Crear nueva cuenta
           </Button>
           
-          <button
+          <Button
             onClick={handleClose}
-            className="w-full text-sm text-neutral-400 hover:text-neutral-200 transition-colors py-2"
+            variant="ghost"
+            size="md"
+            className="w-full"
           >
             Cancelar
-          </button>
+          </Button>
         </div>
       </Modal>
     );
