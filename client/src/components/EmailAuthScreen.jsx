@@ -5,23 +5,24 @@ import heroImg from '../assets/impostor-home.png';
 
 const STORAGE_KEY = 'emailAuth:state';
 
-export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack, isLoading, error, clearError }) {
-  // Restaurar estado desde sessionStorage al montar
-  const getInitialState = () => {
-    try {
-      const saved = sessionStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        console.log('📦 Restaurando estado de autenticación:', parsed);
-        return parsed;
-      }
-    } catch (err) {
-      console.error('Error restaurando estado:', err);
+// Función helper fuera del componente para evitar recreación en cada render
+const getInitialState = () => {
+  try {
+    const saved = sessionStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      console.log('📦 Restaurando estado de autenticación:', parsed);
+      return parsed;
     }
-    return { mode: 'select', email: '', displayName: '' };
-  };
+  } catch (err) {
+    console.error('Error restaurando estado:', err);
+  }
+  return { mode: 'select', email: '', displayName: '' };
+};
 
-  const initialState = getInitialState();
+export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack, isLoading, error, clearError }) {
+  // Usar función inicializadora para ejecutar solo una vez
+  const [initialState] = useState(getInitialState);
   const [mode, setMode] = useState(initialState.mode);
   const [email, setEmail] = useState(initialState.email);
   const [password, setPassword] = useState(''); // Nunca persistir contraseña
@@ -29,12 +30,12 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
   const [localError, setLocalError] = useState('');
   const wasLoadingRef = useRef(false);
   const lastModeRef = useRef(initialState.mode);
+  const lastSavedStateRef = useRef('');
 
   // Mantener el modo activo cuando hay un error después de intentar login/registro
   useEffect(() => {
     // Si estábamos cargando y ahora hay un error, mantener el último modo activo
     if (wasLoadingRef.current && !isLoading && error && lastModeRef.current !== 'select') {
-      console.log('⚠️ Error detectado, manteniendo modo:', lastModeRef.current);
       setMode(lastModeRef.current);
     }
     wasLoadingRef.current = isLoading;
@@ -48,10 +49,16 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
   }, [mode]);
 
   // Persistir estado en sessionStorage cada vez que cambia
+
   useEffect(() => {
     const state = { mode, email, displayName };
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    console.log('💾 Guardando estado de autenticación:', state);
+    const stateString = JSON.stringify(state);
+    
+    // Solo guardar si realmente cambió
+    if (stateString !== lastSavedStateRef.current) {
+      sessionStorage.setItem(STORAGE_KEY, stateString);
+      lastSavedStateRef.current = stateString;
+    }
   }, [mode, email, displayName]);
 
   const handleBack = () => {
@@ -63,7 +70,7 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
     if (mode === 'select') {
       // Limpiar estado persistido al volver a LoginScreen
       sessionStorage.removeItem(STORAGE_KEY);
-      console.log('🧹 Estado de autenticación limpiado (volver atrás)');
+      lastSavedStateRef.current = '';
       onBack();
     } else {
       setMode('select');

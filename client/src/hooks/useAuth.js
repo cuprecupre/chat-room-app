@@ -185,15 +185,18 @@ export function useAuth() {
         
         // Esperar a que el currentUser tenga el displayName actualizado
         let retries = 0;
+        if (!auth.currentUser?.displayName) {
+          console.log('⏳ Esperando displayName...');
+        }
         while (!auth.currentUser?.displayName && retries < 10) {
-          console.log('⏳ Esperando a que displayName se actualice...');
           await new Promise(resolve => setTimeout(resolve, 100));
           await auth.currentUser?.reload();
           retries++;
         }
         
-        console.log('✅ DisplayName actualizado:', auth.currentUser?.displayName);
-        console.log('✅ Token actualizado con nuevo displayName');
+        if (auth.currentUser?.displayName) {
+          console.log('✅ DisplayName actualizado:', auth.currentUser?.displayName);
+        }
       }
       
       console.log('✅ Registro exitoso:', {

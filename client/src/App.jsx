@@ -29,12 +29,11 @@ export default function App() {
       const saved = sessionStorage.getItem('emailAuth:state');
       if (saved) {
         if (!user) {
-          console.log('📦 Detectado intento de autenticación previo, restaurando EmailAuthScreen');
+          console.log('📦 Restaurando sesión de autenticación');
           return true;
         } else {
           // Si hay usuario autenticado pero quedó estado guardado, limpiarlo
           sessionStorage.removeItem('emailAuth:state');
-          console.log('🧹 Limpiando estado obsoleto (usuario ya autenticado)');
         }
       }
     } catch (err) {
@@ -53,6 +52,7 @@ export default function App() {
   const menuRef = useRef(null);
   const lastLoggedUid = useRef(null); // Para evitar logs duplicados
   const hasLoggedNoUser = useRef(false); // Para evitar log infinito de "no hay usuario"
+  const hasLoggedLoading = useRef(false); // Para evitar log infinito de loading
 
   useEffect(() => {
     if (user) {
@@ -66,7 +66,6 @@ export default function App() {
       setShowEmailAuthScreen(false);
       // Limpiar estado persistido de autenticación con email
       sessionStorage.removeItem('emailAuth:state');
-      console.log('🧹 Estado de autenticación limpiado (login exitoso)');
     } else {
       setToken(null);
     }
@@ -293,7 +292,10 @@ export default function App() {
   }, [menuOpen]);
 
   if (loading) {
-    console.log('⏳ App - Renderizando estado de carga (loading=true)');
+    if (!hasLoggedLoading.current) {
+      console.log('⏳ App - Cargando autenticación...');
+      hasLoggedLoading.current = true;
+    }
     return (
       <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
         <div className="flex flex-col items-center gap-6 text-center">
@@ -312,6 +314,9 @@ export default function App() {
         </div>
       </div>
     );
+  } else {
+    // Reset flag cuando termina de cargar
+    hasLoggedLoading.current = false;
   }
 
   if (user && !connected) {

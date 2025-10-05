@@ -6,13 +6,19 @@ export function useSocket(user) {
   const [connected, setConnected] = useState(false);
   const [gameState, setGameState] = useState(null);
   const attemptedResumeRef = useRef(false);
+  const hasLoggedWaitingDisplayName = useRef(false);
 
   useEffect(() => {
     // No conectar socket si el usuario no tiene displayName
     // (puede pasar al registrarse con email mientras se actualiza el perfil)
     if (user && !user.displayName) {
-      console.log('⏳ useSocket - Esperando displayName...');
+      if (!hasLoggedWaitingDisplayName.current) {
+        console.log('⏳ useSocket - Esperando displayName...');
+        hasLoggedWaitingDisplayName.current = true;
+      }
       return;
+    } else {
+      hasLoggedWaitingDisplayName.current = false;
     }
     
     if (!user) {
