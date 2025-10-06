@@ -75,23 +75,37 @@ h1, h2, h3, h4, h5, h6 {
   will-change: transform;
 }
 
-/* Animación de desaceleración gradual (2 segundos) - Movimiento más lento progresivamente */
-.animate-card-float-slowdown {
-  animation: cardFloatSlowdown 2s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+
+
+
+/* Animación completa: 5s normal + 2s desaceleración hasta detenerse */
+.animate-card-float-complete {
+  animation: cardFloatComplete 7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   will-change: transform;
 }
 
-@keyframes cardFloatSlowdown {
+@keyframes cardFloatComplete {
+  /* 0-71% (5 segundos): oscilación normal */
   0% { transform: rotateZ(-1deg); }
-  20% { transform: rotateZ(0.8deg); }
-  35% { transform: rotateZ(-0.5deg); }
-  50% { transform: rotateZ(0.3deg); }
-  65% { transform: rotateZ(-0.15deg); }
-  80% { transform: rotateZ(0.08deg); }
-  95% { transform: rotateZ(-0.02deg); }
+  7% { transform: rotateZ(1deg); }
+  14% { transform: rotateZ(-1deg); }
+  21% { transform: rotateZ(1deg); }
+  28% { transform: rotateZ(-1deg); }
+  35% { transform: rotateZ(1deg); }
+  42% { transform: rotateZ(-1deg); }
+  49% { transform: rotateZ(1deg); }
+  56% { transform: rotateZ(-1deg); }
+  63% { transform: rotateZ(1deg); }
+  71% { transform: rotateZ(-1deg); }
+  
+  /* 71-100% (2 segundos): desaceleración gradual */
+  76% { transform: rotateZ(0.6deg); }
+  81% { transform: rotateZ(-0.4deg); }
+  86% { transform: rotateZ(0.2deg); }
+  91% { transform: rotateZ(-0.1deg); }
+  96% { transform: rotateZ(0.05deg); }
   100% { transform: rotateZ(0deg); }
 }
-
 /* Flip card utility */
 .flip-card {
   perspective: 1200px;
