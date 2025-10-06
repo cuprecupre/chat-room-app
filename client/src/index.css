@@ -75,6 +75,26 @@ h1, h2, h3, h4, h5, h6 {
   will-change: transform;
 }
 
+/* Animación de desaceleración gradual (2 segundos) */
+.animate-card-float-slowdown {
+  animation: cardFloatSlowdown 2s ease-out forwards;
+  will-change: transform;
+}
+
+@keyframes cardFloatSlowdown {
+  0% { transform: rotateZ(-1deg); }
+  10% { transform: rotateZ(1deg); }
+  20% { transform: rotateZ(-0.8deg); }
+  30% { transform: rotateZ(0.8deg); }
+  40% { transform: rotateZ(-0.6deg); }
+  50% { transform: rotateZ(0.6deg); }
+  60% { transform: rotateZ(-0.4deg); }
+  70% { transform: rotateZ(0.4deg); }
+  80% { transform: rotateZ(-0.2deg); }
+  90% { transform: rotateZ(0.2deg); }
+  100% { transform: rotateZ(0deg); }
+}
+
 /* Flip card utility */
 .flip-card {
   perspective: 1200px;

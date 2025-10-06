@@ -228,11 +228,12 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   const [showRestOfUI, setShowRestOfUI] = useState(true);
   const [showEndGameModal, setShowEndGameModal] = useState(false);
   const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
-  const [cardFloating, setCardFloating] = useState(true); // Controlar animación de la carta
+  const [cardAnimationState, setCardAnimationState] = useState('floating'); // 'floating', 'slowing', 'stopped'
   const revealTimeoutRef = useRef(null);
   const turnOverlayTimeoutRef = useRef(null);
   const restUITimeoutRef = useRef(null);
   const cardFloatTimeoutRef = useRef(null);
+  const cardStopTimeoutRef = useRef(null);
 
   useEffect(() => {
     const previousPlayers = prevPlayersRef.current;
@@ -348,22 +349,33 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       if (turnOverlayTimeoutRef.current) clearTimeout(turnOverlayTimeoutRef.current);
       if (restUITimeoutRef.current) clearTimeout(restUITimeoutRef.current);
       if (cardFloatTimeoutRef.current) clearTimeout(cardFloatTimeoutRef.current);
+      if (cardStopTimeoutRef.current) clearTimeout(cardStopTimeoutRef.current);
     };
   }, []);
 
-  // Detener animación de la carta después de 5 segundos para ahorrar recursos
+  // Desacelerar animación de la carta después de 5 segundos, detener a los 7s
   useEffect(() => {
     if (state.phase === 'playing') {
-      setCardFloating(true);
-      if (cardFloatTimeoutRef.current) clearTimeout(cardFloatTimeoutRef.current);
+      setCardAnimationState('floating');
       
+      // Limpiar timeouts previos
+      if (cardFloatTimeoutRef.current) clearTimeout(cardFloatTimeoutRef.current);
+      if (cardStopTimeoutRef.current) clearTimeout(cardStopTimeoutRef.current);
+      
+      // Iniciar desaceleración después de 5 segundos
       cardFloatTimeoutRef.current = setTimeout(() => {
-        setCardFloating(false);
+        setCardAnimationState('slowing');
+        
+        // Detener completamente después de 2 segundos más (total 7s)
+        cardStopTimeoutRef.current = setTimeout(() => {
+          setCardAnimationState('stopped');
+        }, 2000);
       }, 5000);
     }
     
     return () => {
       if (cardFloatTimeoutRef.current) clearTimeout(cardFloatTimeoutRef.current);
+      if (cardStopTimeoutRef.current) clearTimeout(cardStopTimeoutRef.current);
     };
   }, [state.phase]);
 
@@ -470,7 +482,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         </div>
         <div className="w-full max-w-sm mx-auto space-y-3">
           <div className={`${showCardEntrance ? 'animate-cardEntrance' : ''}`}>
-            <div className={`flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full ${cardFloating ? 'animate-card-float' : ''}`}>
+            <div className={`flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full ${cardAnimationState === 'floating' ? 'animate-card-float' : cardAnimationState === 'slowing' ? 'animate-card-float-slowdown' : ''}`}>
               <div className={`flip-card-inner h-full ${reveal ? 'is-flipped' : ''}`}>
               {/* Frente completo (card completa con imagen) */}
               <div className="flip-card-front">
