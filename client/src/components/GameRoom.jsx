@@ -124,7 +124,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                   <Avatar photoURL={p.photoURL} displayName={p.name} size="sm" />
                   {/* Check verde solo si este usuario ya votó (todos lo ven) */}
                   {isPlaying && hasVoted && (
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-neutral-950 flex items-center justify-center">
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-orange-500 rounded-full border-2 border-neutral-950 flex items-center justify-center">
                       <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
@@ -194,8 +194,8 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                       className={`!w-auto gap-2 px-4 ${
                         iVotedForThisPlayer 
                           ? canChangeVote
-                            ? '!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20' 
-                            : '!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed'
+                            ? '!border-orange-500 !text-orange-400 !bg-orange-500/10 hover:!bg-orange-500/20' 
+                            : '!border-orange-500 !text-orange-400 !bg-orange-500/10 !hover:bg-orange-500/10 cursor-not-allowed'
                           : ''
                       }`}
                     >
