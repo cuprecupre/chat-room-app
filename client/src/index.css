@@ -85,7 +85,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes cardFloatComplete {
-  /* 0-71% (5 segundos): oscilación normal */
+  /* 0-71% (5 segundos): oscilación normal a velocidad constante */
   0% { transform: rotateZ(-1deg); }
   7% { transform: rotateZ(1deg); }
   14% { transform: rotateZ(-1deg); }
@@ -98,12 +98,21 @@ h1, h2, h3, h4, h5, h6 {
   63% { transform: rotateZ(1deg); }
   71% { transform: rotateZ(-1deg); }
   
-  /* 71-100% (2 segundos): desaceleración gradual */
-  76% { transform: rotateZ(0.6deg); }
-  81% { transform: rotateZ(-0.4deg); }
-  86% { transform: rotateZ(0.2deg); }
-  91% { transform: rotateZ(-0.1deg); }
-  96% { transform: rotateZ(0.05deg); }
+  /* 71-100% (2 segundos): desaceleración MUY gradual con muchos pasos intermedios */
+  73% { transform: rotateZ(0.9deg); }
+  75% { transform: rotateZ(-0.85deg); }
+  77% { transform: rotateZ(0.75deg); }
+  79% { transform: rotateZ(-0.65deg); }
+  81% { transform: rotateZ(0.55deg); }
+  83% { transform: rotateZ(-0.45deg); }
+  85% { transform: rotateZ(0.35deg); }
+  87% { transform: rotateZ(-0.28deg); }
+  89% { transform: rotateZ(0.22deg); }
+  91% { transform: rotateZ(-0.16deg); }
+  93% { transform: rotateZ(0.11deg); }
+  95% { transform: rotateZ(-0.07deg); }
+  97% { transform: rotateZ(0.04deg); }
+  99% { transform: rotateZ(-0.02deg); }
   100% { transform: rotateZ(0deg); }
 }
 /* Flip card utility */
