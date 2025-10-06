@@ -228,9 +228,11 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   const [showRestOfUI, setShowRestOfUI] = useState(true);
   const [showEndGameModal, setShowEndGameModal] = useState(false);
   const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
+  const [cardFloating, setCardFloating] = useState(true); // Controlar animación de la carta
   const revealTimeoutRef = useRef(null);
   const turnOverlayTimeoutRef = useRef(null);
   const restUITimeoutRef = useRef(null);
+  const cardFloatTimeoutRef = useRef(null);
 
   useEffect(() => {
     const previousPlayers = prevPlayersRef.current;
@@ -345,8 +347,25 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       if (revealTimeoutRef.current) clearTimeout(revealTimeoutRef.current);
       if (turnOverlayTimeoutRef.current) clearTimeout(turnOverlayTimeoutRef.current);
       if (restUITimeoutRef.current) clearTimeout(restUITimeoutRef.current);
+      if (cardFloatTimeoutRef.current) clearTimeout(cardFloatTimeoutRef.current);
     };
   }, []);
+
+  // Detener animación de la carta después de 5 segundos para ahorrar recursos
+  useEffect(() => {
+    if (state.phase === 'playing') {
+      setCardFloating(true);
+      if (cardFloatTimeoutRef.current) clearTimeout(cardFloatTimeoutRef.current);
+      
+      cardFloatTimeoutRef.current = setTimeout(() => {
+        setCardFloating(false);
+      }, 5000);
+    }
+    
+    return () => {
+      if (cardFloatTimeoutRef.current) clearTimeout(cardFloatTimeoutRef.current);
+    };
+  }, [state.phase]);
 
   return (
     <div className="w-full flex flex-col items-center space-y-6">
@@ -451,7 +470,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         </div>
         <div className="w-full max-w-sm mx-auto space-y-3">
           <div className={`${showCardEntrance ? 'animate-cardEntrance' : ''}`}>
-            <div className="flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full animate-card-float">
+            <div className={`flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full ${cardFloating ? 'animate-card-float' : ''}`}>
               <div className={`flip-card-inner h-full ${reveal ? 'is-flipped' : ''}`}>
               {/* Frente completo (card completa con imagen) */}
               <div className="flip-card-front">
