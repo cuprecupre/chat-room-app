@@ -86,7 +86,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   };
 
   // Determinar qué título mostrar
-  let headerText = isPlaying ? 'Orden de jugadores' : `Jugadores Conectados: ${players.length}`;
+  let headerText = isPlaying ? 'Listado de jugadores' : `Jugadores Conectados: ${players.length}`;
   if (showScores) { 
     headerText = isGameOver ? 'Resto de jugadores' : 'Puntuación';
   }
