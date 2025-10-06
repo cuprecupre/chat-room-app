@@ -21,6 +21,8 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   const myVote = gameState?.myVote || null; // A quién voté yo
   const playerScores = gameState?.playerScores || {};
   const lastRoundScores = gameState?.lastRoundScores || {};
+  const playerOrder = gameState?.playerOrder || [];
+  const startingPlayerId = gameState?.startingPlayerId;
   
   // Permitir cambiar voto solo si no todos han votado aún
   const allVoted = votedPlayers.length === activePlayers.length;
@@ -36,14 +38,26 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   // Si hay 3 o más ganadores, no hay ganadores reales
   const hasNoWinners = winners.length >= 3;
   
-  // Ordenar jugadores: usuario actual siempre primero (excepto en scores)
+  // Ordenar jugadores según el contexto
   const sortedPlayers = [...players]
     .sort((a, b) => {
       // Si mostramos puntos, ordenar por puntuación
       if (showScores) {
         return (playerScores[b.uid] || 0) - (playerScores[a.uid] || 0);
       }
-      // Usuario actual siempre primero
+      // Si hay playerOrder (orden base), usarlo
+      if (playerOrder.length > 0) {
+        const indexA = playerOrder.indexOf(a.uid);
+        const indexB = playerOrder.indexOf(b.uid);
+        // Si ambos están en el orden, ordenar por índice
+        if (indexA !== -1 && indexB !== -1) {
+          return indexA - indexB;
+        }
+        // Si solo uno está, el que está va primero
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+      }
+      // Fallback: usuario actual siempre primero
       if (a.uid === currentUserId) return -1;
       if (b.uid === currentUserId) return 1;
       // Ordenar por nombre
@@ -72,16 +86,26 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   };
 
   // Determinar qué título mostrar
-  let headerText = isPlaying ? 'Vota a un jugador para elminarlo' : `Jugadores Conectados: ${players.length}`;
+  let headerText = isPlaying ? 'Orden de jugadores' : `Jugadores Conectados: ${players.length}`;
   if (showScores) { 
     headerText = isGameOver ? 'Resto de jugadores' : 'Puntuación';
   }
+  
+  // Subtítulo descriptivo para la fase de playing
+  const showOrderSubtitle = isPlaying && playerOrder.length > 0;
 
   return (
     <div className="w-full rounded-lg">
-      <p className={`mb-3 ${isPlaying || showScores ? 'text-base font-regular text-neutral-200 text-center' : 'text-sm font-regular text-neutral-500'}`}>
-        {headerText}
-      </p>
+      <div className="mb-3 text-center">
+        <p className={`${isPlaying || showScores ? 'text-base font-regular text-neutral-200' : 'text-sm font-regular text-neutral-500'}`}>
+          {headerText}
+        </p>
+        {showOrderSubtitle && (
+          <p className="text-xs text-neutral-400 mt-1">
+            🎯 indica quién empieza esta ronda
+          </p>
+        )}
+      </div>
       <ul className="space-y-2">
         {sortedPlayers.map((p, index) => {
           const isEliminated = eliminatedPlayers.includes(p.uid);
@@ -111,10 +135,16 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <div>
+                  <div className="flex items-center gap-2">
                     <span className={`font-medium ${isWinner ? 'text-orange-400' : ''}`}>
                       {p.name}{p.uid === currentUserId ? ' (Tú)' : ''}
                     </span>
+                    {/* Indicador de jugador inicial */}
+                    {isPlaying && startingPlayerId === p.uid && (
+                      <span className="text-orange-400 text-sm" title="Empieza esta ronda">
+                        🎯
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

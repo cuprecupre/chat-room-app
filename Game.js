@@ -28,17 +28,69 @@ class Game {
     this.maxRounds = 0; // Máximo de rondas (3 partidas fijas)
     this.targetScore = 15; // Puntos para ganar
     this.lastRoundScores = {}; // Puntos ganados en la última ronda
+    
+    // Sistema de orden y jugador inicial
+    this.playerOrder = []; // Orden base (OB): uids ordenados por joinedAt
+    this.startingPlayerId = null; // Jugador que inicia la ronda actual
 
     this.addPlayer(hostUser);
   }
 
   addPlayer(user) {
     if (!this.players.some(p => p.uid === user.uid)) {
-      this.players.push({ uid: user.uid, name: user.name, photoURL: user.photoURL });
+      const joinedAt = Date.now();
+      this.players.push({ 
+        uid: user.uid, 
+        name: user.name, 
+        photoURL: user.photoURL,
+        joinedAt: joinedAt
+      });
       // Inicializar puntuación del jugador
       this.playerScores[user.uid] = 0;
+      // Actualizar orden base (OB)
+      this.updatePlayerOrder();
     }
     // Si la partida está en juego, NO añadir a roundPlayers: esperará a la siguiente ronda
+  }
+
+  /**
+   * Actualiza el orden base (OB) ordenando jugadores por joinedAt (ASC)
+   * El orden base es inmutable salvo altas/bajas de jugadores
+   */
+  updatePlayerOrder() {
+    // Ordenar jugadores por joinedAt (primeros en llegar → arriba)
+    const sortedPlayers = [...this.players].sort((a, b) => {
+      return (a.joinedAt || 0) - (b.joinedAt || 0);
+    });
+    this.playerOrder = sortedPlayers.map(p => p.uid);
+    console.log(`[Game ${this.gameId}] Orden base actualizado:`, this.playerOrder);
+  }
+
+  /**
+   * Calcula el jugador que inicia la ronda actual
+   * Fórmula: ((roundCount - 1) mod N) donde N es el número de jugadores elegibles
+   * @returns {string|null} UID del jugador inicial o null si no hay jugadores elegibles
+   */
+  calculateStartingPlayer() {
+    // Jugadores elegibles: activos en la ronda (no expulsados definitivamente)
+    // Para simplificar: elegibles = jugadores que están en roundPlayers
+    const eligiblePlayers = this.playerOrder.filter(uid => 
+      this.roundPlayers.includes(uid)
+    );
+    
+    if (eligiblePlayers.length === 0) {
+      console.log(`[Game ${this.gameId}] No hay jugadores elegibles para iniciar ronda`);
+      return null;
+    }
+    
+    // Calcular índice usando la fórmula: ((r - 1) mod N)
+    const roundIndex = (this.roundCount - 1) % eligiblePlayers.length;
+    const startingPlayerId = eligiblePlayers[roundIndex];
+    
+    const startingPlayer = this.players.find(p => p.uid === startingPlayerId);
+    console.log(`[Game ${this.gameId}] Ronda ${this.roundCount}: Jugador inicial = ${startingPlayer?.name} (índice ${roundIndex} de ${eligiblePlayers.length} elegibles)`);
+    
+    return startingPlayerId;
   }
 
   removePlayer(userId) {
@@ -51,6 +103,9 @@ class Game {
     delete this.votes[userId];
     // NO eliminar playerScores - mantener puntos aunque el jugador abandone
     // delete this.playerScores[userId];
+    
+    // Actualizar orden base cuando un jugador se va
+    this.updatePlayerOrder();
 
     if (this.hostId === userId && this.players.length > 0) {
       this.hostId = this.players[0].uid;
@@ -85,6 +140,9 @@ class Game {
     this.turnHistory = [];
     this.lastRoundScores = {};
     this.roundCount++;
+
+    // Calcular jugador inicial para esta ronda
+    this.startingPlayerId = this.calculateStartingPlayer();
 
     // Seleccionar impostor con mejor aleatoriedad
     // Mezclar el array usando Fisher-Yates shuffle antes de seleccionar
@@ -410,6 +468,8 @@ class Game {
       roundCount: this.roundCount,
       maxRounds: this.maxRounds,
       targetScore: this.targetScore,
+      playerOrder: this.playerOrder,
+      startingPlayerId: this.startingPlayerId,
     };
 
     if (this.phase === 'playing') {
