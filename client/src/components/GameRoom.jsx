@@ -483,15 +483,14 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         <div className="w-full max-w-sm mx-auto space-y-3">
           <div className={`${showCardEntrance ? 'animate-cardEntrance' : ''}`}>
             <div className={`flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full ${cardAnimationState === 'floating' ? 'animate-card-float' : cardAnimationState === 'slowing' ? 'animate-card-float-slowdown' : ''}`}>
-              <div className={`flip-card-inner h-full ${reveal ? 'is-flipped' : ''}`}>
+              <div className={`flip-card-inner h-full cursor-pointer ${reveal ? 'is-flipped' : ''}`} onClick={triggerReveal} title="Toca para voltear la carta">
               {/* Frente completo (card completa con imagen) */}
               <div className="flip-card-front">
                 <div className="h-full flex items-center justify-center">
                   <img 
                     src={cardImg} 
                     alt="Frente de la carta" 
-                    className="w-full h-full object-cover rounded-xl cursor-pointer" 
-                    onClick={triggerReveal}
+                    className="w-full h-full object-cover rounded-xl pointer-events-none" 
                     title="Ver mi carta"
                   />
                 </div>
@@ -503,12 +502,11 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   <img 
                     src={cardBackImg} 
                     alt="Fondo del dorso" 
-                    className="absolute inset-0 w-full h-full object-cover" 
+                    className="absolute inset-0 w-full h-full object-cover pointer-events-none" 
                   />
                   {/* Contenido sobre la imagen */}
                   <div 
-                    className="relative z-10 text-center p-8 backdrop-blur-sm rounded-xl cursor-pointer" 
-                    onClick={triggerReveal}
+                    className="relative z-10 text-center p-8 backdrop-blur-sm rounded-xl pointer-events-none" 
                     title="Volver al frente"
                   >
                     <div className="space-y-4">
