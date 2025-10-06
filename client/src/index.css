@@ -75,23 +75,20 @@ h1, h2, h3, h4, h5, h6 {
   will-change: transform;
 }
 
-/* Animación de desaceleración gradual (2 segundos) */
+/* Animación de desaceleración gradual (2 segundos) - Movimiento más lento progresivamente */
 .animate-card-float-slowdown {
-  animation: cardFloatSlowdown 2s ease-out forwards;
+  animation: cardFloatSlowdown 2s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
   will-change: transform;
 }
 
 @keyframes cardFloatSlowdown {
   0% { transform: rotateZ(-1deg); }
-  10% { transform: rotateZ(1deg); }
-  20% { transform: rotateZ(-0.8deg); }
-  30% { transform: rotateZ(0.8deg); }
-  40% { transform: rotateZ(-0.6deg); }
-  50% { transform: rotateZ(0.6deg); }
-  60% { transform: rotateZ(-0.4deg); }
-  70% { transform: rotateZ(0.4deg); }
-  80% { transform: rotateZ(-0.2deg); }
-  90% { transform: rotateZ(0.2deg); }
+  20% { transform: rotateZ(0.8deg); }
+  35% { transform: rotateZ(-0.5deg); }
+  50% { transform: rotateZ(0.3deg); }
+  65% { transform: rotateZ(-0.15deg); }
+  80% { transform: rotateZ(0.08deg); }
+  95% { transform: rotateZ(-0.02deg); }
   100% { transform: rotateZ(0deg); }
 }
 
