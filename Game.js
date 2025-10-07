@@ -32,6 +32,9 @@ class Game {
     // Sistema de orden y jugador inicial
     this.playerOrder = []; // Orden base (OB): uids ordenados por joinedAt
     this.startingPlayerId = null; // Jugador que inicia la ronda actual
+    
+    // Historial de impostores para evitar repeticiones
+    this.impostorHistory = []; // Array de uids de los últimos impostores [más reciente, ... , más antiguo]
 
     this.addPlayer(hostUser);
   }
@@ -93,6 +96,41 @@ class Game {
     return startingPlayerId;
   }
 
+  /**
+   * Selecciona un impostor evitando que el mismo jugador sea impostor más de 2 veces consecutivas
+   * @returns {string} UID del jugador seleccionado como impostor
+   */
+  selectImpostorWithLimit() {
+    // Obtener los últimos 2 impostores del historial
+    const lastTwoImpostors = this.impostorHistory.slice(0, 2);
+    
+    // Verificar si ambas últimas veces fue el mismo jugador
+    let excludedPlayer = null;
+    if (lastTwoImpostors.length === 2 && lastTwoImpostors[0] === lastTwoImpostors[1]) {
+      excludedPlayer = lastTwoImpostors[0];
+      console.log(`[Game ${this.gameId}] Jugador ${this.players.find(p => p.uid === excludedPlayer)?.name} fue impostor las últimas 2 veces, será excluido`);
+    }
+    
+    // Crear lista de candidatos (jugadores activos que no están excluidos)
+    let candidates = this.roundPlayers.filter(uid => uid !== excludedPlayer);
+    
+    // Si no hay candidatos (caso extremo: solo hay 1 jugador o algo salió mal)
+    // Permitir a cualquiera ser impostor
+    if (candidates.length === 0) {
+      console.log(`[Game ${this.gameId}] No hay candidatos elegibles, permitiendo a todos`);
+      candidates = [...this.roundPlayers];
+    }
+    
+    // Seleccionar impostor con mejor aleatoriedad usando Fisher-Yates shuffle
+    const shuffledCandidates = [...candidates];
+    for (let i = shuffledCandidates.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledCandidates[i], shuffledCandidates[j]] = [shuffledCandidates[j], shuffledCandidates[i]];
+    }
+    
+    return shuffledCandidates[0];
+  }
+
   removePlayer(userId) {
     const playerIsImpostor = this.impostorId === userId;
 
@@ -144,20 +182,24 @@ class Game {
     // Calcular jugador inicial para esta ronda
     this.startingPlayerId = this.calculateStartingPlayer();
 
-    // Seleccionar impostor con mejor aleatoriedad
-    // Mezclar el array usando Fisher-Yates shuffle antes de seleccionar
-    const shuffledPlayers = [...this.roundPlayers];
-    for (let i = shuffledPlayers.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledPlayers[i], shuffledPlayers[j]] = [shuffledPlayers[j], shuffledPlayers[i]];
+    // Seleccionar impostor evitando que alguien sea impostor más de 2 veces seguidas
+    this.impostorId = this.selectImpostorWithLimit();
+
+    // Agregar el nuevo impostor al historial
+    this.impostorHistory.unshift(this.impostorId);
+    // Mantener solo los últimos 10 registros para evitar memoria infinita
+    if (this.impostorHistory.length > 10) {
+      this.impostorHistory = this.impostorHistory.slice(0, 10);
     }
-    this.impostorId = shuffledPlayers[0];
 
     // Seleccionar palabra
     const { word, category } = getRandomWordWithCategory();
     this.secretWord = word;
     this.secretCategory = category;
-    console.log(`[Game ${this.gameId}] Ronda ${this.roundCount}: palabra='${this.secretWord}', categoría='${this.secretCategory}', impostor='${this.impostorId}'`);
+    
+    const impostorName = this.players.find(p => p.uid === this.impostorId)?.name || 'desconocido';
+    console.log(`[Game ${this.gameId}] Ronda ${this.roundCount}: palabra='${this.secretWord}', categoría='${this.secretCategory}', impostor='${impostorName}' (${this.impostorId})`);
+    console.log(`[Game ${this.gameId}] Historial de impostores:`, this.impostorHistory.slice(0, 3).map(uid => this.players.find(p => p.uid === uid)?.name || uid));
 
     this.phase = 'playing';
   }
