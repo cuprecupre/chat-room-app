@@ -50,6 +50,8 @@ export default function App() {
   const lastLoggedUid = useRef(null); // Para evitar logs duplicados
   const hasLoggedNoUser = useRef(false); // Para evitar log infinito de "no hay usuario"
   const hasLoggedLoading = useRef(false); // Para evitar log infinito de loading
+  const [showLoader, setShowLoader] = useState(false); // Controlar si mostrar loader (con delay)
+  const loaderTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (user) {
@@ -288,7 +290,29 @@ export default function App() {
     };
   }, [menuOpen]);
 
-  if (loading) {
+  // Mostrar loader solo si loading tarda más de 300ms (evitar parpadeo en recargas rápidas)
+  useEffect(() => {
+    if (loading) {
+      // Iniciar timer de 300ms
+      loaderTimeoutRef.current = setTimeout(() => {
+        setShowLoader(true);
+      }, 300);
+    } else {
+      // Si loading termina, limpiar timer y ocultar loader
+      if (loaderTimeoutRef.current) {
+        clearTimeout(loaderTimeoutRef.current);
+      }
+      setShowLoader(false);
+    }
+    
+    return () => {
+      if (loaderTimeoutRef.current) {
+        clearTimeout(loaderTimeoutRef.current);
+      }
+    };
+  }, [loading]);
+
+  if (loading && showLoader) {
     if (!hasLoggedLoading.current) {
       console.log('⏳ App - Cargando autenticación...');
       hasLoggedLoading.current = true;
