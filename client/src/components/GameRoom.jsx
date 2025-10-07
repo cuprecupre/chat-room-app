@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 // removed icons from labels
 import { Button } from './ui/Button';
 import { Avatar } from './ui/Avatar';
+import { Footer } from './Footer';
 import keyImg from '../assets/llave.png';
 import dualImpostorImg from '../assets/dual-impostor.png';
 import cardImg from '../assets/card.png';
@@ -215,7 +216,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   );
 }
 
-export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAgain, onLeaveGame, onCopyLink, onCopyGameCode, onVote, isMobile }) {
+export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAgain, onLeaveGame, onCopyLink, onCopyGameCode, onVote, isMobile, onOpenInstructions }) {
   const capitalize = (s) => (typeof s === 'string' && s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s);
   const prevPlayersRef = useRef(state.players);
   const prevTurnRef = useRef(state.currentTurn);
@@ -656,6 +657,11 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   Esperando a que el anfitrión (<span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'desconocido'}</span>) <br />inicie la siguiente partida
                 </div>
               )}
+              
+              {/* Footer con instrucciones */}
+              <div className="mt-8">
+                <Footer onOpenInstructions={onOpenInstructions} />
+              </div>
             </div>
           </div>
         </div>
@@ -799,6 +805,11 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   )}
                 </button>
               </div>
+            </div>
+            
+            {/* Footer con instrucciones */}
+            <div className="mt-8">
+              <Footer onOpenInstructions={onOpenInstructions} />
             </div>
             </div>
           </div>

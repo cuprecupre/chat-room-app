@@ -595,6 +595,7 @@ export default function App() {
           onCopyGameCode={copyGameCode}
           onVote={castVote}
           isMobile={isMobile}
+          onOpenInstructions={() => setInstructionsOpen(true)}
         />
       );
     }
