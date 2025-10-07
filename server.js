@@ -312,8 +312,6 @@ io.on('connection', (socket) => {
     };
 
     socket.on('create-game', (options = {}) => {
-        console.log(`🎮 SERVER - Received create-game event with options:`, options, `showImpostorHint=${options?.showImpostorHint}`);
-        
         // Allow creating new game even if in another - leave current first
         const userGame = findUserGame(user.uid);
         if (userGame) {
@@ -326,7 +324,6 @@ io.on('connection', (socket) => {
         const newGame = new Game(user, options);
         games[newGame.gameId] = newGame;
         socket.join(newGame.gameId);
-        console.log(`🔍 SERVER - Game ${newGame.gameId} created with showImpostorHint=${newGame.showImpostorHint}`);
         emitGameState(newGame);
         console.log(`Game created: ${newGame.gameId} by ${user.name} with options:`, options);
     });
