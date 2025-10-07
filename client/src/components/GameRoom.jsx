@@ -156,11 +156,11 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                 )}
                 {showScores ? (
                   <div className="text-right">
-                    {isRoundResult && scoreGained > 0 ? (
-                      // Mostrar puntos ganados y total en resultado de ronda
+                    {isRoundResult ? (
+                      // Mostrar puntos ganados y total en resultado de ronda (para todos)
                       <div className="flex flex-col items-end gap-0.5">
-                        <div className="text-xs text-green-400 font-medium">
-                          +{scoreGained} pts
+                        <div className={`text-xs font-medium ${scoreGained > 0 ? 'text-green-400' : 'text-neutral-500'}`}>
+                          {scoreGained > 0 ? '+' : ''}{scoreGained} pts
                         </div>
                         <div className={`text-sm ${isWinner ? 'text-orange-400' : 'text-neutral-400'}`}>
                           Total: {score}
