@@ -1,7 +1,7 @@
 const { getRandomWordWithCategory } = require('./words');
 
 class Game {
-  constructor(hostUser) {
+  constructor(hostUser, options = {}) {
     this.gameId = Math.random().toString(36).substring(2, 7).toUpperCase();
     this.hostId = hostUser.uid;
     this.players = [];
@@ -10,6 +10,9 @@ class Game {
     this.secretCategory = '';
     this.impostorId = '';
     this.roundPlayers = []; // uids activos en la ronda actual
+    
+    // Opciones del juego
+    this.showImpostorHint = options.showImpostorHint !== undefined ? options.showImpostorHint : true; // Por defecto mostrar pista
     
     // Sistema de vueltas
     this.currentTurn = 1; // Vuelta actual (1, 2, 3)
@@ -522,7 +525,7 @@ class Game {
         baseState.role = this.impostorId === userId ? 'impostor' : 'amigo';
         const isImpostor = this.impostorId === userId;
         baseState.secretWord = isImpostor ? 'Descubre la palabra secreta' : this.secretWord;
-        if (isImpostor) {
+        if (isImpostor && this.showImpostorHint) {
           baseState.secretCategory = this.secretCategory;
         }
         

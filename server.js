@@ -311,7 +311,7 @@ io.on('connection', (socket) => {
         });
     };
 
-    socket.on('create-game', () => {
+    socket.on('create-game', (options = {}) => {
         // Allow creating new game even if in another - leave current first
         const userGame = findUserGame(user.uid);
         if (userGame) {
@@ -321,11 +321,11 @@ io.on('connection', (socket) => {
             emitGameState(userGame);
         }
         
-        const newGame = new Game(user);
+        const newGame = new Game(user, options);
         games[newGame.gameId] = newGame;
         socket.join(newGame.gameId);
         emitGameState(newGame);
-        console.log(`Game created: ${newGame.gameId} by ${user.name}`);
+        console.log(`Game created: ${newGame.gameId} by ${user.name} with options:`, options);
     });
 
     socket.on('join-game', (gameId) => {
