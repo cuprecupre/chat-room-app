@@ -810,7 +810,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       {showTurnOverlay && (
         <div className={`fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm px-4 transition-opacity duration-300 ${isOverlayClosing ? 'opacity-0' : 'animate-fadeIn'}`}>
           <div className={`text-center space-y-8 max-w-md transition-all duration-300 ${isOverlayClosing ? 'opacity-0 scale-95' : 'animate-scaleIn'}`}>
-            <h2 className="text-4xl font-bold text-orange-400" style={{fontFamily: 'Trocchi, serif'}}>
+            <h2 className="text-6xl font-bold text-orange-400" style={{fontFamily: 'Trocchi, serif'}}>
               Ronda {state.currentTurn}
             </h2>
             
