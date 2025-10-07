@@ -657,12 +657,10 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   Esperando a que el anfitrión (<span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'desconocido'}</span>) <br />inicie la siguiente partida
                 </div>
               )}
-              
-              {/* Footer con instrucciones */}
-              <div className="mt-8">
-                <Footer onOpenInstructions={onOpenInstructions} />
-              </div>
             </div>
+            
+            {/* Footer con instrucciones */}
+            <Footer onOpenInstructions={onOpenInstructions} />
           </div>
         </div>
       )}
@@ -806,12 +804,10 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 </button>
               </div>
             </div>
+            </div>
             
             {/* Footer con instrucciones */}
-            <div className="mt-8">
-              <Footer onOpenInstructions={onOpenInstructions} />
-            </div>
-            </div>
+            <Footer onOpenInstructions={onOpenInstructions} />
           </div>
         </div>
         );
