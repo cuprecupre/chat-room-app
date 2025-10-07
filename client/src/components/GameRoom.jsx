@@ -514,16 +514,19 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                       
                       {state.role === 'impostor' ? (
                         <>
-                          {state.secretCategory && (
-                            <div>
-                              <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-neutral-200">
-                                <span>Pista</span>
+                          {(() => {
+                            console.log('🃏 GameRoom - Impostor state.secretCategory:', state.secretCategory);
+                            return state.secretCategory && (
+                              <div>
+                                <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-neutral-200">
+                                  <span>Pista</span>
+                                </div>
+                                <p className="font-semibold text-xl mt-1 text-white underline decoration-dotted underline-offset-4" style={{fontFamily: 'Trocchi, serif'}}>
+                                  {capitalize(state.secretCategory)}
+                                </p>
                               </div>
-                              <p className="font-semibold text-xl mt-1 text-white underline decoration-dotted underline-offset-4" style={{fontFamily: 'Trocchi, serif'}}>
-                                {capitalize(state.secretCategory)}
-                              </p>
-                            </div>
-                          )}
+                            );
+                          })()}
                         </>
                       ) : (
                         <div>
