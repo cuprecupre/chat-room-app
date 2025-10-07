@@ -597,9 +597,8 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {/* Resultado de partida */}
       {state.phase === 'round_result' && state.impostorName && state.secretWord && (
-        <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm animate-fadeIn pt-20">
-          <div className="absolute inset-0 overflow-y-auto pt-20" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <div className="min-h-full w-full max-w-sm mx-auto px-4 pt-6 pb-4 space-y-6">
+        <div className="w-full max-w-sm mx-auto animate-fadeIn">
+          <div className="w-full px-4 py-6 space-y-6">
               <div className="text-center space-y-4 animate-scaleIn animate-delay-200">
                 {state.roundCount && state.maxRounds && (
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 rounded-full">
@@ -657,10 +656,6 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   Esperando a que el anfitrión (<span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'desconocido'}</span>) <br />inicie la siguiente partida
                 </div>
               )}
-            </div>
-            
-            {/* Footer con instrucciones */}
-            <Footer onOpenInstructions={onOpenInstructions} />
           </div>
         </div>
       )}
@@ -693,9 +688,8 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         const winnerNames = winnerPlayers.map(p => p.name).join(' y ');
         
         return (
-        <div className="fixed inset-0 z-40 bg-neutral-950/95 backdrop-blur-sm animate-fadeIn pt-20">
-          <div className="absolute inset-0 overflow-y-auto pt-20" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <div className="min-h-full w-full max-w-sm mx-auto px-4 pt-6 pb-4 space-y-6">
+        <div className="w-full max-w-sm mx-auto animate-fadeIn">
+          <div className="w-full px-4 py-6 space-y-6">
             <div className="text-center space-y-4 animate-scaleIn animate-delay-200">
               <h2 className="text-4xl font-bold text-neutral-50" style={{fontFamily: 'Trocchi, serif'}}>
                 Resultado final
@@ -804,10 +798,6 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                 </button>
               </div>
             </div>
-            </div>
-            
-            {/* Footer con instrucciones */}
-            <Footer onOpenInstructions={onOpenInstructions} />
           </div>
         </div>
         );
