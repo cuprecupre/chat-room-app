@@ -29,8 +29,7 @@ export function Lobby({ onCreateGame, onJoinGame }) {
       </div>
       <div className="max-w-sm mx-auto space-y-4">
         {/* Opciones de juego */}
-        <div className="bg-white/5 rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-semibold text-neutral-200">Opciones de juego</h3>
+        <div className="bg-white/5 rounded-lg p-4">
           <label className="flex items-center justify-between cursor-pointer">
             <div className="flex-1">
               <span className="text-sm text-neutral-300">Mostrar pista al impostor</span>
