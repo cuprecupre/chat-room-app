@@ -52,6 +52,8 @@ export default function App() {
   const hasLoggedLoading = useRef(false); // Para evitar log infinito de loading
   const [showLoader, setShowLoader] = useState(false); // Controlar si mostrar loader (con delay)
   const loaderTimeoutRef = useRef(null);
+  const [showConnectingLoader, setShowConnectingLoader] = useState(false); // Controlar si mostrar loader de conexión (con delay)
+  const connectingLoaderTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (user) {
@@ -85,6 +87,28 @@ export default function App() {
       setIsStuck(false);
     }
   }, [user, connected]);
+
+  // Mostrar loader de conexión solo si tarda más de 300ms (evitar parpadeo en reconexiones rápidas)
+  useEffect(() => {
+    if (user && !connected && !isStuck) {
+      // Iniciar timer de 300ms antes de mostrar el loader
+      connectingLoaderTimeoutRef.current = setTimeout(() => {
+        setShowConnectingLoader(true);
+      }, 300);
+    } else {
+      // Si se conecta o no hay usuario, limpiar timer y ocultar loader
+      if (connectingLoaderTimeoutRef.current) {
+        clearTimeout(connectingLoaderTimeoutRef.current);
+      }
+      setShowConnectingLoader(false);
+    }
+    
+    return () => {
+      if (connectingLoaderTimeoutRef.current) {
+        clearTimeout(connectingLoaderTimeoutRef.current);
+      }
+    };
+  }, [user, connected, isStuck]);
   
   const getUrlGameId = () => {
     try {
@@ -375,24 +399,30 @@ export default function App() {
       );
     }
     
-    return (
-      <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
-        <div className="flex flex-col items-center gap-6 text-center">
-          <img 
-            src={heroImg} 
-            alt="El Impostor" 
-            className="w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10" 
-          />
-          <div className="flex flex-col items-center gap-3">
-            <Spinner size="md" />
-            <div>
-              <p>Conectando al servidor</p>
-              <p className="text-sm text-neutral-400 mt-1">Estableciendo conexión...</p>
+    // Solo mostrar pantalla de conexión si han pasado más de 300ms
+    if (showConnectingLoader) {
+      return (
+        <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
+          <div className="flex flex-col items-center gap-6 text-center">
+            <img 
+              src={heroImg} 
+              alt="El Impostor" 
+              className="w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10" 
+            />
+            <div className="flex flex-col items-center gap-3">
+              <Spinner size="md" />
+              <div>
+                <p>Conectando al servidor</p>
+                <p className="text-sm text-neutral-400 mt-1">Estableciendo conexión...</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    );
+      );
+    }
+    
+    // Si aún no han pasado 300ms, no mostrar nada (evita parpadeo)
+    return null;
   }
 
   const renderContent = () => {
