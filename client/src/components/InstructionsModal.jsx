@@ -13,7 +13,7 @@ export function InstructionsModal({ isOpen, onClose }) {
             <em>El impostor</em> es un juego social de deducción que combina una <strong>app web</strong> con dinámica <strong>presencial</strong>.
           </p>
           <p className="text-neutral-300 leading-relaxed text-base mt-3">
-            En cada <strong>partida</strong>, un jugador es el <strong>Impostor</strong> y el resto son <strong>Amigos.</strong> Se reparten las cartas. Los Amigos ven una <strong>palabra secreta</strong>; el Impostor no la conoce, pero recibe <strong>una pista orientativa</strong>.
+            En cada <strong>partida</strong>, un jugador es el <strong>Impostor</strong> y el resto son <strong>Amigos.</strong> Se reparten las cartas. Los Amigos ven una <strong>palabra secreta</strong>; el Impostor no la conoce, pero puede recibir <strong>una pista orientativa</strong> (según elija el anfitrión al crear el juego).
             Cada jugador solo ha visto su carta y debe desconfiar de todo lo que sucede a su alrededor.
           </p>
           <p className="text-neutral-300 leading-relaxed text-base mt-3">
@@ -72,7 +72,7 @@ export function InstructionsModal({ isOpen, onClose }) {
           <ol className="list-decimal list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li>Abre la <strong>app web</strong> en tu dispositivo.</li>
             <li><strong>Inicia sesión</strong>.</li>
-            <li>Un jugador crea el juego como <strong>anfitrión</strong> y comparte <strong>enlace o código con el resto de jugadores.</strong></li>
+            <li>Un jugador crea el juego como <strong>anfitrión</strong>, elige si mostrar o no la <strong>pista al impostor</strong>, y comparte <strong>enlace o código con el resto de jugadores.</strong></li>
             <li>Con todos conectados, el anfitrión pulsa <strong>"Comenzar juego"</strong>.</li>
           </ol>
         </section>
@@ -101,7 +101,7 @@ export function InstructionsModal({ isOpen, onClose }) {
           </p>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
             <li><span className="text-white"><strong>Amigos</strong></span>: ven la <strong>palabra secreta</strong> (ej.: "Lavadora").</li>
-            <li><span className="text-orange-400"><strong>Impostor</strong></span>: recibe <strong>una pista orientativa</strong> (ej.: "Electrodomésticos"). <strong>No</strong> ve la palabra exacta.</li>
+            <li><span className="text-orange-400"><strong>Impostor</strong></span>: <strong>no</strong> ve la palabra exacta. Si el anfitrión activó la opción, recibe <strong>una pista orientativa</strong> (ej.: "Electrodomésticos"); si no, debe descubrir la palabra sin ayuda.</li>
           </ul>
           <div className="mt-3 p-3 bg-white/5 border border-white/10 rounded-lg">
             <p className="text-sm text-neutral-400 italic">
@@ -116,10 +116,10 @@ export function InstructionsModal({ isOpen, onClose }) {
         <section className="mb-8">
           <h3 className="text-xl font-semibold text-orange-400 mb-4">Dinámica presencial</h3>
           <ul className="list-disc list-outside ml-5 space-y-2 text-neutral-300 text-base">
-            <li>La app <strong>no</strong> gestiona turnos.</li>
-            <li>Los <strong>turnos</strong> se organizan <strong>en persona</strong>: cada jugador dice <strong>una pista breve</strong> en voz alta cuando el grupo lo indique.</li>
-            <li>El jugador que empieza la primera partida es el anfitrión, a partir de ese momento los turnos van en sentido horario.</li>
-            <li>Cuando se lanza una nueva partida el jugador que comienza es el que está en el sentido horario del anfitrión.</li>
+            <li>La app <strong>no</strong> gestiona turnos de habla en tiempo real.</li>
+            <li>Los <strong>turnos orales</strong> se organizan <strong>en persona</strong>: cada jugador dice <strong>una pista breve</strong> en voz alta cuando el grupo lo indique.</li>
+            <li>La app <strong>indica quién debe empezar</strong> cada partida: la primera la inicia el anfitrión, y las siguientes rotan en orden de llegada (sentido horario virtual).</li>
+            <li>A partir del jugador inicial, los turnos continúan en <strong>sentido horario</strong> hasta que todos hayan dado su pista.</li>
           </ul>
         </section>
 
