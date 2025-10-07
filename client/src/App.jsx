@@ -615,7 +615,7 @@ export default function App() {
       
       <div className={containerClasses}>
         {showHeader && (
-          <header className="sticky top-0 z-50 bg-neutral-950 flex justify-between items-center mb-6 pb-6 border-b border-white/10">
+          <header className="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
             <button 
               onClick={handleTitleClick}
               className="text-xl sm:text-2xl font-bold text-neutral-50 hover:text-orange-400 transition-colors active:scale-95 cursor-pointer"

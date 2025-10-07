@@ -4,15 +4,17 @@ export function Modal({ isOpen, onClose, children, title }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 sm:py-8 animate-fadeIn overflow-y-auto">
+    <div className="fixed inset-0 z-50 animate-fadeIn">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         onClick={onClose}
       />
       
-      {/* Modal Content */}
-      <div className="relative w-full max-w-2xl bg-neutral-900 rounded-2xl shadow-2xl border border-white/10 animate-scaleIn my-auto">
+      {/* Modal Container - Scrollable */}
+      <div className="relative h-full overflow-y-auto flex items-start justify-center p-4 sm:py-8">
+        {/* Modal Content */}
+        <div className="relative w-full max-w-2xl bg-neutral-900 rounded-2xl shadow-2xl border border-white/10 animate-scaleIn my-auto">
         {/* Header */}
         {title && (
           <div className="px-6 py-4 border-b border-white/10 sticky top-0 bg-neutral-900 rounded-t-2xl z-10">
@@ -34,6 +36,7 @@ export function Modal({ isOpen, onClose, children, title }) {
         {/* Body - Scrollable */}
         <div className="p-6 max-h-[calc(90vh-120px)] overflow-y-auto">
           {children}
+        </div>
         </div>
       </div>
     </div>
