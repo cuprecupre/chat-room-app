@@ -17,6 +17,7 @@ export function Lobby({ onCreateGame, onJoinGame }) {
   };
 
   const handleCreateGame = () => {
+    console.log('🎮 Lobby - Crear juego con opciones:', { showImpostorHint });
     onCreateGame({ showImpostorHint });
   };
 

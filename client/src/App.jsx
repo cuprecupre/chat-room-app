@@ -118,7 +118,10 @@ export default function App() {
 
   const isHost = useMemo(() => gameState && user && gameState.hostId === user.uid, [gameState, user]);
 
-  const createGame = useCallback((options) => emit('create-game', options), [emit]);
+  const createGame = useCallback((options) => {
+    console.log('📡 App - emit create-game con opciones:', options);
+    emit('create-game', options);
+  }, [emit]);
   const joinGame = useCallback((gameId) => emit('join-game', gameId), [emit]);
   const startGame = useCallback(() => emit('start-game', gameState?.gameId), [emit, gameState]);
   const endGame = useCallback(() => emit('end-game', gameState?.gameId), [emit, gameState]);

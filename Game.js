@@ -13,6 +13,7 @@ class Game {
     
     // Opciones del juego
     this.showImpostorHint = options.showImpostorHint !== undefined ? options.showImpostorHint : true; // Por defecto mostrar pista
+    console.log(`[Game ${this.gameId}] Creado con opciones:`, options, `showImpostorHint=${this.showImpostorHint}`);
     
     // Sistema de vueltas
     this.currentTurn = 1; // Vuelta actual (1, 2, 3)
@@ -525,8 +526,13 @@ class Game {
         baseState.role = this.impostorId === userId ? 'impostor' : 'amigo';
         const isImpostor = this.impostorId === userId;
         baseState.secretWord = isImpostor ? 'Descubre la palabra secreta' : this.secretWord;
-        if (isImpostor && this.showImpostorHint) {
-          baseState.secretCategory = this.secretCategory;
+        if (isImpostor) {
+          if (this.showImpostorHint) {
+            baseState.secretCategory = this.secretCategory;
+            console.log(`[Game ${this.gameId}] Impostor ${userId} - Mostrando pista: ${this.secretCategory}`);
+          } else {
+            console.log(`[Game ${this.gameId}] Impostor ${userId} - Pista OCULTA (showImpostorHint=false)`);
+          }
         }
         
         // Info de votación
