@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { auth, provider, ensurePersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from '../lib/firebase';
+import { saveToken, clearToken } from '../lib/tokenStorage';
 
 export function useAuth() {
   // Verificar si Firebase ya tiene un usuario en memoria (evita parpadeo en recargas)
@@ -13,12 +14,42 @@ export function useAuth() {
   useEffect(() => {
     let isMounted = true;
     let authResolved = false;
+    let tokenRefreshInterval = null;
     
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       authResolved = true;
       if (isMounted) {
         setUser(u);
         setLoading(false);
+        
+        // Si hay usuario autenticado, guardar token en localStorage
+        if (u) {
+          try {
+            const token = await u.getIdToken();
+            saveToken(token);
+            console.log('🔑 Token guardado después de auth state change');
+            
+            // Configurar refresh automático del token cada 50 minutos
+            if (tokenRefreshInterval) clearInterval(tokenRefreshInterval);
+            tokenRefreshInterval = setInterval(async () => {
+              try {
+                if (auth.currentUser) {
+                  const freshToken = await auth.currentUser.getIdToken(true); // force refresh
+                  saveToken(freshToken);
+                  console.log('🔄 Token refrescado automáticamente');
+                }
+              } catch (error) {
+                console.error('❌ Error refrescando token:', error);
+              }
+            }, 50 * 60 * 1000); // 50 minutos
+          } catch (error) {
+            console.error('❌ Error obteniendo token inicial:', error);
+          }
+        } else {
+          // Si no hay usuario, limpiar token y detener refresh
+          clearToken();
+          if (tokenRefreshInterval) clearInterval(tokenRefreshInterval);
+        }
       }
     });
     
@@ -55,6 +86,7 @@ export function useAuth() {
     return () => {
       isMounted = false;
       clearTimeout(timeout);
+      if (tokenRefreshInterval) clearInterval(tokenRefreshInterval);
       unsubscribe();
     };
   }, []);
@@ -224,6 +256,7 @@ export function useAuth() {
 
   const logout = useCallback(async () => {
     try {
+      clearToken(); // Limpiar token de localStorage primero
       await signOut(auth);
     } catch (err) {
       console.error('Logout Error:', err);

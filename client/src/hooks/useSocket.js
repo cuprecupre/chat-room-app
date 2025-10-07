@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { io } from 'socket.io-client';
+import { getToken, saveToken, isTokenExpired } from '../lib/tokenStorage';
 
 export function useSocket(user) {
   const socketRef = useRef(null);
@@ -40,7 +41,19 @@ export function useSocket(user) {
       }
 
       try {
-        const token = await user.getIdToken();
+        // Intentar obtener token de localStorage primero (solución para iOS)
+        let token = getToken();
+        
+        // Si no hay token en localStorage o está expirado, obtener de Firebase
+        if (!token || isTokenExpired()) {
+          console.log('🔑 Obteniendo token desde Firebase Auth...');
+          token = await user.getIdToken(true); // force refresh
+          saveToken(token); // Guardar para próximas conexiones
+          console.log('✅ Token obtenido y guardado desde Firebase');
+        } else {
+          console.log('✅ Usando token de localStorage');
+        }
+        
         if (!isMounted) return;
         
         // En desarrollo, usar el mismo host que la URL actual pero puerto 3000
@@ -97,13 +110,31 @@ export function useSocket(user) {
           }
         });
 
-        socket.on('connect_error', (error) => {
+        socket.on('connect_error', async (error) => {
           console.error('❌ useSocket - Error de conexión del socket:', {
             message: error.message,
             type: error.type,
             description: error.description,
             context: error.context,
           });
+          
+          // Si es error de autenticación, intentar refrescar token
+          if (error.message?.includes('Authentication error') || error.message?.includes('Invalid token')) {
+            console.log('🔄 Error de autenticación, intentando refrescar token...');
+            try {
+              if (user) {
+                const freshToken = await user.getIdToken(true); // force refresh
+                saveToken(freshToken);
+                console.log('✅ Token refrescado, socket se reconectará automáticamente');
+              }
+            } catch (refreshError) {
+              console.error('❌ No se pudo refrescar el token:', refreshError);
+              // Mostrar mensaje al usuario
+              window.dispatchEvent(new CustomEvent('app:toast', { 
+                detail: 'Tu sesión expiró. Por favor, vuelve a iniciar sesión.' 
+              }));
+            }
+          }
         });
 
         socket.on('game-state', (newState) => {
@@ -127,6 +158,32 @@ export function useSocket(user) {
           }
         });
 
+        // Antes de cada intento de reconexión, actualizar el token
+        socket.io.on('reconnect_attempt', async () => {
+          console.log('🔄 Intentando reconexión, actualizando token...');
+          try {
+            // Intentar obtener token fresco
+            let freshToken = getToken();
+            
+            // Si el token en localStorage está expirado o no existe, obtener de Firebase
+            if (!freshToken || isTokenExpired(10)) { // 10 minutos de buffer
+              if (user) {
+                freshToken = await user.getIdToken(true);
+                saveToken(freshToken);
+                console.log('✅ Token refrescado desde Firebase para reconexión');
+              }
+            }
+            
+            // Actualizar auth del socket con el token fresco
+            if (freshToken) {
+              socket.auth.token = freshToken;
+              console.log('✅ Token actualizado en socket.auth');
+            }
+          } catch (error) {
+            console.error('❌ Error actualizando token para reconexión:', error);
+          }
+        });
+        
         // Add reconnection recovery
         socket.on('reconnect', () => {
           console.log('Socket reconnected, attempting to resume...');
