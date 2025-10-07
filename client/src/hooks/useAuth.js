@@ -2,10 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { auth, provider, ensurePersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from '../lib/firebase';
 
 export function useAuth() {
-  const [user, setUser] = useState(null);
-  // Mostrar loading solo si venimos de un redirect de login
-  const initialLoading = typeof window !== 'undefined' && sessionStorage.getItem('auth:redirect') === '1';
-  const [loading, setLoading] = useState(Boolean(initialLoading));
+  // Verificar si Firebase ya tiene un usuario en memoria (evita parpadeo en recargas)
+  const hasCurrentUser = auth.currentUser !== null;
+  const hasRedirect = typeof window !== 'undefined' && sessionStorage.getItem('auth:redirect') === '1';
+  
+  const [user, setUser] = useState(auth.currentUser); // Inicializar con usuario actual si existe
+  const [loading, setLoading] = useState(hasRedirect && !hasCurrentUser); // Solo loading si hay redirect Y no hay usuario
   const [error, setError] = useState(null);
 
   useEffect(() => {

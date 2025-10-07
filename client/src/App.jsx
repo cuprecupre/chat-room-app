@@ -293,10 +293,10 @@ export default function App() {
   // Mostrar loader solo si loading tarda más de 300ms (evitar parpadeo en recargas rápidas)
   useEffect(() => {
     if (loading) {
-      // Iniciar timer de 300ms
+      // Iniciar timer de 500ms
       loaderTimeoutRef.current = setTimeout(() => {
         setShowLoader(true);
-      }, 300);
+      }, 500);
     } else {
       // Si loading termina, limpiar timer y ocultar loader
       if (loaderTimeoutRef.current) {
