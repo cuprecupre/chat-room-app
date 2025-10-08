@@ -1,0 +1,12 @@
+{
+  "name": "mobile-login-tests",
+  "version": "1.0.0",
+  "description": "Tests automatizados para login móvil",
+  "scripts": {
+    "test:mobile": "node test-mobile-login.js",
+    "test:mobile:headless": "HEADLESS=true node test-mobile-login.js"
+  },
+  "devDependencies": {
+    "puppeteer": "^21.0.0"
+  }
+}
