@@ -96,47 +96,23 @@ export function useAuth() {
     setError(null);
     
     try {
-      // Detectar si es dispositivo móvil e iOS
+      console.log('🔄 Iniciando proceso de login...');
+      
+      // Configurar persistencia antes del login
+      console.log('📝 Configurando persistencia...');
+      await ensurePersistence();
+      
+      // Detectar si es dispositivo móvil
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const iOSVersion = isIOS ? parseFloat(
-        (navigator.userAgent.match(/OS (\d+)_(\d+)/) || [])[1] + '.' + 
-        (navigator.userAgent.match(/OS (\d+)_(\d+)/) || [])[2]
-      ) : 0;
       
-      // En iOS < 18, NO configurar persistencia antes del redirect
-      // Safari iOS 17 tiene problemas con setPersistence antes de signInWithRedirect
-      if (!(isIOS && iOSVersion < 18)) {
-        await ensurePersistence();
-      }
-      
-      // iOS 17 tiene problemas con popup, usar redirect directamente
-      // iOS 18+ funciona bien con popup
-      // En otros móviles, usar redirect
-      // En desktop, usar popup
-      if (isIOS && iOSVersion < 18) {
-        try {
-          try { sessionStorage.setItem('auth:redirect', '1'); } catch (_) {}
-          await signInWithRedirect(auth, provider);
-        } catch (redirectError) {
-          console.error('Error en signInWithRedirect:', redirectError?.message);
-          throw redirectError;
-        }
-      } else if (isIOS && iOSVersion >= 18) {
-        try {
-          const loginPromise = signInWithPopup(auth, provider);
-          const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('POPUP_TIMEOUT')), 30000);
-          });
-          await Promise.race([loginPromise, timeoutPromise]);
-        } catch (popupError) {
-          try { sessionStorage.setItem('auth:redirect', '1'); } catch (_) {}
-          await signInWithRedirect(auth, provider);
-        }
-      } else if (isMobile) {
+      if (isMobile) {
+        // En dispositivos móviles, usar redirect para mejor compatibilidad
+        console.log('📱 Dispositivo móvil detectado, usando redirect...');
         try { sessionStorage.setItem('auth:redirect', '1'); } catch (_) {}
         await signInWithRedirect(auth, provider);
       } else {
+        // En desktop, usar popup con timeout
+        console.log('🖥️ Desktop detectado, usando popup...');
         const loginPromise = signInWithPopup(auth, provider);
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(() => reject(new Error('TIMEOUT')), 30000);
@@ -146,7 +122,7 @@ export function useAuth() {
       
       // setLoading will be set to false by onAuthStateChanged
     } catch (err) {
-      console.error('Error en login:', err?.code || err?.message);
+      console.error('❌ Error en login:', err?.code || err?.message);
       
       let errorMessage = 'No se pudo iniciar sesión.';
       

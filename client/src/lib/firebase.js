@@ -1,6 +1,6 @@
 // Firebase initialization for React client (modular SDK)
 import { initializeApp } from 'firebase/app';
-import { initializeAuth, getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence, indexedDBLocalPersistence, browserPopupRedirectResolver, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyCs-vni2Zme9_K_mZgZkft2o9iytR541lQ',
@@ -13,19 +13,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-// Usar initializeAuth con resolvers/persistencias recomendadas para Safari iOS
-// - indexedDBLocalPersistence primero, luego browserLocalPersistence
-// - browserPopupRedirectResolver mejora el manejo del redirect/popup en Safari
-let auth;
-try {
-  auth = initializeAuth(app, {
-    persistence: [indexedDBLocalPersistence, browserLocalPersistence],
-    popupRedirectResolver: browserPopupRedirectResolver,
-  });
-} catch (_) {
-  // Fallback si initializeAuth ya fue llamado (hot reload)
-  auth = getAuth(app);
-}
+const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
 // Configurar el proveedor de Google para solicitar permisos específicos
@@ -33,10 +21,9 @@ provider.addScope('profile');
 provider.addScope('email');
 
 // Configurar parámetros adicionales para mejorar la experiencia
-// Nota: 'prompt: select_account' removido porque causa problemas en iOS 17
-// provider.setCustomParameters({
-//   prompt: 'select_account'
-// });
+provider.setCustomParameters({
+  prompt: 'select_account'
+});
 
 async function ensurePersistence() {
   try {
