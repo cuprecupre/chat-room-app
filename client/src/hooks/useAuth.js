@@ -148,20 +148,34 @@ export function useAuth() {
       console.log('📝 Configurando persistencia...');
       await ensurePersistence();
       
-      // SOLUCIÓN: Usar redirect en todos los dispositivos
-      // Con authDomain personalizado, redirect funciona en todos los navegadores
-      console.log('🚀 Iniciando login con redirect (compatible con Safari iOS)...');
-      console.log('🔧 Auth Domain:', auth.app.options.authDomain);
+      // SOLUCIÓN HÍBRIDA: Popup en desktop, redirect en móviles
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isProduction = window.location.hostname === 'impostor.me';
       
-      try { 
-        sessionStorage.setItem('auth:redirect', '1'); 
-        console.log('✅ Flag de redirect guardado en sessionStorage');
-      } catch (e) {
-        console.warn('⚠️ No se pudo guardar flag de redirect:', e);
+      if (isMobile && isProduction) {
+        // Solo en móviles en producción: usar redirect con dominio personalizado
+        console.log('📱 Móvil en producción, usando redirect con dominio personalizado...');
+        console.log('🔧 Auth Domain:', auth.app.options.authDomain);
+        
+        try { 
+          sessionStorage.setItem('auth:redirect', '1'); 
+          console.log('✅ Flag de redirect guardado en sessionStorage');
+        } catch (e) {
+          console.warn('⚠️ No se pudo guardar flag de redirect:', e);
+        }
+        
+        await signInWithRedirect(auth, provider);
+        console.log('✅ signInWithRedirect completado');
+      } else {
+        // Desktop o desarrollo: usar popup (funciona bien)
+        console.log('🖥️ Desktop/desarrollo, usando popup...');
+        const loginPromise = signInWithPopup(auth, provider);
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('TIMEOUT')), 30000);
+        });
+        await Promise.race([loginPromise, timeoutPromise]);
+        console.log('✅ signInWithPopup completado');
       }
-      
-      await signInWithRedirect(auth, provider);
-      console.log('✅ signInWithRedirect completado');
       
       // setLoading will be set to false by onAuthStateChanged
     } catch (err) {
