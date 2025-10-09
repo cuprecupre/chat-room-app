@@ -148,33 +148,34 @@ export function useAuth() {
       console.log('📝 Configurando persistencia...');
       await ensurePersistence();
       
-      // SOLUCIÓN HÍBRIDA: Popup en desktop, redirect en móviles
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      const isProduction = window.location.hostname === 'impostor.me';
+      // SOLUCIÓN EFECTIVA: Popup con fallback a redirect
+      console.log('🚀 Intentando popup...');
       
-      if (isMobile && isProduction) {
-        // Solo en móviles en producción: usar redirect con dominio personalizado
-        console.log('📱 Móvil en producción, usando redirect con dominio personalizado...');
-        console.log('🔧 Auth Domain:', auth.app.options.authDomain);
-        
-        try { 
-          sessionStorage.setItem('auth:redirect', '1'); 
-          console.log('✅ Flag de redirect guardado en sessionStorage');
-        } catch (e) {
-          console.warn('⚠️ No se pudo guardar flag de redirect:', e);
-        }
-        
-        await signInWithRedirect(auth, provider);
-        console.log('✅ signInWithRedirect completado');
-      } else {
-        // Desktop o desarrollo: usar popup (funciona bien)
-        console.log('🖥️ Desktop/desarrollo, usando popup...');
+      try {
+        // Intentar popup primero
         const loginPromise = signInWithPopup(auth, provider);
         const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('TIMEOUT')), 30000);
+          setTimeout(() => reject(new Error('POPUP_TIMEOUT')), 5000);
         });
+        
         await Promise.race([loginPromise, timeoutPromise]);
-        console.log('✅ signInWithPopup completado');
+        console.log('✅ Popup exitoso');
+        
+      } catch (popupError) {
+        console.log('⚠️ Popup falló, intentando redirect...', popupError?.code);
+        
+        // Si popup falla, usar redirect
+        if (popupError?.code === 'auth/popup-blocked' || 
+            popupError?.code === 'auth/popup-closed-by-user' ||
+            popupError?.message === 'POPUP_TIMEOUT') {
+          
+          console.log('🔄 Usando redirect...');
+          try { sessionStorage.setItem('auth:redirect', '1'); } catch (_) {}
+          await signInWithRedirect(auth, provider);
+          console.log('✅ Redirect iniciado');
+        } else {
+          throw popupError;
+        }
       }
       
       // setLoading will be set to false by onAuthStateChanged

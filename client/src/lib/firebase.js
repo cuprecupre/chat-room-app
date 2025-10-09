@@ -4,11 +4,7 @@ import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence, s
 
 const firebaseConfig = {
   apiKey: 'AIzaSyCs-vni2Zme9_K_mZgZkft2o9iytR541lQ',
-  // SOLUCIÓN HÍBRIDA: Usar dominio personalizado solo en producción
-  // En desarrollo y desktop, usar dominio Firebase (funciona bien)
-  authDomain: window.location.hostname === 'impostor.me' 
-    ? 'impostor.me'  // Producción: dominio personalizado para Safari iOS
-    : 'impostor-468e0.firebaseapp.com', // Desarrollo: dominio Firebase
+  authDomain: 'impostor-468e0.firebaseapp.com',
   projectId: 'impostor-468e0',
   storageBucket: 'impostor-468e0.appspot.com',
   messagingSenderId: '706542941882',
