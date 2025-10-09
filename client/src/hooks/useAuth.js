@@ -15,6 +15,7 @@ export function useAuth() {
     let isMounted = true;
     let authResolved = false;
     let tokenRefreshInterval = null;
+    let redirectCheckInterval = null;
     
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       authResolved = true;
@@ -56,16 +57,20 @@ export function useAuth() {
     // Manejar posible flujo de redirect en navegadores móviles
     const handleRedirect = async () => {
       try {
+        console.log('🔄 Verificando resultado de redirect...');
         const result = await getRedirectResult(auth);
         if (result) {
+          console.log('✅ Redirect exitoso:', result.user?.displayName);
           authResolved = true;
           if (isMounted) {
             setUser(result.user);
             setLoading(false);
           }
+        } else {
+          console.log('ℹ️ No hay resultado de redirect');
         }
       } catch (err) {
-        console.error('Error en redirect:', err?.message);
+        console.error('❌ Error en redirect:', err?.message);
         if (isMounted) {
           setError(err?.message || 'Error al procesar autenticación');
           setLoading(false);
@@ -74,7 +79,46 @@ export function useAuth() {
       try { sessionStorage.removeItem('auth:redirect'); } catch (_) {}
     };
     
+    // Ejecutar inmediatamente
     handleRedirect();
+    
+    // También verificar periódicamente en caso de que el redirect tarde
+    redirectCheckInterval = setInterval(async () => {
+      if (!authResolved && isMounted) {
+        try {
+          const result = await getRedirectResult(auth);
+          if (result) {
+            console.log('✅ Redirect detectado en verificación periódica:', result.user?.displayName);
+            authResolved = true;
+            setUser(result.user);
+            setLoading(false);
+            clearInterval(redirectCheckInterval);
+          }
+        } catch (err) {
+          console.log('ℹ️ Verificación periódica de redirect:', err?.message);
+        }
+      }
+    }, 1000); // Verificar cada segundo
+
+    // Listener para cuando la página se vuelve visible (regresa del redirect)
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible' && !authResolved && isMounted) {
+        console.log('👁️ Página visible, verificando redirect...');
+        try {
+          const result = await getRedirectResult(auth);
+          if (result) {
+            console.log('✅ Redirect detectado al volver a la página:', result.user?.displayName);
+            authResolved = true;
+            setUser(result.user);
+            setLoading(false);
+          }
+        } catch (err) {
+          console.log('ℹ️ Verificación al volver a la página:', err?.message);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     // Timeout de seguridad solo si la autenticación no se resuelve
     const timeout = setTimeout(() => {
@@ -87,6 +131,8 @@ export function useAuth() {
       isMounted = false;
       clearTimeout(timeout);
       if (tokenRefreshInterval) clearInterval(tokenRefreshInterval);
+      if (redirectCheckInterval) clearInterval(redirectCheckInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       unsubscribe();
     };
   }, []);
@@ -108,8 +154,16 @@ export function useAuth() {
       if (isMobile) {
         // En dispositivos móviles, usar redirect para mejor compatibilidad
         console.log('📱 Dispositivo móvil detectado, usando redirect...');
-        try { sessionStorage.setItem('auth:redirect', '1'); } catch (_) {}
+        console.log('🔧 User Agent:', navigator.userAgent);
+        try { 
+          sessionStorage.setItem('auth:redirect', '1'); 
+          console.log('✅ Flag de redirect guardado en sessionStorage');
+        } catch (e) {
+          console.warn('⚠️ No se pudo guardar flag de redirect:', e);
+        }
+        console.log('🚀 Iniciando signInWithRedirect...');
         await signInWithRedirect(auth, provider);
+        console.log('✅ signInWithRedirect completado');
       } else {
         // En desktop, usar popup con timeout
         console.log('🖥️ Desktop detectado, usando popup...');
