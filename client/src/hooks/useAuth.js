@@ -148,31 +148,20 @@ export function useAuth() {
       console.log('📝 Configurando persistencia...');
       await ensurePersistence();
       
-      // Detectar si es dispositivo móvil
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      // SOLUCIÓN: Usar redirect en todos los dispositivos
+      // Con authDomain personalizado, redirect funciona en todos los navegadores
+      console.log('🚀 Iniciando login con redirect (compatible con Safari iOS)...');
+      console.log('🔧 Auth Domain:', auth.app.options.authDomain);
       
-      if (isMobile) {
-        // En dispositivos móviles, usar redirect para mejor compatibilidad
-        console.log('📱 Dispositivo móvil detectado, usando redirect...');
-        console.log('🔧 User Agent:', navigator.userAgent);
-        try { 
-          sessionStorage.setItem('auth:redirect', '1'); 
-          console.log('✅ Flag de redirect guardado en sessionStorage');
-        } catch (e) {
-          console.warn('⚠️ No se pudo guardar flag de redirect:', e);
-        }
-        console.log('🚀 Iniciando signInWithRedirect...');
-        await signInWithRedirect(auth, provider);
-        console.log('✅ signInWithRedirect completado');
-      } else {
-        // En desktop, usar popup con timeout
-        console.log('🖥️ Desktop detectado, usando popup...');
-        const loginPromise = signInWithPopup(auth, provider);
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('TIMEOUT')), 30000);
-        });
-        await Promise.race([loginPromise, timeoutPromise]);
+      try { 
+        sessionStorage.setItem('auth:redirect', '1'); 
+        console.log('✅ Flag de redirect guardado en sessionStorage');
+      } catch (e) {
+        console.warn('⚠️ No se pudo guardar flag de redirect:', e);
       }
+      
+      await signInWithRedirect(auth, provider);
+      console.log('✅ signInWithRedirect completado');
       
       // setLoading will be set to false by onAuthStateChanged
     } catch (err) {

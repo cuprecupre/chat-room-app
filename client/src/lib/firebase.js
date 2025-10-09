@@ -4,7 +4,9 @@ import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence, s
 
 const firebaseConfig = {
   apiKey: 'AIzaSyCs-vni2Zme9_K_mZgZkft2o9iytR541lQ',
-  authDomain: 'impostor-468e0.firebaseapp.com',
+  // SOLUCIÓN: Usar el dominio de la app en lugar del dominio de Firebase
+  // Esto evita el problema de cookies de terceros en Safari iOS
+  authDomain: window.location.hostname, // Usar el dominio actual de la app
   projectId: 'impostor-468e0',
   storageBucket: 'impostor-468e0.appspot.com',
   messagingSenderId: '706542941882',
