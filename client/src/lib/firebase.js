@@ -20,11 +20,6 @@ const provider = new GoogleAuthProvider();
 provider.addScope('profile');
 provider.addScope('email');
 
-// Configurar parámetros adicionales para mejorar la experiencia
-provider.setCustomParameters({
-  prompt: 'select_account'
-});
-
 async function ensurePersistence() {
   try {
     console.log('🔧 Configurando persistencia browserLocalPersistence...');

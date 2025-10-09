@@ -148,35 +148,11 @@ export function useAuth() {
       console.log('📝 Configurando persistencia...');
       await ensurePersistence();
       
-      // SOLUCIÓN EFECTIVA: Popup con fallback a redirect
-      console.log('🚀 Intentando popup...');
+      // SOLUCIÓN: Popup simple sin fallback complicado
+      console.log('🚀 Iniciando login con popup...');
       
-      try {
-        // Intentar popup primero
-        const loginPromise = signInWithPopup(auth, provider);
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('POPUP_TIMEOUT')), 5000);
-        });
-        
-        await Promise.race([loginPromise, timeoutPromise]);
-        console.log('✅ Popup exitoso');
-        
-      } catch (popupError) {
-        console.log('⚠️ Popup falló, intentando redirect...', popupError?.code);
-        
-        // Si popup falla, usar redirect
-        if (popupError?.code === 'auth/popup-blocked' || 
-            popupError?.code === 'auth/popup-closed-by-user' ||
-            popupError?.message === 'POPUP_TIMEOUT') {
-          
-          console.log('🔄 Usando redirect...');
-          try { sessionStorage.setItem('auth:redirect', '1'); } catch (_) {}
-          await signInWithRedirect(auth, provider);
-          console.log('✅ Redirect iniciado');
-        } else {
-          throw popupError;
-        }
-      }
+      await signInWithPopup(auth, provider);
+      console.log('✅ Login exitoso');
       
       // setLoading will be set to false by onAuthStateChanged
     } catch (err) {
