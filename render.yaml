@@ -2,7 +2,7 @@ services:
   - type: web
     name: impostor-app
     env: node
-    buildCommand: cd client && npm install && npm run build
+    buildCommand: npm install && cd client && npm install && npm run build
     startCommand: node server.js
     staticPublishPath: ./client/dist
     # Configurar rutas para Firebase Auth
