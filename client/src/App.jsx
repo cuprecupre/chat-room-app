@@ -13,6 +13,7 @@ import { Footer } from './components/Footer';
 import { InstructionsModal } from './components/InstructionsModal';
 import { UIShowcase } from './components/UIShowcase';
 import { Avatar } from './components/ui/Avatar';
+import { initGA, logPageView } from './lib/analytics';
 import bellImg from './assets/bell.png';
 import heroImg from './assets/impostor-home.png';
 
@@ -22,7 +23,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
   const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
-  
+
   // Restaurar estado de EmailAuthScreen si había un intento de login/registro en curso
   // Usar función lazy initializer para ejecutar solo en el primer render
   const [showEmailAuthScreen, setShowEmailAuthScreen] = useState(() => {
@@ -40,10 +41,10 @@ export default function App() {
     }
     return false;
   });
-  
+
   // Check if user is accessing showcase route
   const isShowcaseRoute = window.location.pathname === '/ui-showcase';
-  
+
   // Precargar assets de la app
   const { isLoading: assetsLoading } = useAppAssetsPreloader();
   const menuRef = useRef(null);
@@ -54,6 +55,11 @@ export default function App() {
   const loaderTimeoutRef = useRef(null);
   const [showConnectingLoader, setShowConnectingLoader] = useState(false); // Controlar si mostrar loader de conexión (con delay)
   const connectingLoaderTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    initGA();
+    logPageView();
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -74,14 +80,14 @@ export default function App() {
 
   const { connected, gameState, emit } = useSocket(user);
   const [isStuck, setIsStuck] = useState(false);
-  
+
   // Detect when app is stuck (no connection for 10 seconds)
   useEffect(() => {
     if (user && !connected) {
       const timer = setTimeout(() => {
         setIsStuck(true);
       }, 10000); // 10 seconds
-      
+
       return () => clearTimeout(timer);
     } else {
       setIsStuck(false);
@@ -102,14 +108,14 @@ export default function App() {
       }
       setShowConnectingLoader(false);
     }
-    
+
     return () => {
       if (connectingLoaderTimeoutRef.current) {
         clearTimeout(connectingLoaderTimeoutRef.current);
       }
     };
   }, [user, connected, isStuck]);
-  
+
   const getUrlGameId = () => {
     try {
       return new URL(window.location).searchParams.get('gameId');
@@ -132,7 +138,7 @@ export default function App() {
         window.history.replaceState({}, '', url.toString());
       }
       emit('leave-game', gameState.gameId);
-      
+
       // Force page reload to clear all state and return to clean lobby
       setTimeout(() => {
         window.location.reload();
@@ -157,7 +163,7 @@ export default function App() {
   const copyLink = useCallback(async () => {
     if (!gameState?.gameId) return;
     const url = `${window.location.origin}?gameId=${gameState.gameId}`;
-    
+
     // En móvil, usar la API de compartir nativa (requiere HTTPS en producción)
     if (isMobile && navigator.share) {
       try {
@@ -176,7 +182,7 @@ export default function App() {
         return;
       }
     }
-    
+
     // En desktop o móvil sin Web Share, copiar al portapapeles
     try {
       if (navigator.clipboard && window.isSecureContext) {
@@ -191,7 +197,7 @@ export default function App() {
         textArea.select();
         const successful = document.execCommand('copy');
         document.body.removeChild(textArea);
-        
+
         if (successful) {
           window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Enlace copiado' }));
         }
@@ -203,7 +209,7 @@ export default function App() {
 
   const copyGameCode = useCallback(async () => {
     if (!gameState?.gameId) return;
-    
+
     // En móvil, usar la API de compartir nativa (requiere HTTPS en producción)
     if (isMobile && navigator.share) {
       try {
@@ -222,7 +228,7 @@ export default function App() {
         return;
       }
     }
-    
+
     // En desktop o móvil sin Web Share, copiar al portapapeles
     try {
       if (navigator.clipboard && window.isSecureContext) {
@@ -237,7 +243,7 @@ export default function App() {
         textArea.select();
         const successful = document.execCommand('copy');
         document.body.removeChild(textArea);
-        
+
         if (successful) {
           window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Código copiado' }));
         }
@@ -256,20 +262,20 @@ export default function App() {
     try {
       // Close dropdown first
       setMenuOpen(false);
-      
+
       // Clear URL parameters before logout
       const url = new URL(window.location);
       url.searchParams.delete('gameId');
       window.history.replaceState({}, '', url.toString());
-      
+
       // Leave game if in one
       if (gameState?.gameId) {
         emit('leave-game', gameState.gameId);
       }
-      
+
       // useSocket hook handles emitting leave-game on disconnect
       await logout();
-      
+
       // Force page reload to clear all state
       window.location.reload();
     } catch (e) {
@@ -282,15 +288,15 @@ export default function App() {
     const url = new URL(window.location);
     url.searchParams.delete('gameId');
     window.history.replaceState({}, '', url.toString());
-    
+
     // Force disconnect and clear state
     if (gameState?.gameId) {
       emit('leave-game', gameState.gameId);
     }
-    
+
     // Show toast
     window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Sesión reiniciada. Vuelve al lobby.' }));
-    
+
     // Force page reload to clear all state
     window.location.reload();
   }, [emit, gameState]);
@@ -328,7 +334,7 @@ export default function App() {
       }
       setShowLoader(false);
     }
-    
+
     return () => {
       if (loaderTimeoutRef.current) {
         clearTimeout(loaderTimeoutRef.current);
@@ -344,10 +350,10 @@ export default function App() {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
         <div className="flex flex-col items-center gap-6 text-center">
-          <img 
-            src={heroImg} 
-            alt="El Impostor" 
-            className="w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10" 
+          <img
+            src={heroImg}
+            alt="El Impostor"
+            className="w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10"
           />
           <div className="flex flex-col items-center gap-3">
             <Spinner size="md" />
@@ -368,15 +374,15 @@ export default function App() {
     if (isStuck) {
       return (
         <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
-        <div className="w-full max-w-sm mx-auto text-center space-y-6">
-          <div className="flex justify-center">
-            <img 
-              src={bellImg} 
-              alt="Advertencia" 
-              className="w-20 h-20 rounded-full object-cover ring-2 ring-orange-400/30 shadow-lg"
-            />
-          </div>
-          <div>
+          <div className="w-full max-w-sm mx-auto text-center space-y-6">
+            <div className="flex justify-center">
+              <img
+                src={bellImg}
+                alt="Advertencia"
+                className="w-20 h-20 rounded-full object-cover ring-2 ring-orange-400/30 shadow-lg"
+              />
+            </div>
+            <div>
               <h2 className="text-2xl font-bold text-neutral-50 mb-2">Conexión perdida</h2>
               <p className="text-neutral-400">No se puede conectar al servidor. Esto puede deberse a problemas de red o el servidor está inactivo.</p>
             </div>
@@ -398,16 +404,16 @@ export default function App() {
         </div>
       );
     }
-    
+
     // Solo mostrar pantalla de conexión si han pasado más de 300ms
     if (showConnectingLoader) {
       return (
         <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
           <div className="flex flex-col items-center gap-6 text-center">
-            <img 
-              src={heroImg} 
-              alt="El Impostor" 
-              className="w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10" 
+            <img
+              src={heroImg}
+              alt="El Impostor"
+              className="w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10"
             />
             <div className="flex flex-col items-center gap-3">
               <Spinner size="md" />
@@ -420,7 +426,7 @@ export default function App() {
         </div>
       );
     }
-    
+
     // Si aún no han pasado 300ms, no mostrar nada (evita parpadeo)
     return null;
   }
@@ -448,7 +454,7 @@ export default function App() {
       if (!user) {
         return <LoginScreen onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(false)} />;
       }
-      
+
       // Check if user is authorized (only leandrovegasb@gmail.com)
       if (user.email !== 'leandrovegasb@gmail.com') {
         return (
@@ -461,10 +467,10 @@ export default function App() {
           </div>
         );
       }
-      
+
       return <UIShowcase />;
     }
-    
+
     // Detect URL vs session mismatch and provide safe recovery UI
     const url = new URL(window.location);
     const urlGameId = url.searchParams.get('gameId');
@@ -483,7 +489,7 @@ export default function App() {
       }
       return <LoginScreen onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} />;
     }
-    
+
     // Usuario autenticado - resetear flag de "no user" y loguear si es un usuario nuevo
     hasLoggedNoUser.current = false;
     if (lastLoggedUid.current !== user.uid) {
@@ -501,9 +507,9 @@ export default function App() {
         <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
           <div className="w-full max-w-sm mx-auto text-center space-y-6">
             <div className="flex justify-center">
-              <img 
-                src={bellImg} 
-                alt="Advertencia" 
+              <img
+                src={bellImg}
+                alt="Advertencia"
                 className="w-20 h-20 rounded-full object-cover ring-2 ring-orange-400/30 shadow-lg"
               />
             </div>
@@ -548,9 +554,9 @@ export default function App() {
         <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
           <div className="w-full max-w-sm mx-auto text-center space-y-6 px-6">
             <div className="flex justify-center">
-              <img 
-                src={bellImg} 
-                alt="Advertencia" 
+              <img
+                src={bellImg}
+                alt="Advertencia"
                 className="w-20 h-20 rounded-full object-cover ring-2 ring-orange-400/30 shadow-lg"
               />
             </div>
@@ -583,10 +589,10 @@ export default function App() {
 
     if (gameState?.gameId) {
       return (
-        <GameRoom 
-          state={gameState} 
-          isHost={isHost} 
-          user={user} 
+        <GameRoom
+          state={gameState}
+          isHost={isHost}
+          user={user}
           onStartGame={startGame}
           onEndGame={endGame}
           onPlayAgain={playAgain}
@@ -612,14 +618,14 @@ export default function App() {
     <div className="bg-neutral-950 text-white min-h-screen font-sans flex flex-col">
       <Toaster />
       <InstructionsModal isOpen={instructionsOpen} onClose={() => setInstructionsOpen(false)} />
-      
+
       <div className={containerClasses}>
         {showHeader && (
           <header className="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
-            <button 
+            <button
               onClick={handleTitleClick}
               className="text-xl sm:text-2xl font-bold text-neutral-50 hover:text-orange-400 transition-colors active:scale-95 cursor-pointer"
-              style={{fontFamily: 'Trocchi, serif'}}
+              style={{ fontFamily: 'Trocchi, serif' }}
             >
               El impostor
             </button>
@@ -630,7 +636,7 @@ export default function App() {
                   aria-label="Abrir menú de usuario"
                   onClick={() => setMenuOpen(v => !v)}
                   className="relative group rounded-full ring-1 ring-transparent focus:outline-none active:scale-95 transition-all duration-150"
-                  style={{ 
+                  style={{
                     backgroundColor: 'transparent',
                     border: 'none',
                     outline: 'none',
@@ -684,7 +690,7 @@ export default function App() {
           {renderContent()}
         </main>
       </div>
-      
+
       {user && connected && <Footer onOpenInstructions={() => setInstructionsOpen(true)} />}
 
       {/* Modal de confirmación para abandonar juego */}
