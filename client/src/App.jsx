@@ -14,7 +14,6 @@ import { InstructionsModal } from './components/InstructionsModal';
 import { FeedbackModal } from './components/FeedbackModal';
 import { UIShowcase } from './components/UIShowcase';
 import { Avatar } from './components/ui/Avatar';
-import { initGA, logPageView } from './lib/analytics';
 import bellImg from './assets/bell.png';
 import heroImg from './assets/impostor-home.png';
 
@@ -58,10 +57,7 @@ export default function App() {
   const [showConnectingLoader, setShowConnectingLoader] = useState(false); // Controlar si mostrar loader de conexión (con delay)
   const connectingLoaderTimeoutRef = useRef(null);
 
-  useEffect(() => {
-    initGA();
-    logPageView();
-  }, []);
+
 
   useEffect(() => {
     if (user) {
