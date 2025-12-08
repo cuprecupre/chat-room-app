@@ -9,7 +9,6 @@ const firebaseConfig = {
   storageBucket: 'impostor-468e0.appspot.com',
   messagingSenderId: '706542941882',
   appId: '1:706542941882:web:3625d2119579844b30f483',
-  measurementId: 'G-PXH204ZK33',
 };
 
 const app = initializeApp(firebaseConfig);
