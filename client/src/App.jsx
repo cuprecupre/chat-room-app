@@ -11,6 +11,7 @@ import { Spinner } from './components/ui/Spinner';
 import { Button } from './components/ui/Button';
 import { Footer } from './components/Footer';
 import { InstructionsModal } from './components/InstructionsModal';
+import { FeedbackModal } from './components/FeedbackModal';
 import { UIShowcase } from './components/UIShowcase';
 import { Avatar } from './components/ui/Avatar';
 import { initGA, logPageView } from './lib/analytics';
@@ -22,6 +23,7 @@ export default function App() {
   const [token, setToken] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
 
   // Restaurar estado de EmailAuthScreen si había un intento de login/registro en curso
@@ -480,14 +482,14 @@ export default function App() {
         console.log('❌ App - Error de autenticación:', error);
         hasLoggedNoUser.current = true;
       }
-      return <LoginScreen onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} />;
+      return <LoginScreen onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} onOpenFeedback={() => setFeedbackOpen(true)} />;
     }
     if (!user) {
       if (!hasLoggedNoUser.current) {
         console.log('🚫 App - Sin usuario autenticado, mostrando login');
         hasLoggedNoUser.current = true;
       }
-      return <LoginScreen onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} />;
+      return <LoginScreen onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} onOpenFeedback={() => setFeedbackOpen(true)} />;
     }
 
     // Usuario autenticado - resetear flag de "no user" y loguear si es un usuario nuevo
@@ -691,7 +693,18 @@ export default function App() {
         </main>
       </div>
 
-      {user && connected && <Footer onOpenInstructions={() => setInstructionsOpen(true)} />}
+      {user && connected && (
+        <Footer
+          onOpenInstructions={() => setInstructionsOpen(true)}
+          onOpenFeedback={() => setFeedbackOpen(true)}
+          gameId={gameState?.gameId}
+          onLeaveGame={() => setShowLeaveGameModal(true)}
+          onCopyGameCode={copyGameCode}
+          isMobile={isMobile}
+        />
+      )}
+
+      <FeedbackModal isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} user={user} />
 
       {/* Modal de confirmación para abandonar juego */}
       {showLeaveGameModal && (
