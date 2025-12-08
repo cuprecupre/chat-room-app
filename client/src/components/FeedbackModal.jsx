@@ -62,7 +62,7 @@ export function FeedbackModal({ isOpen, onClose, user }) {
             <div className="bg-neutral-900 rounded-xl w-full max-w-md shadow-2xl ring-1 ring-white/10 overflow-hidden">
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xl font-bold text-white">Enviar sugerencia</h3>
+                        <h3 className="text-xl font-bold text-white">Enviar sugerencias</h3>
                         <button
                             onClick={onClose}
                             className="text-neutral-400 hover:text-white transition-colors"
