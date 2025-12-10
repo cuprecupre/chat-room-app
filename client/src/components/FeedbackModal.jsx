@@ -83,22 +83,21 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                                 <label className="block text-sm font-medium text-neutral-300 mb-2">
                                     Tipo de mensaje
                                 </label>
-                                <div className="flex gap-2">
-                                    {['bug', 'suggestion', 'other'].map((t) => (
-                                        <button
-                                            key={t}
-                                            type="button"
-                                            onClick={() => setType(t)}
-                                            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${type === t
-                                                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
-                                                : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700'
-                                                }`}
-                                        >
-                                            {t === 'bug' && '🚨 Problema'}
-                                            {t === 'suggestion' && '💡 Idea'}
-                                            {t === 'other' && '💭 Otros'}
-                                        </button>
-                                    ))}
+                                <div className="relative">
+                                    <select
+                                        value={type}
+                                        onChange={(e) => setType(e.target.value)}
+                                        className="w-full appearance-none bg-neutral-800 text-white border border-neutral-700 rounded-lg py-2.5 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
+                                    >
+                                        <option value="bug">🚨 Problema</option>
+                                        <option value="suggestion">💡 Idea</option>
+                                        <option value="other">💭 Otros</option>
+                                    </select>
+                                    <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-neutral-400">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
                                 </div>
                             </div>
 
