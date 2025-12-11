@@ -534,7 +534,7 @@ export default function App() {
     // Case 1: URL has a gameId but session is in another game → offer switch
     if (urlGameId && gameState?.gameId && urlGameId !== gameState.gameId) {
       return (
-        <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950 text-white">
           <div className="w-full max-w-sm mx-auto text-center space-y-6">
             <div className="flex justify-center">
               <img
@@ -597,7 +597,7 @@ export default function App() {
         }
 
         return (
-          <div className="w-full min-h-dvh flex items-center justify-center bg-neutral-950 text-white animate-fadeIn">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950 text-white animate-fadeIn">
             <div className="w-full max-w-sm mx-auto text-center space-y-6 px-6">
               <div className="flex justify-center">
                 <div className="relative">
@@ -639,7 +639,7 @@ export default function App() {
 
       // Pantalla de Invitación (Sin errores)
       return (
-        <div className="w-full min-h-dvh flex items-center justify-center bg-neutral-950 text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950 text-white">
           <div className="w-full max-w-sm mx-auto text-center space-y-6 px-6">
             <div className="flex justify-center">
               <img
