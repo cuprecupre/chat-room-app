@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🛡️  Running Safety Checks before push..."
+
+# 1. Check Client Build (catches JS syntax, imports, and referencing errors)
+echo "🏗️  Building Client..."
+cd client && npm run build
+
+# Capture exit code
+build_status=$?
+
+if [ $build_status -ne 0 ]; then
+    echo "❌ SAFETY CHECK FAILED: Client build failed."
+    echo "Fix build errors before pushing."
+    exit 1
+fi
+
+echo "✅ Safety Checks Passed. Pushing..."

@@ -48,7 +48,7 @@ describe('Game Logic', () => {
         });
 
         test('should change phase to "game"', () => {
-            expect(game.phase).toBe('game');
+            expect(game.phase).toBe('playing');
         });
 
         test('should assign one impostor', () => {
@@ -63,15 +63,15 @@ describe('Game Logic', () => {
 
         test('should return correct state for impostor', () => {
             const impostorState = game.getStateFor(game.impostorId);
-            expect(impostorState.role).toBe('Impostor');
-            expect(impostorState.word).toBe('Descubre la palabra secreta');
+            expect(impostorState.role).toBe('impostor');
+            expect(impostorState.secretWord).toBe('Descubre la palabra secreta');
         });
 
         test('should return correct state for friends', () => {
             const friend = game.players.find(p => p.uid !== game.impostorId);
             const friendState = game.getStateFor(friend.uid);
-            expect(friendState.role).toBe('Amigo');
-            expect(friendState.word).toBe(game.secretWord);
+            expect(friendState.role).toBe('amigo');
+            expect(friendState.secretWord).toBe(game.secretWord);
         });
     });
 
@@ -80,7 +80,7 @@ describe('Game Logic', () => {
         game.startGame(hostUser.uid);
         game.endGame(hostUser.uid);
 
-        expect(game.phase).toBe('over');
+        expect(game.phase).toBe('game_over');
         const finalState = game.getStateFor(hostUser.uid);
         expect(finalState.impostorName).toBeDefined();
         expect(finalState.secretWord).toBe(game.secretWord);
@@ -92,9 +92,10 @@ describe('Game Logic', () => {
         game.endGame(hostUser.uid);
         game.playAgain(hostUser.uid);
 
-        expect(game.phase).toBe('lobby');
-        expect(game.impostorId).toBe('');
-        expect(game.secretWord).toBe('');
+        // Update: playAgain now starts a new round immediately
+        expect(game.phase).toBe('playing');
+        expect(game.impostorId).not.toBe('');
+        expect(game.secretWord).not.toBe('');
         expect(game.players).toHaveLength(2); // Players should remain for the next round
     });
 
@@ -102,35 +103,35 @@ describe('Game Logic', () => {
         // Agregar jugadores para tener 3 en total
         game.addPlayer(player2);
         game.addPlayer(player3);
-        
+
         // Simular múltiples rondas y verificar que nadie es impostor 3 veces seguidas
         const impostorCounts = {};
         const impostorSequence = [];
-        
+
         // Simular 20 rondas para tener datos suficientes
         for (let i = 0; i < 20; i++) {
             game.startGame(hostUser.uid);
             const currentImpostor = game.impostorId;
-            
+
             // Registrar el impostor actual
             impostorSequence.push(currentImpostor);
             if (!impostorCounts[currentImpostor]) {
                 impostorCounts[currentImpostor] = 0;
             }
             impostorCounts[currentImpostor]++;
-            
+
             // Verificar que no hay 3 impostores consecutivos iguales
             if (impostorSequence.length >= 3) {
                 const lastThree = impostorSequence.slice(-3);
                 const allSame = lastThree.every(id => id === lastThree[0]);
                 expect(allSame).toBe(false);
             }
-            
+
             // Resetear para la siguiente ronda
             game.phase = 'lobby';
             game.roundCount = 0;
         }
-        
+
         // Verificar que el historial se está guardando
         expect(game.impostorHistory.length).toBeGreaterThan(0);
     });
@@ -138,11 +139,11 @@ describe('Game Logic', () => {
     test('selectImpostorWithLimit should exclude player who was impostor last 2 times', () => {
         game.addPlayer(player2);
         game.addPlayer(player3);
-        
+
         // Simular que player2 fue impostor las últimas 2 veces
         game.impostorHistory = [player2.uid, player2.uid];
         game.roundPlayers = [hostUser.uid, player2.uid, player3.uid];
-        
+
         // Llamar selectImpostorWithLimit múltiples veces para verificar
         // que player2 nunca es seleccionado
         const selections = new Set();
@@ -151,7 +152,7 @@ describe('Game Logic', () => {
             selections.add(selected);
             expect(selected).not.toBe(player2.uid);
         }
-        
+
         // Verificar que al menos uno de los otros jugadores fue seleccionado
         expect(selections.size).toBeGreaterThan(0);
         expect(selections.has(hostUser.uid) || selections.has(player3.uid)).toBe(true);
