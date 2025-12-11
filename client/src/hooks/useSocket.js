@@ -8,6 +8,7 @@ export function useSocket(user) {
   const [gameState, setGameState] = useState(null);
   const attemptedResumeRef = useRef(false);
   const hasLoggedWaitingDisplayName = useRef(false);
+  const [joinError, setJoinError] = useState(null); // Nuevo estado para errores de unión
 
   useEffect(() => {
     // No conectar socket si el usuario no tiene displayName
@@ -21,7 +22,7 @@ export function useSocket(user) {
     } else {
       hasLoggedWaitingDisplayName.current = false;
     }
-    
+
     if (!user) {
       if (socketRef.current) {
         socketRef.current.disconnect();
@@ -43,7 +44,7 @@ export function useSocket(user) {
       try {
         // Intentar obtener token de localStorage primero (solución para iOS)
         let token = getToken();
-        
+
         // Si no hay token en localStorage o está expirado, obtener de Firebase
         if (!token || isTokenExpired()) {
           console.log('🔑 Obteniendo token desde Firebase Auth...');
@@ -53,41 +54,50 @@ export function useSocket(user) {
         } else {
           console.log('✅ Usando token de localStorage');
         }
-        
+
         if (!isMounted) return;
-        
+
         // En desarrollo, usar el mismo host que la URL actual pero puerto 3000
-        const socketURL = process.env.NODE_ENV === 'production' 
-          ? window.location.origin 
+        const socketURL = process.env.NODE_ENV === 'production'
+          ? window.location.origin
           : `${window.location.protocol}//${window.location.hostname}:3000`;
-        
-        const socket = io(socketURL, {
-          auth: { token, name: user.displayName, photoURL: user.photoURL },
-          reconnection: true,
-          reconnectionAttempts: 5
-        });
+
+        const socket = window.MockSocketIO
+          ? new window.MockSocketIO(socketURL, {
+            auth: { token, name: user.displayName, photoURL: user.photoURL },
+            reconnection: true,
+            reconnectionAttempts: 5
+          })
+          : io(socketURL, {
+            auth: { token, name: user.displayName, photoURL: user.photoURL },
+            reconnection: true,
+            reconnectionAttempts: 5
+          });
         socketRef.current = socket;
 
         socket.on('connect', () => {
           console.log('✅ Socket conectado:', user.displayName);
-          if (isMounted) setConnected(true);
+          if (isMounted) {
+            setConnected(true);
+            setJoinError(null); // Limpiar errores al conectar
+          }
           attemptedResumeRef.current = false; // fresh session
           const urlParams = new URLSearchParams(window.location.search);
           const gameIdFromUrl = urlParams.get('gameId');
-          if (gameIdFromUrl && !attemptedResumeRef.current) {
-            attemptedResumeRef.current = true;
-            // Intento de reanudar sesión
-            socket.emit('join-game', gameIdFromUrl);
-            // Si en 2s no llega estado, forzar UI de recuperación
-            if (socket.resumeTimer) clearTimeout(socket.resumeTimer);
-            socket.resumeTimer = setTimeout(() => {
-              if (!socketRef.current) return;
-              console.log('[Socket] Resume timeout, mostrando UI de unión');
-              // No borrar el gameId de la URL: App mostrará la UI de unión/limpieza
-              if (isMounted) setGameState(null);
-            }, 2000);
-          }
-          
+          // if (gameIdFromUrl && !attemptedResumeRef.current) {
+          //   attemptedResumeRef.current = true;
+          //   // Intento de reanudar sesión
+          //   socket.emit('join-game', gameIdFromUrl);
+          //   // Si en 2s no llega estado, forzar UI de recuperación
+          //   if (socket.resumeTimer) clearTimeout(socket.resumeTimer);
+          //   socket.resumeTimer = setTimeout(() => {
+          //     if (!socketRef.current) return;
+          //     console.log('[Socket] Resume timeout, mostrando UI de unión');
+          //     // No borrar el gameId de la URL: App mostrará la UI de unión/limpieza
+          //     if (isMounted) setGameState(null);
+          //   }, 2000);
+          // }
+
           // Start heartbeat to keep connection alive
           const heartbeatInterval = setInterval(() => {
             if (socket.connected) {
@@ -96,7 +106,7 @@ export function useSocket(user) {
               clearInterval(heartbeatInterval);
             }
           }, 30000); // Send heartbeat every 30 seconds
-          
+
           // Store interval for cleanup
           socket.heartbeatInterval = heartbeatInterval;
         });
@@ -117,7 +127,7 @@ export function useSocket(user) {
             description: error.description,
             context: error.context,
           });
-          
+
           // Si es error de autenticación, intentar refrescar token
           if (error.message?.includes('Authentication error') || error.message?.includes('Invalid token')) {
             console.log('🔄 Error de autenticación, intentando refrescar token...');
@@ -130,8 +140,8 @@ export function useSocket(user) {
             } catch (refreshError) {
               console.error('❌ No se pudo refrescar el token:', refreshError);
               // Mostrar mensaje al usuario
-              window.dispatchEvent(new CustomEvent('app:toast', { 
-                detail: 'Tu sesión expiró. Por favor, vuelve a iniciar sesión.' 
+              window.dispatchEvent(new CustomEvent('app:toast', {
+                detail: 'Tu sesión expiró. Por favor, vuelve a iniciar sesión.'
               }));
             }
           }
@@ -164,7 +174,7 @@ export function useSocket(user) {
           try {
             // Intentar obtener token fresco
             let freshToken = getToken();
-            
+
             // Si el token en localStorage está expirado o no existe, obtener de Firebase
             if (!freshToken || isTokenExpired(10)) { // 10 minutos de buffer
               if (user) {
@@ -173,7 +183,7 @@ export function useSocket(user) {
                 console.log('✅ Token refrescado desde Firebase para reconexión');
               }
             }
-            
+
             // Actualizar auth del socket con el token fresco
             if (freshToken) {
               socket.auth.token = freshToken;
@@ -183,7 +193,7 @@ export function useSocket(user) {
             console.error('❌ Error actualizando token para reconexión:', error);
           }
         });
-        
+
         // Add reconnection recovery
         socket.on('reconnect', () => {
           console.log('Socket reconnected, attempting to resume...');
@@ -197,10 +207,20 @@ export function useSocket(user) {
 
         socket.on('error-message', (message) => {
           console.error('Server error:', message);
-          window.dispatchEvent(new CustomEvent('app:toast', { detail: message }));
-          
-          // Si la sala no existe, no perteneces, o partida en curso, limpiar estado y URL para evitar quedar bloqueado
+
+          // Si el error es sobre unirse a partida, guardarlo en el estado
           if (/no existe|no perteneces|partida en curso/i.test(message)) {
+            if (isMounted) setJoinError(message);
+          } else {
+            // Solo mostrar toast para otros errores
+            window.dispatchEvent(new CustomEvent('app:toast', { detail: message }));
+          }
+
+          // MODIFICADO: NO borrar la URL si es "partida en curso" o "no existe"
+          // Queremos que App.jsx muestre una pantalla de error específica
+          // Solo limpiamos si es "no perteneces" (ej. intentando votar en partida ajena)
+          if (/no perteneces/i.test(message)) {
+            // ... lógica anterior de limpieza ...
             const url = new URL(window.location);
             url.searchParams.delete('gameId');
             window.history.replaceState({}, '', url.toString());
@@ -244,11 +264,11 @@ export function useSocket(user) {
         socketRef.current = null;
       }
     };
-  }, [user]);
+  }, [user, user?.displayName]);
 
   const emit = useCallback((event, payload) => {
     socketRef.current?.emit(event, payload);
   }, []);
 
-  return { connected, gameState, emit };
+  return { connected, gameState, emit, joinError, clearJoinError: () => setJoinError(null) };
 }

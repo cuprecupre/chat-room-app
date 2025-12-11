@@ -147,6 +147,26 @@ app.use(express.static(clientDist, {
 // Servir archivos estáticos de la carpeta public (root)
 // Esto asegura que robots.txt y sitemap.xml se sirvan correctamente
 app.use(express.static(path.join(__dirname, 'public')));
+// API Endpoint to get game preview info (e.g., Host Name)
+app.get('/api/game/:gameId', (req, res) => {
+  const { gameId } = req.params;
+  const game = games[gameId];
+
+  if (!game) {
+    return res.status(404).json({ error: 'Game not found' });
+  }
+
+  const host = game.players.find(p => p.uid === game.hostId);
+  const hostName = host ? host.name : 'Anfitrión desconocido';
+
+  res.json({
+    gameId: game.gameId,
+    hostName: hostName,
+    playerCount: game.players.length,
+    status: game.phase
+  });
+});
+
 // SPA fallback con inyección de OG absoluta
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/socket.io/')) return next();

@@ -1,14 +1,14 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, onIdTokenChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyCs-vni2Zme9_K_mZgZkft2o9iytR541lQ',
-  authDomain: 'impostor-468e0.firebaseapp.com',
-  projectId: 'impostor-468e0',
-  storageBucket: 'impostor-468e0.appspot.com',
-  messagingSenderId: '706542941882',
-  appId: '1:706542941882:web:3625d2119579844b30f483',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyCs-vni2Zme9_K_mZgZkft2o9iytR541lQ',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'impostor-468e0.firebaseapp.com',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'impostor-468e0',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'impostor-468e0.appspot.com',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '706542941882',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:706542941882:web:3625d2119579844b30f483',
 };
 
 const app = initializeApp(firebaseConfig);
@@ -35,4 +35,4 @@ async function ensurePersistence() {
   }
 }
 
-export { app, auth, db, provider, ensurePersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile };
+export { app, auth, db, provider, ensurePersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, onIdTokenChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile };

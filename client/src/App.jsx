@@ -76,7 +76,7 @@ export default function App() {
     }
   }, [user?.uid]); // Solo re-ejecutar si cambia el UID, no el objeto completo
 
-  const { connected, gameState, emit } = useSocket(user);
+  const { connected, gameState, emit, joinError, clearJoinError } = useSocket(user);
   const [isStuck, setIsStuck] = useState(false);
 
   // Detect when app is stuck (no connection for 10 seconds)
@@ -119,6 +119,38 @@ export default function App() {
       return new URL(window.location).searchParams.get('gameId');
     } catch (_) { return null; }
   };
+
+  const [previewHostName, setPreviewHostName] = useState(null);
+
+  useEffect(() => {
+    const urlGameId = getUrlGameId();
+    if (urlGameId && !gameState?.gameId) {
+      // Fetch game preview info
+      const controller = new AbortController();
+      const fetchPreview = async () => {
+        try {
+          // Determine API URL based on environment (dev vs prod)
+          const apiBase = process.env.NODE_ENV === 'production'
+            ? window.location.origin
+            : `${window.location.protocol}//${window.location.hostname}:3000`;
+
+          const res = await fetch(`${apiBase}/api/game/${urlGameId}`, { signal: controller.signal });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.hostName) {
+              setPreviewHostName(data.hostName);
+            }
+          }
+        } catch (e) {
+          // Ignore abort errors or network errors (UI will show ID as fallback)
+        }
+      };
+      fetchPreview();
+      return () => controller.abort();
+    } else {
+      setPreviewHostName(null);
+    }
+  }, [gameState?.gameId]);
 
   const isHost = useMemo(() => gameState && user && gameState.hostId === user.uid, [gameState, user]);
 
@@ -546,38 +578,99 @@ export default function App() {
       );
     }
 
+
+
     // Case 2: URL has a gameId but session is not attached → allow joining or clearing
     if (urlGameId && !gameState?.gameId) {
+      // Manejo de errores específicos de unión (Sala llena / No existe)
+      if (joinError) {
+        let errorTitle = "No se pudo unir";
+        let errorMsg = joinError;
+        let showHomeButton = true;
+
+        if (/partida en curso/i.test(joinError)) {
+          errorTitle = "Partida ya iniciada";
+          errorMsg = "Lo sentimos, esta partida ya comenzó y no acepta nuevos jugadores en este momento.";
+        } else if (/no existe/i.test(joinError)) {
+          errorTitle = "Enlace no válido";
+          errorMsg = "No encontramos esta sala. Es posible que el anfitrión la haya cerrado o el enlace sea incorrecto.";
+        }
+
+        return (
+          <div className="w-full min-h-dvh flex items-center justify-center bg-neutral-950 text-white animate-fadeIn">
+            <div className="w-full max-w-sm mx-auto text-center space-y-6 px-6">
+              <div className="flex justify-center">
+                <div className="relative">
+                  <img
+                    src={bellImg}
+                    alt="Error"
+                    className="w-24 h-24 rounded-full object-cover ring-4 ring-red-500/20 grayscale"
+                  />
+                  <div className="absolute -bottom-2 -right-2 bg-neutral-900 rounded-full p-2 border border-neutral-800">
+                    <span className="text-2xl">🚫</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-neutral-50 mb-3">{errorTitle}</h2>
+                <p className="text-neutral-400 leading-relaxed">
+                  {errorMsg}
+                </p>
+              </div>
+              <div className="space-y-3 pt-2">
+                <Button
+                  onClick={() => {
+                    clearJoinError();
+                    url.searchParams.delete('gameId');
+                    window.history.replaceState({}, '', url.toString());
+                    window.dispatchEvent(new Event('popstate'));
+                    setPreviewHostName(null);
+                  }}
+                  variant="primary"
+                  className="w-full"
+                >
+                  Volver al inicio
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // Pantalla de Invitación (Sin errores)
       return (
-        <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
+        <div className="w-full min-h-dvh flex items-center justify-center bg-neutral-950 text-white">
           <div className="w-full max-w-sm mx-auto text-center space-y-6 px-6">
             <div className="flex justify-center">
               <img
                 src={bellImg}
-                alt="Advertencia"
-                className="w-20 h-20 rounded-full object-cover ring-2 ring-orange-400/30 shadow-lg"
+                alt="Invitación"
+                className="w-24 h-24 rounded-full object-cover ring-4 ring-orange-500/30 shadow-2xl animate-pulse-slow"
               />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-neutral-50 mb-3">Unirse a sala</h2>
-              <p className="text-sm text-neutral-400">
-                ¿Quieres unirte a la sala <span className="font-mono font-semibold text-neutral-300">{urlGameId}</span>?
+              <h2 className="text-3xl font-bold text-neutral-50 mb-4" style={{ fontFamily: 'Trocchi, serif' }}>¡Te han invitado!</h2>
+              <p className="text-neutral-300 text-lg leading-relaxed">
+                Has recibido un enlace para unirte a la sala de <span className="font-mono font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded">{previewHostName || urlGameId}</span>.
+                <br /><span className="text-sm text-neutral-500 mt-2 block">¿Quieres entrar ahora?</span>
               </p>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3 pt-4">
               <Button
                 onClick={() => emit('join-game', urlGameId)}
                 variant="primary"
-                size="md"
+                size="lg"
+                className="w-full text-lg shadow-orange-900/20 shadow-lg"
               >
-                Unirme ahora
+                Entrar a la sala
               </Button>
               <Button
                 onClick={() => { url.searchParams.delete('gameId'); window.history.replaceState({}, '', url.toString()); window.dispatchEvent(new Event('popstate')); }}
-                variant="outline"
+                variant="ghost"
                 size="md"
+                className="w-full text-neutral-500 hover:text-neutral-300"
               >
-                Volver al lobby
+                Volver al inicio
               </Button>
             </div>
           </div>

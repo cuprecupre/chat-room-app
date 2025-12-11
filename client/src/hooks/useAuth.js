@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { auth, provider, ensurePersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from '../lib/firebase';
+import { auth, provider, ensurePersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onIdTokenChanged, signOut } from '../lib/firebase';
 import { saveToken, clearToken } from '../lib/tokenStorage';
 
 export function useAuth() {
   // Verificar si Firebase ya tiene un usuario en memoria (evita parpadeo en recargas)
   const hasCurrentUser = auth.currentUser !== null;
   const hasRedirect = typeof window !== 'undefined' && sessionStorage.getItem('auth:redirect') === '1';
-  
+
   const [user, setUser] = useState(auth.currentUser); // Inicializar con usuario actual si existe
   const [loading, setLoading] = useState(hasRedirect && !hasCurrentUser); // Solo loading si hay redirect Y no hay usuario
   const [error, setError] = useState(null);
@@ -16,20 +16,20 @@ export function useAuth() {
     let authResolved = false;
     let tokenRefreshInterval = null;
     let redirectCheckInterval = null;
-    
-    const unsubscribe = onAuthStateChanged(auth, async (u) => {
+
+    const unsubscribe = onIdTokenChanged(auth, async (u) => {
       authResolved = true;
       if (isMounted) {
         setUser(u);
         setLoading(false);
-        
+
         // Si hay usuario autenticado, guardar token en localStorage
         if (u) {
           try {
             const token = await u.getIdToken();
             saveToken(token);
             console.log('🔑 Token guardado después de auth state change');
-            
+
             // Configurar refresh automático del token cada 50 minutos
             if (tokenRefreshInterval) clearInterval(tokenRefreshInterval);
             tokenRefreshInterval = setInterval(async () => {
@@ -53,7 +53,7 @@ export function useAuth() {
         }
       }
     });
-    
+
     // Manejar posible flujo de redirect en navegadores móviles
     const handleRedirect = async () => {
       try {
@@ -76,12 +76,12 @@ export function useAuth() {
           setLoading(false);
         }
       }
-      try { sessionStorage.removeItem('auth:redirect'); } catch (_) {}
+      try { sessionStorage.removeItem('auth:redirect'); } catch (_) { }
     };
-    
+
     // Ejecutar inmediatamente
     handleRedirect();
-    
+
     // También verificar periódicamente en caso de que el redirect tarde
     redirectCheckInterval = setInterval(async () => {
       if (!authResolved && isMounted) {
@@ -140,26 +140,37 @@ export function useAuth() {
   const login = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       console.log('🔄 Iniciando proceso de login...');
-      
+
       // Configurar persistencia antes del login
       console.log('📝 Configurando persistencia...');
       await ensurePersistence();
-      
+
       // SOLUCIÓN: Popup simple sin fallback complicado
       console.log('🚀 Iniciando login con popup...');
-      
-      await signInWithPopup(auth, provider);
+
+      // Allow mocking for E2E tests
+      const performSignIn = window.mockSignInWithPopup
+        ? () => window.mockSignInWithPopup(auth, provider)
+        : () => signInWithPopup(auth, provider);
+
+      const result = await performSignIn();
+
+      // If we are mocking, we need to manually update state because onIdTokenChanged won't fire
+      if (window.mockSignInWithPopup && result?.user) {
+        console.log('🎭 Mock Login: Manually setting user state');
+        setUser(result.user);
+        setLoading(false);
+      }
+
       console.log('✅ Login exitoso');
-      
-      // setLoading will be set to false by onAuthStateChanged
     } catch (err) {
       console.error('❌ Error en login:', err?.code || err?.message);
-      
+
       let errorMessage = 'No se pudo iniciar sesión.';
-      
+
       if (err?.message === 'TIMEOUT') {
         errorMessage = 'El login tardó demasiado. Verifica tu conexión y que el dominio esté autorizado en Firebase.';
       } else if (err?.code === 'auth/popup-blocked') {
@@ -177,7 +188,7 @@ export function useAuth() {
       } else if (err?.message) {
         errorMessage = err.message;
       }
-      
+
       setError(errorMessage);
       setLoading(false);
     }
@@ -214,19 +225,19 @@ export function useAuth() {
       console.log('📧 Registrando usuario con email...');
       const { createUserWithEmailAndPassword: createUser, updateProfile: updateProf } = await import('../lib/firebase');
       const result = await createUser(auth, email, password);
-      
+
       // Actualizar displayName ANTES de que onAuthStateChanged propague el usuario
       if (displayName) {
         console.log('📝 Actualizando displayName:', displayName);
         await updateProf(result.user, { displayName });
-        
+
         // Forzar recarga del usuario para obtener el displayName actualizado
         await result.user.reload();
-        
+
         // IMPORTANTE: Forzar actualización del token para que incluya el displayName
         // El token JWT original no tiene el displayName, necesitamos uno nuevo
         await result.user.getIdToken(true); // true = force refresh
-        
+
         // Esperar a que el currentUser tenga el displayName actualizado
         let retries = 0;
         if (!auth.currentUser?.displayName) {
@@ -237,12 +248,12 @@ export function useAuth() {
           await auth.currentUser?.reload();
           retries++;
         }
-        
+
         if (auth.currentUser?.displayName) {
           console.log('✅ DisplayName actualizado:', auth.currentUser?.displayName);
         }
       }
-      
+
       console.log('✅ Registro exitoso:', {
         email: result.user.email,
         displayName: auth.currentUser?.displayName,
