@@ -58,10 +58,7 @@ export default function App() {
   const [showConnectingLoader, setShowConnectingLoader] = useState(false); // Controlar si mostrar loader de conexión (con delay)
   const connectingLoaderTimeoutRef = useRef(null);
 
-  // Reset scroll when major views change
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [user?.uid, gameState?.gameId, showEmailAuthScreen, isShowcaseRoute]);
+
 
 
   useEffect(() => {
@@ -82,6 +79,12 @@ export default function App() {
   }, [user?.uid]); // Solo re-ejecutar si cambia el UID, no el objeto completo
 
   const { connected, gameState, emit, joinError, clearJoinError } = useSocket(user);
+
+  // Reset scroll when major views change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [user?.uid, gameState?.gameId, showEmailAuthScreen, isShowcaseRoute]);
+
   const [isStuck, setIsStuck] = useState(false);
 
   // Detect when app is stuck (no connection for 10 seconds)
