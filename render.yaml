@@ -6,14 +6,9 @@ services:
     branch: main
     buildCommand: npm install && cd client && npm install && npm run build
     startCommand: node server.js
-    staticPublishPath: ./client/dist
     envVars:
       - key: NODE_ENV
         value: production
-    routes:
-      - type: rewrite
-        source: /__/auth/*
-        destination: /__/auth/handler
 
   # Servicio de Staging
   - type: web
@@ -22,11 +17,6 @@ services:
     branch: develop
     buildCommand: npm install && cd client && npm install && npm run build
     startCommand: node server.js
-    staticPublishPath: ./client/dist
     envVars:
       - key: NODE_ENV
         value: staging # Puede ser development o staging según prefieras
-    routes:
-      - type: rewrite
-        source: /__/auth/*
-        destination: /__/auth/handler
