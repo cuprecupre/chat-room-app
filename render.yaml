@@ -1,11 +1,31 @@
 services:
+  # Servicio de Producción
   - type: web
-    name: impostor-app
+    name: impostor-app-production
     env: node
+    branch: main
     buildCommand: npm install && cd client && npm install && npm run build
     startCommand: node server.js
     staticPublishPath: ./client/dist
-    # Configurar rutas para Firebase Auth
+    envVars:
+      - key: NODE_ENV
+        value: production
+    routes:
+      - type: rewrite
+        source: /__/auth/*
+        destination: /__/auth/handler
+
+  # Servicio de Staging
+  - type: web
+    name: impostor-app-staging
+    env: node
+    branch: develop
+    buildCommand: npm install && cd client && npm install && npm run build
+    startCommand: node server.js
+    staticPublishPath: ./client/dist
+    envVars:
+      - key: NODE_ENV
+        value: staging # Puede ser development o staging según prefieras
     routes:
       - type: rewrite
         source: /__/auth/*
