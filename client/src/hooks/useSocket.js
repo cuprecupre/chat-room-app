@@ -57,8 +57,9 @@ export function useSocket(user) {
 
         if (!isMounted) return;
 
-        // En desarrollo, usar el mismo host que la URL actual pero puerto 3000
-        const socketURL = process.env.NODE_ENV === 'production'
+        // En desarrollo (y no staging), usar puerto 3000
+        const isProductionOrStaging = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging';
+        const socketURL = isProductionOrStaging
           ? window.location.origin
           : `${window.location.protocol}//${window.location.hostname}:3000`;
 
