@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { auth, provider, ensurePersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onIdTokenChanged, signOut } from '../lib/firebase';
+import { auth, provider, ensurePersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onIdTokenChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from '../lib/firebase';
 import { saveToken, clearToken } from '../lib/tokenStorage';
 
 export function useAuth() {
@@ -198,8 +198,7 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      const { signInWithEmailAndPassword: signInEmail } = await import('../lib/firebase');
-      await signInEmail(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       setLoading(false);
     } catch (err) {
       console.error('Error login con email:', err?.code);
@@ -223,13 +222,12 @@ export function useAuth() {
     setError(null);
     try {
       console.log('📧 Registrando usuario con email...');
-      const { createUserWithEmailAndPassword: createUser, updateProfile: updateProf } = await import('../lib/firebase');
-      const result = await createUser(auth, email, password);
+      const result = await createUserWithEmailAndPassword(auth, email, password);
 
       // Actualizar displayName ANTES de que onAuthStateChanged propague el usuario
       if (displayName) {
         console.log('📝 Actualizando displayName:', displayName);
-        await updateProf(result.user, { displayName });
+        await updateProfile(result.user, { displayName });
 
         // Forzar recarga del usuario para obtener el displayName actualizado
         await result.user.reload();
