@@ -35,11 +35,13 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
   // Mantener el modo activo cuando hay un error después de intentar login/registro
   useEffect(() => {
     // Si estábamos cargando y ahora hay un error, mantener el último modo activo
-    if (wasLoadingRef.current && !isLoading && error && lastModeRef.current !== 'select') {
-      setMode(lastModeRef.current);
-    }
     wasLoadingRef.current = isLoading;
   }, [isLoading, error]);
+
+  // Scroll reset when mode changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [mode]);
 
   // Rastrear el modo actual
   useEffect(() => {
@@ -53,7 +55,7 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
   useEffect(() => {
     const state = { mode, email, displayName };
     const stateString = JSON.stringify(state);
-    
+
     // Solo guardar si realmente cambió
     if (stateString !== lastSavedStateRef.current) {
       sessionStorage.setItem(STORAGE_KEY, stateString);
@@ -88,7 +90,7 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
   const handleRegister = (e) => {
     e.preventDefault();
     setLocalError('');
-    
+
     if (!displayName.trim()) {
       setLocalError('Por favor, ingresa tu nombre y apellido.');
       return;
@@ -100,17 +102,17 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
   const displayError = localError || error;
 
   return (
-    <div className="w-full h-dvh flex flex-col">
+    <div className="w-full min-h-screen flex flex-col">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-6">
           {/* Logo/Header */}
           <div className="text-center space-y-4">
             <div className="perspective-1000 animate-scaleIn">
-              <img 
-                src={heroImg} 
-                alt="El Impostor" 
-                className="mx-auto w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10" 
-                loading="lazy" 
+              <img
+                src={heroImg}
+                alt="El Impostor"
+                className="mx-auto w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10"
+                loading="lazy"
               />
             </div>
             <h1 className="text-3xl font-bold text-neutral-50">
@@ -126,7 +128,7 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
               <p className="text-neutral-300 text-center">
                 ¿Ya tienes una cuenta o quieres crear una nueva?
               </p>
-              
+
               <Button
                 onClick={() => {
                   setMode('login');
@@ -139,7 +141,7 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
               >
                 Iniciar sesión
               </Button>
-              
+
               <Button
                 onClick={() => {
                   setMode('register');
@@ -309,7 +311,7 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
           </Button>
         </div>
       </div>
-      
+
       <footer className="w-full py-4 px-6">
         <div className="flex items-center justify-center">
           <p className="text-xs sm:text-sm text-neutral-500">

@@ -251,6 +251,12 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
     prevPlayersRef.current = currentPlayers;
   }, [state.players]);
 
+
+  // Detectar cambio de fase para resetear scroll
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [state.phase]);
+
   // Reveal helpers
   const triggerReveal = () => {
     if (revealTimeoutRef.current) clearTimeout(revealTimeoutRef.current);
@@ -265,6 +271,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
       }, 5000);
     }
   };
+
 
 
   // Detectar cambio de ronda y mostrar overlay

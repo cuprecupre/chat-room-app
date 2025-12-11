@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from './ui/Button';
 import { Spinner } from './ui/Spinner';
 import heroImg from '../assets/impostor-home.png';
 
 export function LoginScreen({ onLogin, onGoToEmailAuth, isLoading, onOpenInstructions, onOpenFeedback }) {
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
-    <div className="w-full h-dvh flex flex-col">
+    <div className="w-full min-h-screen flex flex-col">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md text-center space-y-4 sm:space-y-6">
           <div className="perspective-1000 animate-scaleIn animate-delay-200">

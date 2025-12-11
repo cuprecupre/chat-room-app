@@ -54,9 +54,14 @@ export default function App() {
   const hasLoggedLoading = useRef(false); // Para evitar log infinito de loading
   const [showLoader, setShowLoader] = useState(false); // Controlar si mostrar loader (con delay)
   const loaderTimeoutRef = useRef(null);
+
   const [showConnectingLoader, setShowConnectingLoader] = useState(false); // Controlar si mostrar loader de conexión (con delay)
   const connectingLoaderTimeoutRef = useRef(null);
 
+  // Reset scroll when major views change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [user?.uid, gameState?.gameId, showEmailAuthScreen, isShowcaseRoute]);
 
 
   useEffect(() => {
@@ -703,7 +708,7 @@ export default function App() {
   const showHeader = user && connected;
   const containerClasses = showHeader
     ? "w-full max-w-4xl mx-auto p-6 sm:p-6 lg:p-8"
-    : "w-full max-w-4xl mx-auto min-h-dvh flex items-center justify-center p-0";
+    : "w-full max-w-4xl mx-auto min-h-screen flex items-center justify-center p-0";
 
   return (
     <div className="bg-neutral-950 text-white min-h-screen font-sans flex flex-col">
