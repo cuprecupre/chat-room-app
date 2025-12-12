@@ -135,7 +135,7 @@ class Game {
       this.players.push({
         uid: user.uid,
         name: user.name,
-        photoURL: user.photoURL,
+        photoURL: user.photoURL || null, // Evitar undefined para Firestore
         joinedAt: joinedAt
       });
       // Inicializar puntuación del jugador

@@ -24,6 +24,7 @@ class DBService {
         try {
             // Assumes firebase-admin has been initialized in server.js
             this.db = admin.firestore();
+            this.db.settings({ ignoreUndefinedProperties: true }); // Robustness fix for "undefined" errors
             this.collectionName = options.collectionName || 'dev_games';
             console.log(`✅ [DB Service] Persistence ENABLED. Targets collection: '${this.collectionName}'`);
         } catch (e) {
