@@ -44,6 +44,53 @@ class Game {
     this.persist();
   }
 
+  /**
+   * Reconstructs a Game instance from a plain object (database state).
+   * @param {string} gameId
+   * @param {Object} data 
+   */
+  static fromState(gameId, data) {
+    // Create a dummy host user to satisfy constructor, then overwrite everything
+    const dummyHost = { uid: data.hostId, name: 'Recovering...' };
+    const game = new Game(dummyHost, { showImpostorHint: data.showImpostorHint });
+
+    // Overwrite fields
+    game.gameId = gameId; // Ensure ID matches DB
+    game.hostId = data.hostId;
+    game.phase = data.phase;
+    // Sanitize players to avoid undefined photoURL issues
+    game.players = (data.players || []).map(p => ({
+      ...p,
+      photoURL: p.photoURL || null
+    }));
+    game.playerScores = data.playerScores || {};
+
+    // Config
+    game.maxRounds = data.maxRounds || 3;
+    game.targetScore = data.targetScore || 15;
+    game.initialPlayerCount = data.initialPlayerCount || 0;
+
+    // Round State
+    game.roundCount = data.roundCount || 0;
+    game.secretWord = data.secretWord || '';
+    game.secretCategory = data.secretCategory || '';
+    game.impostorId = data.impostorId || '';
+    game.startingPlayerId = data.startingPlayerId || null;
+    game.currentTurn = data.currentTurn || 1;
+
+    // Arrays & Collections
+    game.roundPlayers = data.roundPlayers || [];
+    game.eliminatedInRound = data.eliminatedInRound || [];
+    game.votes = data.votes || {};
+    game.turnHistory = data.turnHistory || [];
+    game.lastRoundScores = data.lastRoundScores || {};
+    game.playerOrder = data.playerOrder || [];
+    game.impostorHistory = data.impostorHistory || [];
+
+    console.log(`[Game Recovery] Game ${gameId} restored in phase '${game.phase}' with ${game.players.length} players.`);
+    return game;
+  }
+
   // --- Persistence Helpers ---
   getPersistenceState() {
     return {

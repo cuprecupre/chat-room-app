@@ -68,6 +68,25 @@ dbService.initialize({
   collectionName: DB_COLLECTION_NAME
 });
 
+// --- State Recovery (Restore) ---
+// Recuperar partidas activas de la base de datos al iniciar el servidor
+if (ENABLE_DB_PERSISTENCE) {
+  console.log('🔄 [Server] Starting game recovery process...');
+  dbService.getActiveGames().then(activeGames => {
+    activeGames.forEach(data => {
+      try {
+        const game = Game.fromState(data.gameId, data);
+        games[data.gameId] = game;
+      } catch (e) {
+        console.error(`❌ [Server] Failed to restore game ${data.gameId}:`, e.message);
+      }
+    });
+    console.log(`✅ [Server] Recovery complete. ${Object.keys(games).length} games loaded into memory.`);
+  }).catch(e => {
+    console.error('❌ [Server] Recovery procedure failed:', e);
+  });
+}
+
 const app = express();
 const server = http.createServer(app);
 const dynamicOrigins = (process.env.CLIENT_ORIGINS || '')

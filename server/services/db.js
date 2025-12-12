@@ -79,6 +79,38 @@ class DBService {
             return null;
         }
     }
+    /**
+     * Retrieves all games that are not 'game_over'.
+     * Used for server restart recovery.
+     */
+    async getActiveGames() {
+        if (!this.enabled || !this.db) return [];
+
+        try {
+            // NOTE: '!=' queries in Firestore have limitations and might require indexes.
+            // An alternative is to just get all and filter, or store a dedicated 'active' boolean.
+            // For now, let's try the simple query. If it fails due to index, we'll log it.
+            // A safer approach regarding indexes is query phase 'in' ['lobby', 'playing', 'round_result']
+            const snapshot = await this.db.collection(this.collectionName)
+                .where('phase', 'in', ['lobby', 'playing', 'round_result'])
+                .get();
+
+            if (snapshot.empty) {
+                return [];
+            }
+
+            const games = [];
+            snapshot.forEach(doc => {
+                games.push({ gameId: doc.id, ...doc.data() });
+            });
+
+            console.log(`✅ [DB Service] Recovered ${games.length} active games.`);
+            return games;
+        } catch (error) {
+            console.error(`❌ [DB Service] Failed to recover games: ${error.message}`);
+            return [];
+        }
+    }
 }
 
 // Export singleton
