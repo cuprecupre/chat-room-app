@@ -58,7 +58,8 @@ const Game = require('./Game');
 const dbService = require('./server/services/db');
 
 // --- Configuration & Services Initialization ---
-const ENABLE_DB_PERSISTENCE = process.env.ENABLE_DB_PERSISTENCE === 'true';
+// Robust check: trim whitespace and lowercase to avoid " true" or "True" failures
+const ENABLE_DB_PERSISTENCE = String(process.env.ENABLE_DB_PERSISTENCE || '').trim().toLowerCase() === 'true';
 // Strategy: use 'games' for production, 'dev_games' for everything else (shared dev/staging)
 const DB_COLLECTION_NAME = process.env.NODE_ENV === 'production' ? 'games' : 'dev_games';
 
