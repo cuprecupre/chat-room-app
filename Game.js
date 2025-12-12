@@ -1,4 +1,5 @@
 const { getRandomWordWithCategory } = require('./words');
+const dbService = require('./server/services/db');
 
 class Game {
   constructor(hostUser, options = {}) {
@@ -10,20 +11,20 @@ class Game {
     this.secretCategory = '';
     this.impostorId = '';
     this.roundPlayers = []; // uids activos en la ronda actual
-    
+
     // Opciones del juego
     this.showImpostorHint = options.showImpostorHint !== undefined ? options.showImpostorHint : true; // Por defecto mostrar pista
-    
+
     // Sistema de vueltas
     this.currentTurn = 1; // Vuelta actual (1, 2, 3)
     this.maxTurns = 3;
     this.eliminatedInRound = []; // Jugadores expulsados en esta ronda (acumulado de todas las vueltas)
     this.lastEliminatedInTurn = null; // Último jugador eliminado en la vuelta anterior
-    
+
     // Sistema de votación
     this.votes = {}; // { [playerId]: votedForPlayerId }
     this.turnHistory = []; // Historial de vueltas y resultados
-    
+
     // Sistema de puntos
     this.playerScores = {}; // { [playerId]: totalScore }
     this.roundCount = 0; // Contador de rondas jugadas
@@ -31,23 +32,62 @@ class Game {
     this.maxRounds = 0; // Máximo de rondas (3 partidas fijas)
     this.targetScore = 15; // Puntos para ganar
     this.lastRoundScores = {}; // Puntos ganados en la última ronda
-    
+
     // Sistema de orden y jugador inicial
     this.playerOrder = []; // Orden base (OB): uids ordenados por joinedAt
     this.startingPlayerId = null; // Jugador que inicia la ronda actual
-    
+
     // Historial de impostores para evitar repeticiones
     this.impostorHistory = []; // Array de uids de los últimos impostores [más reciente, ... , más antiguo]
 
     this.addPlayer(hostUser);
+    this.persist();
+  }
+
+  // --- Persistence Helpers ---
+  getPersistenceState() {
+    return {
+      hostId: this.hostId,
+      phase: this.phase,
+      players: this.players,
+      playerScores: this.playerScores,
+
+      // Game Config
+      showImpostorHint: this.showImpostorHint,
+      maxRounds: this.maxRounds,
+      targetScore: this.targetScore,
+      initialPlayerCount: this.initialPlayerCount,
+
+      // Round State
+      roundCount: this.roundCount,
+      secretWord: this.secretWord,
+      secretCategory: this.secretCategory,
+      impostorId: this.impostorId,
+      startingPlayerId: this.startingPlayerId,
+      currentTurn: this.currentTurn,
+
+      // Arrays & Objects
+      roundPlayers: this.roundPlayers,
+      eliminatedInRound: this.eliminatedInRound,
+      votes: this.votes,
+      turnHistory: this.turnHistory,
+      lastRoundScores: this.lastRoundScores,
+      playerOrder: this.playerOrder,
+      impostorHistory: this.impostorHistory
+    };
+  }
+
+  persist() {
+    // Fire and forget - don't block game loop
+    dbService.saveGameState(this.gameId, this.getPersistenceState());
   }
 
   addPlayer(user) {
     if (!this.players.some(p => p.uid === user.uid)) {
       const joinedAt = Date.now();
-      this.players.push({ 
-        uid: user.uid, 
-        name: user.name, 
+      this.players.push({
+        uid: user.uid,
+        name: user.name,
         photoURL: user.photoURL,
         joinedAt: joinedAt
       });
@@ -55,6 +95,7 @@ class Game {
       this.playerScores[user.uid] = 0;
       // Actualizar orden base (OB)
       this.updatePlayerOrder();
+      this.persist();
     }
     // Si la partida está en juego, NO añadir a roundPlayers: esperará a la siguiente ronda
   }
@@ -80,22 +121,22 @@ class Game {
   calculateStartingPlayer() {
     // Jugadores elegibles: activos en la ronda (no expulsados definitivamente)
     // Para simplificar: elegibles = jugadores que están en roundPlayers
-    const eligiblePlayers = this.playerOrder.filter(uid => 
+    const eligiblePlayers = this.playerOrder.filter(uid =>
       this.roundPlayers.includes(uid)
     );
-    
+
     if (eligiblePlayers.length === 0) {
       console.log(`[Game ${this.gameId}] No hay jugadores elegibles para iniciar ronda`);
       return null;
     }
-    
+
     // Calcular índice usando la fórmula: ((r - 1) mod N)
     const roundIndex = (this.roundCount - 1) % eligiblePlayers.length;
     const startingPlayerId = eligiblePlayers[roundIndex];
-    
+
     const startingPlayer = this.players.find(p => p.uid === startingPlayerId);
     console.log(`[Game ${this.gameId}] Ronda ${this.roundCount}: Jugador inicial = ${startingPlayer?.name} (índice ${roundIndex} de ${eligiblePlayers.length} elegibles)`);
-    
+
     return startingPlayerId;
   }
 
@@ -106,31 +147,31 @@ class Game {
   selectImpostorWithLimit() {
     // Obtener los últimos 2 impostores del historial
     const lastTwoImpostors = this.impostorHistory.slice(0, 2);
-    
+
     // Verificar si ambas últimas veces fue el mismo jugador
     let excludedPlayer = null;
     if (lastTwoImpostors.length === 2 && lastTwoImpostors[0] === lastTwoImpostors[1]) {
       excludedPlayer = lastTwoImpostors[0];
       console.log(`[Game ${this.gameId}] Jugador ${this.players.find(p => p.uid === excludedPlayer)?.name} fue impostor las últimas 2 veces, será excluido`);
     }
-    
+
     // Crear lista de candidatos (jugadores activos que no están excluidos)
     let candidates = this.roundPlayers.filter(uid => uid !== excludedPlayer);
-    
+
     // Si no hay candidatos (caso extremo: solo hay 1 jugador o algo salió mal)
     // Permitir a cualquiera ser impostor
     if (candidates.length === 0) {
       console.log(`[Game ${this.gameId}] No hay candidatos elegibles, permitiendo a todos`);
       candidates = [...this.roundPlayers];
     }
-    
+
     // Seleccionar impostor con mejor aleatoriedad usando Fisher-Yates shuffle
     const shuffledCandidates = [...candidates];
     for (let i = shuffledCandidates.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffledCandidates[i], shuffledCandidates[j]] = [shuffledCandidates[j], shuffledCandidates[i]];
     }
-    
+
     return shuffledCandidates[0];
   }
 
@@ -144,7 +185,7 @@ class Game {
     delete this.votes[userId];
     // NO eliminar playerScores - mantener puntos aunque el jugador abandone
     // delete this.playerScores[userId];
-    
+
     // Actualizar orden base cuando un jugador se va
     this.updatePlayerOrder();
 
@@ -156,6 +197,7 @@ class Game {
     if (this.phase === 'playing' && playerIsImpostor) {
       this.phase = 'round_result';
     }
+    this.persist();
   }
 
   startGame(userId) {
@@ -199,24 +241,26 @@ class Game {
     const { word, category } = getRandomWordWithCategory();
     this.secretWord = word;
     this.secretCategory = category;
-    
+
     const impostorName = this.players.find(p => p.uid === this.impostorId)?.name || 'desconocido';
     console.log(`[Game ${this.gameId}] Ronda ${this.roundCount}: palabra='${this.secretWord}', categoría='${this.secretCategory}', impostor='${impostorName}' (${this.impostorId})`);
     console.log(`[Game ${this.gameId}] Historial de impostores:`, this.impostorHistory.slice(0, 3).map(uid => this.players.find(p => p.uid === uid)?.name || uid));
 
     this.phase = 'playing';
+    this.persist();
   }
 
   endGame(userId) {
     if (userId !== this.hostId) throw new Error('Solo el host puede terminar la partida.');
     this.phase = 'game_over';
+    this.persist();
   }
 
   playAgain(userId) {
     if (userId !== this.hostId) throw new Error('Solo el host puede empezar una nueva ronda.');
-    
+
     console.log(`[Game ${this.gameId}] playAgain called. Current phase: ${this.phase}`);
-    
+
     // Si el juego está en game_over, reiniciar completamente
     if (this.phase === 'game_over') {
       // Resetear todos los puntos y contadores
@@ -232,8 +276,9 @@ class Game {
     } else {
       console.log(`[Game ${this.gameId}] Continuando con siguiente ronda. Ronda actual: ${this.roundCount}`);
     }
-    
+
     this.startNewRound();
+    // Persistence handled in startNewRound
   }
 
   // Métodos de votación
@@ -242,15 +287,15 @@ class Game {
     if (this.phase !== 'playing') {
       throw new Error('Solo puedes votar durante una ronda activa.');
     }
-    
+
     if (this.eliminatedInRound.includes(voterId)) {
       throw new Error('Los jugadores eliminados no pueden votar.');
     }
-    
+
     if (!this.roundPlayers.includes(voterId)) {
       throw new Error('No estás participando en esta ronda.');
     }
-    
+
     // Si targetId es null o undefined, el jugador está desmarcando su voto
     if (targetId === null || targetId === undefined) {
       if (this.votes[voterId]) {
@@ -259,15 +304,15 @@ class Game {
       }
       return; // No verificar si todos votaron cuando se desmarca
     }
-    
+
     if (voterId === targetId) {
       throw new Error('No puedes votarte a ti mismo.');
     }
-    
+
     if (this.eliminatedInRound.includes(targetId)) {
       throw new Error('No puedes votar a un jugador eliminado.');
     }
-    
+
     if (!this.roundPlayers.includes(targetId)) {
       throw new Error('Ese jugador no está en esta ronda.');
     }
@@ -279,12 +324,13 @@ class Game {
 
     // Verificar si todos han votado
     this.checkIfAllVoted();
+    this.persist();
   }
 
   checkIfAllVoted() {
     const activePlayers = this.roundPlayers.filter(uid => !this.eliminatedInRound.includes(uid));
     const votedPlayers = Object.keys(this.votes).filter(uid => activePlayers.includes(uid));
-    
+
     if (votedPlayers.length === activePlayers.length) {
       console.log(`[Game ${this.gameId}] Todos han votado. Procesando resultados...`);
       this.processVotingResults();
@@ -295,10 +341,10 @@ class Game {
     // Contar votos
     const voteCount = {};
     const activePlayers = this.roundPlayers.filter(uid => !this.eliminatedInRound.includes(uid));
-    
+
     console.log(`[Game ${this.gameId}] Procesando resultados. Jugadores activos:`, activePlayers);
     console.log(`[Game ${this.gameId}] Votos registrados:`, this.votes);
-    
+
     Object.entries(this.votes).forEach(([voter, target]) => {
       if (activePlayers.includes(voter)) {
         voteCount[target] = (voteCount[target] || 0) + 1;
@@ -310,7 +356,7 @@ class Game {
     // Encontrar el más votado
     let maxVotes = 0;
     let mostVoted = [];
-    
+
     Object.entries(voteCount).forEach(([playerId, votes]) => {
       if (votes > maxVotes) {
         maxVotes = votes;
@@ -319,7 +365,7 @@ class Game {
         mostVoted.push(playerId);
       }
     });
-    
+
     console.log(`[Game ${this.gameId}] Más votados:`, mostVoted, `con ${maxVotes} votos`);
 
     // Guardar historial de esta vuelta
@@ -335,7 +381,7 @@ class Game {
     if (mostVoted.length !== 1) {
       const reason = mostVoted.length === 0 ? 'sin votos' : `empate entre: ${mostVoted.join(', ')}`;
       console.log(`[Game ${this.gameId}] No hay eliminación (${reason}).`);
-      
+
       // Si ya estamos en la vuelta 3, el impostor gana
       if (this.currentTurn >= this.maxTurns) {
         console.log(`[Game ${this.gameId}] Vuelta 3 completada sin eliminación. ¡El impostor gana!`);
@@ -378,10 +424,10 @@ class Game {
     console.log(`[Game ${this.gameId}] 🔄 startNextTurn llamado. Vuelta actual: ${this.currentTurn} → ${this.currentTurn + 1}`);
     console.log(`[Game ${this.gameId}] lastEliminatedInTurn antes de cambiar vuelta:`, this.lastEliminatedInTurn);
     console.log(`[Game ${this.gameId}] Fue empate:`, wasTie);
-    
+
     this.currentTurn++;
     this.votes = {}; // Resetear votos para la nueva vuelta
-    
+
     // Dar puntos al impostor por sobrevivir la vuelta SOLO si hubo eliminación (no empate)
     // Vuelta 1 completada: +2 puntos
     // Vuelta 2 completada: +3 puntos
@@ -395,17 +441,18 @@ class Game {
     } else if (wasTie) {
       console.log(`[Game ${this.gameId}] Empate: no se otorgan puntos al impostor`);
     }
-    
+
     console.log(`[Game ${this.gameId}] ✅ Vuelta ${this.currentTurn} iniciada. lastEliminatedInTurn:`, this.lastEliminatedInTurn);
+    this.persist();
   }
 
   endRound(friendsWon) {
     // Calcular puntos
     this.calculateRoundScores(friendsWon);
-    
+
     // Verificar si alguien ganó o se alcanzó el máximo de rondas
     const gameOver = this.checkGameOver();
-    
+
     if (gameOver) {
       this.phase = 'game_over';
       console.log(`[Game ${this.gameId}] ¡Partida terminada! Ganador: ${gameOver}`);
@@ -413,11 +460,12 @@ class Game {
       this.phase = 'round_result';
       console.log(`[Game ${this.gameId}] Ronda ${this.roundCount} terminada.`);
     }
+    this.persist();
   }
 
   calculateRoundScores(friendsWon) {
     this.lastRoundScores = {};
-    
+
     if (friendsWon) {
       // Amigos ganaron: dar puntos a quienes votaron correctamente
       this.turnHistory.forEach(turn => {
@@ -428,7 +476,7 @@ class Game {
           }
         });
       });
-      
+
       // +1 punto adicional por expulsar al impostor
       this.roundPlayers.forEach(uid => {
         if (uid !== this.impostorId && !this.eliminatedInRound.includes(uid)) {
@@ -440,7 +488,7 @@ class Game {
       // Impostor ganó
       // Los puntos por sobrevivir cada vuelta ya fueron dados durante el juego (2, 3, 4 puntos)
       // No hay puntos adicionales
-      
+
       // Dar puntos a amigos que votaron correctamente (aunque no ganaron)
       this.turnHistory.forEach(turn => {
         Object.entries(turn.votes).forEach(([voter, target]) => {
@@ -451,7 +499,7 @@ class Game {
         });
       });
     }
-    
+
     console.log(`[Game ${this.gameId}] Puntos de esta ronda:`, this.lastRoundScores);
   }
 
@@ -462,13 +510,13 @@ class Game {
         return playerId;
       }
     }
-    
+
     // Verificar si se alcanzó el máximo de rondas
     if (this.roundCount >= this.maxRounds) {
       // Encontrar al jugador con más puntos
       let maxScore = 0;
       const playersWithMaxScore = [];
-      
+
       Object.entries(this.playerScores).forEach(([playerId, score]) => {
         if (score > maxScore) {
           maxScore = score;
@@ -478,17 +526,17 @@ class Game {
           playersWithMaxScore.push(playerId);
         }
       });
-      
+
       // Solo declarar ganador si hay uno claro (no empate)
       if (playersWithMaxScore.length === 1) {
         return playersWithMaxScore[0];
       }
-      
+
       // Si hay empate, continuar jugando
       console.log(`[Game ${this.gameId}] Empate con ${maxScore} puntos. Continuando...`);
       return null;
     }
-    
+
     return null;
   }
 
@@ -528,7 +576,7 @@ class Game {
         if (isImpostor && this.showImpostorHint) {
           baseState.secretCategory = this.secretCategory;
         }
-        
+
         // Info de votación
         baseState.currentTurn = this.currentTurn;
         baseState.maxTurns = this.maxTurns;
@@ -548,7 +596,7 @@ class Game {
       baseState.secretWord = this.secretWord;
       baseState.lastRoundScores = this.lastRoundScores;
       baseState.eliminatedInRound = this.eliminatedInRound;
-      
+
       if (this.phase === 'game_over') {
         const winnerId = this.checkGameOver();
         const winner = this.players.find(p => p.uid === winnerId);

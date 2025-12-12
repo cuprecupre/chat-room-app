@@ -55,6 +55,18 @@ const Game = require('./Game');
   }
 })();
 
+const dbService = require('./server/services/db');
+
+// --- Configuration & Services Initialization ---
+const ENABLE_DB_PERSISTENCE = process.env.ENABLE_DB_PERSISTENCE === 'true';
+// Strategy: use 'games' for production, 'dev_games' for everything else (shared dev/staging)
+const DB_COLLECTION_NAME = process.env.NODE_ENV === 'production' ? 'games' : 'dev_games';
+
+dbService.initialize({
+  enabled: ENABLE_DB_PERSISTENCE,
+  collectionName: DB_COLLECTION_NAME
+});
+
 const app = express();
 const server = http.createServer(app);
 const dynamicOrigins = (process.env.CLIENT_ORIGINS || '')

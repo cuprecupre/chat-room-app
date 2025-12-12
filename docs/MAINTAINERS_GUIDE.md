@@ -14,9 +14,14 @@ Referencia a conservar:
 ## Reglas estrictas (producción)
 
 - No tocar autenticación, roles, sincronización, o contrato de eventos Socket.IO sin aprobación explícita.
+- **SEPARACIÓN DE BASES DE DATOS**: Staging (`develop`) NUNCA debe conectarse a la base de datos de producción. Debe usar una instancia o colección separada.
 - No commitear `.env` ni credenciales. Mantener `.gitignore` tal como está.
 - No cambiar `render.yaml` (plan, buildCommand, startCommand) sin aprobación.
 - Cualquier cambio debe ser compatible hacia atrás y testeado en local antes de merge.
+- **PERSISTENCIA DE DATOS**: `Game.js` utiliza `server/services/db.js` para persistir estado en Firestore.
+  - Producción: Colección `games`.
+  - Staging/Dev: Colección `dev_games`.
+  - Feature Flag: `ENABLE_DB_PERSISTENCE` controla si se escribe o no en la BBDD.
 
 ## Requisitos para entorno local
 
@@ -46,6 +51,7 @@ GOOGLE_APPLICATION_CREDENTIALS=./firebase-service-account.json
 
 # Opción B: JSON completo como string (si no usas archivo)
 # FIREBASE_SERVICE_ACCOUNT={"type":"service_account",...}
+ENABLE_DB_PERSISTENCE=true # Opcional: para probar guardado en Firestore localmente
 ```
 
 3) Colocar la clave de servicio Firebase (solo local):
@@ -96,6 +102,7 @@ Realizar SIEMPRE este smoke test en local (dos navegadores o uno normal + incogn
 1) Login con Google en ambas ventanas.
 2) Ventana A: crear partida y verificar `game-state` inicial; rol asignado.
 3) Ventana B: unirse con código; verificar rol asignado correctamente.
+3b) (Opcional) Verificar que los documentos se crean en Firestore (colección `dev_games`) si `ENABLE_DB_PERSISTENCE=true`.
 4) Probar: `start-game`, generación de pistas/turnos, y flujo de impostor.
 5) Desconectar B (cerrar pestaña); verificar periodo de gracia y reentrada.
 6) Reabrir B; confirmar reanudación de estado correcto.

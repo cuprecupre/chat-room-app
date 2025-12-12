@@ -9,6 +9,8 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: ENABLE_DB_PERSISTENCE
+        value: false # Activar manualmente en Dashboard cuando estemos listos
 
   # Servicio de Staging
   - type: web
@@ -19,4 +21,6 @@ services:
     startCommand: node server.js
     envVars:
       - key: NODE_ENV
-        value: staging # Puede ser development o staging según prefieras
+        value: staging
+      - key: ENABLE_DB_PERSISTENCE
+        value: true # Activado para pruebas en Staging
