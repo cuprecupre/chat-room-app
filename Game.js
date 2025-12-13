@@ -246,6 +246,7 @@ class Game {
 
   removePlayer(userId) {
     const playerIsImpostor = this.impostorId === userId;
+    const wasHost = this.hostId === userId;
 
     // Guardar datos del jugador antes de eliminarlo
     const leavingPlayer = this.players.find(p => p.uid === userId);
@@ -259,16 +260,26 @@ class Game {
     this.players = this.players.filter(p => p.uid !== userId);
     this.roundPlayers = this.roundPlayers.filter(uid => uid !== userId);
     this.eliminatedInRound = this.eliminatedInRound.filter(uid => uid !== userId);
-    this.eliminatedInRound = this.eliminatedInRound.filter(uid => uid !== userId);
     delete this.votes[userId];
     // NO eliminar playerScores - mantener puntos aunque el jugador abandone
-    // delete this.playerScores[userId];
 
     // Actualizar orden base cuando un jugador se va
     this.updatePlayerOrder();
 
-    if (this.hostId === userId && this.players.length > 0) {
-      this.hostId = this.players[0].uid;
+    // Transferir host si el que se fue era el host
+    let newHostInfo = null;
+    if (wasHost && this.players.length > 0) {
+      // Usar playerOrder para determinar el siguiente host (por orden de llegada)
+      const nextHostId = this.playerOrder.find(uid => this.players.some(p => p.uid === uid));
+      if (nextHostId) {
+        this.hostId = nextHostId;
+        const newHost = this.players.find(p => p.uid === nextHostId);
+        newHostInfo = {
+          uid: nextHostId,
+          name: newHost ? newHost.name : 'Jugador'
+        };
+        console.log(`[Game ${this.gameId}] Host transferido a ${newHostInfo.name} (${nextHostId})`);
+      }
     }
 
     // If the impostor leaves during the game, end the round
@@ -279,6 +290,9 @@ class Game {
       this.checkIfAllVoted();
     }
     this.persist();
+
+    // Retornar info del nuevo host si hubo cambio
+    return newHostInfo;
   }
 
   startGame(userId) {

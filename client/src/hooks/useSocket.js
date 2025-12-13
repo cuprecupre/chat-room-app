@@ -253,6 +253,12 @@ export function useSocket(user) {
           }
         });
 
+        // Escuchar toasts del servidor (ej: cambio de host)
+        socket.on('toast', (message) => {
+          console.log('[Socket] Toast from server:', message);
+          window.dispatchEvent(new CustomEvent('app:toast', { detail: message }));
+        });
+
       } catch (error) {
         console.error('❌ useSocket - Error al obtener token de Firebase para socket:', {
           message: error.message,
