@@ -169,17 +169,21 @@ export default function App() {
   const playAgain = useCallback(() => emit('play-again', gameState?.gameId), [emit, gameState]);
   const leaveGame = useCallback(() => {
     if (gameState?.gameId) {
-      // Remove gameId from URL BEFORE leaving and reloading
+      // Remove gameId from URL immediately to prevent accidental reopen
       const url = new URL(window.location);
       url.searchParams.delete('gameId');
       window.history.replaceState({}, '', url.toString());
 
-      emit('leave-game', gameState.gameId);
-
-      // Force page reload to clear all state and return to clean lobby
-      setTimeout(() => {
+      const handleCleanExit = () => {
+        // Force page reload only after server ack or timeout
         window.location.reload();
-      }, 100);
+      };
+
+      // Emit with Ack callback
+      emit('leave-game', gameState.gameId, handleCleanExit);
+
+      // Fallback: if server doesn't respond in 2s, force exit anyway
+      setTimeout(handleCleanExit, 2000);
     }
   }, [emit, gameState]);
 
@@ -326,18 +330,22 @@ export default function App() {
     url.searchParams.delete('gameId');
     window.history.replaceState({}, '', url.toString());
 
-    // Force disconnect and clear state
-    if (gameState?.gameId) {
-      emit('leave-game', gameState.gameId);
-    }
-
-    // Show toast
+    // Show toast immediately
     window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Sesión reiniciada. Vuelve al lobby.' }));
 
-    // Force page reload to clear all state
-    setTimeout(() => {
+    const handleCleanExit = () => {
       window.location.reload();
-    }, 100);
+    };
+
+    // Force disconnect and clear state with Ack
+    if (gameState?.gameId) {
+      emit('leave-game', gameState.gameId, handleCleanExit);
+      // Fallback timeout
+      setTimeout(handleCleanExit, 2000);
+    } else {
+      // If no game ID known, just reload with small delay
+      setTimeout(handleCleanExit, 100);
+    }
   }, [emit, gameState]);
 
   // Cerrar dropdown al hacer click fuera o al presionar Escape

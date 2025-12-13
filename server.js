@@ -476,32 +476,40 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('leave-game', (gameId) => {
+  socket.on('leave-game', (gameId, callback) => {
     const game = games[gameId];
+    // Helper to safely call callback
+    const safeCallback = () => {
+      if (typeof callback === 'function') callback();
+    };
+
     if (!game || !game.players.some(p => p.uid === user.uid)) {
-      // Game doesn't exist or user is not in it. Nothing to do.
-      // We can send a null state just in case the client is out of sync.
+      // Game doesn't exist or user is not in it.
       socket.emit('game-state', null);
+      safeCallback();
       return;
     }
 
     console.log(`User ${user.name} is leaving game ${gameId}`);
 
-    // Clear any pending disconnect timer since user is manually leaving
+    // Clear pending disconnect timer
     if (pendingDisconnects[user.uid]) {
       clearTimeout(pendingDisconnects[user.uid].timeout);
       delete pendingDisconnects[user.uid];
     }
 
-    // Remove player from the game model
+    // Remove player
     game.removePlayer(user.uid);
 
-    // 1. Tell the leaving player to go to the lobby by resetting their state
+    // 1. Reset leaving player state
     socket.emit('game-state', null);
     socket.leave(gameId);
 
-    // 2. Notify all *remaining* players of the change
+    // 2. Notify remaining players
     emitGameState(game);
+
+    // 3. Acknowledge completion
+    safeCallback();
   });
 
   // Safety: if a client requests their current state explicitly

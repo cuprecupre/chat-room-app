@@ -267,8 +267,8 @@ export function useSocket(user) {
     };
   }, [user, user?.displayName]);
 
-  const emit = useCallback((event, payload) => {
-    socketRef.current?.emit(event, payload);
+  const emit = useCallback((event, payload, callback) => {
+    socketRef.current?.emit(event, payload, callback);
   }, []);
 
   return { connected, gameState, emit, joinError, clearJoinError: () => setJoinError(null) };
