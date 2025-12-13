@@ -157,8 +157,13 @@ export function useSocket(user) {
           }
           const url = new URL(window.location);
           if (newState?.gameId) {
-            url.searchParams.set('gameId', newState.gameId);
-            window.history.replaceState({}, '', url.toString());
+            const currentUrlId = url.searchParams.get('gameId');
+            // Only update URL if empty or matching (don't overwrite if user is trying to join another game via URL)
+            // App.jsx will handle the mismatch UI
+            if (!currentUrlId || currentUrlId === newState.gameId) {
+              url.searchParams.set('gameId', newState.gameId);
+              window.history.replaceState({}, '', url.toString());
+            }
           } else {
             const urlGameId = url.searchParams.get('gameId');
             // Do not auto-join here; let App render recovery UI if mismatch
