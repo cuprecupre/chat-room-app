@@ -249,6 +249,9 @@ export function useAuth() {
 
         if (auth.currentUser?.displayName) {
           console.log('✅ DisplayName actualizado:', auth.currentUser?.displayName);
+          // CRITICAL FIX: Force update user state directly so useSocket receives the displayName immediately
+          // onIdTokenChanged might not fire fast enough or at all for profile updates
+          setUser({ ...auth.currentUser });
         }
       }
 
