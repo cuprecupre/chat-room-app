@@ -386,7 +386,7 @@ export default function App() {
       hasLoggedLoading.current = true;
     }
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
+      <div className="w-full h-[100dvh] flex items-center justify-center bg-neutral-950 text-white">
         <div className="flex flex-col items-center gap-6 text-center">
           <img
             src={heroImg}
@@ -411,7 +411,7 @@ export default function App() {
   if (user && !connected) {
     if (isStuck) {
       return (
-        <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
+        <div className="w-full h-[100dvh] flex items-center justify-center bg-neutral-950 text-white">
           <div className="w-full max-w-sm mx-auto text-center space-y-6">
             <div className="flex justify-center">
               <img
@@ -446,7 +446,7 @@ export default function App() {
     // Solo mostrar pantalla de conexión si han pasado más de 300ms
     if (showConnectingLoader) {
       return (
-        <div className="w-full h-screen flex items-center justify-center bg-neutral-950 text-white">
+        <div className="w-full h-[100dvh] flex items-center justify-center bg-neutral-950 text-white">
           <div className="flex flex-col items-center gap-6 text-center">
             <img
               src={heroImg}
@@ -496,7 +496,7 @@ export default function App() {
       // Check if user is authorized (only leandrovegasb@gmail.com)
       if (user.email !== 'leandrovegasb@gmail.com') {
         return (
-          <div className="w-full h-screen flex items-center justify-center">
+          <div className="w-full h-[100dvh] flex items-center justify-center">
             <div className="text-center space-y-4 max-w-md px-4">
               <h1 className="text-3xl font-bold text-red-400">Acceso Denegado</h1>
               <p className="text-neutral-400">No tienes permisos para acceder a esta página.</p>
@@ -711,10 +711,10 @@ export default function App() {
   const showHeader = user && connected;
   const containerClasses = showHeader
     ? "w-full max-w-4xl mx-auto p-6 sm:p-6 lg:p-8"
-    : "w-full max-w-4xl mx-auto min-h-screen flex items-center justify-center p-0";
+    : "w-full max-w-4xl mx-auto min-h-[100dvh] flex items-center justify-center p-0";
 
   return (
-    <div className="bg-neutral-950 text-white min-h-screen font-sans flex flex-col">
+    <div className="bg-neutral-950 text-white min-h-[100dvh] font-sans flex flex-col">
       <Toaster />
       <InstructionsModal isOpen={instructionsOpen} onClose={() => setInstructionsOpen(false)} />
 

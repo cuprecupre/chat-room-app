@@ -14,6 +14,12 @@ Referencia a conservar:
 ## Reglas estrictas (producción)
 
 - No tocar autenticación, roles, sincronización, o contrato de eventos Socket.IO sin aprobación explícita.
+- **Idioma**: Español.
+- **Reporting Protocol**: Antes de cualquier commit/deploy a `develop` o `main`, **SIEMPRE**:
+  1.  Resumir qué se hizo (ficheros tocados y lógica cambiada).
+  2.  Explicar por qué soluciona el problema.
+  3.  Pedir confirmación explícita para proceder.
+- **Paridad**: `main` y `develop` deben mantenerse sincronizados tras validar features.
 - **SEPARACIÓN DE BASES DE DATOS**: Staging (`develop`) NUNCA debe conectarse a la base de datos de producción. Debe usar una instancia o colección separada.
 - No commitear `.env` ni credenciales. Mantener `.gitignore` tal como está.
 - No cambiar `render.yaml` (plan, buildCommand, startCommand) sin aprobación.
