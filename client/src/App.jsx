@@ -132,7 +132,8 @@ export default function App() {
 
   useEffect(() => {
     const urlGameId = getUrlGameId();
-    if (urlGameId && !gameState?.gameId) {
+    // Fetch preview if we have a URL ID and it's either a new session OR a mismatch with current session
+    if (urlGameId && (!gameState?.gameId || urlGameId !== gameState.gameId)) {
       // Fetch game preview info
       const controller = new AbortController();
       const fetchPreview = async () => {
@@ -552,42 +553,37 @@ export default function App() {
     if (urlGameId && gameState?.gameId && urlGameId !== gameState.gameId) {
       return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950 text-white">
-          <div className="w-full max-w-sm mx-auto text-center space-y-6">
+          <div className="w-full max-w-sm mx-auto text-center space-y-6 px-6">
             <div className="flex justify-center">
               <img
                 src={bellImg}
-                alt="Advertencia"
-                className="w-20 h-20 rounded-full object-cover ring-2 ring-orange-400/30 shadow-lg"
+                alt="Invitación"
+                className="w-24 h-24 rounded-full object-cover ring-4 ring-orange-500/30 shadow-2xl animate-pulse-slow"
               />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-neutral-50 mb-2">¿Cambiar de sala?</h2>
-              <p className="text-neutral-400">
-                Estás en la sala <span className="font-mono font-semibold text-neutral-300">{gameState.gameId}</span>, pero la URL apunta a <span className="font-mono font-semibold text-neutral-300">{urlGameId}</span>.
+              <h2 className="text-3xl font-bold text-neutral-50 mb-4" style={{ fontFamily: 'Trocchi, serif' }}>¡Te han invitado!</h2>
+              <p className="text-neutral-300 text-lg leading-relaxed">
+                Has recibido un enlace para unirte a la sala de <span className="font-mono font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded">{previewHostName || urlGameId}</span>.
+                <br /><span className="text-sm text-neutral-500 mt-2 block">¿Quieres abandonar tu partida actual para unirte?</span>
               </p>
             </div>
-            <div className="space-y-3 px-6">
+            <div className="space-y-3 pt-4">
               <Button
                 onClick={() => emit('join-game', urlGameId)}
                 variant="primary"
-                size="md"
+                size="lg"
+                className="w-full text-lg shadow-orange-900/20 shadow-lg"
               >
-                Cambiarme a {urlGameId}
+                Unirme a la partida
               </Button>
               <Button
                 onClick={() => { url.searchParams.delete('gameId'); window.history.replaceState({}, '', url.toString()); window.dispatchEvent(new Event('popstate')); }}
-                variant="outline"
+                variant="ghost"
                 size="md"
+                className="w-full text-neutral-500 hover:text-neutral-300"
               >
-                Mantenerme en {gameState.gameId}
-              </Button>
-              <Button
-                onClick={forceExit}
-                variant="outline"
-                size="md"
-                className="border-orange-500/30 text-orange-400 hover:text-orange-300 hover:bg-orange-500/10"
-              >
-                Forzar salida
+                Cancelar
               </Button>
             </div>
           </div>
