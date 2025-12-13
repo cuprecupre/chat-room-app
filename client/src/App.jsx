@@ -169,18 +169,17 @@ export default function App() {
   const playAgain = useCallback(() => emit('play-again', gameState?.gameId), [emit, gameState]);
   const leaveGame = useCallback(() => {
     if (gameState?.gameId) {
-      // Remove gameId from URL BEFORE leaving to avoid auto-rejoin via useSocket resume logic
+      // Remove gameId from URL BEFORE leaving and reloading
       const url = new URL(window.location);
-      if (url.searchParams.get('gameId') === gameState.gameId) {
-        url.searchParams.delete('gameId');
-        window.history.replaceState({}, '', url.toString());
-      }
+      url.searchParams.delete('gameId');
+      window.history.replaceState({}, '', url.toString());
+
       emit('leave-game', gameState.gameId);
 
       // Force page reload to clear all state and return to clean lobby
       setTimeout(() => {
         window.location.reload();
-      }, 100); // Small delay to ensure the leave-game event is processed
+      }, 100);
     }
   }, [emit, gameState]);
 
@@ -322,7 +321,7 @@ export default function App() {
   }, [logout, emit, gameState]);
 
   const forceExit = useCallback(() => {
-    // Clear URL parameters
+    // Clear URL parameters immediately
     const url = new URL(window.location);
     url.searchParams.delete('gameId');
     window.history.replaceState({}, '', url.toString());
@@ -336,7 +335,9 @@ export default function App() {
     window.dispatchEvent(new CustomEvent('app:toast', { detail: 'Sesión reiniciada. Vuelve al lobby.' }));
 
     // Force page reload to clear all state
-    window.location.reload();
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   }, [emit, gameState]);
 
   // Cerrar dropdown al hacer click fuera o al presionar Escape

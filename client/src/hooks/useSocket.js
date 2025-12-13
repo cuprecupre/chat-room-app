@@ -195,11 +195,11 @@ export function useSocket(user) {
           }
         });
 
-        // Add reconnection recovery
         socket.on('reconnect', () => {
           console.log('Socket reconnected, attempting to resume...');
           const urlParams = new URLSearchParams(window.location.search);
           const gameIdFromUrl = urlParams.get('gameId');
+          // Only attempt rejoin if gameId is still in URL (meaning user didn't leave)
           if (gameIdFromUrl && !attemptedResumeRef.current) {
             attemptedResumeRef.current = true;
             socket.emit('join-game', gameIdFromUrl);
