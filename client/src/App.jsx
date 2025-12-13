@@ -679,7 +679,7 @@ export default function App() {
                 Entrar a la sala
               </Button>
               <Button
-                onClick={() => { url.searchParams.delete('gameId'); window.history.replaceState({}, '', url.toString()); window.dispatchEvent(new Event('popstate')); }}
+                onClick={() => window.location.href = '/'}
                 variant="ghost"
                 size="md"
                 className="w-full text-neutral-500 hover:text-neutral-300"
