@@ -711,7 +711,7 @@ export default function App() {
       );
     }
 
-    return <Lobby user={user} onCreateGame={createGame} onJoinGame={joinGame} onLogout={handleLogout} />;
+    return <Lobby user={user} onCreateGame={createGame} onLogout={handleLogout} />;
   };
 
   const showHeader = user && connected;
