@@ -180,22 +180,50 @@ app.use(express.static(clientDist, {
 // Esto asegura que robots.txt y sitemap.xml se sirvan correctamente
 app.use(express.static(path.join(__dirname, 'public')));
 // API Endpoint to get game preview info (e.g., Host Name)
-app.get('/api/game/:gameId', (req, res) => {
+app.get('/api/game/:gameId', async (req, res) => {
   const { gameId } = req.params;
-  const game = games[gameId];
+  // Enforce uppercase to match internal ID format standard (defensive)
+  const safeGameId = (gameId || '').toUpperCase();
 
-  if (!game) {
+  let game = games[safeGameId];
+  let hostName = 'Anfitrión desconocido';
+  let playerCount = 0;
+  let status = 'unknown';
+  let found = false;
+
+  if (game) {
+    // 1. Memory Hit
+    const host = game.players.find(p => p.uid === game.hostId);
+    hostName = host ? host.name : 'Anfitrión desconocido';
+    playerCount = game.players.length;
+    status = game.phase;
+    found = true;
+  } else {
+    // 2. Memory Miss -> Try Lazy DB Lookup
+    try {
+      const state = await dbService.getGameState(safeGameId);
+      if (state) {
+        // DB Hit
+        const host = state.players ? state.players.find(p => p.uid === state.hostId) : null;
+        hostName = host ? host.name : 'Partida recuperada';
+        playerCount = state.players ? state.players.length : 0;
+        status = state.phase;
+        found = true;
+      }
+    } catch (e) {
+      console.error(`Error lazy loading game ${safeGameId}:`, e);
+    }
+  }
+
+  if (!found) {
     return res.status(404).json({ error: 'Game not found' });
   }
 
-  const host = game.players.find(p => p.uid === game.hostId);
-  const hostName = host ? host.name : 'Anfitrión desconocido';
-
   res.json({
-    gameId: game.gameId,
+    gameId: safeGameId,
     hostName: hostName,
-    playerCount: game.players.length,
-    status: game.phase
+    playerCount: playerCount,
+    status: status
   });
 });
 
