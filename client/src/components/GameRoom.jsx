@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Link, Share } from 'lucide-react';
 // removed icons from labels
 import { Button } from './ui/Button';
 import { Avatar } from './ui/Avatar';
@@ -382,36 +383,65 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
       {state.phase === 'lobby' && (
         <div className="w-full max-w-sm mx-auto text-center space-y-4">
-          <img src={dualImpostorImg} alt="Esperando jugadores" className="mx-auto w-56 h-56 rounded-full object-cover shadow-lg ring-1 ring-white/10" loading="lazy" />
-          <h2 className="text-3xl sm:text-4xl font-bold text-neutral-50">Invita a tus amigos<br />para empezar</h2>
-          <p className="text-lg text-neutral-400 mt-2">Esperando a que se unan los jugadores.</p>
-          <div className="w-full space-y-3">
-            {isHost && (
-              <>
+          {/* Header Image - 50% smaller (w-28 h-28) */}
+          <img src={dualImpostorImg} alt="Lobby" className="mx-auto w-28 h-28 rounded-full object-cover shadow-lg ring-1 ring-white/10" loading="lazy" />
+
+          {isHost ? (
+            /* HOST VIEW */
+            <>
+              <h2 className="text-3xl font-bold text-neutral-50 leading-tight">Invita a tus amigos<br />para empezar</h2>
+
+              <div className="w-full space-y-4">
+                <Button onClick={onCopyLink} variant="outline" size="md" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20 gap-2">
+                  {isMobile ? <Share className="w-4 h-4" /> : <Link className="w-4 h-4" />}
+                  {isMobile ? 'Compartir invitación' : 'Copiar invitación'}
+                </Button>
+
                 <div className="relative" title={state.players.length < 2 ? 'Se necesitan al menos 2 jugadores' : ''}>
                   <Button
                     onClick={onStartGame}
                     disabled={state.players.length < 2}
                     variant="primary"
                     size="md"
+                    className="w-full"
                   >
                     Comenzar juego
                   </Button>
                 </div>
-                <Button onClick={onCopyLink} variant="outline" size="md">{isMobile ? 'Compartir enlace' : 'Copiar enlace'}</Button>
-              </>
-            )}
-          </div>
-          <div className="w-full mt-6">
-            <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
-          </div>
-          {!isHost && (
-            <div className="w-full mt-4">
-              <Button onClick={onCopyLink} variant={state.players.length === 1 ? "primary" : "outline"} size="md">{isMobile ? 'Compartir enlace' : 'Copiar enlace'}</Button>
-            </div>
+
+                <p className="text-lg text-neutral-400 animate-pulse font-medium">
+                  Esperando a que se unan los jugadores...
+                </p>
+
+                <div className="w-full pt-2">
+                  <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
+                </div>
+              </div>
+            </>
+          ) : (
+            /* GUEST VIEW */
+            <>
+              <h2 className="text-3xl font-bold text-neutral-50 leading-tight">La partida empezará pronto</h2>
+
+              <div className="space-y-6">
+                <p className="text-lg text-neutral-400 animate-pulse">
+                  Esperando a que <span className="text-orange-400 font-semibold">{state.players.find(p => p.uid === state.hostId)?.name || 'el anfitrión'}</span> inicie la partida.
+                </p>
+
+                <div className="w-full">
+                  <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
+                </div>
+
+                <div className="pt-4 space-y-3">
+                  <p className="text-sm text-neutral-500">También puedes invitar amigos a esta partida</p>
+                  <Button onClick={onCopyLink} variant="outline" size="md" className="w-full border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20 gap-2">
+                    {isMobile ? <Share className="w-4 h-4" /> : <Link className="w-4 h-4" />}
+                    {isMobile ? 'Compartir invitación' : 'Copiar invitación'}
+                  </Button>
+                </div>
+              </div>
+            </>
           )}
-
-
         </div>
       )}
 
