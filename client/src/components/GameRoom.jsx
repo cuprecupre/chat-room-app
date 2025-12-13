@@ -396,7 +396,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               <div className="w-full space-y-4">
                 <Button onClick={onCopyLink} variant="outline" size="md" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20 gap-2">
                   {isMobile ? <Share className="w-4 h-4" /> : <Link className="w-4 h-4" />}
-                  {isMobile ? 'Compartir invitación' : 'Copiar invitación'}
+                  {isMobile ? 'Compartir invitación' : 'Copiar enlace de la partida'}
                 </Button>
 
                 <p className="text-lg text-neutral-400 font-regular">
@@ -454,7 +454,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   <p className="text-sm text-neutral-500">También puedes invitar amigos a esta partida</p>
                   <Button onClick={onCopyLink} variant="outline" size="md" className="w-full border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20 gap-2">
                     {isMobile ? <Share className="w-4 h-4" /> : <Link className="w-4 h-4" />}
-                    {isMobile ? 'Compartir invitación' : 'Copiar invitación'}
+                    {isMobile ? 'Compartir invitación' : 'Copiar enlace de la partida'}
                   </Button>
                 </div>
               </div>

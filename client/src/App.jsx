@@ -832,8 +832,7 @@ export default function App() {
           onOpenInstructions={() => setInstructionsOpen(true)}
           onOpenFeedback={() => setFeedbackOpen(true)}
           gameId={gameState?.gameId}
-          onLeaveGame={() => setShowLeaveGameModal(true)}
-          onCopyGameCode={copyGameCode}
+          onCopyLink={copyLink}
           isMobile={isMobile}
         />
       )}
