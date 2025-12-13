@@ -157,4 +157,86 @@ describe('Game Logic', () => {
         expect(selections.size).toBeGreaterThan(0);
         expect(selections.has(hostUser.uid) || selections.has(player3.uid)).toBe(true);
     });
+
+    describe('Host Transfer', () => {
+        test('should transfer host to next player in order when host leaves', () => {
+            game.addPlayer(player2);
+            game.addPlayer(player3);
+
+            // Verificar orden inicial: host123 -> player456 -> player789
+            expect(game.playerOrder).toEqual([hostUser.uid, player2.uid, player3.uid]);
+            expect(game.hostId).toBe(hostUser.uid);
+
+            // Host abandona la partida
+            const newHostInfo = game.removePlayer(hostUser.uid);
+
+            // Verificar que se transfirió al siguiente en orden (player456)
+            expect(game.hostId).toBe(player2.uid);
+            expect(newHostInfo).not.toBeNull();
+            expect(newHostInfo.uid).toBe(player2.uid);
+            expect(newHostInfo.name).toBe('Player Two');
+        });
+
+        test('should return newHostInfo with correct name', () => {
+            game.addPlayer(player2);
+
+            const newHostInfo = game.removePlayer(hostUser.uid);
+
+            expect(newHostInfo).toEqual({
+                uid: player2.uid,
+                name: 'Player Two'
+            });
+        });
+
+        test('should transfer host to player3 if player2 also left', () => {
+            game.addPlayer(player2);
+            game.addPlayer(player3);
+
+            // Host y player2 abandonan
+            game.removePlayer(hostUser.uid);
+            expect(game.hostId).toBe(player2.uid);
+
+            const newHostInfo = game.removePlayer(player2.uid);
+            expect(game.hostId).toBe(player3.uid);
+            expect(newHostInfo.uid).toBe(player3.uid);
+            expect(newHostInfo.name).toBe('Player Three');
+        });
+
+        test('should return null when non-host leaves', () => {
+            game.addPlayer(player2);
+            game.addPlayer(player3);
+
+            // Player2 abandona (no es host)
+            const result = game.removePlayer(player2.uid);
+
+            // No hubo cambio de host
+            expect(result).toBeNull();
+            expect(game.hostId).toBe(hostUser.uid);
+        });
+
+        test('should handle host leaving when only one player remains', () => {
+            game.addPlayer(player2);
+
+            const newHostInfo = game.removePlayer(hostUser.uid);
+
+            expect(game.hostId).toBe(player2.uid);
+            expect(game.players).toHaveLength(1);
+            expect(newHostInfo.uid).toBe(player2.uid);
+        });
+
+        test('should use playerOrder (join order) not array index', () => {
+            // player3 se une primero, luego player2
+            const gameWithDifferentOrder = new Game(hostUser);
+            gameWithDifferentOrder.addPlayer(player3); // Se une primero
+            gameWithDifferentOrder.addPlayer(player2); // Se une después
+
+            expect(gameWithDifferentOrder.playerOrder).toEqual([hostUser.uid, player3.uid, player2.uid]);
+
+            // Cuando host abandona, player3 (quien llegó primero) debe ser el nuevo host
+            const newHostInfo = gameWithDifferentOrder.removePlayer(hostUser.uid);
+
+            expect(gameWithDifferentOrder.hostId).toBe(player3.uid);
+            expect(newHostInfo.name).toBe('Player Three');
+        });
+    });
 });
