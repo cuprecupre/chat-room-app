@@ -179,6 +179,21 @@ app.use(express.static(clientDist, {
 // Servir archivos estáticos de la carpeta public (root)
 // Esto asegura que robots.txt y sitemap.xml se sirvan correctamente
 app.use(express.static(path.join(__dirname, 'public')));
+
+// CORS for API endpoints in development
+app.use('/api', (req, res, next) => {
+  const origin = req.headers.origin;
+  if (process.env.NODE_ENV !== 'production') {
+    // Allow localhost and local network in development
+    if (!origin || origin.includes('localhost') || /^https?:\/\/(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(origin)) {
+      res.header('Access-Control-Allow-Origin', origin || '*');
+      res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    }
+  }
+  next();
+});
+
 // API Endpoint to get game preview info (e.g., Host Name)
 app.get('/api/game/:gameId', async (req, res) => {
   const { gameId } = req.params;

@@ -405,17 +405,15 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
                 </div>
 
-                <div className="relative pt-4" title={state.players.length < 2 ? 'Se necesitan al menos 2 jugadores' : ''}>
-                  <Button
-                    onClick={onStartGame}
-                    disabled={state.players.length < 2}
-                    variant="primary"
-                    size="md"
-                    className="w-full"
-                  >
-                    Comenzar juego
-                  </Button>
-                </div>
+                <Button
+                  onClick={onStartGame}
+                  disabled={state.players.length < 2}
+                  variant="primary"
+                  size="md"
+                  className="w-full"
+                >
+                  Comenzar juego
+                </Button>
               </div>
             </>
           ) : (
@@ -443,12 +441,14 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             </>
           )}
         </div>
-      )}
+      )
+      }
 
       {/* Mostrar pantalla de playing si estamos en playing con datos completos, o esperando datos de resultado */}
-      {((state.phase === 'playing' && state.role && state.currentTurn && state.maxTurns) ||
-        (state.phase === 'round_result' && (!state.impostorName || !state.secretWord)) ||
-        (state.phase === 'game_over' && state.winner === undefined)) && (
+      {
+        ((state.phase === 'playing' && state.role && state.currentTurn && state.maxTurns) ||
+          (state.phase === 'round_result' && (!state.impostorName || !state.secretWord)) ||
+          (state.phase === 'game_over' && state.winner === undefined)) && (
           <>
             {/* Overlay de carga cuando estamos esperando datos (solo si estamos en playing cargando datos) */}
             {(state.phase === 'playing' && (!state.role || !state.currentTurn)) && (
@@ -571,222 +571,214 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
             {isHost && (
               <div className={`w-full max-w-sm mx-auto mt-6 ${showRestOfUI ? 'animate-fadeIn animate-delay-1000' : 'opacity-0 pointer-events-none'}`}>
-                <Button onClick={() => setShowEndGameModal(true)} variant="outline" size="md" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20">Terminar juego</Button>
+                <Button onClick={() => setShowEndGameModal(true)} variant="ghost" size="md">Terminar juego</Button>
               </div>
             )}
 
           </>
-        )}
+        )
+      }
 
       {/* Resultado de partida */}
-      {state.phase === 'round_result' && state.impostorName && state.secretWord && (
-        <div className="w-full max-w-sm mx-auto animate-fadeIn">
-          <div className="w-full px-4 py-6 space-y-6">
-            <div className="text-center space-y-4 animate-scaleIn animate-delay-200">
-              {state.roundCount && state.maxRounds && (
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 rounded-full">
-                  <span className="text-sm font-semibold text-orange-400">
-                    Partida {state.roundCount} de {state.maxRounds}
-                  </span>
-                </div>
-              )}
-              <h2 className="text-3xl font-bold text-neutral-50" style={{ fontFamily: 'Trocchi, serif' }}>
-                Resultado de la partida
-              </h2>
-            </div>
-
-            {/* Revelar impostor y palabra */}
-            <div className="bg-white/5 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400">
-              <div className="space-y-6 text-center">
-                <div>
-                  <span className="text-xs tracking-wider uppercase text-neutral-400">El impostor era</span>
-                  {/* Avatar del impostor */}
-                  <div className="flex justify-center my-4">
-                    {state.players && (() => {
-                      const impostor = state.players.find(p => p.uid === state.impostorId);
-                      return impostor ? (
-                        <Avatar photoURL={impostor.photoURL} displayName={impostor.name} size="lg" className="ring-4 ring-orange-400/50 shadow-lg" />
-                      ) : null;
-                    })()}
-                  </div>
-                  <p className="font-semibold text-2xl text-orange-400 mt-2" style={{ fontFamily: 'Trocchi, serif' }}>
-                    {state.impostorName}
-                  </p>
-                </div>
-                <div className="pt-4 border-t border-white/10">
-                  <span className="text-xs tracking-wider uppercase text-neutral-400">Palabra secreta</span>
-                  <p className="font-semibold text-2xl text-white mt-2" style={{ fontFamily: 'Trocchi, serif' }}>
-                    {capitalize(state.secretWord)}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Puntuación */}
-            <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-600">
-              <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
-            </div>
-
-            {/* Botón o mensaje de espera */}
-            {isHost ? (
-              <div className="space-y-3 animate-fadeIn animate-delay-800">
-                <Button onClick={onPlayAgain} variant="primary" size="md" className="w-full">
-                  Siguiente partida
-                </Button>
-                <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="w-full gap-2">
-                  <span>Abandonar juego</span>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-3 animate-fadeIn animate-delay-800">
-                <div className="text-center text-neutral-400 text-sm animate-text-pulse">
-                  Esperando a que el anfitrión (<span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'desconocido'}</span>) <br />inicie la siguiente partida
-                </div>
-                <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="w-full gap-2">
-                  <span>Abandonar juego</span>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Fin del juego */}
-      {state.phase === 'game_over' && state.winner !== undefined && (() => {
-        // Calcular ganadores - buscar entre TODOS los jugadores que tienen puntos, no solo los conectados
-        const isTie = state.winner === 'Empate';
-        const playerScores = state.playerScores || {};
-        const maxScore = Math.max(...Object.values(playerScores));
-
-        // Crear lista de todos los jugadores (conectados + desconectados con puntos)
-        const allPlayerUids = new Set([
-          ...state.players.map(p => p.uid),
-          ...Object.keys(playerScores)
-        ]);
-
-        const allPlayers = Array.from(allPlayerUids).map(uid => {
-          const connectedPlayer = state.players.find(p => p.uid === uid);
-          if (connectedPlayer) return connectedPlayer;
-          // Si no está conectado, crear objeto básico con la info que tenemos
-          return {
-            uid,
-            name: 'Jugador desconectado',
-            photoURL: null
-          };
-        });
-
-        const winnerPlayers = allPlayers.filter(player => (playerScores[player.uid] || 0) === maxScore);
-        const winnerNames = winnerPlayers.map(p => p.name).join(' y ');
-
-        return (
+      {
+        state.phase === 'round_result' && state.impostorName && state.secretWord && (
           <div className="w-full max-w-sm mx-auto animate-fadeIn">
             <div className="w-full px-4 py-6 space-y-6">
               <div className="text-center space-y-4 animate-scaleIn animate-delay-200">
-                <h2 className="text-4xl font-bold text-neutral-50" style={{ fontFamily: 'Trocchi, serif' }}>
-                  Resultado final
+                {state.roundCount && state.maxRounds && (
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 rounded-full">
+                    <span className="text-sm font-semibold text-orange-400">
+                      Partida {state.roundCount} de {state.maxRounds}
+                    </span>
+                  </div>
+                )}
+                <h2 className="text-3xl font-bold text-neutral-50" style={{ fontFamily: 'Trocchi, serif' }}>
+                  Resultado de la partida
                 </h2>
               </div>
 
-              {/* Caja de ganadores */}
+              {/* Revelar impostor y palabra */}
               <div className="bg-white/5 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400">
                 <div className="space-y-6 text-center">
-                  {winnerPlayers.length >= 3 ? (
-                    // Sin ganadores (empate triple o mayor)
-                    <div>
-                      <span className="text-xs tracking-wider uppercase text-neutral-400">Resultado</span>
-                      <p className="font-semibold text-2xl text-orange-400 mt-4" style={{ fontFamily: 'Trocchi, serif' }}>
-                        No hay ganadores
-                      </p>
-                      <p className="text-lg text-neutral-300 mt-2">¡Empieza otro juego!</p>
+                  <div>
+                    <span className="text-xs tracking-wider uppercase text-neutral-400">El impostor era</span>
+                    {/* Avatar del impostor */}
+                    <div className="flex justify-center my-4">
+                      {state.players && (() => {
+                        const impostor = state.players.find(p => p.uid === state.impostorId);
+                        return impostor ? (
+                          <Avatar photoURL={impostor.photoURL} displayName={impostor.name} size="lg" className="ring-4 ring-orange-400/50 shadow-lg" />
+                        ) : null;
+                      })()}
                     </div>
-                  ) : winnerPlayers.length === 2 ? (
-                    // Dos ganadores
-                    <div>
-                      <span className="text-xs tracking-wider uppercase text-white">Ganadores</span>
-                      <div className="flex justify-center gap-6 my-4">
-                        {winnerPlayers.map(winner => (
-                          <div key={winner.uid} className="flex flex-col items-center">
-                            <Avatar photoURL={winner.photoURL} displayName={winner.name} size="lg" className="ring-4 ring-orange-400/50 shadow-lg" />
-                            <p className="font-semibold text-lg text-orange-400 mt-2" style={{ fontFamily: 'Trocchi, serif' }}>
-                              {winner.name}
-                            </p>
-                            <p className="text-sm text-neutral-400 mt-1">
-                              {playerScores[winner.uid] || 0} pts
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : winnerPlayers.length === 1 ? (
-                    // Un ganador
-                    <div>
-                      <span className="text-xs tracking-wider uppercase text-white">Ganador</span>
-                      <div className="flex justify-center my-4">
-                        <Avatar photoURL={winnerPlayers[0].photoURL} displayName={winnerPlayers[0].name} size="lg" className="ring-4 ring-orange-400/50 shadow-lg" />
-                      </div>
-                      <p className="font-semibold text-2xl text-orange-400 mt-2" style={{ fontFamily: 'Trocchi, serif' }}>
-                        {winnerPlayers[0].name}
-                      </p>
-                      <p className="text-lg text-neutral-400 mt-2">
-                        {playerScores[winnerPlayers[0].uid] || 0} pts
-                      </p>
-                    </div>
-                  ) : null}
+                    <p className="font-semibold text-2xl text-orange-400 mt-2" style={{ fontFamily: 'Trocchi, serif' }}>
+                      {state.impostorName}
+                    </p>
+                  </div>
+                  <div className="pt-4 border-t border-white/10">
+                    <span className="text-xs tracking-wider uppercase text-neutral-400">Palabra secreta</span>
+                    <p className="font-semibold text-2xl text-white mt-2" style={{ fontFamily: 'Trocchi, serif' }}>
+                      {capitalize(state.secretWord)}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* Puntuación final - solo mostrar si hay jugadores además de los ganadores */}
-              {allPlayers.filter(p => !winnerPlayers.some(w => w.uid === p.uid)).length > 0 && (
-                <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
-                  <PlayerList
-                    players={allPlayers.filter(p => !winnerPlayers.some(w => w.uid === p.uid))}
-                    currentUserId={user.uid}
-                    isHost={isHost}
-                    onCopyLink={onCopyLink}
-                    gameState={state}
-                    onVote={onVote}
-                  />
-                </div>
-              )}
+              {/* Puntuación */}
+              <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-600">
+                <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
+              </div>
 
-              {isHost && (
-                <div className="animate-fadeIn animate-delay-600">
-                  <Button
-                    onClick={() => {
-                      console.log('🎮 Click en Nuevo Juego', { gameId: state.gameId, isHost });
-                      onPlayAgain();
-                    }}
-                    variant="primary"
-                    size="md"
-                  >
-                    Nuevo juego
+              {/* Botón o mensaje de espera */}
+              {isHost ? (
+                <div className="space-y-3 animate-fadeIn animate-delay-800">
+                  <Button onClick={onPlayAgain} variant="primary" size="md" className="w-full">
+                    Siguiente partida
+                  </Button>
+                  <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="w-full gap-2">
+                    <span>Abandonar juego</span>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3 animate-fadeIn animate-delay-800">
+                  <div className="text-center text-neutral-400 text-sm animate-text-pulse">
+                    Esperando a que el anfitrión (<span className="font-semibold text-neutral-300">{state.players.find(p => p.uid === state.hostId)?.name || 'desconocido'}</span>) <br />inicie la siguiente partida
+                  </div>
+                  <Button onClick={() => setShowLeaveGameModal(true)} variant="ghost" size="md" className="w-full gap-2">
+                    <span>Abandonar juego</span>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
                   </Button>
                 </div>
               )}
-
-
-              <button
-                onClick={() => onCopyGameCode()}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-neutral-500 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150"
-                title="Copiar código"
-              >
-                <span>Código de partida: <span className="font-mono font-semibold text-neutral-500">{state.gameId}</span></span>
-                {!isMobile && (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                )}
-              </button>
             </div>
           </div>
-        );
-      })()}
+        )
+      }
+
+      {/* Fin del juego */}
+      {
+        state.phase === 'game_over' && state.winner !== undefined && (() => {
+          // Calcular ganadores - buscar entre TODOS los jugadores que tienen puntos, no solo los conectados
+          const isTie = state.winner === 'Empate';
+          const playerScores = state.playerScores || {};
+          const maxScore = Math.max(...Object.values(playerScores));
+
+          // Crear lista de todos los jugadores (conectados + desconectados con puntos)
+          const allPlayerUids = new Set([
+            ...state.players.map(p => p.uid),
+            ...Object.keys(playerScores)
+          ]);
+
+          const allPlayers = Array.from(allPlayerUids).map(uid => {
+            const connectedPlayer = state.players.find(p => p.uid === uid);
+            if (connectedPlayer) return connectedPlayer;
+            // Si no está conectado, buscar en formerPlayers
+            const formerPlayer = state.formerPlayers?.[uid];
+            return {
+              uid,
+              name: formerPlayer?.name || 'Jugador desconectado',
+              photoURL: formerPlayer?.photoURL || null
+            };
+          });
+
+          const winnerPlayers = allPlayers.filter(player => (playerScores[player.uid] || 0) === maxScore);
+          const winnerNames = winnerPlayers.map(p => p.name).join(' y ');
+
+          return (
+            <div className="w-full max-w-sm mx-auto animate-fadeIn">
+              <div className="w-full px-4 py-6 space-y-6">
+                <div className="text-center space-y-4 animate-scaleIn animate-delay-200">
+                  <h2 className="text-4xl font-bold text-neutral-50" style={{ fontFamily: 'Trocchi, serif' }}>
+                    Resultado final
+                  </h2>
+                </div>
+
+                {/* Caja de ganadores */}
+                <div className="bg-white/5 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400">
+                  <div className="space-y-6 text-center">
+                    {winnerPlayers.length >= 3 ? (
+                      // Sin ganadores (empate triple o mayor)
+                      <div>
+                        <span className="text-xs tracking-wider uppercase text-neutral-400">Resultado</span>
+                        <p className="font-semibold text-2xl text-orange-400 mt-4" style={{ fontFamily: 'Trocchi, serif' }}>
+                          No hay ganadores
+                        </p>
+                        <p className="text-lg text-neutral-300 mt-2">¡Empieza otro juego!</p>
+                      </div>
+                    ) : winnerPlayers.length === 2 ? (
+                      // Dos ganadores
+                      <div>
+                        <span className="text-xs tracking-wider uppercase text-white">Ganadores</span>
+                        <div className="flex justify-center gap-6 my-4">
+                          {winnerPlayers.map(winner => (
+                            <div key={winner.uid} className="flex flex-col items-center">
+                              <Avatar photoURL={winner.photoURL} displayName={winner.name} size="lg" className="ring-4 ring-orange-400/50 shadow-lg" />
+                              <p className="font-semibold text-lg text-orange-400 mt-2" style={{ fontFamily: 'Trocchi, serif' }}>
+                                {winner.name}
+                              </p>
+                              <p className="text-sm text-neutral-400 mt-1">
+                                {playerScores[winner.uid] || 0} pts
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : winnerPlayers.length === 1 ? (
+                      // Un ganador
+                      <div>
+                        <span className="text-xs tracking-wider uppercase text-white">Ganador</span>
+                        <div className="flex justify-center my-4">
+                          <Avatar photoURL={winnerPlayers[0].photoURL} displayName={winnerPlayers[0].name} size="lg" className="ring-4 ring-orange-400/50 shadow-lg" />
+                        </div>
+                        <p className="font-semibold text-2xl text-orange-400 mt-2" style={{ fontFamily: 'Trocchi, serif' }}>
+                          {winnerPlayers[0].name}
+                        </p>
+                        <p className="text-lg text-neutral-400 mt-2">
+                          {playerScores[winnerPlayers[0].uid] || 0} pts
+                        </p>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+
+                {/* Puntuación final - solo mostrar si hay jugadores además de los ganadores */}
+                {allPlayers.filter(p => !winnerPlayers.some(w => w.uid === p.uid)).length > 0 && (
+                  <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
+                    <PlayerList
+                      players={allPlayers.filter(p => !winnerPlayers.some(w => w.uid === p.uid))}
+                      currentUserId={user.uid}
+                      isHost={isHost}
+                      onCopyLink={onCopyLink}
+                      gameState={state}
+                      onVote={onVote}
+                    />
+                  </div>
+                )}
+
+                {isHost && (
+                  <div className="animate-fadeIn animate-delay-600">
+                    <Button
+                      onClick={() => {
+                        console.log('🎮 Click en Nuevo Juego', { gameId: state.gameId, isHost });
+                        onPlayAgain();
+                      }}
+                      variant="primary"
+                      size="md"
+                    >
+                      Nuevo juego
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()
+      }
 
       {/* Overlay de nueva ronda */}
       {

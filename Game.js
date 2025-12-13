@@ -40,6 +40,9 @@ class Game {
     // Historial de impostores para evitar repeticiones
     this.impostorHistory = []; // Array de uids de los últimos impostores [más reciente, ... , más antiguo]
 
+    // Guardar datos de jugadores que abandonaron para mostrarlos en resultados
+    this.formerPlayers = {}; // { [uid]: { name, photoURL } }
+
     // If restoring, do NOT add dummy player or persist initial state
     if (!options.isRestoring) {
       this.addPlayer(hostUser);
@@ -93,6 +96,7 @@ class Game {
     game.lastRoundScores = data.lastRoundScores || {};
     game.playerOrder = data.playerOrder || [];
     game.impostorHistory = data.impostorHistory || [];
+    game.formerPlayers = data.formerPlayers || {};
 
     console.log(`[Game Recovery] Game ${gameId} restored in phase '${game.phase}' with ${game.players.length} players.`);
     return game;
@@ -127,7 +131,8 @@ class Game {
       turnHistory: this.turnHistory,
       lastRoundScores: this.lastRoundScores,
       playerOrder: this.playerOrder,
-      impostorHistory: this.impostorHistory
+      impostorHistory: this.impostorHistory,
+      formerPlayers: this.formerPlayers
     };
   }
 
@@ -145,6 +150,11 @@ class Game {
         photoURL: user.photoURL || null, // Evitar undefined para Firestore
         joinedAt: joinedAt
       });
+      // Guardar copia de datos del jugador (backup para mostrar en resultados si se desconecta)
+      this.formerPlayers[user.uid] = {
+        name: user.name,
+        photoURL: user.photoURL || null
+      };
       // Inicializar puntuación del jugador
       this.playerScores[user.uid] = 0;
       // Actualizar orden base (OB)
@@ -231,6 +241,15 @@ class Game {
 
   removePlayer(userId) {
     const playerIsImpostor = this.impostorId === userId;
+
+    // Guardar datos del jugador antes de eliminarlo
+    const leavingPlayer = this.players.find(p => p.uid === userId);
+    if (leavingPlayer) {
+      this.formerPlayers[userId] = {
+        name: leavingPlayer.name,
+        photoURL: leavingPlayer.photoURL || null
+      };
+    }
 
     this.players = this.players.filter(p => p.uid !== userId);
     this.roundPlayers = this.roundPlayers.filter(uid => uid !== userId);
@@ -648,19 +667,25 @@ class Game {
       }
     } else if (this.phase === 'round_result' || this.phase === 'game_over') {
       const impostor = this.players.find(p => p.uid === this.impostorId);
-      baseState.impostorName = impostor ? impostor.name : 'Jugador desconectado';
+      const formerImpostor = this.formerPlayers[this.impostorId];
+      baseState.impostorName = impostor ? impostor.name : (formerImpostor ? formerImpostor.name : 'Jugador desconectado');
       baseState.impostorId = this.impostorId;
       baseState.secretWord = this.secretWord;
       baseState.lastRoundScores = this.lastRoundScores;
       baseState.eliminatedInRound = this.eliminatedInRound;
+      baseState.formerPlayers = this.formerPlayers; // Send to client for UI
 
       if (this.phase === 'game_over') {
         const winnerId = this.checkGameOver();
         const winner = this.players.find(p => p.uid === winnerId);
-        baseState.winner = winner ? winner.name : 'Empate';
+        const formerWinner = this.formerPlayers[winnerId];
+        baseState.winner = winner ? winner.name : (formerWinner ? formerWinner.name : 'Empate');
         baseState.winnerId = winnerId;
       }
     }
+
+    // Always include formerPlayers for showing scores
+    baseState.formerPlayers = this.formerPlayers;
 
     return baseState;
   }
