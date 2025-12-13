@@ -87,8 +87,9 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
     return myVote === playerId;
   };
 
-  // Determinar qué título mostrar
-  let headerText = isPlaying ? 'Listado de jugadores' : `Jugadores Conectados: ${players.length}`;
+  // Determinar qué título mostrar (solo en fases playing/result/game_over)
+  const isLobby = !isPlaying && !showScores;
+  let headerText = isPlaying ? 'Vota al jugador que creas impostor' : '';
   if (showScores) {
     headerText = isGameOver ? 'Resto de jugadores' : 'Puntuación parcial';
   }
@@ -98,16 +99,14 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
 
   return (
     <div className="w-full rounded-lg">
-      <div className="mb-3 text-center">
-        <p className={`${isPlaying || showScores ? 'text-base font-regular text-neutral-200' : 'text-sm font-regular text-neutral-500'}`}>
-          {headerText}
-        </p>
-        {showOrderSubtitle && (
-          <p className="text-xs text-neutral-400 mt-1">
-            🎯 Jugador que empieza la partida
+      {/* Solo mostrar header si no estamos en lobby */}
+      {!isLobby && (
+        <div className="mb-3 text-center">
+          <p className={`${isPlaying || showScores ? 'text-base font-regular text-neutral-200' : 'text-sm font-regular text-neutral-500'}`}>
+            {headerText}
           </p>
-        )}
-      </div>
+        </div>
+      )}
       <ul className="space-y-2">
         {sortedPlayers.map((p, index) => {
           const isEliminated = eliminatedPlayers.includes(p.uid);
@@ -144,7 +143,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                     {/* Indicador de jugador inicial */}
                     {isPlaying && startingPlayerId === p.uid && (
                       <span className="text-orange-400 text-sm" title="Empieza esta ronda">
-                        🎯
+                        ☀️
                       </span>
                     )}
                   </div>
@@ -195,8 +194,8 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                       disabled={iVotedForThisPlayer && !canChangeVote}
                       className={`!w-auto gap-2 px-4 ${iVotedForThisPlayer
                         ? canChangeVote
-                          ? '!border-orange-500 !text-orange-400 !bg-orange-500/10 hover:!bg-orange-500/20'
-                          : '!border-orange-500 !text-orange-400 !bg-orange-500/10 !hover:bg-orange-500/10 cursor-not-allowed'
+                          ? '!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20'
+                          : '!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed'
                         : ''
                         }`}
                     >
@@ -212,6 +211,16 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
           );
         })}
       </ul>
+      {/* Subtítulo al final de la lista */}
+      {showOrderSubtitle && (
+        <p className="text-xs text-neutral-400 mt-3 text-center">
+          ☀️ Jugador que empieza la partida
+        </p>
+      )}
+      {/* Divider para separar del footer */}
+      {isPlaying && (
+        <div className="w-full h-px bg-neutral-800 mt-10"></div>
+      )}
     </div>
   );
 }
@@ -382,7 +391,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
     <div className="w-full flex flex-col items-center space-y-6">
 
       {state.phase === 'lobby' && (
-        <div className="w-full max-w-sm mx-auto text-center space-y-4">
+        <div className="w-full max-w-sm mx-auto text-center space-y-4 pb-24 sm:pb-0">
           {/* Header Image - 50% smaller (w-28 h-28) */}
           <img src={dualImpostorImg} alt="Lobby" className="mx-auto w-28 h-28 rounded-full object-cover shadow-lg ring-1 ring-white/10" loading="lazy" />
 
@@ -397,23 +406,41 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   {isMobile ? 'Compartir invitación' : 'Copiar invitación'}
                 </Button>
 
-                <p className="text-lg text-neutral-400 animate-pulse font-medium">
-                  Esperando a que se unan los jugadores...
+                <p className="text-lg text-neutral-400 font-regular">
+                  Espera a que se unan los jugadores...
                 </p>
 
                 <div className="w-full pt-2">
                   <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
                 </div>
 
-                <Button
-                  onClick={onStartGame}
-                  disabled={state.players.length < 2}
-                  variant="primary"
-                  size="md"
-                  className="w-full"
-                >
-                  Comenzar juego
-                </Button>
+                {/* Botón fijo en mobile, normal en desktop */}
+                <div className="hidden sm:block">
+                  <Button
+                    onClick={onStartGame}
+                    disabled={state.players.length < 2}
+                    variant="primary"
+                    size="md"
+                    className="w-full"
+                  >
+                    Comenzar juego
+                  </Button>
+                </div>
+              </div>
+
+              {/* Botón fijo solo en mobile */}
+              <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-neutral-950 via-neutral-950/95 to-transparent sm:hidden z-40">
+                <div className="max-w-sm mx-auto">
+                  <Button
+                    onClick={onStartGame}
+                    disabled={state.players.length < 2}
+                    variant="primary"
+                    size="md"
+                    className="w-full shadow-lg"
+                  >
+                    Comenzar juego
+                  </Button>
+                </div>
               </div>
             </>
           ) : (
@@ -423,7 +450,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
               <div className="space-y-6">
                 <p className="text-lg text-neutral-400 animate-pulse">
-                  Esperando a que <span className="text-orange-400 font-semibold">{state.players.find(p => p.uid === state.hostId)?.name || 'el anfitrión'}</span> inicie la partida.
+                  Espera hasta que <span className="text-orange-400 font-regular">{state.players.find(p => p.uid === state.hostId)?.name || 'el anfitrión'}</span> inicie la partida.
                 </p>
 
                 <div className="w-full">
@@ -512,7 +539,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                         >
                           <div className="space-y-4">
                             <div>
-                              <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-neutral-300">
+                              <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-orange-400">
                                 <span>Tu rol</span>
                               </div>
                               <p className="text-xl font-semibold mt-1 text-white" style={{ fontFamily: 'Trocchi, serif' }}>{capitalize(state.role)}</p>
@@ -525,8 +552,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                               <>
                                 {state.secretCategory && (
                                   <div>
-                                    <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-neutral-200">
-                                      <span>Pista</span>
+                                    <div className="flex flex-col items-center justify-center gap-1 text-xs tracking-wider text-orange-400">
+                                      <span className="uppercase">Pista:</span>
+                                      <span className="normal-case">La palabra secreta está relacionada con...</span>
                                     </div>
                                     <p className="font-semibold text-xl mt-1 text-white underline decoration-dotted underline-offset-4" style={{ fontFamily: 'Trocchi, serif' }}>
                                       {capitalize(state.secretCategory)}
@@ -536,7 +564,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                               </>
                             ) : (
                               <div>
-                                <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-neutral-200">
+                                <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-orange-400">
                                   <span>Palabra secreta</span>
                                 </div>
                                 <p className="font-semibold text-xl mt-1 text-white" style={{ fontFamily: 'Trocchi, serif' }}>
@@ -571,7 +599,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
 
             {isHost && (
               <div className={`w-full max-w-sm mx-auto mt-6 ${showRestOfUI ? 'animate-fadeIn animate-delay-1000' : 'opacity-0 pointer-events-none'}`}>
-                <Button onClick={() => setShowEndGameModal(true)} variant="ghost" size="md">Terminar juego</Button>
+                <Button onClick={() => setShowEndGameModal(true)} variant="ghost" size="md">Finalizar juego</Button>
               </div>
             )}
 
@@ -822,7 +850,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
             <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full">
               <div className="text-center space-y-4">
-                <h3 className="text-xl font-bold text-neutral-50">¿Terminar juego?</h3>
+                <h3 className="text-xl font-bold text-neutral-50">¿Finalizar juego?</h3>
                 <p className="text-neutral-400">
                   Esta acción finalizará el juego para todos los jugadores. ¿Estás seguro?
                 </p>
