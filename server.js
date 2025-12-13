@@ -290,6 +290,9 @@ const userSockets = {}; // { userId: socket.id }
 const pendingDisconnects = {};
 // Heartbeat tracking: { [uid]: { lastSeen, timeout } }
 const userHeartbeats = {};
+// Users who explicitly left games - prevents auto-rejoin on reconnect: { [uid]: true }
+// This is cleared after a short period once we're sure they're in a clean state
+const explicitlyLeftUsers = {};
 
 // Helper to find which game a user belongs to (global scope)
 const findUserGame = (userId) => Object.values(games).find(g => g.players.some(p => p.uid === userId));
@@ -373,28 +376,47 @@ io.on('connection', (socket) => {
     timeout: null
   };
 
-  // Reconnection logic: if user is already in a game, join room and send state
-  const existingGame = findUserGame(user.uid);
-  if (existingGame) {
-    socket.join(existingGame.gameId);
-    console.log(`User ${user.name} reconnected to game ${existingGame.gameId}`);
-    // Cancel any pending removal timer
+  // Check if user explicitly left a game - don't auto-rejoin them
+  if (explicitlyLeftUsers[user.uid]) {
+    console.log(`User ${user.name} recently left explicitly - NOT auto-rejoining, sending null state`);
+    delete explicitlyLeftUsers[user.uid]; // Clear the flag, user is clean now
+    socket.emit('game-state', null);
+    // Clear any pending disconnect as well
     if (pendingDisconnects[user.uid]) {
       clearTimeout(pendingDisconnects[user.uid].timeout);
       delete pendingDisconnects[user.uid];
     }
-    // Send the specific state to the reconnected user only
-    socket.emit('game-state', existingGame.getStateFor(user.uid));
   } else {
-    // User not in any game, check if they have a pending disconnect
-    if (pendingDisconnects[user.uid]) {
-      const pendingGame = games[pendingDisconnects[user.uid].gameId];
-      if (pendingGame) {
-        socket.join(pendingGame.gameId);
-        console.log(`User ${user.name} reconnected to pending game ${pendingGame.gameId}`);
+    // Reconnection logic: if user is already in a game, join room and send state
+    const existingGame = findUserGame(user.uid);
+    if (existingGame) {
+      socket.join(existingGame.gameId);
+      console.log(`User ${user.name} reconnected to game ${existingGame.gameId}`);
+      // Cancel any pending removal timer
+      if (pendingDisconnects[user.uid]) {
         clearTimeout(pendingDisconnects[user.uid].timeout);
         delete pendingDisconnects[user.uid];
-        socket.emit('game-state', pendingGame.getStateFor(user.uid));
+      }
+      // Send the specific state to the reconnected user only
+      socket.emit('game-state', existingGame.getStateFor(user.uid));
+    } else {
+      // User not in any game, check if they have a pending disconnect
+      if (pendingDisconnects[user.uid]) {
+        const pendingGame = games[pendingDisconnects[user.uid].gameId];
+        // Only rejoin if the user is still in the player list (they might have been removed)
+        if (pendingGame && pendingGame.players.some(p => p.uid === user.uid)) {
+          socket.join(pendingGame.gameId);
+          console.log(`User ${user.name} reconnected to pending game ${pendingGame.gameId}`);
+          clearTimeout(pendingDisconnects[user.uid].timeout);
+          delete pendingDisconnects[user.uid];
+          socket.emit('game-state', pendingGame.getStateFor(user.uid));
+        } else {
+          // Pending game doesn't exist or user not in player list anymore
+          console.log(`User ${user.name} had pending disconnect but game/player no longer valid`);
+          clearTimeout(pendingDisconnects[user.uid].timeout);
+          delete pendingDisconnects[user.uid];
+          socket.emit('game-state', null); // Send null to ensure client is in clean state
+        }
       }
     }
   }
@@ -505,7 +527,14 @@ io.on('connection', (socket) => {
       return;
     }
 
-    console.log(`User ${user.name} is leaving game ${gameId}`);
+    console.log(`User ${user.name} is EXPLICITLY leaving game ${gameId}`);
+
+    // Mark user as explicitly left - prevents auto-rejoin on reconnect
+    explicitlyLeftUsers[user.uid] = true;
+    // Clear the flag after 10 seconds (enough time for client to get to clean state)
+    setTimeout(() => {
+      delete explicitlyLeftUsers[user.uid];
+    }, 10000);
 
     // Clear pending disconnect timer
     if (pendingDisconnects[user.uid]) {
@@ -513,10 +542,10 @@ io.on('connection', (socket) => {
       delete pendingDisconnects[user.uid];
     }
 
-    // Remove player
+    // Remove player from game
     game.removePlayer(user.uid);
 
-    // 1. Reset leaving player state
+    // 1. Reset leaving player state - send null BEFORE leaving room
     socket.emit('game-state', null);
     socket.leave(gameId);
 
@@ -524,6 +553,7 @@ io.on('connection', (socket) => {
     emitGameState(game);
 
     // 3. Acknowledge completion
+    console.log(`User ${user.name} successfully left game ${gameId}`);
     safeCallback();
   });
 

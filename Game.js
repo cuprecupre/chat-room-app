@@ -56,19 +56,20 @@ class Game {
    * @param {Object} data 
    */
   static fromState(gameId, data) {
-    // Create a dummy host user to satisfy constructor, then overwrite everything
-    // DISABLE_PERSISTENCE flag prevents the constructor from saving the "Recovering..." state
-    const dummyHost = { uid: data.hostId, name: 'Recovering...' };
-    const game = new Game(dummyHost, {
-      showImpostorHint: data.showImpostorHint,
-      isRestoring: true // Prevent side-effects in constructor
-    });
+    // Create a minimal Game instance for restoration
+    // We use isRestoring: true to prevent any side-effects in constructor
+    // IMPORTANT: We don't create any dummy player - all data comes from the DB
 
-    // Overwrite fields
-    game.gameId = gameId; // Ensure ID matches DB
+    // Create instance with minimal setup
+    const game = Object.create(Game.prototype);
+
+    // Initialize all properties directly from data (no dummy players!)
+    game.gameId = gameId;
     game.hostId = data.hostId;
     game.phase = data.phase;
+
     // Sanitize players to avoid undefined photoURL issues
+    // These are the REAL players from the database, not dummies
     game.players = (data.players || []).map(p => ({
       ...p,
       photoURL: p.photoURL || null
@@ -76,6 +77,7 @@ class Game {
     game.playerScores = data.playerScores || {};
 
     // Config
+    game.showImpostorHint = data.showImpostorHint !== undefined ? data.showImpostorHint : true;
     game.maxRounds = data.maxRounds || 3;
     game.targetScore = data.targetScore || 15;
     game.initialPlayerCount = data.initialPlayerCount || 0;
@@ -87,6 +89,8 @@ class Game {
     game.impostorId = data.impostorId || '';
     game.startingPlayerId = data.startingPlayerId || null;
     game.currentTurn = data.currentTurn || 1;
+    game.maxTurns = 3;
+    game.lastEliminatedInTurn = null;
 
     // Arrays & Collections
     game.roundPlayers = data.roundPlayers || [];
@@ -98,7 +102,8 @@ class Game {
     game.impostorHistory = data.impostorHistory || [];
     game.formerPlayers = data.formerPlayers || {};
 
-    console.log(`[Game Recovery] Game ${gameId} restored in phase '${game.phase}' with ${game.players.length} players.`);
+    console.log(`[Game Recovery] Game ${gameId} restored in phase '${game.phase}' with ${game.players.length} players:`,
+      game.players.map(p => p.name).join(', '));
     return game;
   }
 

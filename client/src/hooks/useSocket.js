@@ -149,7 +149,7 @@ export function useSocket(user) {
         });
 
         socket.on('game-state', (newState) => {
-          console.log('[Socket] Received game-state:', newState ? { phase: newState.phase, role: newState.role } : null);
+          console.log('[Socket] Received game-state:', newState ? { phase: newState.phase, role: newState.role } : 'null (user left or game ended)');
           if (isMounted) setGameState(newState);
           if (socket.resumeTimer) {
             clearTimeout(socket.resumeTimer);
@@ -165,9 +165,15 @@ export function useSocket(user) {
               window.history.replaceState({}, '', url.toString());
             }
           } else {
+            // IMPORTANT: When receiving null state, ALWAYS clear the URL gameId
+            // This happens when:
+            // 1. User explicitly leaves the game
+            // 2. User was removed from the game
+            // 3. Game was deleted/ended
+            // Clearing URL prevents the user from getting stuck trying to rejoin
             const urlGameId = url.searchParams.get('gameId');
-            // Do not auto-join here; let App render recovery UI if mismatch
-            if (!urlGameId) {
+            if (urlGameId) {
+              console.log('[Socket] Clearing gameId from URL after receiving null state');
               url.searchParams.delete('gameId');
               window.history.replaceState({}, '', url.toString());
             }
