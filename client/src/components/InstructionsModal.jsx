@@ -55,7 +55,7 @@ export function InstructionsModal({ isOpen, onClose }) {
                         </li>
                         <li>
                             <strong className="text-white">Unirse a la partida:</strong> El Anfitrión comparte el código de partida o enlace con el resto de jugadores,
-                            que se unen a la sala de espera.
+                            que se unen a la partida.
                         </li>
                         <li>
                             <strong className="text-white">Inicio del juego:</strong> Cuando todos estén listos, el Anfitrión pulsa el botón "Comenzar juego".

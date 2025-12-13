@@ -257,8 +257,8 @@ export default function App() {
     if (isMobile && navigator.share) {
       try {
         await navigator.share({
-          title: 'Código de sala - El Impostor',
-          text: `Código de sala: ${gameState.gameId}`
+          title: 'Código de partida - El Impostor',
+          text: `Código de partida: ${gameState.gameId}`
         });
         return;
       } catch (err) {
@@ -565,7 +565,7 @@ export default function App() {
             <div>
               <h2 className="text-3xl font-bold text-neutral-50 mb-4" style={{ fontFamily: 'Trocchi, serif' }}>¡Te han invitado!</h2>
               <p className="text-neutral-300 text-lg leading-relaxed">
-                Has recibido un enlace para unirte a la sala de <span className="font-mono font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded">{previewHostName || urlGameId}</span>.
+                Has recibido un enlace para unirte a la partida de <span className="font-mono font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded">{previewHostName || urlGameId}</span>.
                 <br /><span className="text-sm text-neutral-500 mt-2 block">¿Quieres abandonar tu partida actual para unirte?</span>
               </p>
             </div>
@@ -607,7 +607,7 @@ export default function App() {
           errorMsg = "Lo sentimos, esta partida ya comenzó y no acepta nuevos jugadores en este momento.";
         } else if (/no existe/i.test(joinError)) {
           errorTitle = "Enlace no válido";
-          errorMsg = "No encontramos esta sala. Es posible que el anfitrión la haya cerrado o el enlace sea incorrecto.";
+          errorMsg = "No encontramos esta partida. Es posible que el anfitrión la haya cerrado o el enlace sea incorrecto.";
         }
 
         return (
@@ -665,7 +665,7 @@ export default function App() {
             <div>
               <h2 className="text-3xl font-bold text-neutral-50 mb-4" style={{ fontFamily: 'Trocchi, serif' }}>¡Te han invitado!</h2>
               <p className="text-neutral-300 text-lg leading-relaxed">
-                Has recibido un enlace para unirte a la sala de <span className="font-mono font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded">{previewHostName || urlGameId}</span>.
+                Has recibido un enlace para unirte a la partida de <span className="font-mono font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded">{previewHostName || urlGameId}</span>.
                 <br /><span className="text-sm text-neutral-500 mt-2 block">¿Quieres entrar ahora?</span>
               </p>
             </div>
@@ -676,7 +676,7 @@ export default function App() {
                 size="lg"
                 className="w-full text-lg shadow-orange-900/20 shadow-lg"
               >
-                Entrar a la sala
+                Entrar a la partida
               </Button>
               <Button
                 onClick={() => window.location.href = '/'}
