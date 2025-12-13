@@ -139,7 +139,7 @@ export default function App() {
       const fetchPreview = async () => {
         try {
           // Determine API URL based on environment (dev vs prod)
-          const apiBase = process.env.NODE_ENV === 'production'
+          const apiBase = import.meta.env.MODE === 'production'
             ? window.location.origin
             : `${window.location.protocol}//${window.location.hostname}:3000`;
 
@@ -151,6 +151,7 @@ export default function App() {
             }
           }
         } catch (e) {
+          console.warn('⚠️ No se pudo obtener info de la partida (¿404?):', e);
           // Ignore abort errors or network errors (UI will show ID as fallback)
         }
       };

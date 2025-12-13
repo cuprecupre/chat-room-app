@@ -397,7 +397,15 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   {isMobile ? 'Compartir invitación' : 'Copiar invitación'}
                 </Button>
 
-                <div className="relative" title={state.players.length < 2 ? 'Se necesitan al menos 2 jugadores' : ''}>
+                <p className="text-lg text-neutral-400 animate-pulse font-medium">
+                  Esperando a que se unan los jugadores...
+                </p>
+
+                <div className="w-full pt-2">
+                  <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
+                </div>
+
+                <div className="relative pt-4" title={state.players.length < 2 ? 'Se necesitan al menos 2 jugadores' : ''}>
                   <Button
                     onClick={onStartGame}
                     disabled={state.players.length < 2}
@@ -407,14 +415,6 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   >
                     Comenzar juego
                   </Button>
-                </div>
-
-                <p className="text-lg text-neutral-400 animate-pulse font-medium">
-                  Esperando a que se unan los jugadores...
-                </p>
-
-                <div className="w-full pt-2">
-                  <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
                 </div>
               </div>
             </>
