@@ -24,6 +24,7 @@ export default function App() {
   const [instructionsOpen, setInstructionsOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
+  const [showEndGameModal, setShowEndGameModal] = useState(false);
 
   // Restaurar estado de EmailAuthScreen si había un intento de login/registro en curso
   // Usar función lazy initializer para ejecutar solo en el primer render
@@ -707,6 +708,8 @@ export default function App() {
           onVote={castVote}
           isMobile={isMobile}
           onOpenInstructions={() => setInstructionsOpen(true)}
+          showEndGameModal={showEndGameModal}
+          onShowEndGameModal={setShowEndGameModal}
         />
       );
     }
@@ -775,6 +778,34 @@ export default function App() {
                           className="block w-full text-left px-3 py-2 text-neutral-200 hover:text-white hover:bg-white/10 rounded-md"
                         >
                           UI Showcase
+                        </button>
+                        <div className="my-1 h-px bg-white/10" />
+                      </>
+                    )}
+                    {isHost && gameState?.phase === 'playing' && (
+                      <>
+                        <button
+                          onClick={() => {
+                            setShowEndGameModal(true);
+                            setMenuOpen(false);
+                          }}
+                          className="block w-full text-left px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md"
+                        >
+                          Finalizar juego
+                        </button>
+                        <div className="my-1 h-px bg-white/10" />
+                      </>
+                    )}
+                    {gameState?.gameId && (
+                      <>
+                        <button
+                          onClick={() => {
+                            setShowLeaveGameModal(true);
+                            setMenuOpen(false);
+                          }}
+                          className="block w-full text-left px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md"
+                        >
+                          Abandonar partida
                         </button>
                         <div className="my-1 h-px bg-white/10" />
                       </>

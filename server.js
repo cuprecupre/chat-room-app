@@ -552,10 +552,16 @@ io.on('connection', (socket) => {
     // 2. Notify remaining players
     emitGameState(game);
 
-    // 3. Si hubo cambio de host, notificar a todos con toast
-    if (newHostInfo) {
-      io.to(gameId).emit('toast', `Ahora el anfitrión es ${newHostInfo.name}`);
-      console.log(`[Host Transfer] Notificación enviada: Nuevo host es ${newHostInfo.name}`);
+    // 3. Enviar toast sobre el abandono (combinado si hubo cambio de host)
+    if (game.players.length > 0) {
+      if (newHostInfo) {
+        // El host abandonó - mensaje combinado
+        io.to(gameId).emit('toast', `${user.name} ha abandonado. Ahora el anfitrión es ${newHostInfo.name}`);
+        console.log(`[Host Transfer] ${user.name} abandonó. Nuevo host: ${newHostInfo.name}`);
+      } else {
+        // Un jugador normal abandonó
+        io.to(gameId).emit('toast', `${user.name} ha abandonado el juego`);
+      }
     }
 
     // 4. Acknowledge completion
@@ -602,18 +608,23 @@ io.on('connection', (socket) => {
         if (pendingDisconnects[user.uid]) {
           clearTimeout(pendingDisconnects[user.uid].timeout);
         }
+        const userName = user.name; // Capturar nombre antes del timeout
         pendingDisconnects[user.uid] = {
           gameId: userGame.gameId,
           timeout: setTimeout(() => {
             const g = games[userGame.gameId];
             if (!g) return;
-            console.log(`[Grace Expired] Removing user ${user.name} from game ${userGame.gameId} after 5 minutes`);
+            console.log(`[Grace Expired] Removing user ${userName} from game ${userGame.gameId} after 5 minutes`);
             const newHostInfo = g.removePlayer(user.uid);
             emitGameState(g);
-            // Notificar cambio de host
-            if (newHostInfo) {
-              io.to(userGame.gameId).emit('toast', `Ahora el anfitrión es ${newHostInfo.name}`);
-              console.log(`[Host Transfer] Notificación enviada: Nuevo host es ${newHostInfo.name}`);
+            // Notificar abandono (combinado si hubo cambio de host)
+            if (g.players.length > 0) {
+              if (newHostInfo) {
+                io.to(userGame.gameId).emit('toast', `${userName} se ha desconectado. Ahora el anfitrión es ${newHostInfo.name}`);
+                console.log(`[Host Transfer] ${userName} desconectado. Nuevo host: ${newHostInfo.name}`);
+              } else {
+                io.to(userGame.gameId).emit('toast', `${userName} se ha desconectado`);
+              }
             }
             delete pendingDisconnects[user.uid];
           }, 300000) // 5 minutes grace period for mobile users who lock their phones
@@ -624,18 +635,23 @@ io.on('connection', (socket) => {
         if (pendingDisconnects[user.uid]) {
           clearTimeout(pendingDisconnects[user.uid].timeout);
         }
+        const userName = user.name; // Capturar nombre antes del timeout
         pendingDisconnects[user.uid] = {
           gameId: userGame.gameId,
           timeout: setTimeout(() => {
             const g = games[userGame.gameId];
             if (!g) return;
-            console.log(`[Grace Expired] Removing user ${user.name} from game ${userGame.gameId} after 1 minute`);
+            console.log(`[Grace Expired] Removing user ${userName} from game ${userGame.gameId} after 1 minute`);
             const newHostInfo = g.removePlayer(user.uid);
             emitGameState(g);
-            // Notificar cambio de host
-            if (newHostInfo) {
-              io.to(userGame.gameId).emit('toast', `Ahora el anfitrión es ${newHostInfo.name}`);
-              console.log(`[Host Transfer] Notificación enviada: Nuevo host es ${newHostInfo.name}`);
+            // Notificar abandono (combinado si hubo cambio de host)
+            if (g.players.length > 0) {
+              if (newHostInfo) {
+                io.to(userGame.gameId).emit('toast', `${userName} se ha desconectado. Ahora el anfitrión es ${newHostInfo.name}`);
+                console.log(`[Host Transfer] ${userName} desconectado. Nuevo host: ${newHostInfo.name}`);
+              } else {
+                io.to(userGame.gameId).emit('toast', `${userName} se ha desconectado`);
+              }
             }
             delete pendingDisconnects[user.uid];
           }, 60000) // 1 minute for users who were already inactive

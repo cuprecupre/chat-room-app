@@ -4,20 +4,8 @@ export function Footer({ onOpenInstructions, onOpenFeedback, gameId, onLeaveGame
   return (
     <footer className="w-full py-6 px-6 relative z-10">
       <div className="flex flex-col gap-4">
-        {/* Botones globales (Reglas / Abandonar / Feedback) */}
+        {/* Botones globales (Reglas / Código / Feedback) */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-          {gameId && (
-            <button
-              onClick={onLeaveGame}
-              className="inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-red-400 transition-colors duration-150"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              <span>Abandonar partida</span>
-            </button>
-          )}
-
           {gameId && (
             <button
               onClick={() => onCopyGameCode(gameId)}

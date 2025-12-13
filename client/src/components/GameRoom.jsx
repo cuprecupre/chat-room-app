@@ -225,7 +225,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
   );
 }
 
-export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAgain, onLeaveGame, onCopyLink, onCopyGameCode, onVote, isMobile, onOpenInstructions }) {
+export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAgain, onLeaveGame, onCopyLink, onCopyGameCode, onVote, isMobile, onOpenInstructions, showEndGameModal: showEndGameModalProp, onShowEndGameModal }) {
   const capitalize = (s) => (typeof s === 'string' && s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s);
   const prevPlayersRef = useRef(state.players);
   const prevTurnRef = useRef(state.currentTurn);
@@ -236,7 +236,11 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   const [eliminatedPlayerInfo, setEliminatedPlayerInfo] = useState(null);
   const [showCardEntrance, setShowCardEntrance] = useState(false);
   const [showRestOfUI, setShowRestOfUI] = useState(true);
-  const [showEndGameModal, setShowEndGameModal] = useState(false);
+  const [showEndGameModalInternal, setShowEndGameModalInternal] = useState(false);
+
+  // Usar props si están definidas, sino usar estado interno
+  const showEndGameModal = showEndGameModalProp !== undefined ? showEndGameModalProp : showEndGameModalInternal;
+  const setShowEndGameModal = onShowEndGameModal || setShowEndGameModalInternal;
   const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
   const [cardAnimating, setCardAnimating] = useState(false); // Controla si la animación está activa
   const revealTimeoutRef = useRef(null);
@@ -245,20 +249,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
   const cardFloatTimeoutRef = useRef(null);
   const cardStopTimeoutRef = useRef(null);
 
+  // Referencia para tracking de jugadores (sin toast - el servidor lo maneja)
   useEffect(() => {
-    const previousPlayers = prevPlayersRef.current;
-    const currentPlayers = state.players;
-
-    if (previousPlayers.length > currentPlayers.length) {
-      const leftPlayer = previousPlayers.find(p =>
-        !currentPlayers.some(cp => cp.uid === p.uid)
-      );
-      if (leftPlayer) {
-        window.dispatchEvent(new CustomEvent('app:toast', { detail: `${leftPlayer.name} ha abandonado el juego.` }));
-      }
-    }
-
-    prevPlayersRef.current = currentPlayers;
+    prevPlayersRef.current = state.players;
   }, [state.players]);
 
 
@@ -597,11 +590,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
               <PlayerList players={state.players} currentUserId={user.uid} isHost={isHost} onCopyLink={onCopyLink} gameState={state} onVote={onVote} />
             </div>
 
-            {isHost && (
-              <div className={`w-full max-w-sm mx-auto mt-6 ${showRestOfUI ? 'animate-fadeIn animate-delay-1000' : 'opacity-0 pointer-events-none'}`}>
-                <Button onClick={() => setShowEndGameModal(true)} variant="ghost" size="md">Finalizar juego</Button>
-              </div>
-            )}
+
 
           </>
         )
@@ -683,6 +672,9 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                   </Button>
                 </div>
               )}
+
+              {/* Divider para separar del footer */}
+              <div className="w-full h-px bg-neutral-800 mt-10"></div>
             </div>
           </div>
         )
