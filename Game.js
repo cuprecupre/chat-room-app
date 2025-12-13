@@ -40,8 +40,11 @@ class Game {
     // Historial de impostores para evitar repeticiones
     this.impostorHistory = []; // Array de uids de los últimos impostores [más reciente, ... , más antiguo]
 
-    this.addPlayer(hostUser);
-    this.persist();
+    // If restoring, do NOT add dummy player or persist initial state
+    if (!options.isRestoring) {
+      this.addPlayer(hostUser);
+      this.persist();
+    }
   }
 
   /**
@@ -51,8 +54,12 @@ class Game {
    */
   static fromState(gameId, data) {
     // Create a dummy host user to satisfy constructor, then overwrite everything
+    // DISABLE_PERSISTENCE flag prevents the constructor from saving the "Recovering..." state
     const dummyHost = { uid: data.hostId, name: 'Recovering...' };
-    const game = new Game(dummyHost, { showImpostorHint: data.showImpostorHint });
+    const game = new Game(dummyHost, {
+      showImpostorHint: data.showImpostorHint,
+      isRestoring: true // Prevent side-effects in constructor
+    });
 
     // Overwrite fields
     game.gameId = gameId; // Ensure ID matches DB
