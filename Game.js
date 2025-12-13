@@ -250,6 +250,9 @@ class Game {
     // If the impostor leaves during the game, end the round
     if (this.phase === 'playing' && playerIsImpostor) {
       this.phase = 'round_result';
+    } else if (this.phase === 'playing') {
+      // If a regular player leaves, check if we can proceed with voting
+      this.checkIfAllVoted();
     }
     this.persist();
   }
