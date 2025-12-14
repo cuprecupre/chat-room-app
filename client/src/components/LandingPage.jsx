@@ -110,7 +110,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
             <nav className="fixed top-0 left-0 right-0 z-50 bg-neutral-950/80 backdrop-blur-md border-b border-white/5 py-4 px-6 md:px-12 flex justify-between items-center transition-all duration-300">
                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
                     <img src={heroImg} alt="Logo El Impostor" className="w-8 h-8 rounded-full" />
-                    <h1 className="text-xl font-bold font-serif tracking-wide text-neutral-100">El Impostor</h1>
+                    <span className="text-xl font-medium font-serif tracking-wide text-neutral-100">El Impostor</span>
                 </div>
                 <div className="hidden md:flex gap-6 items-center">
                     <button onClick={scrollToFeatures} className="text-sm font-medium text-neutral-400 hover:text-white transition-colors">Cómo se juega</button>
@@ -157,12 +157,20 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                         </div>
                     </div>
 
-                    <h2 className="text-5xl md:text-7xl/tight lg:text-8xl/tight font-extrabold tracking-tight font-serif animate-fadeIn animate-delay-400 drop-shadow-2xl">
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600">Engaña.</span> Deduce. <br className="hidden sm:block" /> Sobrevive.
+                    <h2 className="flex flex-col items-center gap-2 animate-fadeIn animate-delay-400 drop-shadow-2xl">
+                        <span className="text-4xl md:text-6xl/tight lg:text-7xl/tight font-serif text-white">
+                            El Impostor está entre nosotros.
+                        </span>
+                        <span className="text-4xl md:text-6xl font-serif font-medium tracking-tight mt-2 bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600">
+                            ¿Podrás descubrirlo?
+                        </span>
                     </h2>
 
-                    <p className="text-lg md:text-2xl text-neutral-300 max-w-2xl mx-auto leading-relaxed animate-fadeIn animate-delay-500 font-light">
-                        El juego de deducción social definitivo. <br className="hidden md:inline" />Únete a tus amigos, descubre quién miente y expulsa al impostor.
+                    <h1 className="text-lg md:text-2xl text-neutral-300 max-w-3xl mx-auto leading-relaxed animate-fadeIn animate-delay-500 !font-light !font-sans">
+                        Juega a El Impostor Online GRATIS con tus amigos.
+                    </h1>
+                    <p className="text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed animate-fadeIn animate-delay-500 font-light mt-4">
+                        Inicia una partida en segundos y sumérgete en el mejor juego de deducción social.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12 animate-fadeIn animate-delay-600 w-full max-w-md mx-auto sm:max-w-none">
@@ -239,8 +247,8 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
 
                 <div className="max-w-7xl mx-auto relative z-10">
                     <div className="text-center mb-20 space-y-6">
-                        <h2 className="text-4xl md:text-5xl font-bold font-serif text-neutral-100">Cómo funciona</h2>
-                        <p className="text-xl text-neutral-400 max-w-2xl mx-auto">La mecánica es simple, pero la estrategia lo es todo.</p>
+                        <h2 className="text-4xl md:text-5xl font-bold font-serif text-neutral-100">Cómo se juega a El Impostor</h2>
+                        <p className="text-xl text-neutral-400 max-w-2xl mx-auto">Una mecánica de roles ocultos fácil de aprender. Descubre quién miente en partidas rápidas de deducción.</p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-6 md:gap-8">
@@ -335,7 +343,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                         <div className="w-full md:w-1/2 space-y-8 relative z-10">
                             <h2 className="text-4xl md:text-5xl font-bold font-serif leading-tight">El mejor juego para<br />reuniones online</h2>
                             <p className="text-neutral-400 text-xl leading-relaxed">
-                                Olvídate de instalaciones complejas o explicaciones interminables. <strong>El Impostor</strong> está diseñado para ser intuitivo y rápido. Perfecto para romper el hielo en videollamadas, jugar con amigos a distancia o animar fiestas.
+                                Juega directamente en tu navegador web. Sin descargar apps, sin instalaciones y compatible con todos los móviles. <strong>El Impostor</strong> es la forma más rápida de empezar a divertirse en grupo.
                             </p>
 
                             <ul className="space-y-3 pt-2">
