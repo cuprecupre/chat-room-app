@@ -144,8 +144,8 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
             <header className="relative pt-32 pb-20 px-6 md:pt-48 md:pb-32 overflow-hidden flex flex-col items-center text-center">
                 {/* Dynamic Background Elements */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
-                    <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-600/20 rounded-full blur-[100px] opacity-30 animate-pulse-slow mix-blend-screen" />
-                    <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-red-600/10 rounded-full blur-[120px] opacity-20 animate-pulse-slow mix-blend-screen" />
+                    <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-600/20 rounded-full blur-[100px] opacity-30 mix-blend-screen" />
+                    <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-red-600/10 rounded-full blur-[120px] opacity-20 mix-blend-screen" />
 
 
                 </div>
@@ -336,7 +336,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
             <section className="py-32 px-6 md:px-12 bg-neutral-950 relative">
                 <div className="max-w-6xl mx-auto space-y-24">
                     <div className="flex flex-col md:flex-row items-center gap-16">
-                        <div className="flex-1 space-y-8 relative z-10">
+                        <div className="w-full md:w-1/2 space-y-8 relative z-10">
                             <h2 className="text-4xl md:text-5xl font-bold font-serif leading-tight">El mejor juego para<br />reuniones online</h2>
                             <p className="text-neutral-400 text-xl leading-relaxed">
                                 Olvídate de instalaciones complejas o explicaciones interminables. <strong>El Impostor</strong> está diseñado para ser intuitivo y rápido. Perfecto para romper el hielo en videollamadas, jugar con amigos a distancia o animar fiestas.
@@ -354,37 +354,50 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                                 </li>
                             </ul>
                         </div>
-                        <div className="w-full flex-1 relative perspective-1000 h-[300px] flex items-center justify-center">
+                        <div className="w-full md:w-1/2 relative perspective-1000 grid grid-cols-1 place-items-center">
                             {/* Dynamic background glow based on current review */}
-                            <div className="absolute inset-0 transition-colors duration-1000 ease-in-out">
-                                <div className={`absolute inset-0 bg-gradient-to-tr ${reviews[currentReview].gradient} opacity-20 blur-[100px] rounded-full`} />
+                            <div className="col-start-1 row-start-1 w-full h-full transition-colors duration-1000 ease-in-out z-0">
+                                <div className={`w-full h-full bg-gradient-to-tr ${reviews[currentReview].gradient} opacity-20 blur-[100px] rounded-full`} />
                             </div>
 
+                            {/* Hidden spacer to set minimum height based on longest content if needed, 
+                                but since all are in grid, the tallest one dictates height naturally. 
+                                We render all reviews stacked. */}
                             {reviews.map((review, index) => (
                                 <div
                                     key={index}
-                                    className={`absolute w-full top-0 left-0 transition-all duration-700 ease-in-out ${index === currentReview
-                                        ? 'animate-verbatim-in z-10'
-                                        : 'animate-verbatim-out z-0 pointer-events-none'
+                                    className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${index === currentReview
+                                        ? 'animate-verbatim-in z-10 relative'
+                                        : 'animate-verbatim-out z-0 pointer-events-none absolute' // Keep absolute for exiting items to prevent layout jumps if they were different sizes, or just relative if strictly stacking
                                         }`}
+                                // Note: If we want the container to ALWAYS hold the height of the TALLEST, we should make them all relative (grid items).
+                                // BUT, if we want them to cross-fade, one might need to be absolute to not push the other? 
+                                // Actually in CSS Grid, overlapping items (col-start-1 row-start-1) Sit on top of each other without pushing.
+                                // So they act like layers. The grid cell grows to fit the tallest layer. 
+                                // So we can remove 'absolute' from here entirely!
                                 >
-                                    <div className="bg-neutral-950 border border-white/5 p-10 rounded-3xl relative overflow-hidden shadow-2xl">
-                                        <div className="flex flex-col gap-6">
-                                            <div className="flex items-start gap-5">
-                                                <div className="w-12 h-12 shrink-0 rounded-full overflow-hidden border border-white/10 shadow-lg">
-                                                    <img src={review.image} alt={review.author} className="w-full h-full object-cover" />
+                                    <div className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${index === currentReview
+                                        ? 'animate-verbatim-in z-10 opacity-100'
+                                        : 'animate-verbatim-out z-0 opacity-0 pointer-events-none'
+                                        }`}
+                                    >
+                                        <div className="bg-neutral-950 border border-white/5 p-8 md:p-10 rounded-3xl relative overflow-hidden shadow-2xl mx-auto max-w-2xl">
+                                            <div className="flex flex-col gap-6">
+                                                <div className="flex items-start gap-4 md:gap-5">
+                                                    <div className="w-12 h-12 shrink-0 rounded-full overflow-hidden border border-white/10 shadow-lg">
+                                                        <img src={review.image} alt={review.author} className="w-full h-full object-cover" />
+                                                    </div>
+                                                    <div className="relative">
+                                                        <p className="text-neutral-300 font-light text-lg leading-relaxed relative z-10 italic">"{review.text}"</p>
+                                                    </div>
                                                 </div>
-                                                <div className="relative">
-
-                                                    <p className="text-neutral-300 font-light text-lg leading-relaxed relative z-10 italic">"{review.text}"</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-2">
-                                                <span className="text-sm font-medium text-neutral-400 tracking-wide">{review.author}</span>
-                                                <div className="flex text-yellow-500/80 gap-0.5 text-sm">
-                                                    {[...Array(review.stars)].map((_, i) => (
-                                                        <span key={i}>★</span>
-                                                    ))}
+                                                <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-2">
+                                                    <span className="text-sm font-medium text-neutral-400 tracking-wide">{review.author}</span>
+                                                    <div className="flex text-yellow-500/80 gap-0.5 text-sm">
+                                                        {[...Array(review.stars)].map((_, i) => (
+                                                            <span key={i}>★</span>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -397,7 +410,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
             </section>
 
             {/* FAQ Section */}
-            <section className="pt-32 pb-24 md:py-24 px-6 relative bg-neutral-950">
+            <section className="pt-24 pb-24 md:py-24 px-6 relative bg-neutral-950">
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-bold font-serif mb-4 text-white">Preguntas Frecuentes</h2>
