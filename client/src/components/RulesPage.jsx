@@ -4,31 +4,38 @@ import heroImg from '../assets/impostor-home.png';
 
 export function RulesPage() {
     return (
-        <div className="bg-neutral-950 text-white min-h-[100dvh] font-sans flex flex-col">
-            {/* Header */}
-            <header className="py-6 px-6 border-b border-white/10 sticky top-0 bg-neutral-950/80 backdrop-blur-md z-50">
-                <div className="max-w-4xl mx-auto flex items-center justify-between">
-                    <a href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                        <img src={heroImg} alt="Logo" className="w-10 h-10 rounded-full" />
-                        <h1 className="text-xl font-bold font-serif tracking-wide text-neutral-100">El Impostor</h1>
-                    </a>
-
+        <div className="bg-neutral-950 text-white min-h-[100dvh] font-sans flex flex-col select-text" style={{ userSelect: 'text', WebkitUserSelect: 'text' }}>
+            {/* Navbar Fixed */}
+            <nav className="fixed top-0 left-0 right-0 z-50 bg-neutral-950/80 backdrop-blur-md border-b border-white/5 py-4 px-6 md:px-12 flex justify-between items-center transition-all duration-300">
+                <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                    <img src={heroImg} alt="Logo El Impostor" className="w-8 h-8 rounded-full" />
+                    <span className="text-xl font-normal font-serif tracking-wide text-neutral-100">El Impostor</span>
+                </a>
+                <div>
+                    <Button
+                        onClick={() => window.location.href = '/'}
+                        variant="primary"
+                        size="sm"
+                        className="w-auto !px-6 !py-1 !h-9 text-sm rounded-full"
+                    >
+                        Jugar Ahora
+                    </Button>
                 </div>
-            </header>
+            </nav>
 
             {/* Content */}
-            <main className="flex-1 py-12 px-6">
+            <main className="flex-1 pt-24 pb-12 px-6">
                 <div className="max-w-3xl mx-auto space-y-12">
 
                     <div className="text-center space-y-4">
-                        <h2 className="text-4xl md:text-5xl font-bold font-serif text-white">Reglas del Juego</h2>
-                        <p className="text-xl text-neutral-400">Aprende a detectar al Impostor o a engañar a todos sin ser descubierto.</p>
+                        <h2 className="text-4xl md:text-5xl font-serif text-white">Reglas del Juego</h2>
+                        <p className="text-xl text-neutral-400 font-normal">Aprende a detectar al Impostor o a engañar a todos sin ser descubierto.</p>
                     </div>
 
                     <div className="space-y-12">
                         {/* INTRODUCCIÓN */}
                         <section className="space-y-4">
-                            <h3 className="text-2xl font-bold text-orange-500 font-serif border-b border-white/10 pb-2">Introducción</h3>
+                            <h3 className="text-2xl text-orange-500 font-serif">Introducción</h3>
                             <p className="text-neutral-300 text-lg leading-relaxed">
                                 <strong className="text-white">El Impostor</strong> es un juego de deducción social para 4 o más jugadores que combina elementos digitales
                                 (aplicación web) con interacción presencial o por videollamada. En cada partida, los jugadores deberán descubrir quién entre ellos
@@ -39,7 +46,7 @@ export function RulesPage() {
 
                         {/* COMPONENTES */}
                         <section className="space-y-4">
-                            <h3 className="text-2xl font-bold text-orange-500 font-serif border-b border-white/10 pb-2">Componentes</h3>
+                            <h3 className="text-2xl text-orange-500 font-serif">Componentes</h3>
                             <ul className="space-y-3 text-neutral-300 text-lg">
                                 <li className="flex gap-3">
                                     <span className="text-orange-500 shrink-0">▸</span>
@@ -58,7 +65,7 @@ export function RulesPage() {
 
                         {/* PREPARACIÓN */}
                         <section className="space-y-4">
-                            <h3 className="text-2xl font-bold text-orange-500 font-serif border-b border-white/10 pb-2">Preparación</h3>
+                            <h3 className="text-2xl text-orange-500 font-serif">Preparación</h3>
                             <ol className="space-y-4 text-neutral-300 text-lg list-decimal list-outside ml-6">
                                 <li className="pl-2">
                                     <strong className="text-white">Acceso:</strong> Todos acceden a la web e inician sesión.
@@ -77,17 +84,17 @@ export function RulesPage() {
 
                         {/* OBJETIVO */}
                         <section className="space-y-4">
-                            <h3 className="text-2xl font-bold text-orange-500 font-serif border-b border-white/10 pb-2">Objetivo</h3>
+                            <h3 className="text-2xl text-orange-500 font-serif">Objetivo</h3>
                             <p className="text-neutral-300 text-lg leading-relaxed">
-                                Gana el primero en alcanzar <strong className="text-yellow-400">15 puntos</strong>. Si tras 3 partidas nadie llega, gana quien tenga más puntos.
+                                Gana el primero en alcanzar <strong className="text-orange-400">15 puntos</strong>. Si tras 3 partidas nadie llega, gana quien tenga más puntos.
                             </p>
                             <div className="grid md:grid-cols-2 gap-4">
-                                <div className="bg-neutral-900 border border-white/10 p-5 rounded-xl">
-                                    <h4 className="text-green-400 font-bold mb-2">Como Amigo</h4>
+                                <div className="bg-neutral-900 p-5 rounded-xl">
+                                    <h4 className="text-white font-semibold mb-2">Como Amigo</h4>
                                     <p className="text-neutral-400">Identificar y expulsar al Impostor para proteger la palabra secreta.</p>
                                 </div>
-                                <div className="bg-neutral-900 border border-white/10 p-5 rounded-xl">
-                                    <h4 className="text-orange-400 font-bold mb-2">Como Impostor</h4>
+                                <div className="bg-neutral-900 p-5 rounded-xl">
+                                    <h4 className="text-orange-400 font-semibold mb-2">Como Impostor</h4>
                                     <p className="text-neutral-400">Fingir conocer la palabra, pasar desapercibido y sobrevivir.</p>
                                 </div>
                             </div>
@@ -95,18 +102,18 @@ export function RulesPage() {
 
                         {/* DESARROLLO */}
                         <section className="space-y-6">
-                            <h3 className="text-2xl font-bold text-orange-500 font-serif border-b border-white/10 pb-2">Desarrollo de la Partida</h3>
+                            <h3 className="text-2xl text-orange-500 font-serif">Desarrollo de la Partida</h3>
 
                             <div className="space-y-6">
                                 {/* 1 */}
                                 <div className="flex gap-4">
                                     <div className="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center font-bold text-lg shrink-0 mt-1">1</div>
                                     <div className="space-y-2">
-                                        <h4 className="text-xl font-bold text-white">Reparto de Cartas</h4>
+                                        <h4 className="text-xl font-semibold text-white">Reparto de Cartas</h4>
                                         <p className="text-neutral-300">La app asigna roles y palabra secreta.</p>
                                         <ul className="list-disc ml-5 text-neutral-400 space-y-1">
-                                            <li><strong>Amigos:</strong> Ven la palabra secreta.</li>
-                                            <li><strong>Impostor:</strong> No ve la palabra (puede ver categoría).</li>
+                                            <li><span className="text-neutral-400">Amigos:</span> Ven la palabra secreta.</li>
+                                            <li><span className="text-neutral-400">Impostor:</span> No ve la palabra (puede ver categoría).</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -115,7 +122,7 @@ export function RulesPage() {
                                 <div className="flex gap-4">
                                     <div className="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center font-bold text-lg shrink-0 mt-1">2</div>
                                     <div className="space-y-2">
-                                        <h4 className="text-xl font-bold text-white">Ronda de Pistas</h4>
+                                        <h4 className="text-xl font-semibold text-white">Ronda de Pistas</h4>
                                         <p className="text-neutral-300">Cada jugador dice una pista relacionada con la palabra en orden. No deben ser ni muy obvias ni muy difíciles.</p>
                                     </div>
                                 </div>
@@ -124,7 +131,7 @@ export function RulesPage() {
                                 <div className="flex gap-4">
                                     <div className="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center font-bold text-lg shrink-0 mt-1">3</div>
                                     <div className="space-y-2">
-                                        <h4 className="text-xl font-bold text-white">Votación</h4>
+                                        <h4 className="text-xl font-semibold text-white">Votación</h4>
                                         <p className="text-neutral-300">En cualquier momento se puede votar al sospechoso. Cuando todos votan, se revela el resultado.</p>
                                     </div>
                                 </div>
@@ -133,7 +140,7 @@ export function RulesPage() {
                                 <div className="flex gap-4">
                                     <div className="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center font-bold text-lg shrink-0 mt-1">4</div>
                                     <div className="space-y-2">
-                                        <h4 className="text-xl font-bold text-white">Resolución</h4>
+                                        <h4 className="text-xl font-semibold text-white">Resolución</h4>
                                         <p className="text-neutral-300">Si el Impostor es expulsado, ganan los Amigos. Si se expulsa a un Amigo, el Impostor gana puntos y sigue la partida (hasta 3 rondas).</p>
                                     </div>
                                 </div>
@@ -142,17 +149,17 @@ export function RulesPage() {
 
                         {/* PUNTUACIÓN */}
                         <section className="space-y-4">
-                            <h3 className="text-2xl font-bold text-orange-500 font-serif border-b border-white/10 pb-2">Puntuación</h3>
+                            <h3 className="text-2xl text-orange-500 font-serif">Puntuación</h3>
                             <div className="grid md:grid-cols-2 gap-6">
-                                <div className="bg-green-900/10 border border-green-500/20 p-5 rounded-xl">
-                                    <h4 className="text-green-400 font-bold mb-3 text-lg">Amigos</h4>
+                                <div className="bg-neutral-900 p-5 rounded-xl">
+                                    <h4 className="text-white font-semibold mb-3 text-lg">Amigos</h4>
                                     <ul className="text-neutral-300 space-y-2">
                                         <li>• <strong>+1 punto</strong> por votar correctamente al Impostor.</li>
                                         <li>• <strong>+1 punto</strong> extra si el Impostor es expulsado.</li>
                                     </ul>
                                 </div>
-                                <div className="bg-orange-900/10 border border-orange-500/20 p-5 rounded-xl">
-                                    <h4 className="text-orange-400 font-bold mb-3 text-lg">Impostor</h4>
+                                <div className="bg-orange-900/10 p-5 rounded-xl">
+                                    <h4 className="text-orange-400 font-semibold mb-3 text-lg">Impostor</h4>
                                     <ul className="text-neutral-300 space-y-2">
                                         <li>• <strong>+2 puntos</strong> por sobrevivir ronda 1.</li>
                                         <li>• <strong>+3 puntos</strong> por sobrevivir ronda 2.</li>

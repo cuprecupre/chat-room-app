@@ -115,7 +115,7 @@ export function EmailAuthScreen({ onLoginWithEmail, onRegisterWithEmail, onBack,
                 loading="lazy"
               />
             </div>
-            <h1 className="text-3xl font-bold text-neutral-50">
+            <h1 className="text-3xl font-serif text-neutral-50">
               {mode === 'select' && 'Acceder con Email'}
               {mode === 'login' && 'Iniciar sesión'}
               {mode === 'register' && 'Crear cuenta'}

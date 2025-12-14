@@ -16,7 +16,7 @@ export function LoginScreen({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
           <div className="perspective-1000 animate-scaleIn animate-delay-200">
             <img src={heroImg} alt="El Impostor" className="mx-auto w-56 h-56 rounded-full object-cover shadow-xl ring-1 ring-white/10 animate-tilt-oscillate" loading="lazy" />
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-neutral-50 animate-fadeIn animate-delay-500">El impostor</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif text-neutral-50 animate-fadeIn animate-delay-500">El impostor</h1>
           <p className="text-lg sm:text-xl text-neutral-300 animate-fadeIn animate-delay-600">Alguien no dice la verdad.<br />¿Lo vas a descubrir?</p>
 
           <div className="animate-fadeIn animate-delay-800">

@@ -8,7 +8,7 @@ export function InstructionsModal({ isOpen, onClose }) {
 
                 {/* INTRODUCCIÓN */}
                 <section>
-                    <h3 className="text-xl font-bold text-orange-400 mb-3">Introducción</h3>
+                    <h3 className="text-xl font-serif text-orange-400 mb-3">Introducción</h3>
                     <p className="text-neutral-300 text-base leading-relaxed">
                         <strong className="text-white">El Impostor</strong> es un juego de deducción social para 4 o más jugadores que combina elementos digitales
                         (aplicación web) con interacción presencial o por videollamada. En cada partida, los jugadores deberán descubrir quién entre ellos
@@ -17,11 +17,11 @@ export function InstructionsModal({ isOpen, onClose }) {
                     </p>
                 </section>
 
-                <div className="h-px bg-white/10" />
+
 
                 {/* COMPONENTES */}
                 <section>
-                    <h3 className="text-xl font-bold text-orange-400 mb-3">Componentes</h3>
+                    <h3 className="text-xl font-serif text-orange-400 mb-3">Componentes</h3>
                     <ul className="space-y-2 text-neutral-300 text-base">
                         <li className="flex gap-2">
                             <span className="text-orange-400 shrink-0">▸</span>
@@ -38,11 +38,11 @@ export function InstructionsModal({ isOpen, onClose }) {
                     </ul>
                 </section>
 
-                <div className="h-px bg-white/10" />
+
 
                 {/* PREPARACIÓN */}
                 <section>
-                    <h3 className="text-xl font-bold text-orange-400 mb-3">Preparación</h3>
+                    <h3 className="text-xl font-serif text-orange-400 mb-3">Preparación</h3>
                     <ol className="space-y-3 text-neutral-300 text-base ml-5 list-decimal list-outside">
                         <li>
                             <strong className="text-white">Acceso a la aplicación:</strong> Todos los jugadores deben acceder a la aplicación web desde sus dispositivos
@@ -63,20 +63,20 @@ export function InstructionsModal({ isOpen, onClose }) {
                     </ol>
                 </section>
 
-                <div className="h-px bg-white/10" />
+
 
                 {/* OBJETIVO DEL JUEGO */}
                 <section>
-                    <h3 className="text-xl font-bold text-orange-400 mb-3">Objetivo del Juego</h3>
+                    <h3 className="text-xl font-serif text-orange-400 mb-3">Objetivo del Juego</h3>
                     <div className="space-y-4">
                         <p className="text-neutral-300 text-base leading-relaxed">
                             Un juego completo se desarrolla a lo largo de <strong>varias partidas consecutivas</strong>. El primer jugador en alcanzar
-                            <strong className="text-yellow-400"> 15 puntos</strong> gana. Si tras <strong>3 partidas</strong> nadie ha alcanzado ese total,
+                            <strong className="text-orange-400"> 15 puntos</strong> gana. Si tras <strong>3 partidas</strong> nadie ha alcanzado ese total,
                             gana quien tenga la mayor puntuación acumulada.
                         </p>
                         <div className="bg-neutral-800/50 p-4 rounded-lg space-y-2">
                             <p className="text-neutral-200 text-sm">
-                                <strong className="text-green-400">Como Amigo:</strong> Tu objetivo es identificar y expulsar al Impostor para ganar puntos.
+                                <strong className="text-white">Como Amigo:</strong> Tu objetivo es identificar y expulsar al Impostor para ganar puntos.
                             </p>
                             <p className="text-neutral-200 text-sm">
                                 <strong className="text-orange-400">Como Impostor:</strong> Tu objetivo es permanecer oculto el mayor tiempo posible,
@@ -86,11 +86,11 @@ export function InstructionsModal({ isOpen, onClose }) {
                     </div>
                 </section>
 
-                <div className="h-px bg-white/10" />
+
 
                 {/* DESARROLLO DE UNA PARTIDA */}
                 <section>
-                    <h3 className="text-xl font-bold text-orange-400 mb-4">Desarrollo de una Partida</h3>
+                    <h3 className="text-xl font-serif text-orange-400 mb-4">Desarrollo de una Partida</h3>
 
                     <div className="space-y-5">
                         {/* 1. Reparto de Cartas */}
@@ -106,11 +106,11 @@ export function InstructionsModal({ isOpen, onClose }) {
                                 </p>
                                 <p>
                                     <strong className="text-white">Cada jugador recibe su carta digitalmente</strong> en su dispositivo. Esta carta es
-                                    <strong className="text-yellow-400"> privada y confidencial</strong>.
+                                    <strong className="text-orange-400"> privada y confidencial</strong>.
                                 </p>
                                 <ul className="space-y-2 ml-4">
                                     <li className="flex gap-2">
-                                        <span className="text-green-400 shrink-0">●</span>
+                                        <span className="text-neutral-400 shrink-0">●</span>
                                         <span>
                                             <strong>Los Amigos</strong> ven la palabra secreta completa (por ejemplo: <em>"Lavadora"</em>).
                                         </span>
@@ -146,7 +146,7 @@ export function InstructionsModal({ isOpen, onClose }) {
                                 </p>
                                 <div className="bg-white/5 p-3 rounded-lg space-y-2">
                                     <p className="text-sm text-neutral-200">
-                                        <strong className="text-green-400">Estrategia para los Amigos:</strong>
+                                        <strong className="text-white">Estrategia para los Amigos:</strong>
                                     </p>
                                     <p className="text-sm text-neutral-300">
                                         Debes dar una pista que demuestre a los demás Amigos que <strong>conoces la palabra</strong>, pero sin ser tan específica
@@ -232,7 +232,7 @@ export function InstructionsModal({ isOpen, onClose }) {
                                 </p>
                                 <div className="space-y-3">
                                     <div className="flex gap-3 items-start">
-                                        <span className="text-green-400 font-bold text-xl shrink-0">✓</span>
+                                        <span className="text-neutral-400 font-bold text-xl shrink-0">✓</span>
                                         <div>
                                             <p className="text-white font-semibold">El jugador más votado era el Impostor</p>
                                             <p className="text-sm">
@@ -270,17 +270,17 @@ export function InstructionsModal({ isOpen, onClose }) {
                     </div>
                 </section>
 
-                <div className="h-px bg-white/10" />
+
 
                 {/* SISTEMA DE PUNTUACIÓN */}
                 <section>
-                    <h3 className="text-xl font-bold text-orange-400 mb-3">Sistema de Puntuación</h3>
+                    <h3 className="text-xl font-serif text-orange-400 mb-3">Sistema de Puntuación</h3>
                     <div className="space-y-4">
                         <p className="text-neutral-300 text-base">
                             Los puntos se acumulan entre partidas. El primer jugador en alcanzar 15 puntos gana el juego completo.
                         </p>
-                        <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-lg">
-                            <h4 className="text-green-400 font-bold mb-2">Puntuación para los Amigos</h4>
+                        <div className="bg-neutral-900 p-4 rounded-lg">
+                            <h4 className="text-white font-semibold mb-2">Puntuación para los Amigos</h4>
                             <ul className="space-y-1 text-neutral-300 text-sm ml-4">
                                 <li className="flex gap-2">
                                     <span className="shrink-0">•</span>
@@ -292,8 +292,8 @@ export function InstructionsModal({ isOpen, onClose }) {
                                 </li>
                             </ul>
                         </div>
-                        <div className="bg-orange-500/10 border border-orange-500/20 p-4 rounded-lg">
-                            <h4 className="text-orange-400 font-bold mb-2">Puntuación para el Impostor</h4>
+                        <div className="bg-orange-900/10 p-4 rounded-lg">
+                            <h4 className="text-orange-400 font-semibold mb-2">Puntuación para el Impostor</h4>
                             <ul className="space-y-1 text-neutral-300 text-sm ml-4">
                                 <li className="flex gap-2">
                                     <span className="shrink-0">•</span>
@@ -316,11 +316,11 @@ export function InstructionsModal({ isOpen, onClose }) {
                     </div>
                 </section>
 
-                <div className="h-px bg-white/10" />
+
 
                 {/* REGLAS ADICIONALES */}
                 <section>
-                    <h3 className="text-xl font-bold text-orange-400 mb-3">Reglas Adicionales</h3>
+                    <h3 className="text-xl font-serif text-orange-400 mb-3">Reglas Adicionales</h3>
                     <ul className="space-y-3 text-neutral-300 text-base">
                         <li className="flex gap-2">
                             <span className="text-orange-400 shrink-0">▸</span>

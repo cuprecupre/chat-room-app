@@ -48,17 +48,7 @@ button {
   user-select: none;
 }
 
-/* Titulares con Trocchi */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: "Trocchi", serif;
-  font-weight: 400 !important;
-  /* Forzar regular sobre utilidades font-bold */
-}
+/* Typography is now controlled explicitly via Tailwind classes (font-serif, font-sans) */
 
 /* Sutile tilt on hover */
 .perspective-1000 {

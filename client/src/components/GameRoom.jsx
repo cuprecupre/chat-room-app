@@ -391,7 +391,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           {isHost ? (
             /* HOST VIEW */
             <>
-              <h2 className="text-3xl font-bold text-neutral-50 leading-tight">Invita a tus amigos<br />para empezar</h2>
+              <h2 className="text-3xl font-serif text-neutral-50 leading-tight">Invita a tus amigos<br />para empezar</h2>
 
               <div className="w-full space-y-4">
                 <Button onClick={onCopyLink} variant="outline" size="md" className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20 gap-2">
@@ -439,7 +439,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           ) : (
             /* GUEST VIEW */
             <>
-              <h2 className="text-3xl font-bold text-neutral-50 leading-tight">La partida empezará pronto</h2>
+              <h2 className="text-3xl font-serif text-neutral-50 leading-tight">La partida empezará pronto</h2>
 
               <div className="space-y-6">
                 <p className="text-lg text-neutral-400 animate-pulse">
@@ -499,7 +499,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             </div>
 
             <div className={`w-full max-w-sm mx-auto text-center mb-5 ${showRestOfUI ? 'animate-fadeIn animate-delay-400' : 'opacity-0 pointer-events-none'}`}>
-              <h2 className="text-2xl font-bold text-neutral-50" style={{ fontFamily: 'Trocchi, serif' }}>Tu carta</h2>
+              <h2 className="text-2xl font-serif text-neutral-50">Tu carta</h2>
             </div>
             <div className="w-full max-w-sm mx-auto space-y-3">
               <div className={`${showCardEntrance ? 'animate-cardEntrance' : ''}`}>
@@ -535,7 +535,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                               <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-orange-400">
                                 <span>Tu rol</span>
                               </div>
-                              <p className="text-xl font-semibold mt-1 text-white" style={{ fontFamily: 'Trocchi, serif' }}>{capitalize(state.role)}</p>
+                              <p className="text-xl font-serif mt-1 text-white">{capitalize(state.role)}</p>
                             </div>
 
                             {/* Línea separadora */}
@@ -549,7 +549,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                                       <span className="uppercase">Pista:</span>
                                       <span className="normal-case">La palabra secreta está relacionada con...</span>
                                     </div>
-                                    <p className="font-semibold text-xl mt-1 text-white underline decoration-dotted underline-offset-4" style={{ fontFamily: 'Trocchi, serif' }}>
+                                    <p className="font-serif text-xl mt-1 text-white underline decoration-dotted underline-offset-4">
                                       {capitalize(state.secretCategory)}
                                     </p>
                                   </div>
@@ -560,7 +560,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                                 <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-orange-400">
                                   <span>Palabra secreta</span>
                                 </div>
-                                <p className="font-semibold text-xl mt-1 text-white" style={{ fontFamily: 'Trocchi, serif' }}>
+                                <p className="font-serif text-xl mt-1 text-white">
                                   {capitalize(state.secretWord)}
                                 </p>
                               </div>
@@ -609,7 +609,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                     </span>
                   </div>
                 )}
-                <h2 className="text-3xl font-bold text-neutral-50" style={{ fontFamily: 'Trocchi, serif' }}>
+                <h2 className="text-3xl font-serif text-neutral-50">
                   Resultado de la partida
                 </h2>
               </div>
@@ -628,13 +628,13 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                         ) : null;
                       })()}
                     </div>
-                    <p className="font-semibold text-2xl text-orange-400 mt-2" style={{ fontFamily: 'Trocchi, serif' }}>
+                    <p className="font-serif text-2xl text-orange-400 mt-2">
                       {state.impostorName}
                     </p>
                   </div>
                   <div className="pt-4 border-t border-white/10">
                     <span className="text-xs tracking-wider uppercase text-neutral-400">Palabra secreta</span>
-                    <p className="font-semibold text-2xl text-white mt-2" style={{ fontFamily: 'Trocchi, serif' }}>
+                    <p className="font-serif text-2xl text-white mt-2">
                       {capitalize(state.secretWord)}
                     </p>
                   </div>
@@ -713,7 +713,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
             <div className="w-full max-w-sm mx-auto animate-fadeIn">
               <div className="w-full px-4 py-6 space-y-6">
                 <div className="text-center space-y-4 animate-scaleIn animate-delay-200">
-                  <h2 className="text-4xl font-bold text-neutral-50" style={{ fontFamily: 'Trocchi, serif' }}>
+                  <h2 className="text-4xl font-serif text-neutral-50">
                     Resultado final
                   </h2>
                 </div>
@@ -725,7 +725,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                       // Sin ganadores (empate triple o mayor)
                       <div>
                         <span className="text-xs tracking-wider uppercase text-neutral-400">Resultado</span>
-                        <p className="font-semibold text-2xl text-orange-400 mt-4" style={{ fontFamily: 'Trocchi, serif' }}>
+                        <p className="font-serif text-2xl text-orange-400 mt-4">
                           No hay ganadores
                         </p>
                         <p className="text-lg text-neutral-300 mt-2">¡Empieza otro juego!</p>
@@ -738,7 +738,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                           {winnerPlayers.map(winner => (
                             <div key={winner.uid} className="flex flex-col items-center">
                               <Avatar photoURL={winner.photoURL} displayName={winner.name} size="lg" className="ring-4 ring-orange-400/50 shadow-lg" />
-                              <p className="font-semibold text-lg text-orange-400 mt-2" style={{ fontFamily: 'Trocchi, serif' }}>
+                              <p className="font-serif text-lg text-orange-400 mt-2">
                                 {winner.name}
                               </p>
                               <p className="text-sm text-neutral-400 mt-1">
@@ -755,7 +755,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
                         <div className="flex justify-center my-4">
                           <Avatar photoURL={winnerPlayers[0].photoURL} displayName={winnerPlayers[0].name} size="lg" className="ring-4 ring-orange-400/50 shadow-lg" />
                         </div>
-                        <p className="font-semibold text-2xl text-orange-400 mt-2" style={{ fontFamily: 'Trocchi, serif' }}>
+                        <p className="font-serif text-2xl text-orange-400 mt-2">
                           {winnerPlayers[0].name}
                         </p>
                         <p className="text-lg text-neutral-400 mt-2">
@@ -805,7 +805,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
         showTurnOverlay && (
           <div className={`fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm px-4 transition-opacity duration-300 ${isOverlayClosing ? 'opacity-0' : 'animate-fadeIn'}`}>
             <div className={`text-center space-y-8 max-w-md transition-all duration-300 ${isOverlayClosing ? 'opacity-0 scale-95' : 'animate-scaleIn'}`}>
-              <h2 className="text-6xl font-bold text-orange-400" style={{ fontFamily: 'Trocchi, serif' }}>
+              <h2 className="text-6xl font-serif text-orange-400">
                 Ronda {state.currentTurn}
               </h2>
 
@@ -842,7 +842,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
             <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full">
               <div className="text-center space-y-4">
-                <h3 className="text-xl font-bold text-neutral-50">¿Finalizar juego?</h3>
+                <h3 className="text-xl font-serif text-neutral-50">¿Finalizar juego?</h3>
                 <p className="text-neutral-400">
                   Esta acción finalizará el juego para todos los jugadores. ¿Estás seguro?
                 </p>
@@ -879,7 +879,7 @@ export function GameRoom({ state, isHost, user, onStartGame, onEndGame, onPlayAg
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
             <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full">
               <div className="text-center space-y-4">
-                <h3 className="text-xl font-bold text-neutral-50">¿Abandonar juego?</h3>
+                <h3 className="text-xl font-serif text-neutral-50">¿Abandonar juego?</h3>
                 <p className="text-neutral-400">
                   Saldrás del juego y volverás al lobby. ¿Estás seguro?
                 </p>

@@ -80,6 +80,10 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
         {
             question: "¿Podemos jugar a distancia?",
             answer: "¡Claro! Podéis usar una videollamada (Zoom, Meet, Discord) para hablar y veros las caras, y usar la app para gestionar las cartas y votaciones."
+        },
+        {
+            question: "¿Dónde puedo ver las reglas completas?",
+            answer: <>Puedes consultar todas las reglas del juego en nuestra <a href="/reglas" className="text-orange-400 hover:text-orange-300 underline">página de reglas</a>. Ahí encontrarás explicaciones detalladas sobre cómo jugar, puntuación y consejos.</>
         }
     ];
 
@@ -110,7 +114,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
             <nav className="fixed top-0 left-0 right-0 z-50 bg-neutral-950/80 backdrop-blur-md border-b border-white/5 py-4 px-6 md:px-12 flex justify-between items-center transition-all duration-300">
                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
                     <img src={heroImg} alt="Logo El Impostor" className="w-8 h-8 rounded-full" />
-                    <span className="text-xl font-medium font-serif tracking-wide text-neutral-100">El Impostor</span>
+                    <span className="text-xl font-normal font-serif tracking-wide text-neutral-100">El Impostor</span>
                 </div>
                 <div className="hidden md:flex gap-6 items-center">
                     <button onClick={scrollToFeatures} className="text-sm font-medium text-neutral-400 hover:text-white transition-colors">Cómo se juega</button>
@@ -140,10 +144,8 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
             <header className="relative pt-32 pb-20 px-6 md:pt-48 md:pb-32 overflow-hidden flex flex-col items-center text-center">
                 {/* Dynamic Background Elements */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
-                    <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-600/20 rounded-full blur-[100px] opacity-30 mix-blend-screen" />
-                    <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-red-600/10 rounded-full blur-[120px] opacity-20 mix-blend-screen" />
-
-
+                    <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-amber-600/[0.08] md:bg-amber-600/15 rounded-full blur-[80px] md:blur-[100px]" />
+                    <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] md:w-[600px] md:h-[600px] bg-orange-600/[0.08] md:bg-orange-600/15 rounded-full blur-[90px] md:blur-[120px]" />
                 </div>
 
                 <div className="relative z-10 max-w-4xl mx-auto space-y-8">
@@ -152,28 +154,27 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                             <img
                                 src={heroImg}
                                 alt="Icono del juego El Impostor"
-                                className="relative w-32 h-32 md:w-40 md:h-40 rounded-full object-cover animate-tilt-oscillate shadow-2xl ring-1 ring-white/10"
+                                className="relative w-36 h-36 md:w-44 md:h-44 rounded-full object-cover animate-tilt-oscillate shadow-2xl ring-1 ring-white/10"
                             />
                         </div>
                     </div>
 
-                    <h2 className="flex flex-col items-center gap-2 animate-fadeIn animate-delay-400 drop-shadow-2xl">
-                        <span className="text-4xl md:text-6xl/tight lg:text-7xl/tight font-serif text-white">
+                    <h2 className="flex flex-col items-center gap-3 md:gap-4 animate-fadeIn animate-delay-400 drop-shadow-2xl">
+                        <span className="text-4xl md:text-6xl/tight lg:text-7xl/tight font-serif font-normal text-white">
                             El Impostor está entre nosotros.
                         </span>
-                        <span className="text-4xl md:text-6xl font-serif font-medium tracking-tight mt-2 bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600">
+                        <span className="text-3xl md:text-5xl font-serif font-normal tracking-tight mt-1 bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600">
                             ¿Podrás descubrirlo?
                         </span>
                     </h2>
 
-                    <h1 className="text-lg md:text-2xl text-neutral-300 max-w-3xl mx-auto leading-relaxed animate-fadeIn animate-delay-500 !font-light !font-sans">
-                        Juega a El Impostor Online GRATIS con tus amigos.
-                    </h1>
-                    <p className="text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed animate-fadeIn animate-delay-500 font-light mt-4">
-                        Inicia una partida en segundos y sumérgete en el mejor juego de deducción social.
-                    </p>
+                    <div className="space-y-2 mt-2">
+                        <p className="text-base md:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed animate-fadeIn animate-delay-500 font-light">
+                            Inicia una partida, invita a tus amigos y sumérgete en el mejor juego de deducción&nbsp;social.
+                        </p>
+                    </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12 animate-fadeIn animate-delay-600 w-full max-w-md mx-auto sm:max-w-none">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10 animate-fadeIn animate-delay-600 w-full max-w-md mx-auto sm:max-w-none">
                         <div className="w-full sm:w-auto min-w-[240px]">
                             <Button
                                 onClick={onLogin}
@@ -201,7 +202,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                                         </svg>
                                     )}
                                 </span>
-                                <span className="align-middle font-medium">Continuar con Google</span>
+                                <span className="align-middle font-semibold">Continuar con Google</span>
                             </Button>
                         </div>
                         <div className="w-full sm:w-auto min-w-[240px]">
@@ -217,7 +218,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                     </svg>
                                 </span>
-                                <span className="align-middle font-medium">Continuar con Email</span>
+                                <span className="align-middle font-semibold">Continuar con Email</span>
                             </Button>
                         </div>
                     </div>
@@ -242,12 +243,18 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
             {/* Feature / Dynamics Section */}
             <section ref={featuresRef} className="py-32 px-6 relative bg-neutral-900/50 overflow-hidden">
                 {/* Decoration */}
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[100px] pointer-events-none" />
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-600/5 rounded-full blur-[100px] pointer-events-none" />
                 <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-orange-600/5 rounded-full blur-[100px] pointer-events-none" />
+
+                <div className="max-w-4xl mx-auto text-center mb-20 relative z-10">
+                    <h1 className="text-xl md:text-2xl text-orange-400 font-sans font-normal leading-relaxed animate-fadeIn">
+                        Juega ahora a El Impostor Online GRATIS con tus amigos.
+                    </h1>
+                </div>
 
                 <div className="max-w-7xl mx-auto relative z-10">
                     <div className="text-center mb-20 space-y-6">
-                        <h2 className="text-4xl md:text-5xl font-bold font-serif text-neutral-100">Cómo se juega a El Impostor</h2>
+                        <h2 className="text-3xl md:text-5xl font-serif font-normal text-neutral-100">Cómo se juega a El Impostor</h2>
                         <p className="text-xl text-neutral-400 max-w-2xl mx-auto">Una mecánica de roles ocultos fácil de aprender. Descubre quién miente en partidas rápidas de deducción.</p>
                     </div>
 
@@ -270,9 +277,9 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                             {/* Content */}
                             <div className="relative z-10 p-8 md:p-12 h-full flex flex-col justify-end">
                                 <div className="mb-2">
-                                    <span className="text-6xl md:text-8xl font-bold font-serif text-orange-500 group-hover:text-orange-400 transition-colors">1</span>
+                                    <span className="text-6xl md:text-8xl font-serif font-normal text-orange-500 group-hover:text-orange-400 transition-colors">1</span>
                                 </div>
-                                <h3 className="text-2xl font-bold mb-4 text-white">Recibe tu palabra</h3>
+                                <h3 className="text-xl md:text-2xl font-sans font-semibold mb-4 text-white">Recibe tu palabra</h3>
                                 <p className="text-neutral-400 leading-relaxed text-lg">
                                     Todos reciben la misma palabra secreta, excepto el <strong className="text-orange-400 font-medium">Impostor</strong>. Él no sabe nada, pero debe fingir que sí.
                                 </p>
@@ -297,9 +304,9 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                             {/* Content */}
                             <div className="relative z-10 p-8 md:p-12 h-full flex flex-col justify-end">
                                 <div className="mb-2">
-                                    <span className="text-6xl md:text-8xl font-bold font-serif text-orange-500 group-hover:text-orange-400 transition-colors">2</span>
+                                    <span className="text-6xl md:text-8xl font-serif font-normal text-orange-500 group-hover:text-orange-400 transition-colors">2</span>
                                 </div>
-                                <h3 className="text-2xl font-bold mb-4 text-white">Describe y Debate</h3>
+                                <h3 className="text-xl md:text-2xl font-sans font-semibold mb-4 text-white">Describe y Debate</h3>
                                 <p className="text-neutral-400 leading-relaxed text-lg">
                                     Cada jugador da una pista sobre la palabra. El Impostor debe escuchar atentamente y mentir para no ser descubierto.
                                 </p>
@@ -324,14 +331,27 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                             {/* Content */}
                             <div className="relative z-10 p-8 md:p-12 h-full flex flex-col justify-end">
                                 <div className="mb-2">
-                                    <span className="text-6xl md:text-8xl font-bold font-serif text-orange-500 group-hover:text-orange-400 transition-colors">3</span>
+                                    <span className="text-6xl md:text-8xl font-serif font-normal text-orange-500 group-hover:text-orange-400 transition-colors">3</span>
                                 </div>
-                                <h3 className="text-2xl font-bold mb-4 text-white">Vota y Gana</h3>
+                                <h3 className="text-xl md:text-2xl font-sans font-semibold mb-4 text-white">Vota y Gana</h3>
                                 <p className="text-neutral-400 leading-relaxed text-lg">
                                     ¿Quién es el sospechoso? Vota para expulsarlo. Si atrapan al Impostor, ganan los amigos. ¡Si escapa, gana él!
                                 </p>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Link to Rules */}
+                    <div className="text-center mt-12">
+                        <a
+                            href="/reglas"
+                            className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors text-lg"
+                        >
+                            <span>Ver reglas completas</span>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                        </a>
                     </div>
                 </div>
             </section>
@@ -341,7 +361,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                 <div className="max-w-6xl mx-auto space-y-24">
                     <div className="flex flex-col md:flex-row items-center gap-16">
                         <div className="w-full md:w-1/2 space-y-8 relative z-10">
-                            <h2 className="text-4xl md:text-5xl font-bold font-serif leading-tight">El mejor juego para<br />reuniones online</h2>
+                            <h2 className="text-3xl md:text-5xl font-serif font-normal leading-tight">El mejor juego para<br />reuniones online</h2>
                             <p className="text-neutral-400 text-xl leading-relaxed">
                                 Juega directamente en tu navegador web. Sin descargar apps, sin instalaciones y compatible con todos los móviles. <strong>El Impostor</strong> es la forma más rápida de empezar a divertirse en grupo.
                             </p>
@@ -417,7 +437,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
             <section className="pt-24 pb-24 md:py-24 px-6 relative bg-neutral-950">
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-bold font-serif mb-4 text-white">Preguntas Frecuentes</h2>
+                        <h2 className="text-3xl md:text-5xl font-serif font-normal mb-4 text-white">Preguntas Frecuentes</h2>
                         <p className="text-neutral-400">Todo lo que necesitas saber antes de empezar a mentir.</p>
                     </div>
 
@@ -425,7 +445,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                         {faqs.map((faq, index) => (
                             <div
                                 key={index}
-                                className={`group border border-white/5 rounded-2xl overflow-hidden transition-all duration-300 ${openFaq === index ? 'bg-neutral-900 border-white/10 ring-1 ring-white/10' : 'hover:border-white/10 hover:bg-neutral-900/50'
+                                className={`group border rounded-2xl overflow-hidden transition-all duration-300 ${openFaq === index ? 'bg-neutral-900 border-orange-500/50 ring-1 ring-orange-500/20' : 'border-white/10 hover:border-orange-500/30 hover:bg-neutral-900/50'
                                     }`}
                             >
                                 <button
@@ -466,7 +486,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                             <img src={heroImg} alt="" className="w-full h-full object-cover" />
                         </div>
                     </div>
-                    <h2 className="text-3xl md:text-5xl font-bold font-serif mb-4 tracking-tight">¿Listo para jugar?</h2>
+                    <h2 className="text-3xl md:text-5xl font-serif font-normal mb-4 tracking-tight text-white">¿Listo para jugar?</h2>
                     <p className="text-lg text-neutral-400 max-w-xl mx-auto">Únete ahora y demuestra tus habilidades de decepción. No necesitas instalar nada.</p>
                     <div className="flex justify-center pt-4">
                         <Button
@@ -503,8 +523,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
             {/* Main Footer */}
             <footer className="border-t border-white/5 py-12 px-6 bg-neutral-950">
                 <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-                    <div className="flex items-center gap-2">
-                        <img src={heroImg} alt="El Impostor Logo" className="w-6 h-6 grayscale opacity-50" />
+                    <div className="flex items-center">
                         <span className="text-neutral-500 text-sm font-serif">El Impostor © 2025</span>
                     </div>
                     <div className="flex gap-8 text-sm text-neutral-500">

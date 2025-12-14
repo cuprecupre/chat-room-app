@@ -434,7 +434,7 @@ export default function App() {
               />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-neutral-50 mb-2">Conexión perdida</h2>
+              <h2 className="text-2xl font-serif text-neutral-50 mb-2">Conexión perdida</h2>
               <p className="text-neutral-400">No se puede conectar al servidor. Esto puede deberse a problemas de red o el servidor está inactivo.</p>
             </div>
             <div className="space-y-3 px-6">
@@ -570,7 +570,7 @@ export default function App() {
               />
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-neutral-50 mb-4" style={{ fontFamily: 'Trocchi, serif' }}>¡Te han invitado!</h2>
+              <h2 className="text-3xl font-serif text-neutral-50 mb-4">¡Te han invitado!</h2>
               <p className="text-neutral-300 text-lg leading-relaxed">
                 Has recibido un enlace para unirte a la partida de <span className="font-mono font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded">{previewHostName || urlGameId}</span>.
                 <br /><span className="text-sm text-neutral-500 mt-2 block">¿Quieres abandonar tu partida actual para unirte?</span>
@@ -633,7 +633,7 @@ export default function App() {
                 </div>
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-neutral-50 mb-3">{errorTitle}</h2>
+                <h2 className="text-2xl font-serif text-neutral-50 mb-3">{errorTitle}</h2>
                 <p className="text-neutral-400 leading-relaxed">
                   {errorMsg}
                 </p>
@@ -670,7 +670,7 @@ export default function App() {
               />
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-neutral-50 mb-4" style={{ fontFamily: 'Trocchi, serif' }}>¡Te han invitado!</h2>
+              <h2 className="text-3xl font-serif text-neutral-50 mb-4">¡Te han invitado!</h2>
               <p className="text-neutral-300 text-lg leading-relaxed">
                 Has recibido un enlace para unirte a la partida de <span className="font-mono font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded">{previewHostName || urlGameId}</span>.
                 <br /><span className="text-sm text-neutral-500 mt-2 block">¿Quieres entrar ahora?</span>
@@ -745,10 +745,9 @@ export default function App() {
           <header className="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
             <button
               onClick={handleTitleClick}
-              className="text-xl sm:text-2xl font-bold text-neutral-50 hover:text-orange-400 transition-colors active:scale-95 cursor-pointer"
-              style={{ fontFamily: 'Trocchi, serif' }}
+              className="text-xl sm:text-2xl font-serif text-neutral-50 hover:text-orange-400 transition-colors active:scale-95 cursor-pointer"
             >
-              El impostor
+              El Impostor
             </button>
             <div className="flex items-center gap-3 sm:gap-4">
               <span className="text-sm sm:text-base font-medium hidden sm:inline flex items-center">{user.displayName}</span>
@@ -857,7 +856,7 @@ export default function App() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
           <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full">
             <div className="text-center space-y-4">
-              <h3 className="text-xl font-bold text-neutral-50">¿Abandonar la partida?</h3>
+              <h3 className="text-xl font-serif text-neutral-50">¿Abandonar la partida?</h3>
               <p className="text-neutral-400">Si abandonas, perderás tu progreso en esta partida.</p>
               <div className="space-y-2 pt-2">
                 <Button
