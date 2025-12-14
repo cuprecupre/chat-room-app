@@ -18,7 +18,7 @@ const sizeClasses = {
   lg: 'h-12 text-lg',
 };
 
-const baseClasses = 'w-full inline-flex items-center justify-center rounded-3xl font-semibold transition-all duration-150 active:scale-95 touch-manipulation focus:outline-none ring-1 ring-transparent focus-visible:ring-white/20 disabled:bg-neutral-500 disabled:text-neutral-400 disabled:cursor-not-allowed';
+const baseClasses = 'w-auto inline-flex items-center justify-center rounded-3xl font-semibold transition-all duration-150 active:scale-95 touch-manipulation focus:outline-none ring-1 ring-transparent focus-visible:ring-white/20 disabled:bg-neutral-500 disabled:text-neutral-400 disabled:cursor-not-allowed';
 
 export function Button({
   children,

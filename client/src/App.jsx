@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { useSocket } from './hooks/useSocket';
 import { useAppAssetsPreloader } from './hooks/useImagePreloader';
-import { LoginScreen } from './components/LoginScreen';
+import { LandingPage } from './components/LandingPage';
 import { EmailAuthScreen } from './components/EmailAuthScreen';
 import { Lobby } from './components/Lobby';
 import { GameRoom } from './components/GameRoom';
@@ -502,7 +502,7 @@ export default function App() {
     // Handle showcase route with access control
     if (isShowcaseRoute) {
       if (!user) {
-        return <LoginScreen onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(false)} />;
+        return <LandingPage onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(false)} />;
       }
 
       // Check if user is authorized (only leandrovegasb@gmail.com)
@@ -530,14 +530,14 @@ export default function App() {
         console.log('❌ App - Error de autenticación:', error);
         hasLoggedNoUser.current = true;
       }
-      return <LoginScreen onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} onOpenFeedback={() => setFeedbackOpen(true)} />;
+      return <LandingPage onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} onOpenFeedback={() => setFeedbackOpen(true)} />;
     }
     if (!user) {
       if (!hasLoggedNoUser.current) {
         console.log('🚫 App - Sin usuario autenticado, mostrando login');
         hasLoggedNoUser.current = true;
       }
-      return <LoginScreen onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} onOpenFeedback={() => setFeedbackOpen(true)} />;
+      return <LandingPage onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} onOpenFeedback={() => setFeedbackOpen(true)} />;
     }
 
     // Usuario autenticado - resetear flag de "no user" y loguear si es un usuario nuevo
@@ -718,9 +718,16 @@ export default function App() {
   };
 
   const showHeader = user && connected;
+
+  // If no user, we are on LandingPage which needs full width.
+  // If user && connected, we are in Lobby/Game which needs constrained width.
+  // Other cases (like showcase) might fall into one of these or strictly require custom handling, 
+  // but !user covers the LandingPage requirement.
   const containerClasses = showHeader
     ? "w-full max-w-4xl mx-auto p-6 sm:p-6 lg:p-8"
-    : "w-full max-w-4xl mx-auto min-h-[100dvh] flex items-center justify-center p-0";
+    : (!user
+      ? "w-full min-h-[100dvh] p-0"
+      : "w-full max-w-4xl mx-auto min-h-[100dvh] flex items-center justify-center p-0");
 
   return (
     <div className="bg-neutral-950 text-white min-h-[100dvh] font-sans flex flex-col">
