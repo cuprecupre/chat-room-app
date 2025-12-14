@@ -91,17 +91,13 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
     }, []);
 
     useEffect(() => {
-        document.title = "El Impostor - Juego de Rol Oculto y Deducción Online Gratis";
-        const metaDesc = document.querySelector('meta[name="description"]');
-        if (metaDesc) {
-            metaDesc.setAttribute("content", "Juega a El Impostor online gratis. El mejor juego de deducción social tipo Mafia o Werewolf. Descubre al espía, debate con amigos y gana la partida sin descargar nada.");
-        }
-
         document.documentElement.style.scrollBehavior = 'smooth';
         return () => {
             document.documentElement.style.scrollBehavior = 'auto';
         };
     }, []);
+
+
 
     const scrollToFeatures = () => {
         featuresRef.current?.scrollIntoView({ behavior: 'smooth' });
