@@ -13,12 +13,12 @@ const variantClasses = {
 };
 
 const sizeClasses = {
-  sm: 'h-9 text-sm',
-  md: 'h-11 text-base',
-  lg: 'h-12 text-lg',
+  sm: 'h-9 text-sm px-4',
+  md: 'h-11 text-base px-6',
+  lg: 'h-12 text-lg px-8',
 };
 
-const baseClasses = 'w-auto inline-flex items-center justify-center rounded-3xl font-semibold transition-all duration-150 active:scale-95 touch-manipulation focus:outline-none ring-1 ring-transparent focus-visible:ring-white/20 disabled:bg-neutral-500 disabled:text-neutral-400 disabled:cursor-not-allowed';
+const baseClasses = 'w-full inline-flex items-center justify-center rounded-3xl font-semibold transition-all duration-150 active:scale-95 touch-manipulation focus:outline-none ring-1 ring-transparent focus-visible:ring-white/20 disabled:bg-neutral-500 disabled:text-neutral-400 disabled:cursor-not-allowed';
 
 export function Button({
   children,

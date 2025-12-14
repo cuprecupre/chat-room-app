@@ -14,6 +14,7 @@ import { InstructionsModal } from './components/InstructionsModal';
 import { FeedbackModal } from './components/FeedbackModal';
 import { UIShowcase } from './components/UIShowcase';
 import { Avatar } from './components/ui/Avatar';
+import { RulesPage } from './components/RulesPage';
 import bellImg from './assets/bell.png';
 import heroImg from './assets/impostor-home.png';
 
@@ -497,6 +498,11 @@ export default function App() {
           clearError={clearError}
         />
       );
+    }
+
+    // Handle static rule page
+    if (window.location.pathname === '/reglas') {
+      return <RulesPage />;
     }
 
     // Handle showcase route with access control

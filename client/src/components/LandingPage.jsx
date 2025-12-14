@@ -7,32 +7,79 @@ import cardImg from '../assets/card.png';
 import maskImg from '../assets/mascara.png';
 import clockImg from '../assets/reloj.png';
 import dualImpostorImg from '../assets/dual-impostor.png';
+import avatarAlex from '../assets/avatar-alex.jpg';
+import avatarSofia from '../assets/avatar-sofia.jpg';
+import avatarJavi from '../assets/avatar-javi.jpg';
+import avatarLucia from '../assets/avatar-lucia.jpg';
+import avatarMarco from '../assets/avatar-marco.jpg';
 
 export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstructions, onOpenFeedback }) {
     const featuresRef = useRef(null);
     const [currentReview, setCurrentReview] = useState(0);
+    const [openFaq, setOpenFaq] = useState(null);
+
+    const toggleFaq = (index) => {
+        setOpenFaq(openFaq === index ? null : index);
+    };
 
     const reviews = [
         {
             text: "La partida se puso tensísima cuando acusaron a María y resultó que yo era el impostor todo el tiempo. ¡Risas aseguradas!",
             author: "Alex, Jugador Frecuente",
             stars: 5,
-            initial: "A",
+            image: avatarAlex,
             gradient: "from-orange-400 to-red-600"
         },
         {
             text: "Lo mejor es que no hay que instalar nada. Mandas el link y en 10 segundos estamos todos jugando. Genial para romper el hielo.",
             author: "Sofía, Jugador Frecuente",
             stars: 5,
-            initial: "S",
+            image: avatarSofia,
             gradient: "from-purple-400 to-blue-600"
         },
         {
             text: "Simple pero adictivo. Las discusiones para encontrar al espía son lo mejor. Muy recomendado para noches de juegos.",
             author: "Javi, Jugador Frecuente",
             stars: 5,
-            initial: "J",
+            image: avatarJavi,
             gradient: "from-green-400 to-emerald-600"
+        },
+        {
+            text: "Ideal para jugar con compañeros de trabajo en remoto. Nos reímos mucho y ayuda a desconectar del estrés del día a día.",
+            author: "Lucía, Team Lead",
+            stars: 5,
+            image: avatarLucia,
+            gradient: "from-pink-400 to-rose-600"
+        },
+        {
+            text: "Increíble cómo un juego tan sencillo puede generar tanto debate. ¡Siempre acabamos gritando (de risa) al final de cada ronda!",
+            author: "Marco, Estudiante",
+            stars: 5,
+            image: avatarMarco,
+            gradient: "from-cyan-400 to-blue-500"
+        }
+    ];
+
+    const faqs = [
+        {
+            question: "¿Qué es El Impostor?",
+            answer: "Es un juego de deducción social donde todos reciben una palabra secreta excepto uno: el Impostor. ¿El objetivo? Descubrirlo antes de que él descubra la palabra."
+        },
+        {
+            question: "¿Necesito instalar algo?",
+            answer: "No. El juego funciona directamente en el navegador de tu móvil, tablet o PC. Solo necesitas conexión a internet."
+        },
+        {
+            question: "¿Es gratis?",
+            answer: "Sí, 100% gratuito. Sin compras ocultas ni anuncios molestos. Solo diversión pura."
+        },
+        {
+            question: "¿Cuántos jugadores pueden jugar?",
+            answer: "Mínimo 4 jugadores son necesarios para que la dinámica funcione bien. Recomendamos grupos de entre 4 y 10 personas."
+        },
+        {
+            question: "¿Podemos jugar a distancia?",
+            answer: "¡Claro! Podéis usar una videollamada (Zoom, Meet, Discord) para hablar y veros las caras, y usar la app para gestionar las cartas y votaciones."
         }
     ];
 
@@ -71,14 +118,14 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                 </div>
                 <div className="hidden md:flex gap-6 items-center">
                     <button onClick={scrollToFeatures} className="text-sm font-medium text-neutral-400 hover:text-white transition-colors">Cómo se juega</button>
-                    <button onClick={onOpenInstructions} className="text-sm font-medium text-neutral-400 hover:text-white transition-colors">Reglas</button>
+                    <button onClick={() => window.location.href = '/reglas'} className="text-sm font-medium text-neutral-400 hover:text-white transition-colors">Reglas</button>
                 </div>
                 <div>
                     <Button
                         onClick={onLogin}
                         variant="primary"
                         size="sm"
-                        className="!px-6 !py-1 !h-9 text-sm disabled:opacity-50 disabled:cursor-not-allowed rounded-full flex items-center gap-2"
+                        className="w-auto !px-6 !py-1 !h-9 text-sm disabled:opacity-50 disabled:cursor-not-allowed rounded-full flex items-center gap-2"
                         disabled={isLoading}
                     >
                         <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
@@ -277,7 +324,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                                 </div>
                                 <h3 className="text-2xl font-bold mb-4 text-white">Vota y Gana</h3>
                                 <p className="text-neutral-400 leading-relaxed text-lg">
-                                    ¿Quién es el sospechoso? Vota para expulsarlo. Si atrapan al Impostor, ganan los civiles. ¡Si escapa, gana él!
+                                    ¿Quién es el sospechoso? Vota para expulsarlo. Si atrapan al Impostor, ganan los amigos. ¡Si escapa, gana él!
                                 </p>
                             </div>
                         </div>
@@ -324,8 +371,8 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                                     <div className="bg-neutral-950 border border-white/5 p-10 rounded-3xl relative overflow-hidden shadow-2xl">
                                         <div className="flex flex-col gap-6">
                                             <div className="flex items-start gap-5">
-                                                <div className={`w-12 h-12 shrink-0 rounded-full bg-gradient-to-br ${review.gradient} flex items-center justify-center font-bold text-lg text-white shadow-lg`}>
-                                                    {review.initial}
+                                                <div className="w-12 h-12 shrink-0 rounded-full overflow-hidden border border-white/10 shadow-lg">
+                                                    <img src={review.image} alt={review.author} className="w-full h-full object-cover" />
                                                 </div>
                                                 <div className="relative">
 
@@ -345,6 +392,48 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* FAQ Section */}
+            <section className="pt-32 pb-24 md:py-24 px-6 relative bg-neutral-950">
+                <div className="max-w-4xl mx-auto">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-5xl font-bold font-serif mb-4 text-white">Preguntas Frecuentes</h2>
+                        <p className="text-neutral-400">Todo lo que necesitas saber antes de empezar a mentir.</p>
+                    </div>
+
+                    <div className="space-y-4">
+                        {faqs.map((faq, index) => (
+                            <div
+                                key={index}
+                                className={`group border border-white/5 rounded-2xl overflow-hidden transition-all duration-300 ${openFaq === index ? 'bg-neutral-900 border-white/10 ring-1 ring-white/10' : 'hover:border-white/10 hover:bg-neutral-900/50'
+                                    }`}
+                            >
+                                <button
+                                    onClick={() => toggleFaq(index)}
+                                    className="w-full flex items-center justify-between p-6 text-left focus:outline-none"
+                                >
+                                    <span className={`text-lg font-medium transition-colors ${openFaq === index ? 'text-white' : 'text-neutral-300 group-hover:text-white'}`}>
+                                        {faq.question}
+                                    </span>
+                                    <span className={`flex-shrink-0 ml-6 flex items-center justify-center w-8 h-8 rounded-full border border-white/5 bg-white/5 transition-all duration-300 ${openFaq === index ? 'rotate-180 bg-orange-600 border-orange-500 text-white' : 'text-neutral-400 group-hover:border-white/20'}`}>
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </span>
+                                </button>
+                                <div
+                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${openFaq === index ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'
+                                        }`}
+                                >
+                                    <div className="p-6 pt-0 text-neutral-300 leading-relaxed">
+                                        {faq.answer}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>
@@ -402,7 +491,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                         <span className="text-neutral-500 text-sm font-serif">El Impostor © 2025</span>
                     </div>
                     <div className="flex gap-8 text-sm text-neutral-500">
-                        <button onClick={onOpenInstructions} className="hover:text-neutral-300 transition-colors">Reglas</button>
+                        <button onClick={() => window.location.href = '/reglas'} className="hover:text-neutral-300 transition-colors">Reglas</button>
                         <button onClick={onOpenFeedback} className="hover:text-neutral-300 transition-colors">Contacto</button>
                     </div>
                 </div>
