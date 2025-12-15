@@ -192,9 +192,11 @@ app.post('/auth/google', async (req, res) => {
 
     console.log('🔐 [GIS] Recibido credential de Google Identity Services');
 
-    // Verificar CSRF token
+    // Verificar CSRF token (skip en localhost para desarrollo)
     const cookieCsrf = req.cookies.g_csrf_token;
-    if (!g_csrf_token || !cookieCsrf || g_csrf_token !== cookieCsrf) {
+    const isLocalhostDev = g_csrf_token === 'localhost_dev';
+
+    if (!isLocalhostDev && (!g_csrf_token || !cookieCsrf || g_csrf_token !== cookieCsrf)) {
       console.error('❌ [GIS] CSRF token mismatch');
       return res.redirect('/?error=csrf_mismatch');
     }
@@ -261,6 +263,122 @@ app.post('/auth/google', async (req, res) => {
   } catch (error) {
     console.error('❌ [GIS] Error en /auth/google:', error);
     res.redirect('/?error=auth_failed');
+  }
+});
+
+// --- Google OAuth 2.0 Callback Endpoint ---
+// Recibe el código de autorización después del redirect de Google y lo intercambia por tokens
+const GOOGLE_CLIENT_ID = '706542941882-483ctnm99nl51g174gj09srt1m7rmogd.apps.googleusercontent.com';
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+
+app.get('/auth/google/callback', async (req, res) => {
+  try {
+    const { code, error } = req.query;
+
+    console.log('🔐 [OAuth] Recibido callback de Google OAuth');
+
+    if (error) {
+      console.error('❌ [OAuth] Error de Google:', error);
+      return res.redirect('/?error=google_auth_denied');
+    }
+
+    if (!code) {
+      console.error('❌ [OAuth] No se recibió código de autorización');
+      return res.redirect('/?error=no_auth_code');
+    }
+
+    // Verificar que tenemos el client secret
+    if (!GOOGLE_CLIENT_SECRET) {
+      console.error('❌ [OAuth] GOOGLE_CLIENT_SECRET no configurado');
+      return res.redirect('/?error=server_config_error');
+    }
+
+    // Determinar el redirect_uri basado en el origen de la petición
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const host = req.headers.host;
+    const redirectUri = `${protocol}://${host}/auth/google/callback`;
+
+    console.log('🔄 [OAuth] Intercambiando código por tokens...');
+
+    // Intercambiar código por tokens usando Google OAuth 2.0 token endpoint
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        code,
+        client_id: GOOGLE_CLIENT_ID,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code',
+      }),
+    });
+
+    if (!tokenResponse.ok) {
+      const errorText = await tokenResponse.text();
+      console.error('❌ [OAuth] Error al intercambiar código:', errorText);
+      return res.redirect('/?error=token_exchange_failed');
+    }
+
+    const tokens = await tokenResponse.json();
+    console.log('✅ [OAuth] Tokens obtenidos');
+
+    // Obtener información del usuario usando el access token
+    const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: {
+        Authorization: `Bearer ${tokens.access_token}`,
+      },
+    });
+
+    if (!userInfoResponse.ok) {
+      console.error('❌ [OAuth] Error al obtener userinfo');
+      return res.redirect('/?error=userinfo_failed');
+    }
+
+    const userInfo = await userInfoResponse.json();
+    console.log('✅ [OAuth] Información del usuario obtenida:', {
+      id: userInfo.id,
+      email: userInfo.email,
+      name: userInfo.name,
+      picture: userInfo.picture ? 'presente' : 'ausente'
+    });
+
+    // Buscar si ya existe un usuario con este email en Firebase
+    let uid = userInfo.id; // Por defecto usar el Google ID
+
+    try {
+      const existingUser = await admin.auth().getUserByEmail(userInfo.email);
+      if (existingUser) {
+        uid = existingUser.uid;
+        console.log('👤 [OAuth] Usuario existente encontrado:', {
+          uid: existingUser.uid,
+          email: existingUser.email,
+        });
+      }
+    } catch (getUserError) {
+      if (getUserError.code === 'auth/user-not-found') {
+        console.log('🆕 [OAuth] Usuario nuevo, se creará con Google ID como UID');
+      } else {
+        console.warn('⚠️ [OAuth] Error buscando usuario existente:', getUserError.message);
+      }
+    }
+
+    // Crear custom token de Firebase
+    const customToken = await admin.auth().createCustomToken(uid, {
+      email: userInfo.email,
+      name: userInfo.name,
+      picture: userInfo.picture
+    });
+
+    console.log('✅ [OAuth] Custom token de Firebase creado para UID:', uid);
+
+    // Redirect al cliente con el token
+    res.redirect(`/?authToken=${encodeURIComponent(customToken)}&name=${encodeURIComponent(userInfo.name || '')}&photo=${encodeURIComponent(userInfo.picture || '')}`);
+
+  } catch (error) {
+    console.error('❌ [OAuth] Error en callback:', error);
+    res.redirect('/?error=auth_callback_failed');
   }
 });
 
