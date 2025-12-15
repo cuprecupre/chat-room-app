@@ -308,22 +308,32 @@ export default function App() {
     try {
       setMenuOpen(false);
 
-      if (gameState?.gameId) {
-        emit('leave-game', gameState.gameId);
-        resetGameState();
-      }
+      // Reset local state immediately for optimistic UI
+      resetGameState();
 
       const url = new URL(window.location);
       url.searchParams.delete('gameId');
       window.history.replaceState({}, '', url.toString());
 
+      // Wait for server to process logout event before disconnecting
+      await new Promise((resolve) => {
+        console.log('[Logout] Emitting logout event to server...');
+        emit('logout', () => {
+          console.log('[Logout] Server acknowledged logout');
+          resolve();
+        });
+        // Timeout fallback in case server doesn't respond
+        setTimeout(resolve, 1000);
+      });
+
+      console.log('[Logout] Proceeding with Firebase logout...');
       await logout();
       // Logout triggers !user, which updates UI automatically
     } catch (e) {
       console.error("Error during logout:", e);
       window.location.reload();
     }
-  }, [logout, emit, gameState, resetGameState]);
+  }, [logout, emit, resetGameState]);
 
   const forceExit = useCallback(() => {
     // Clear URL parameters immediately

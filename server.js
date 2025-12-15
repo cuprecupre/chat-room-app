@@ -863,6 +863,36 @@ io.on('connection', (socket) => {
     safeCallback();
   });
 
+  // Handle explicit logout - ensures clean slate
+  socket.on('logout', (callback) => {
+    console.log(`[Logout] User ${user.name} is logging out - cleaning all game associations`);
+
+    // Find ALL games where this user exists (any status)
+    Object.values(games).forEach(game => {
+      const player = game.getPlayer(user.uid);
+      if (player) {
+        // Force status to LEFT for all games
+        game.setPlayerStatus(user.uid, 'left');
+        game.persist(); // Ensure it's saved to DB
+        console.log(`[Logout] Marked ${user.name} as left in game ${game.gameId}`);
+      }
+    });
+
+    // Clear any pending disconnect timers
+    if (pendingDisconnects[user.uid]) {
+      clearTimeout(pendingDisconnects[user.uid].timeout);
+      delete pendingDisconnects[user.uid];
+    }
+
+    // Send null game state
+    socket.emit('game-state', null);
+
+    // Acknowledge to client
+    if (typeof callback === 'function') {
+      callback();
+    }
+  });
+
   // Safety: if a client requests their current state explicitly
   socket.on('get-state', () => {
     const userGame = findUserGame(user.uid);

@@ -401,8 +401,11 @@ class Game {
    */
   leaveGame(userId) {
     const player = this.getPlayer(userId);
-    if (!player || player.status !== PLAYER_STATUS.ACTIVE) {
-      console.log(`[Game ${this.gameId}] Player ${userId} cannot leave (not active or not found)`);
+
+    // Allow leaving if player is ACTIVE or WAITING_REJOIN
+    // Only prevent if player is already LEFT or doesn't exist
+    if (!player || player.status === PLAYER_STATUS.LEFT) {
+      console.log(`[Game ${this.gameId}] Player ${userId} cannot leave (already left or not found)`);
       return null;
     }
 
