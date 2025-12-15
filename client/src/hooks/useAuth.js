@@ -152,7 +152,19 @@ export function useAuth() {
     const redirectUri = `${window.location.origin}/auth/google/callback`;
 
     // Capturar gameId actual si existe para preservarlo tras el login
-    const currentGameId = new URL(window.location).searchParams.get('gameId');
+    // Check both query params (legacy) AND path params (new /join/:gameId)
+    const url = new URL(window.location);
+    let currentGameId = url.searchParams.get('gameId');
+
+    // If no gameId in query params, check if we're on /join/:gameId route
+    if (!currentGameId) {
+      const pathMatch = url.pathname.match(/^\/join\/([A-Za-z0-9]+)$/);
+      if (pathMatch) {
+        currentGameId = pathMatch[1];
+        console.log('🎮 Detected gameId from /join/ path:', currentGameId);
+      }
+    }
+
     const state = currentGameId ? JSON.stringify({ gameId: currentGameId }) : undefined;
 
     const params = new URLSearchParams({

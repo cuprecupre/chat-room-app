@@ -80,7 +80,7 @@ export default function App() {
     }
   }, [user?.uid]); // Solo re-ejecutar si cambia el UID, no el objeto completo
 
-  const { connected, gameState, emit, joinError, clearJoinError } = useSocket(user);
+  const { connected, gameState, emit, joinError, clearJoinError, resetGameState } = useSocket(user);
 
   // Reset scroll when major views change
   useEffect(() => {
@@ -175,23 +175,22 @@ export default function App() {
   const playAgain = useCallback(() => emit('play-again', gameState?.gameId), [emit, gameState]);
   const leaveGame = useCallback(() => {
     if (gameState?.gameId) {
-      // Remove gameId from URL immediately to prevent accidental reopen
+      // 1. Clean URL immediately
       const url = new URL(window.location);
       url.searchParams.delete('gameId');
       window.history.replaceState({}, '', url.toString());
 
-      const handleCleanExit = () => {
-        // Force page reload only after server ack or timeout
-        window.location.reload();
-      };
+      // 2. Emit leave command
+      emit('leave-game', gameState.gameId);
 
-      // Emit with Ack callback
-      emit('leave-game', gameState.gameId, handleCleanExit);
+      // 3. Force UI Reset immediately (Optimistic UI)
+      // This prevents the "black screen" dead end by immediately showing the Lobby
+      resetGameState();
 
-      // Fallback: if server doesn't respond in 2s, force exit anyway
-      setTimeout(handleCleanExit, 2000);
+      // Set session flag to prevent auto-rejoin
+      sessionStorage.setItem('justLeftGame', 'true');
     }
-  }, [emit, gameState]);
+  }, [emit, gameState, resetGameState]);
 
   const handleTitleClick = useCallback(() => {
     // Si está en una partida (lobby o jugando), mostrar modal de confirmación
@@ -307,39 +306,24 @@ export default function App() {
 
   const handleLogout = useCallback(async () => {
     try {
-      // 1. UI Feedback immediately
       setMenuOpen(false);
 
-      // 2. Clear URL parameters
+      if (gameState?.gameId) {
+        emit('leave-game', gameState.gameId);
+        resetGameState();
+      }
+
       const url = new URL(window.location);
       url.searchParams.delete('gameId');
       window.history.replaceState({}, '', url.toString());
 
-      // 3. Leave game if in one (best effort)
-      if (gameState?.gameId) {
-        emit('leave-game', gameState.gameId);
-      }
-
-      // 4. Force Socket Disconnect & Cleanup
-      // We do this BEFORE firebase logout to ensure no race conditions with auth state
-      if (window.location.reload) {
-        // Clear all storage to remove any "Recovering..." or stale state
-        localStorage.clear();
-        sessionStorage.clear();
-      }
-
-      // 5. Build proper logout sequence
       await logout();
-
-      // 6. Force hard reload to clear memory state
-      window.location.href = '/';
+      // Logout triggers !user, which updates UI automatically
     } catch (e) {
       console.error("Error during logout:", e);
-      // Fallback if something fails
-      localStorage.clear();
       window.location.reload();
     }
-  }, [logout, emit, gameState]);
+  }, [logout, emit, gameState, resetGameState]);
 
   const forceExit = useCallback(() => {
     // Clear URL parameters immediately

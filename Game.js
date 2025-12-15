@@ -1,11 +1,26 @@
 const { getRandomWordWithCategory } = require('./words');
 const dbService = require('./server/services/db');
 
+// Schema version for migration
+const SCHEMA_VERSION = 2;
+
+// Player status constants
+const PLAYER_STATUS = {
+  ACTIVE: 'active',
+  LEFT: 'left',
+  WAITING_REJOIN: 'waiting_rejoin'
+};
+
 class Game {
   constructor(hostUser, options = {}) {
     this.gameId = Math.random().toString(36).substring(2, 7).toUpperCase();
     this.hostId = hostUser.uid;
-    this.players = [];
+    this.schemaVersion = SCHEMA_VERSION;
+
+    // NEW: Players is now an object keyed by UID with status tracking
+    // Format: { [uid]: { name, photoURL, status, joinedAt, leftAt, isHost } }
+    this.players = {};
+
     this.phase = 'lobby'; // lobby, playing, round_result, game_over
     this.secretWord = '';
     this.secretCategory = '';
@@ -13,41 +28,112 @@ class Game {
     this.roundPlayers = []; // uids activos en la ronda actual
 
     // Opciones del juego
-    this.showImpostorHint = options.showImpostorHint !== undefined ? options.showImpostorHint : true; // Por defecto mostrar pista
+    this.showImpostorHint = options.showImpostorHint !== undefined ? options.showImpostorHint : true;
 
     // Sistema de vueltas
-    this.currentTurn = 1; // Vuelta actual (1, 2, 3)
+    this.currentTurn = 1;
     this.maxTurns = 3;
-    this.eliminatedInRound = []; // Jugadores expulsados en esta ronda (acumulado de todas las vueltas)
-    this.lastEliminatedInTurn = null; // Último jugador eliminado en la vuelta anterior
+    this.eliminatedInRound = [];
+    this.lastEliminatedInTurn = null;
 
     // Sistema de votación
-    this.votes = {}; // { [playerId]: votedForPlayerId }
-    this.turnHistory = []; // Historial de vueltas y resultados
+    this.votes = {};
+    this.turnHistory = [];
 
     // Sistema de puntos
-    this.playerScores = {}; // { [playerId]: totalScore }
-    this.roundCount = 0; // Contador de rondas jugadas
-    this.initialPlayerCount = 0; // Guardado para referencia
-    this.maxRounds = 0; // Máximo de rondas (3 partidas fijas)
-    this.targetScore = 15; // Puntos para ganar
-    this.lastRoundScores = {}; // Puntos ganados en la última ronda
+    this.playerScores = {};
+    this.roundCount = 0;
+    this.initialPlayerCount = 0;
+    this.maxRounds = 0;
+    this.targetScore = 15;
+    this.lastRoundScores = {};
 
     // Sistema de orden y jugador inicial
-    this.playerOrder = []; // Orden base (OB): uids ordenados por joinedAt
-    this.startingPlayerId = null; // Jugador que inicia la ronda actual
+    this.playerOrder = [];
+    this.startingPlayerId = null;
 
-    // Historial de impostores para evitar repeticiones
-    this.impostorHistory = []; // Array de uids de los últimos impostores [más reciente, ... , más antiguo]
+    // Historial de impostores
+    this.impostorHistory = [];
 
-    // Guardar datos de jugadores que abandonaron para mostrarlos en resultados
-    this.formerPlayers = {}; // { [uid]: { name, photoURL } }
+    // Legacy: formerPlayers for backward compatibility
+    this.formerPlayers = {};
 
-    // If restoring, do NOT add dummy player or persist initial state
     if (!options.isRestoring) {
       this.addPlayer(hostUser);
       this.persist();
     }
+  }
+
+  // ============ HELPER METHODS FOR NEW PLAYER STRUCTURE ============
+
+  /**
+   * Get a player by UID
+   * @param {string} uid 
+   * @returns {Object|null}
+   */
+  getPlayer(uid) {
+    return this.players[uid] || null;
+  }
+
+  /**
+   * Get all active players (status === 'active')
+   * @returns {Array} Array of player objects with uid included
+   */
+  getActivePlayersArray() {
+    return Object.entries(this.players)
+      .filter(([uid, p]) => p.status === PLAYER_STATUS.ACTIVE)
+      .map(([uid, p]) => ({ uid, ...p }));
+  }
+
+  /**
+   * Get all active player UIDs
+   * @returns {Array<string>}
+   */
+  getActivePlayerUids() {
+    return Object.entries(this.players)
+      .filter(([uid, p]) => p.status === PLAYER_STATUS.ACTIVE)
+      .map(([uid]) => uid);
+  }
+
+  /**
+   * Get player count (active only)
+   * @returns {number}
+   */
+  getActivePlayerCount() {
+    return this.getActivePlayerUids().length;
+  }
+
+  /**
+   * Check if a player exists and is active
+   * @param {string} uid 
+   * @returns {boolean}
+   */
+  isPlayerActive(uid) {
+    return this.players[uid]?.status === PLAYER_STATUS.ACTIVE;
+  }
+
+  /**
+   * Set player status
+   * @param {string} uid 
+   * @param {string} status - 'active', 'left', 'waiting_rejoin'
+   */
+  setPlayerStatus(uid, status) {
+    if (this.players[uid]) {
+      this.players[uid].status = status;
+      if (status === PLAYER_STATUS.LEFT) {
+        this.players[uid].leftAt = Date.now();
+      }
+      console.log(`[Game ${this.gameId}] Player ${this.players[uid].name} status -> ${status}`);
+    }
+  }
+
+  /**
+   * Convert players object to array format for client compatibility
+   * Only returns active players
+   * @returns {Array}
+   */
+  getPlayersAsArray() {
+    return this.getActivePlayersArray();
   }
 
   /**
@@ -55,25 +141,52 @@ class Game {
    * @param {string} gameId
    * @param {Object} data 
    */
-  static fromState(gameId, data) {
-    // Create a minimal Game instance for restoration
-    // We use isRestoring: true to prevent any side-effects in constructor
-    // IMPORTANT: We don't create any dummy player - all data comes from the DB
+  /**
+   * Migrate old array-based players to new object format
+   * @param {Array} playersArray 
+   * @returns {Object}
+   */
+  static migratePlayersToObject(playersArray) {
+    const playersObj = {};
+    playersArray.forEach(p => {
+      playersObj[p.uid] = {
+        name: p.name,
+        photoURL: p.photoURL || null,
+        status: PLAYER_STATUS.ACTIVE,
+        joinedAt: p.joinedAt || Date.now(),
+        leftAt: null,
+        isHost: false // Will be set correctly after
+      };
+    });
+    return playersObj;
+  }
 
-    // Create instance with minimal setup
+  /**
+   * Reconstructs a Game instance from a plain object (database state).
+   * Includes on-the-fly migration for old schema versions.
+   */
+  static fromState(gameId, data) {
     const game = Object.create(Game.prototype);
 
-    // Initialize all properties directly from data (no dummy players!)
     game.gameId = gameId;
     game.hostId = data.hostId;
     game.phase = data.phase;
+    game.schemaVersion = data.schemaVersion || 1;
 
-    // Sanitize players to avoid undefined photoURL issues
-    // These are the REAL players from the database, not dummies
-    game.players = (data.players || []).map(p => ({
-      ...p,
-      photoURL: p.photoURL || null
-    }));
+    // MIGRATION: Detect old format (players is array) and convert
+    if (Array.isArray(data.players)) {
+      console.log(`[Migration] Converting game ${gameId} from schema v1 to v${SCHEMA_VERSION}`);
+      game.players = Game.migratePlayersToObject(data.players);
+      game.schemaVersion = SCHEMA_VERSION;
+      // Mark host
+      if (game.players[data.hostId]) {
+        game.players[data.hostId].isHost = true;
+      }
+    } else {
+      // New format - use directly
+      game.players = data.players || {};
+    }
+
     game.playerScores = data.playerScores || {};
 
     // Config
@@ -102,17 +215,18 @@ class Game {
     game.impostorHistory = data.impostorHistory || [];
     game.formerPlayers = data.formerPlayers || {};
 
-    console.log(`[Game Recovery] Game ${gameId} restored in phase '${game.phase}' with ${game.players.length} players:`,
-      game.players.map(p => p.name).join(', '));
+    const activeCount = game.getActivePlayerCount();
+    console.log(`[Game Recovery] Game ${gameId} restored in phase '${game.phase}' with ${activeCount} active players`);
     return game;
   }
 
   // --- Persistence Helpers ---
   getPersistenceState() {
     return {
+      schemaVersion: this.schemaVersion,
       hostId: this.hostId,
       phase: this.phase,
-      players: this.players,
+      players: this.players,  // Now an object with status
       playerScores: this.playerScores,
 
       // Game Config
@@ -147,35 +261,70 @@ class Game {
   }
 
   addPlayer(user) {
-    if (!this.players.some(p => p.uid === user.uid)) {
-      const joinedAt = Date.now();
-      this.players.push({
-        uid: user.uid,
-        name: user.name,
-        photoURL: user.photoURL || null, // Evitar undefined para Firestore
-        joinedAt: joinedAt
-      });
-      // Guardar copia de datos del jugador (backup para mostrar en resultados si se desconecta)
-      this.formerPlayers[user.uid] = {
-        name: user.name,
-        photoURL: user.photoURL || null
-      };
-      // Inicializar puntuación del jugador
-      this.playerScores[user.uid] = 0;
-      // Actualizar orden base (OB)
-      this.updatePlayerOrder();
-      this.persist();
+    const existingPlayer = this.players[user.uid];
+
+    // If player exists but left, handle rejoin
+    if (existingPlayer) {
+      if (existingPlayer.status === PLAYER_STATUS.LEFT) {
+        // Player is rejoining - check game phase
+        if (this.phase === 'lobby') {
+          // Lobby: can rejoin immediately as active
+          this.setPlayerStatus(user.uid, PLAYER_STATUS.ACTIVE);
+          console.log(`[Game ${this.gameId}] Player ${user.name} rejoined (was left, now active)`);
+        } else {
+          // Game in progress: set as waiting_rejoin
+          this.setPlayerStatus(user.uid, PLAYER_STATUS.WAITING_REJOIN);
+          console.log(`[Game ${this.gameId}] Player ${user.name} set to waiting_rejoin (game in progress)`);
+        }
+        // Update player info in case it changed
+        this.players[user.uid].name = user.name;
+        this.players[user.uid].photoURL = user.photoURL || null;
+        this.updatePlayerOrder();
+        this.persist();
+        return;
+      } else if (existingPlayer.status === PLAYER_STATUS.ACTIVE) {
+        // Already active - nothing to do
+        console.log(`[Game ${this.gameId}] Player ${user.name} already active`);
+        return;
+      }
     }
-    // Si la partida está en juego, NO añadir a roundPlayers: esperará a la siguiente ronda
+
+    // New player
+    const joinedAt = Date.now();
+    this.players[user.uid] = {
+      name: user.name,
+      photoURL: user.photoURL || null,
+      status: PLAYER_STATUS.ACTIVE,
+      joinedAt: joinedAt,
+      leftAt: null,
+      isHost: Object.keys(this.players).length === 0 // First player is host
+    };
+
+    // Backup for former players display
+    this.formerPlayers[user.uid] = {
+      name: user.name,
+      photoURL: user.photoURL || null
+    };
+
+    // Initialize score
+    if (this.playerScores[user.uid] === undefined) {
+      this.playerScores[user.uid] = 0;
+    }
+
+    // Update order
+    this.updatePlayerOrder();
+    this.persist();
+
+    console.log(`[Game ${this.gameId}] Player ${user.name} joined as active`);
   }
 
   /**
-   * Actualiza el orden base (OB) ordenando jugadores por joinedAt (ASC)
-   * El orden base es inmutable salvo altas/bajas de jugadores
+   * Actualiza el orden base (OB) ordenando jugadores activos por joinedAt (ASC)
    */
   updatePlayerOrder() {
-    // Ordenar jugadores por joinedAt (primeros en llegar → arriba)
-    const sortedPlayers = [...this.players].sort((a, b) => {
+    // Get active players and sort by joinedAt
+    const activePlayers = this.getActivePlayersArray();
+    const sortedPlayers = activePlayers.sort((a, b) => {
       return (a.joinedAt || 0) - (b.joinedAt || 0);
     });
     this.playerOrder = sortedPlayers.map(p => p.uid);
@@ -203,7 +352,7 @@ class Game {
     const roundIndex = (this.roundCount - 1) % eligiblePlayers.length;
     const startingPlayerId = eligiblePlayers[roundIndex];
 
-    const startingPlayer = this.players.find(p => p.uid === startingPlayerId);
+    const startingPlayer = this.getPlayer(startingPlayerId);
     console.log(`[Game ${this.gameId}] Ronda ${this.roundCount}: Jugador inicial = ${startingPlayer?.name} (índice ${roundIndex} de ${eligiblePlayers.length} elegibles)`);
 
     return startingPlayerId;
@@ -221,7 +370,8 @@ class Game {
     let excludedPlayer = null;
     if (lastTwoImpostors.length === 2 && lastTwoImpostors[0] === lastTwoImpostors[1]) {
       excludedPlayer = lastTwoImpostors[0];
-      console.log(`[Game ${this.gameId}] Jugador ${this.players.find(p => p.uid === excludedPlayer)?.name} fue impostor las últimas 2 veces, será excluido`);
+      const excludedPlayerData = this.getPlayer(excludedPlayer);
+      console.log(`[Game ${this.gameId}] Jugador ${excludedPlayerData?.name} fue impostor las últimas 2 veces, será excluido`);
     }
 
     // Crear lista de candidatos (jugadores activos que no están excluidos)
@@ -244,36 +394,50 @@ class Game {
     return shuffledCandidates[0];
   }
 
-  removePlayer(userId) {
+  /**
+   * Mark player as left (not removed from object)
+   * @param {string} userId 
+   * @returns {Object|null} newHostInfo if host changed
+   */
+  leaveGame(userId) {
+    const player = this.getPlayer(userId);
+    if (!player || player.status !== PLAYER_STATUS.ACTIVE) {
+      console.log(`[Game ${this.gameId}] Player ${userId} cannot leave (not active or not found)`);
+      return null;
+    }
+
     const playerIsImpostor = this.impostorId === userId;
     const wasHost = this.hostId === userId;
 
-    // Guardar datos del jugador antes de eliminarlo
-    const leavingPlayer = this.players.find(p => p.uid === userId);
-    if (leavingPlayer) {
-      this.formerPlayers[userId] = {
-        name: leavingPlayer.name,
-        photoURL: leavingPlayer.photoURL || null
-      };
-    }
+    // Update formerPlayers backup
+    this.formerPlayers[userId] = {
+      name: player.name,
+      photoURL: player.photoURL || null
+    };
 
-    this.players = this.players.filter(p => p.uid !== userId);
+    // Set status to LEFT (player stays in object for historical data)
+    this.setPlayerStatus(userId, PLAYER_STATUS.LEFT);
+
+    // Remove from active round
     this.roundPlayers = this.roundPlayers.filter(uid => uid !== userId);
     this.eliminatedInRound = this.eliminatedInRound.filter(uid => uid !== userId);
     delete this.votes[userId];
-    // NO eliminar playerScores - mantener puntos aunque el jugador abandone
+    // playerScores preserved
 
-    // Actualizar orden base cuando un jugador se va
+    // Update player order
     this.updatePlayerOrder();
 
-    // Transferir host si el que se fue era el host
+    // Transfer host if needed
     let newHostInfo = null;
-    if (wasHost && this.players.length > 0) {
-      // Usar playerOrder para determinar el siguiente host (por orden de llegada)
-      const nextHostId = this.playerOrder.find(uid => this.players.some(p => p.uid === uid));
+    const activePlayerCount = this.getActivePlayerCount();
+    if (wasHost && activePlayerCount > 0) {
+      const nextHostId = this.playerOrder.find(uid => this.isPlayerActive(uid));
       if (nextHostId) {
         this.hostId = nextHostId;
-        const newHost = this.players.find(p => p.uid === nextHostId);
+        if (this.players[nextHostId]) {
+          this.players[nextHostId].isHost = true;
+        }
+        const newHost = this.getPlayer(nextHostId);
         newHostInfo = {
           uid: nextHostId,
           name: newHost ? newHost.name : 'Jugador'
@@ -282,35 +446,48 @@ class Game {
       }
     }
 
-    // If the impostor leaves during the game, end the round
+    // Handle game phase impact
     if (this.phase === 'playing' && playerIsImpostor) {
       this.phase = 'round_result';
     } else if (this.phase === 'playing') {
-      // If a regular player leaves, check if we can proceed with voting
       this.checkIfAllVoted();
     }
-    this.persist();
 
-    // Retornar info del nuevo host si hubo cambio
+    this.persist();
+    console.log(`[Game ${this.gameId}] Player ${player.name} left game`);
+
     return newHostInfo;
+  }
+
+  // Legacy alias for backward compatibility
+  removePlayer(userId) {
+    return this.leaveGame(userId);
   }
 
   startGame(userId) {
     if (userId !== this.hostId) throw new Error('Solo el host puede iniciar la partida.');
-    if (this.players.length < 2) throw new Error('Se necesitan al menos 2 jugadores para empezar.');
+    const activeCount = this.getActivePlayerCount();
+    if (activeCount < 2) throw new Error('Se necesitan al menos 2 jugadores para empezar.');
 
     // Establecer máximo de rondas en el primer inicio
     if (this.initialPlayerCount === 0) {
-      this.initialPlayerCount = this.players.length;
-      this.maxRounds = 3; // Máximo 3 partidas por juego
+      this.initialPlayerCount = activeCount;
+      this.maxRounds = 3;
     }
+
+    // Activate any waiting_rejoin players
+    Object.entries(this.players).forEach(([uid, p]) => {
+      if (p.status === PLAYER_STATUS.WAITING_REJOIN) {
+        this.setPlayerStatus(uid, PLAYER_STATUS.ACTIVE);
+      }
+    });
 
     this.startNewRound();
   }
 
   startNewRound() {
-    // Reiniciar estado de ronda - todos vuelven a jugar
-    this.roundPlayers = this.players.map(p => p.uid);
+    // Active players participate in round
+    this.roundPlayers = this.getActivePlayerUids();
     this.currentTurn = 1;
     this.eliminatedInRound = [];
     this.lastEliminatedInTurn = null;
@@ -337,9 +514,10 @@ class Game {
     this.secretWord = word;
     this.secretCategory = category;
 
-    const impostorName = this.players.find(p => p.uid === this.impostorId)?.name || 'desconocido';
+    const impostorPlayer = this.getPlayer(this.impostorId);
+    const impostorName = impostorPlayer?.name || 'desconocido';
     console.log(`[Game ${this.gameId}] Ronda ${this.roundCount}: palabra='${this.secretWord}', categoría='${this.secretCategory}', impostor='${impostorName}' (${this.impostorId})`);
-    console.log(`[Game ${this.gameId}] Historial de impostores:`, this.impostorHistory.slice(0, 3).map(uid => this.players.find(p => p.uid === uid)?.name || uid));
+    console.log(`[Game ${this.gameId}] Historial de impostores:`, this.impostorHistory.slice(0, 3).map(uid => this.getPlayer(uid)?.name || uid));
 
     this.phase = 'playing';
     this.persist();
@@ -360,13 +538,14 @@ class Game {
     if (this.phase === 'game_over') {
       // Resetear todos los puntos y contadores
       this.playerScores = {};
-      this.players.forEach(p => {
-        this.playerScores[p.uid] = 0;
+      const activeUids = this.getActivePlayerUids();
+      activeUids.forEach(uid => {
+        this.playerScores[uid] = 0;
       });
       this.roundCount = 0;
-      this.initialPlayerCount = this.players.length;
-      this.maxRounds = 3; // Máximo 3 partidas por juego
-      this.phase = 'lobby'; // Cambiar fase para evitar checks de game_over
+      this.initialPlayerCount = activeUids.length;
+      this.maxRounds = 3;
+      this.phase = 'lobby';
       console.log(`[Game ${this.gameId}] ✅ Nueva partida iniciada desde game_over. Jugadores: ${this.initialPlayerCount}, Max rondas: ${this.maxRounds}`);
     } else {
       console.log(`[Game ${this.gameId}] Continuando con siguiente ronda. Ronda actual: ${this.roundCount}`);
@@ -644,13 +823,18 @@ class Game {
   }
 
   getStateFor(userId) {
-    const player = this.players.find(p => p.uid === userId);
+    const player = this.getPlayer(userId);
+    // Allow users with any status to view state (for spectating / history)
+    // But only active players can participate
     if (!player) return null;
+
+    // For client compatibility, convert players object to array format
+    const playersArray = this.getPlayersAsArray();
 
     const baseState = {
       gameId: this.gameId,
       hostId: this.hostId,
-      players: this.players,
+      players: playersArray,  // Array format for client
       phase: this.phase,
       playerScores: this.playerScores,
       roundCount: this.roundCount,
@@ -658,6 +842,7 @@ class Game {
       targetScore: this.targetScore,
       playerOrder: this.playerOrder,
       startingPlayerId: this.startingPlayerId,
+      myStatus: player.status,  // Tell client their status
     };
 
     if (this.phase === 'playing') {
@@ -676,27 +861,26 @@ class Game {
         baseState.currentTurn = this.currentTurn;
         baseState.maxTurns = this.maxTurns;
         baseState.eliminatedInRound = this.eliminatedInRound;
-        baseState.eliminatedInRound = this.eliminatedInRound;
         baseState.lastEliminatedInTurn = this.lastEliminatedInTurn;
         baseState.hasVoted = this.hasVoted(userId);
         baseState.votedPlayers = Object.keys(this.votes);
-        baseState.myVote = this.votes[userId] || null; // A quién votó este usuario
+        baseState.myVote = this.votes[userId] || null;
         baseState.activePlayers = this.getActivePlayers();
         baseState.canVote = !this.eliminatedInRound.includes(userId);
       }
     } else if (this.phase === 'round_result' || this.phase === 'game_over') {
-      const impostor = this.players.find(p => p.uid === this.impostorId);
+      const impostor = this.getPlayer(this.impostorId);
       const formerImpostor = this.formerPlayers[this.impostorId];
       baseState.impostorName = impostor ? impostor.name : (formerImpostor ? formerImpostor.name : 'Jugador desconectado');
       baseState.impostorId = this.impostorId;
       baseState.secretWord = this.secretWord;
       baseState.lastRoundScores = this.lastRoundScores;
       baseState.eliminatedInRound = this.eliminatedInRound;
-      baseState.formerPlayers = this.formerPlayers; // Send to client for UI
+      baseState.formerPlayers = this.formerPlayers;
 
       if (this.phase === 'game_over') {
         const winnerId = this.checkGameOver();
-        const winner = this.players.find(p => p.uid === winnerId);
+        const winner = this.getPlayer(winnerId);
         const formerWinner = this.formerPlayers[winnerId];
         baseState.winner = winner ? winner.name : (formerWinner ? formerWinner.name : 'Empate');
         baseState.winnerId = winnerId;

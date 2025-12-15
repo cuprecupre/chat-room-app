@@ -208,16 +208,8 @@ export function useSocket(user) {
           }
         });
 
-        socket.on('reconnect', () => {
-          console.log('Socket reconnected, attempting to resume...');
-          const urlParams = new URLSearchParams(window.location.search);
-          const gameIdFromUrl = urlParams.get('gameId');
-          // Only attempt rejoin if gameId is still in URL (meaning user didn't leave)
-          if (gameIdFromUrl && !attemptedResumeRef.current) {
-            attemptedResumeRef.current = true;
-            socket.emit('join-game', gameIdFromUrl);
-          }
-        });
+        // socket.on('reconnect') removed to prevent race conditions. 
+        // Server handles resumption on connection handshake automatically.
 
         socket.on('error-message', (message) => {
           console.error('Server error:', message);
@@ -290,5 +282,12 @@ export function useSocket(user) {
     socketRef.current?.emit(event, payload, callback);
   }, []);
 
-  return { connected, gameState, emit, joinError, clearJoinError: () => setJoinError(null) };
+  return {
+    connected,
+    gameState,
+    emit,
+    joinError,
+    clearJoinError: () => setJoinError(null),
+    resetGameState: () => setGameState(null)
+  };
 }

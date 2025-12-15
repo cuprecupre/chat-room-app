@@ -4,6 +4,8 @@ console.log('🔧 [DEBUG] Variables cargadas:', {
   GOOG_SECRET_EXISTS: !!process.env.GOOGLE_CLIENT_SECRET,
   CWD: process.cwd()
 });
+console.log('--- SERVER RESTART: FIX APPLIED ---');
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -403,18 +405,16 @@ app.get('/auth/google/callback', async (req, res) => {
     }
 
     // Redirect al cliente con el token
-    let redirectUrl = `/?authToken=${encodeURIComponent(customToken)}&name=${encodeURIComponent(userInfo.name || '')}&photo=${encodeURIComponent(userInfo.picture || '')}`;
+    // New URL structure: /app for dashboard, /join/:gameId for invitations
+    let redirectPath = gameId ? `/join/${gameId}` : '/app';
+    let redirectUrl = `${redirectPath}?authToken=${encodeURIComponent(customToken)}&name=${encodeURIComponent(userInfo.name || '')}&photo=${encodeURIComponent(userInfo.picture || '')}`;
 
-    // Append gameId if preserved
-    if (gameId) {
-      redirectUrl += `&gameId=${encodeURIComponent(gameId)}`;
-    }
-
+    console.log('🔄 [OAuth] Redirecting to:', redirectPath);
     res.redirect(redirectUrl);
 
   } catch (error) {
     console.error('❌ [OAuth] Error en callback:', error);
-    res.redirect('/?error=auth_callback_failed');
+    res.redirect('/login?error=auth_callback_failed');
   }
 });
 
@@ -450,9 +450,9 @@ app.get('/api/game/:gameId', async (req, res) => {
 
   if (game) {
     // 1. Memory Hit
-    const host = game.players.find(p => p.uid === game.hostId);
+    const host = game.getPlayer(game.hostId);
     hostName = host ? host.name : 'Anfitrión desconocido';
-    playerCount = game.players.length;
+    playerCount = game.getActivePlayerCount();
     status = game.phase;
     found = true;
   } else {
@@ -461,9 +461,21 @@ app.get('/api/game/:gameId', async (req, res) => {
       const state = await dbService.getGameState(safeGameId);
       if (state) {
         // DB Hit
-        const host = state.players ? state.players.find(p => p.uid === state.hostId) : null;
+        let host = null;
+        let pCount = 0;
+
+        // Handle both old array format and new object format from DB
+        if (Array.isArray(state.players)) {
+          host = state.players.find(p => p.uid === state.hostId);
+          pCount = state.players.length;
+        } else if (state.players) {
+          host = state.players[state.hostId];
+          // count active players
+          pCount = Object.values(state.players).filter(p => !p.status || p.status === 'active').length;
+        }
+
         hostName = host ? host.name : 'Partida recuperada';
-        playerCount = state.players ? state.players.length : 0;
+        playerCount = pCount;
         status = state.phase;
         found = true;
       }
@@ -482,6 +494,17 @@ app.get('/api/game/:gameId', async (req, res) => {
     playerCount: playerCount,
     status: status
   });
+});
+
+// Legacy redirect: /?gameId=XYZ → /join/XYZ
+// This ensures old invitation links continue to work
+app.get('/', (req, res, next) => {
+  const gameId = req.query.gameId;
+  if (gameId) {
+    console.log(`🔄 [Legacy] Redirecting /?gameId=${gameId} to /join/${gameId}`);
+    return res.redirect(301, `/join/${gameId}`);
+  }
+  next();
 });
 
 // SPA fallback con inyección de OG absoluta
@@ -537,7 +560,20 @@ const userHeartbeats = {};
 const explicitlyLeftUsers = {};
 
 // Helper to find which game a user belongs to (global scope)
-const findUserGame = (userId) => Object.values(games).find(g => g.players.some(p => p.uid === userId));
+// Helper to find which game a user belongs to (global scope) - IGNORES 'left' players
+const findUserGame = (userId, debugCtx = '') => {
+  const game = Object.values(games).find(g => {
+    const p = g.getPlayer(userId);
+    // Explicitly log candidacy
+    if (p) {
+      console.log(`[DEBUG_FIND:${debugCtx}] User ${userId} found in game ${g.gameId} with status '${p.status}'`);
+    }
+    return p && p.status !== 'left';
+  });
+  if (game) console.log(`[DEBUG_FIND:${debugCtx}] MATCH found: game ${game.gameId}`);
+  else console.log(`[DEBUG_FIND:${debugCtx}] No active game found for user ${userId}`);
+  return game;
+};
 
 // --- Socket.IO Middleware ---
 io.use(async (socket, next) => {
@@ -618,20 +654,24 @@ io.on('connection', (socket) => {
     timeout: null
   };
 
-  // Check if user explicitly left a game - don't auto-rejoin them
-  if (explicitlyLeftUsers[user.uid]) {
-    console.log(`User ${user.name} recently left explicitly - NOT auto-rejoining, sending null state`);
-    delete explicitlyLeftUsers[user.uid]; // Clear the flag, user is clean now
-    socket.emit('game-state', null);
-    // Clear any pending disconnect as well
-    if (pendingDisconnects[user.uid]) {
-      clearTimeout(pendingDisconnects[user.uid].timeout);
-      delete pendingDisconnects[user.uid];
-    }
-  } else {
-    // Reconnection logic: if user is already in a game, join room and send state
-    const existingGame = findUserGame(user.uid);
-    if (existingGame) {
+  // Check for existing game - now respects player status
+  console.log(`[DEBUG_CONN] Checking existing game for ${user.name} (${user.uid})...`);
+  const existingGame = findUserGame(user.uid, 'CONNECTION');
+
+  if (existingGame) {
+    // Check if player's status is 'left' - they explicitly left and shouldn't auto-rejoin
+    const playerData = existingGame.getPlayer(user.uid);
+
+    if (playerData && playerData.status === 'left') {
+      console.log(`User ${user.name} found in game ${existingGame.gameId} but status is 'left' - NOT auto-rejoining`);
+      socket.emit('game-state', null);
+      // Clear any pending disconnect
+      if (pendingDisconnects[user.uid]) {
+        clearTimeout(pendingDisconnects[user.uid].timeout);
+        delete pendingDisconnects[user.uid];
+      }
+    } else if (playerData && playerData.status === 'active') {
+      // Active player - reconnect normally
       socket.join(existingGame.gameId);
       console.log(`User ${user.name} reconnected to game ${existingGame.gameId}`);
       // Cancel any pending removal timer
@@ -641,31 +681,44 @@ io.on('connection', (socket) => {
       }
       // Send the specific state to the reconnected user only
       socket.emit('game-state', existingGame.getStateFor(user.uid));
+    } else if (playerData && playerData.status === 'waiting_rejoin') {
+      // Waiting to rejoin - just send current state without full participation
+      socket.join(existingGame.gameId);
+      console.log(`User ${user.name} connected as waiting_rejoin to game ${existingGame.gameId}`);
+      socket.emit('game-state', existingGame.getStateFor(user.uid));
     } else {
-      // User not in any game, check if they have a pending disconnect
-      if (pendingDisconnects[user.uid]) {
-        const pendingGame = games[pendingDisconnects[user.uid].gameId];
-        // Only rejoin if the user is still in the player list (they might have been removed)
-        if (pendingGame && pendingGame.players.some(p => p.uid === user.uid)) {
-          socket.join(pendingGame.gameId);
-          console.log(`User ${user.name} reconnected to pending game ${pendingGame.gameId}`);
-          clearTimeout(pendingDisconnects[user.uid].timeout);
-          delete pendingDisconnects[user.uid];
-          socket.emit('game-state', pendingGame.getStateFor(user.uid));
-        } else {
-          // Pending game doesn't exist or user not in player list anymore
-          console.log(`User ${user.name} had pending disconnect but game/player no longer valid`);
-          clearTimeout(pendingDisconnects[user.uid].timeout);
-          delete pendingDisconnects[user.uid];
-          socket.emit('game-state', null); // Send null to ensure client is in clean state
-        }
+      // No player data found - shouldn't happen, but handle gracefully
+      console.log(`User ${user.name} has no player data in game ${existingGame.gameId}`);
+      socket.emit('game-state', null);
+    }
+  } else {
+    // User not in any game
+    if (pendingDisconnects[user.uid]) {
+      const pendingGame = games[pendingDisconnects[user.uid].gameId];
+      // Only rejoin if the user is still active in the player list
+      if (pendingGame && pendingGame.isPlayerActive(user.uid)) {
+        socket.join(pendingGame.gameId);
+        console.log(`User ${user.name} reconnected to pending game ${pendingGame.gameId}`);
+        clearTimeout(pendingDisconnects[user.uid].timeout);
+        delete pendingDisconnects[user.uid];
+        socket.emit('game-state', pendingGame.getStateFor(user.uid));
+      } else {
+        // User was removed or left, clear pending
+        clearTimeout(pendingDisconnects[user.uid].timeout);
+        delete pendingDisconnects[user.uid];
+        socket.emit('game-state', null);
       }
+    } else {
+      // No game, no pending - clean state
+      socket.emit('game-state', null);
     }
   }
 
   // Helper to broadcast the state to all players in a game
   const emitGameState = (game) => {
-    game.players.forEach(p => {
+    // Use getActivePlayersArray() for object-based players
+    const activePlayers = game.getActivePlayersArray();
+    activePlayers.forEach(p => {
       const playerSocketId = userSockets[p.uid];
       if (playerSocketId) {
         // Send each player their specific version of the state
@@ -692,17 +745,18 @@ io.on('connection', (socket) => {
   });
 
   socket.on('join-game', (gameId) => {
+    console.log(`[DEBUG_EVENT] join-game received from ${user.name} for ${gameId}`);
     const gameToJoin = games[gameId];
     if (!gameToJoin) return socket.emit('error-message', 'La partida no existe.');
 
     // No permitir unirse si la partida ya empezó (salvo que ya seas parte del juego)
-    const isAlreadyInGame = gameToJoin.players.some(p => p.uid === user.uid);
+    const isAlreadyInGame = !!gameToJoin.getPlayer(user.uid);
     if (gameToJoin.phase === 'playing' && !isAlreadyInGame) {
       return socket.emit('error-message', 'No puedes unirte a una partida en curso.');
     }
 
     // Allow switching games - leave current game first if in one
-    const userGame = findUserGame(user.uid);
+    const userGame = findUserGame(user.uid, 'JOIN_SWITCH_CHECK');
     if (userGame && userGame.gameId !== gameId) {
       console.log(`User ${user.name} switching from game ${userGame.gameId} to ${gameId}`);
       // Remove from current game
@@ -721,9 +775,9 @@ io.on('connection', (socket) => {
   const handleGameAction = (gameId, action) => {
     const game = games[gameId];
     if (!game) return socket.emit('error-message', 'La partida no existe.');
-    // Ensure the player is in the game before allowing actions
-    if (!game.players.some(p => p.uid === user.uid)) {
-      return socket.emit('error-message', 'No perteneces a esta partida.');
+    // Ensure the player is in the game (and active) before allowing actions
+    if (!game.isPlayerActive(user.uid)) {
+      return socket.emit('error-message', 'No perteneces a esta partida o no estás activo.');
     }
     try {
       action(game);
@@ -742,8 +796,8 @@ io.on('connection', (socket) => {
   socket.on('cast-vote', ({ gameId, targetId }) => {
     const game = games[gameId];
     if (!game) return socket.emit('error-message', 'La partida no existe.');
-    if (!game.players.some(p => p.uid === user.uid)) {
-      return socket.emit('error-message', 'No perteneces a esta partida.');
+    if (!game.isPlayerActive(user.uid)) {
+      return socket.emit('error-message', 'No perteneces a esta partida o no estás activo.');
     }
     try {
       game.castVote(user.uid, targetId);
@@ -756,13 +810,14 @@ io.on('connection', (socket) => {
   });
 
   socket.on('leave-game', (gameId, callback) => {
+    console.log(`[DEBUG_EVENT] leave-game received from ${user.name} for ${gameId}`);
     const game = games[gameId];
     // Helper to safely call callback
     const safeCallback = () => {
       if (typeof callback === 'function') callback();
     };
 
-    if (!game || !game.players.some(p => p.uid === user.uid)) {
+    if (!game || !game.getPlayer(user.uid)) {
       // Game doesn't exist or user is not in it.
       socket.emit('game-state', null);
       safeCallback();
@@ -771,31 +826,19 @@ io.on('connection', (socket) => {
 
     console.log(`User ${user.name} is EXPLICITLY leaving game ${gameId}`);
 
-    // Mark user as explicitly left - prevents auto-rejoin on reconnect
-    explicitlyLeftUsers[user.uid] = true;
-    // Clear the flag after 10 seconds (enough time for client to get to clean state)
-    setTimeout(() => {
-      delete explicitlyLeftUsers[user.uid];
-    }, 10000);
-
     // Clear pending disconnect timer
     if (pendingDisconnects[user.uid]) {
       clearTimeout(pendingDisconnects[user.uid].timeout);
       delete pendingDisconnects[user.uid];
     }
 
-    // Remove player from game - capturar si hubo cambio de host
-    const newHostInfo = game.removePlayer(user.uid);
+    // Use the new leaveGame method which sets status to 'left'
+    const newHostInfo = game.leaveGame(user.uid);
 
     // 1. Reset leaving player state - send null BEFORE leaving room
     socket.emit('game-state', null);
 
-    // Explicitly clear any retained session data for this socket
-    if (userSockets[user.uid] === socket.id) {
-      // Don't delete userSockets[user.uid] as they might be reconnecting, but 
-      // explicitlyLeftUsers flag handles the state protection
-      console.log(`[Leave] User ${user.name} marked as explicitly left.`);
-    }
+    console.log(`[Leave] User ${user.name} marked as left in game data.`);
 
     socket.leave(gameId);
 
@@ -803,7 +846,8 @@ io.on('connection', (socket) => {
     emitGameState(game);
 
     // 3. Enviar toast sobre el abandono (combinado si hubo cambio de host)
-    if (game.players.length > 0) {
+    const activePlayerCount = game.getActivePlayerCount();
+    if (activePlayerCount > 0) {
       if (newHostInfo) {
         // El host abandonó - mensaje combinado
         io.to(gameId).emit('toast', `${user.name} ha abandonado. Ahora el anfitrión es ${newHostInfo.name}`);
