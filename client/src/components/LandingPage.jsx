@@ -12,8 +12,9 @@ import avatarSofia from '../assets/avatar-sofia.jpg';
 import avatarJavi from '../assets/avatar-javi.jpg';
 import avatarLucia from '../assets/avatar-lucia.jpg';
 import avatarMarco from '../assets/avatar-marco.jpg';
+import bellImg from '../assets/bell.png';
 
-export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstructions, onOpenFeedback }) {
+export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstructions, onOpenFeedback, invitedGameId, hostName }) {
     const featuresRef = useRef(null);
     const [currentReview, setCurrentReview] = useState(0);
     const [openFaq, setOpenFaq] = useState(null);
@@ -121,61 +122,51 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                     <button onClick={() => window.location.href = '/reglas'} className="text-sm font-medium text-neutral-400 hover:text-white transition-colors">Reglas</button>
                 </div>
                 <div>
-                    <Button
-                        onClick={onLogin}
-                        variant="primary"
-                        size="sm"
-                        className="w-auto !px-6 !py-1 !h-9 text-sm disabled:opacity-50 disabled:cursor-not-allowed rounded-full flex items-center gap-2"
-                        disabled={isLoading}
-                    >
-                        <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
-                            <title>Google</title>
-                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#FFFFFF" />
-                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#FFFFFF" />
-                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.26.81-.58z" fill="#FFFFFF" />
-                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#FFFFFF" />
-                        </svg>
-                        Jugar Ahora
-                    </Button>
+                    {!invitedGameId && (
+                        <Button
+                            onClick={onLogin}
+                            variant="primary"
+                            size="sm"
+                            className="w-auto !px-6 !py-1 !h-9 text-sm disabled:opacity-50 disabled:cursor-not-allowed rounded-full flex items-center gap-2"
+                            disabled={isLoading}
+                        >
+                            <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
+                                <title>Google</title>
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#FFFFFF" />
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#FFFFFF" />
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.26.81-.58z" fill="#FFFFFF" />
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#FFFFFF" />
+                            </svg>
+                            Jugar Ahora
+                        </Button>
+                    )}
                 </div>
             </nav>
 
-            {/* Hero Section */}
-            <header className="relative pt-32 pb-20 px-6 md:pt-48 md:pb-32 overflow-hidden flex flex-col items-center text-center">
-                {/* Dynamic Background Elements */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
-                    <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-amber-600/[0.08] md:bg-amber-600/15 rounded-full blur-[80px] md:blur-[100px]" />
-                    <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] md:w-[600px] md:h-[600px] bg-orange-600/[0.08] md:bg-orange-600/15 rounded-full blur-[90px] md:blur-[120px]" />
-                </div>
-
-                <div className="relative z-10 max-w-4xl mx-auto space-y-8">
-                    <div className="animate-scaleIn animate-delay-200 inline-block">
-                        <div className="relative">
-                            <img
-                                src={heroImg}
-                                alt="Icono del juego El Impostor"
-                                className="relative w-36 h-36 md:w-44 md:h-44 rounded-full object-cover animate-tilt-oscillate shadow-2xl ring-1 ring-white/10"
-                            />
+            {/* Invitation Card (Modal Style) */}
+            {invitedGameId ? (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950 text-white animate-fadeIn">
+                    <div className="w-full max-w-sm mx-auto text-center space-y-6 px-6">
+                        <div className="flex justify-center">
+                            <div className="relative">
+                                <img
+                                    src={bellImg}
+                                    alt="Invitación"
+                                    className="w-24 h-24 rounded-full object-cover ring-4 ring-orange-500/30 shadow-2xl animate-pulse-slow"
+                                />
+                            </div>
                         </div>
-                    </div>
 
-                    <h2 className="flex flex-col items-center gap-3 md:gap-4 animate-fadeIn animate-delay-400 drop-shadow-2xl">
-                        <span className="text-4xl md:text-6xl/tight lg:text-7xl/tight font-serif font-normal text-white">
-                            El Impostor está entre nosotros.
-                        </span>
-                        <span className="text-3xl md:text-5xl font-serif font-normal tracking-tight mt-1 bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600">
-                            ¿Podrás descubrirlo?
-                        </span>
-                    </h2>
+                        <div>
+                            <h2 className="text-3xl font-serif text-neutral-50 mb-4">¡Te han invitado!</h2>
+                            <p className="text-neutral-300 text-lg leading-relaxed">
+                                Has recibido un enlace para unirte a la partida de <span className="font-mono font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded">{hostName || invitedGameId}</span>.
+                                <br /><span className="text-sm text-neutral-500 mt-2 block">¿Quieres entrar ahora?</span>
+                            </p>
+                        </div>
 
-                    <div className="space-y-2 mt-2">
-                        <p className="text-base md:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed animate-fadeIn animate-delay-500 font-light">
-                            Inicia una partida, invita a tus amigos y sumérgete en el mejor juego de deducción&nbsp;social.
-                        </p>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10 animate-fadeIn animate-delay-600 w-full max-w-md mx-auto sm:max-w-none">
-                        <div className="w-full sm:w-auto min-w-[240px]">
+                        <div className="space-y-3 pt-4">
+                            {/* Google Button */}
                             <Button
                                 onClick={onLogin}
                                 disabled={isLoading}
@@ -188,14 +179,14 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                                         <Spinner size="sm" />
                                     ) : (
                                         <svg width="20" height="20" viewBox="0 0 16 16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-                                            <g clipPath="url(#clip0_643_9687)">
+                                            <g clipPath="url(#clip0_buttons_invited)">
                                                 <path d="M8.00018 3.16667C9.18018 3.16667 10.2368 3.57333 11.0702 4.36667L13.3535 2.08333C11.9668 0.793333 10.1568 0 8.00018 0C4.87352 0 2.17018 1.79333 0.853516 4.40667L3.51352 6.47C4.14352 4.57333 5.91352 3.16667 8.00018 3.16667Z" fill="#EA4335" />
                                                 <path d="M15.66 8.18335C15.66 7.66002 15.61 7.15335 15.5333 6.66669H8V9.67335H12.3133C12.12 10.66 11.56 11.5 10.72 12.0667L13.2967 14.0667C14.8 12.6734 15.66 10.6134 15.66 8.18335Z" fill="#4285F4" />
                                                 <path d="M3.51 9.53001C3.35 9.04668 3.25667 8.53334 3.25667 8.00001C3.25667 7.46668 3.34667 6.95334 3.51 6.47001L0.85 4.40668C0.306667 5.48668 0 6.70668 0 8.00001C0 9.29334 0.306667 10.5133 0.853333 11.5933L3.51 9.53001Z" fill="#FBBC05" />
                                                 <path d="M8.0001 16C10.1601 16 11.9768 15.29 13.2968 14.0633L10.7201 12.0633C10.0034 12.5467 9.0801 12.83 8.0001 12.83C5.91343 12.83 4.14343 11.4233 3.5101 9.52667L0.850098 11.59C2.1701 14.2067 4.87343 16 8.0001 16Z" fill="#34A853" />
                                             </g>
                                             <defs>
-                                                <clipPath id="clip0_643_9687">
+                                                <clipPath id="clip0_buttons_invited">
                                                     <rect width="16" height="16" fill="white" />
                                                 </clipPath>
                                             </defs>
@@ -204,8 +195,8 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                                 </span>
                                 <span className="align-middle font-semibold">Continuar con Google</span>
                             </Button>
-                        </div>
-                        <div className="w-full sm:w-auto min-w-[240px]">
+
+                            {/* Email Button */}
                             <Button
                                 onClick={onGoToEmailAuth}
                                 disabled={isLoading}
@@ -220,25 +211,124 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                                 </span>
                                 <span className="align-middle font-semibold">Continuar con Email</span>
                             </Button>
+
+                            <div className="pt-2">
+                                <button
+                                    onClick={() => {
+                                        const url = new URL(window.location);
+                                        url.searchParams.delete('gameId');
+                                        window.history.replaceState({}, '', url.toString());
+                                        window.location.reload();
+                                    }}
+                                    className="text-sm text-neutral-500 hover:text-orange-400 transition-colors"
+                                >
+                                    Volver al inicio
+                                </button>
+                            </div>
                         </div>
                     </div>
-
-                    <div className="pt-8 flex justify-center gap-8 text-sm text-neutral-500 animate-fadeIn animate-delay-800">
-                        <span className="flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                            Gratis
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                            Sin instalación
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                            Multijugador
-                        </span>
-                    </div>
                 </div>
-            </header>
+            ) : (
+                /* Hero Section (Standard) */
+                <header className="relative pt-32 pb-20 px-6 md:pt-48 md:pb-32 overflow-hidden flex flex-col items-center text-center">
+                    {/* Dynamic Background Elements */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
+                        <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-amber-600/[0.08] md:bg-amber-600/15 rounded-full blur-[80px] md:blur-[100px]" />
+                        <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] md:w-[600px] md:h-[600px] bg-orange-600/[0.08] md:bg-orange-600/15 rounded-full blur-[90px] md:blur-[120px]" />
+                    </div>
+
+                    <div className="relative z-10 max-w-4xl mx-auto space-y-8">
+                        <div className="animate-scaleIn animate-delay-200 inline-block">
+                            <div className="relative">
+                                <img
+                                    src={heroImg}
+                                    alt="Icono del juego El Impostor"
+                                    className="relative w-36 h-36 md:w-44 md:h-44 rounded-full object-cover animate-tilt-oscillate shadow-2xl ring-1 ring-white/10"
+                                />
+                            </div>
+                        </div>
+
+                        <h2 className="flex flex-col items-center gap-3 md:gap-4 animate-fadeIn animate-delay-400 drop-shadow-2xl">
+                            <span className="text-4xl md:text-6xl/tight lg:text-7xl/tight font-serif font-normal text-white">
+                                El Impostor está entre nosotros.
+                            </span>
+                            <span className="text-3xl md:text-5xl font-serif font-normal tracking-tight mt-1 bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600">
+                                ¿Podrás descubrirlo?
+                            </span>
+                        </h2>
+
+                        <div className="space-y-2 mt-2">
+                            <p className="text-base md:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed animate-fadeIn animate-delay-500 font-light">
+                                Inicia una partida, invita a tus amigos y sumérgete en el mejor juego de deducción&nbsp;social.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10 animate-fadeIn animate-delay-600 w-full max-w-md mx-auto sm:max-w-none">
+                            <div className="w-full sm:w-auto min-w-[240px]">
+                                <Button
+                                    onClick={onLogin}
+                                    disabled={isLoading}
+                                    variant="outline"
+                                    size="lg"
+                                    className="bg-white/5 border-white/10 text-white hover:bg-white/10 shadow-none px-8 w-full h-14 text-base backdrop-blur-sm rounded-full"
+                                >
+                                    <span className="mr-3 inline-flex items-center justify-center align-middle">
+                                        {isLoading ? (
+                                            <Spinner size="sm" />
+                                        ) : (
+                                            <svg width="20" height="20" viewBox="0 0 16 16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                                                <g clipPath="url(#clip0_643_9687)">
+                                                    <path d="M8.00018 3.16667C9.18018 3.16667 10.2368 3.57333 11.0702 4.36667L13.3535 2.08333C11.9668 0.793333 10.1568 0 8.00018 0C4.87352 0 2.17018 1.79333 0.853516 4.40667L3.51352 6.47C4.14352 4.57333 5.91352 3.16667 8.00018 3.16667Z" fill="#EA4335" />
+                                                    <path d="M15.66 8.18335C15.66 7.66002 15.61 7.15335 15.5333 6.66669H8V9.67335H12.3133C12.12 10.66 11.56 11.5 10.72 12.0667L13.2967 14.0667C14.8 12.6734 15.66 10.6134 15.66 8.18335Z" fill="#4285F4" />
+                                                    <path d="M3.51 9.53001C3.35 9.04668 3.25667 8.53334 3.25667 8.00001C3.25667 7.46668 3.34667 6.95334 3.51 6.47001L0.85 4.40668C0.306667 5.48668 0 6.70668 0 8.00001C0 9.29334 0.306667 10.5133 0.853333 11.5933L3.51 9.53001Z" fill="#FBBC05" />
+                                                    <path d="M8.0001 16C10.1601 16 11.9768 15.29 13.2968 14.0633L10.7201 12.0633C10.0034 12.5467 9.0801 12.83 8.0001 12.83C5.91343 12.83 4.14343 11.4233 3.5101 9.52667L0.850098 11.59C2.1701 14.2067 4.87343 16 8.0001 16Z" fill="#34A853" />
+                                                </g>
+                                                <defs>
+                                                    <clipPath id="clip0_643_9687">
+                                                        <rect width="16" height="16" fill="white" />
+                                                    </clipPath>
+                                                </defs>
+                                            </svg>
+                                        )}
+                                    </span>
+                                    <span className="align-middle font-semibold">Continuar con Google</span>
+                                </Button>
+                            </div>
+                            <div className="w-full sm:w-auto min-w-[240px]">
+                                <Button
+                                    onClick={onGoToEmailAuth}
+                                    disabled={isLoading}
+                                    variant="outline"
+                                    size="lg"
+                                    className="bg-white/5 border-white/10 text-white hover:bg-white/10 shadow-none px-8 w-full h-14 text-base backdrop-blur-sm rounded-full"
+                                >
+                                    <span className="mr-3 inline-flex items-center justify-center align-middle">
+                                        <svg className="w-5 h-5 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                    </span>
+                                    <span className="align-middle font-semibold">Continuar con Email</span>
+                                </Button>
+                            </div>
+                        </div>
+
+                        <div className="pt-8 flex justify-center gap-8 text-sm text-neutral-500 animate-fadeIn animate-delay-800">
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                Gratis
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                Sin instalación
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                                Multijugador
+                            </span>
+                        </div>
+                    </div>
+                </header>
+            )}
 
             {/* Feature / Dynamics Section */}
             <section ref={featuresRef} className="py-32 px-6 relative bg-neutral-900/50 overflow-hidden">

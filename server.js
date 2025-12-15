@@ -387,8 +387,30 @@ app.get('/auth/google/callback', async (req, res) => {
 
     console.log('✅ [OAuth] Custom token de Firebase creado para UID:', uid);
 
+    // Verify and parse state parameter if present
+    let gameId = null;
+    const { state } = req.query;
+    if (state) {
+      try {
+        const parsedState = JSON.parse(state);
+        if (parsedState.gameId) {
+          gameId = parsedState.gameId;
+          console.log('🎮 [OAuth] GameId preservado del state:', gameId);
+        }
+      } catch (e) {
+        console.warn('⚠️ [OAuth] Could not parse state:', e.message);
+      }
+    }
+
     // Redirect al cliente con el token
-    res.redirect(`/?authToken=${encodeURIComponent(customToken)}&name=${encodeURIComponent(userInfo.name || '')}&photo=${encodeURIComponent(userInfo.picture || '')}`);
+    let redirectUrl = `/?authToken=${encodeURIComponent(customToken)}&name=${encodeURIComponent(userInfo.name || '')}&photo=${encodeURIComponent(userInfo.picture || '')}`;
+
+    // Append gameId if preserved
+    if (gameId) {
+      redirectUrl += `&gameId=${encodeURIComponent(gameId)}`;
+    }
+
+    res.redirect(redirectUrl);
 
   } catch (error) {
     console.error('❌ [OAuth] Error en callback:', error);

@@ -164,6 +164,8 @@ export default function App() {
     }
   }, [gameState?.gameId]);
 
+
+
   const isHost = useMemo(() => gameState && user && gameState.hostId === user.uid, [gameState, user]);
 
   const createGame = useCallback((options) => emit('create-game', options), [emit]);
@@ -363,6 +365,16 @@ export default function App() {
     }
   }, [emit, gameState]);
 
+  // Auto-join effect for Case 2 (URL has gameId but session is not attached)
+  // MOVED HERE: After joinGame definition to avoid ReferenceError
+  const urlGameId = getUrlGameId();
+  useEffect(() => {
+    if (urlGameId && !gameState?.gameId && !joinError && !isStuck && connected && user) {
+      console.log('🔄 Auto-joining invited game (Top Level Effect):', urlGameId);
+      joinGame(urlGameId);
+    }
+  }, [urlGameId, gameState?.gameId, joinError, isStuck, connected, joinGame, user]);
+
   // Cerrar dropdown al hacer click fuera o al presionar Escape
   useEffect(() => {
     if (!menuOpen) return;
@@ -547,14 +559,30 @@ export default function App() {
         console.log('❌ App - Error de autenticación:', error);
         hasLoggedNoUser.current = true;
       }
-      return <LandingPage onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} onOpenFeedback={() => setFeedbackOpen(true)} />;
+      return <LandingPage
+        onLogin={login}
+        onGoToEmailAuth={() => setShowEmailAuthScreen(true)}
+        isLoading={loading}
+        onOpenInstructions={() => setInstructionsOpen(true)}
+        onOpenFeedback={() => setFeedbackOpen(true)}
+        invitedGameId={urlGameId}
+        hostName={previewHostName}
+      />;
     }
     if (!user) {
       if (!hasLoggedNoUser.current) {
         console.log('🚫 App - Sin usuario autenticado, mostrando login');
         hasLoggedNoUser.current = true;
       }
-      return <LandingPage onLogin={login} onGoToEmailAuth={() => setShowEmailAuthScreen(true)} isLoading={loading} onOpenInstructions={() => setInstructionsOpen(true)} onOpenFeedback={() => setFeedbackOpen(true)} />;
+      return <LandingPage
+        onLogin={login}
+        onGoToEmailAuth={() => setShowEmailAuthScreen(true)}
+        isLoading={loading}
+        onOpenInstructions={() => setInstructionsOpen(true)}
+        onOpenFeedback={() => setFeedbackOpen(true)}
+        invitedGameId={urlGameId}
+        hostName={previewHostName}
+      />;
     }
 
     // Usuario autenticado - resetear flag de "no user" y loguear si es un usuario nuevo
@@ -669,40 +697,36 @@ export default function App() {
         );
       }
 
-      // Pantalla de Invitación (Sin errores)
+      // Logic moved to top level useEffect (lines 167-175) to prevent hook rule violation
+      // "Rendered more hooks than during the previous render"
+
+      // Pantalla de Invitación (Cargando / Uniendo)
       return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950 text-white">
           <div className="w-full max-w-sm mx-auto text-center space-y-6 px-6">
             <div className="flex justify-center">
               <img
                 src={bellImg}
-                alt="Invitación"
-                className="w-24 h-24 rounded-full object-cover ring-4 ring-orange-500/30 shadow-2xl animate-pulse-slow"
+                alt="Uniendo"
+                className="w-24 h-24 rounded-full object-cover ring-4 ring-orange-500/30 shadow-2xl animate-pulse"
               />
             </div>
             <div>
-              <h2 className="text-3xl font-serif text-neutral-50 mb-4">¡Te han invitado!</h2>
-              <p className="text-neutral-300 text-lg leading-relaxed">
-                Has recibido un enlace para unirte a la partida de <span className="font-mono font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded">{previewHostName || urlGameId}</span>.
-                <br /><span className="text-sm text-neutral-500 mt-2 block">¿Quieres entrar ahora?</span>
+              <h2 className="text-3xl font-serif text-neutral-50 mb-4">Uniéndose...</h2>
+              <p className="text-neutral-300 text-lg leading-relaxed animate-pulse">
+                Conectando con la sala de <span className="font-mono font-bold text-orange-400">{previewHostName || urlGameId}</span>
               </p>
             </div>
-            <div className="space-y-3 pt-4">
-              <Button
-                onClick={() => emit('join-game', urlGameId)}
-                variant="primary"
-                size="lg"
-                className="w-full text-lg shadow-orange-900/20 shadow-lg"
-              >
-                Entrar a la partida
-              </Button>
+
+            {/* Botón de cancelar solo si tarda mucho (opcional, pero buena práctica UX) */}
+            <div className="pt-8">
               <Button
                 onClick={() => window.location.href = '/'}
                 variant="ghost"
-                size="md"
-                className="w-full text-neutral-500 hover:text-neutral-300"
+                size="sm"
+                className="text-neutral-500 hover:text-neutral-300"
               >
-                Volver al inicio
+                Cancelar
               </Button>
             </div>
           </div>

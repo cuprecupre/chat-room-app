@@ -60,10 +60,17 @@ export function useAuth() {
         const errorParam = urlParams.get('error');
         const photoUrl = urlParams.get('photo');
         const name = urlParams.get('name');
+        const gameId = urlParams.get('gameId'); // Capturar gameId si vuelve del server
 
-        // Limpiar URL de parámetros de auth
+        // Limpiar URL de parámetros de auth PERO mantener gameId si existe
         if (authToken || errorParam) {
-          window.history.replaceState({}, '', window.location.pathname);
+          const newUrl = new URL(window.location);
+          newUrl.searchParams.delete('authToken');
+          newUrl.searchParams.delete('error');
+          newUrl.searchParams.delete('photo');
+          newUrl.searchParams.delete('name');
+          // gameId se mantiene automáticamente porque no lo borramos
+          window.history.replaceState({}, '', newUrl.toString());
         }
 
         if (errorParam) {
@@ -140,9 +147,13 @@ export function useAuth() {
   const GOOGLE_CLIENT_ID = '706542941882-483ctnm99nl51g174gj09srt1m7rmoqd.apps.googleusercontent.com';
 
   const login = useCallback(() => {
-    console.log('� Redirigiendo a Google OAuth...');
+    console.log('🔑 Redirigiendo a Google OAuth...');
 
     const redirectUri = `${window.location.origin}/auth/google/callback`;
+
+    // Capturar gameId actual si existe para preservarlo tras el login
+    const currentGameId = new URL(window.location).searchParams.get('gameId');
+    const state = currentGameId ? JSON.stringify({ gameId: currentGameId }) : undefined;
 
     const params = new URLSearchParams({
       client_id: GOOGLE_CLIENT_ID,
@@ -152,6 +163,10 @@ export function useAuth() {
       access_type: 'offline',
       prompt: 'select_account',
     });
+
+    if (state) {
+      params.append('state', state);
+    }
 
     window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
   }, []);
