@@ -58,6 +58,8 @@ export function useAuth() {
         const urlParams = new URLSearchParams(window.location.search);
         const authToken = urlParams.get('authToken');
         const errorParam = urlParams.get('error');
+        const photoUrl = urlParams.get('photo');
+        const name = urlParams.get('name');
 
         // Limpiar URL de parámetros de auth
         if (authToken || errorParam) {
@@ -80,11 +82,30 @@ export function useAuth() {
           await ensurePersistence();
           const userCredential = await signInWithCustomToken(auth, authToken);
 
+          // Actualizar perfil si vienen datos de Google y faltan en el perfil actual
+          if (userCredential.user && (photoUrl || name)) {
+            console.log('🔄 Actualizando perfil con datos de Google...', { name, photoUrl });
+            try {
+              const updates = {};
+              if (photoUrl) updates.photoURL = photoUrl;
+              if (name && !userCredential.user.displayName) updates.displayName = name;
+
+              if (Object.keys(updates).length > 0) {
+                await updateProfile(userCredential.user, updates);
+                await userCredential.user.reload(); // Recargar usuario para asegurar datos frescos
+                console.log('✅ Perfil actualizado correctamente');
+              }
+            } catch (updateError) {
+              console.warn('⚠️ Error actualizando perfil de usuario:', updateError);
+            }
+          }
+
           console.log('✅ Sesión iniciada con custom token:', userCredential.user?.uid);
           authResolved = true;
 
           if (isMounted) {
-            setUser(userCredential.user);
+            // Usar auth.currentUser para asegurar que tenemos la versión más reciente del objeto usuario
+            setUser(auth.currentUser);
             setLoading(false);
           }
         }
