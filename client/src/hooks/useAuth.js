@@ -2,9 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { auth, ensurePersistence, signInWithCustomToken, onIdTokenChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from '../lib/firebase';
 import { saveToken, clearToken } from '../lib/tokenStorage';
 
-// Google OAuth Client ID (el mismo que está en Google Cloud Console)
-const GOOGLE_CLIENT_ID = '706542941882-483ctnm99nl51g174gj09srt1m7rmogd.apps.googleusercontent.com';
-
 export function useAuth() {
   // Verificar si Firebase ya tiene un usuario en memoria (evita parpadeo en recargas)
   const hasCurrentUser = auth.currentUser !== null;
@@ -118,36 +115,24 @@ export function useAuth() {
     };
   }, []);
 
-  // Login con Google Identity Services (redirect mode)
-  const login = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  // Login con Google OAuth 2.0 (redirect directo a accounts.google.com)
+  const GOOGLE_CLIENT_ID = '706542941882-483ctnm99nl51g174gj09srt1m7rmogd.apps.googleusercontent.com';
 
-    try {
-      console.log('🔄 Iniciando proceso de login con Google Identity Services...');
+  const login = useCallback(() => {
+    console.log('� Redirigiendo a Google OAuth...');
 
-      // Verificar que GIS esté cargado
-      if (!window.google?.accounts?.id) {
-        throw new Error('Google Identity Services no está cargado. Recarga la página.');
-      }
+    const redirectUri = `${window.location.origin}/auth/google/callback`;
 
-      // Inicializar GIS con redirect mode
-      window.google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        ux_mode: 'redirect',
-        login_uri: `${window.location.origin}/auth/google`,
-      });
+    const params = new URLSearchParams({
+      client_id: GOOGLE_CLIENT_ID,
+      redirect_uri: redirectUri,
+      response_type: 'code',
+      scope: 'openid email profile',
+      access_type: 'offline',
+      prompt: 'select_account',
+    });
 
-      console.log('🚀 Redirigiendo a Google...');
-
-      // Iniciar el flujo de autenticación con prompt
-      window.google.accounts.id.prompt();
-
-    } catch (err) {
-      console.error('❌ Error en login:', err?.message);
-      setError(err?.message || 'No se pudo iniciar sesión.');
-      setLoading(false);
-    }
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
   }, []);
 
   const loginWithEmail = useCallback(async (email, password) => {
