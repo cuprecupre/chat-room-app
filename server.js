@@ -767,6 +767,14 @@ io.on('connection', (socket) => {
 
     // 1. Reset leaving player state - send null BEFORE leaving room
     socket.emit('game-state', null);
+
+    // Explicitly clear any retained session data for this socket
+    if (userSockets[user.uid] === socket.id) {
+      // Don't delete userSockets[user.uid] as they might be reconnecting, but 
+      // explicitlyLeftUsers flag handles the state protection
+      console.log(`[Leave] User ${user.name} marked as explicitly left.`);
+    }
+
     socket.leave(gameId);
 
     // 2. Notify remaining players

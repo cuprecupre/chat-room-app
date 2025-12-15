@@ -24,7 +24,9 @@ export function useSocket(user) {
     }
 
     if (!user) {
+      // Force disconnection if user logs out
       if (socketRef.current) {
+        console.log('🔌 useSocket - User logout, disconnecting socket...');
         socketRef.current.disconnect();
         socketRef.current = null;
       }

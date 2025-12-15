@@ -305,26 +305,37 @@ export default function App() {
 
   const handleLogout = useCallback(async () => {
     try {
-      // Close dropdown first
+      // 1. UI Feedback immediately
       setMenuOpen(false);
 
-      // Clear URL parameters before logout
+      // 2. Clear URL parameters
       const url = new URL(window.location);
       url.searchParams.delete('gameId');
       window.history.replaceState({}, '', url.toString());
 
-      // Leave game if in one
+      // 3. Leave game if in one (best effort)
       if (gameState?.gameId) {
         emit('leave-game', gameState.gameId);
       }
 
-      // useSocket hook handles emitting leave-game on disconnect
+      // 4. Force Socket Disconnect & Cleanup
+      // We do this BEFORE firebase logout to ensure no race conditions with auth state
+      if (window.location.reload) {
+        // Clear all storage to remove any "Recovering..." or stale state
+        localStorage.clear();
+        sessionStorage.clear();
+      }
+
+      // 5. Build proper logout sequence
       await logout();
 
-      // Force page reload to clear all state
-      window.location.reload();
+      // 6. Force hard reload to clear memory state
+      window.location.href = '/';
     } catch (e) {
       console.error("Error during logout:", e);
+      // Fallback if something fails
+      localStorage.clear();
+      window.location.reload();
     }
   }, [logout, emit, gameState]);
 
