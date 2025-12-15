@@ -148,46 +148,43 @@ export function useAuth() {
       console.log('📝 Configurando persistencia...');
       await ensurePersistence();
 
-      // SOLUCIÓN: Popup simple sin fallback complicado
-      console.log('🚀 Iniciando login con popup...');
+      // SOLUCIÓN: Redirección para evitar problemas de popup en móviles
+      console.log('🚀 Iniciando login con redirección...');
 
-      // Allow mocking for E2E tests
-      const performSignIn = window.mockSignInWithPopup
-        ? () => window.mockSignInWithPopup(auth, provider)
-        : () => signInWithPopup(auth, provider);
-
-      const result = await performSignIn();
-
-      // If we are mocking, we need to manually update state because onIdTokenChanged won't fire
-      if (window.mockSignInWithPopup && result?.user) {
-        console.log('🎭 Mock Login: Manually setting user state');
-        setUser(result.user);
-        setLoading(false);
+      // Marcar que estamos en proceso de redirect para mostrar loading al volver
+      try {
+        sessionStorage.setItem('auth:redirect', '1');
+      } catch (_) {
+        // sessionStorage puede fallar en modo privado de algunos navegadores
       }
 
-      console.log('✅ Login exitoso');
+      // Redirigir a Google Auth
+      // Nota: signInWithRedirect no retorna, el navegador redirige a Google
+      await signInWithRedirect(auth, provider);
+
+      // Este código no se ejecutará porque el navegador redirige
+      console.log('✅ Redirigiendo a Google...');
     } catch (err) {
       console.error('❌ Error en login:', err?.code || err?.message);
 
       let errorMessage = 'No se pudo iniciar sesión.';
 
-      if (err?.message === 'TIMEOUT') {
-        errorMessage = 'El login tardó demasiado. Verifica tu conexión y que el dominio esté autorizado en Firebase.';
-      } else if (err?.code === 'auth/popup-blocked') {
-        errorMessage = 'El popup fue bloqueado por el navegador. Habilita los popups e inténtalo de nuevo.';
-      } else if (err?.code === 'auth/popup-closed-by-user') {
-        errorMessage = 'El popup fue cerrado antes de completar el login.';
+      if (err?.code === 'auth/redirect-cancelled-by-user') {
+        errorMessage = 'La autenticación fue cancelada.';
       } else if (err?.code === 'auth/unauthorized-domain') {
         errorMessage = 'Este dominio no está autorizado en Firebase. Verifica la configuración.';
       } else if (err?.code === 'auth/operation-not-allowed') {
         errorMessage = 'El proveedor de Google no está habilitado en Firebase.';
-      } else if (err?.code === 'auth/cancelled-popup-request') {
-        errorMessage = 'Se canceló la solicitud de popup anterior.';
       } else if (err?.code === 'auth/network-request-failed') {
         errorMessage = 'Error de red. Verifica tu conexión a internet.';
       } else if (err?.message) {
         errorMessage = err.message;
       }
+
+      // Limpiar marca de redirect si hay error
+      try {
+        sessionStorage.removeItem('auth:redirect');
+      } catch (_) { }
 
       setError(errorMessage);
       setLoading(false);

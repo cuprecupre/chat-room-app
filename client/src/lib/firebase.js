@@ -4,7 +4,11 @@ import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyCs-vni2Zme9_K_mZgZkft2o9iytR541lQ',
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'impostor-468e0.firebaseapp.com',
+  // Usar el dominio de la app para que el proxy funcione en Safari iOS
+  // En producción: impostor.me, en desarrollo: localhost:5173
+  authDomain: typeof window !== 'undefined' && window.location.host
+    ? window.location.host
+    : (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'impostor-468e0.firebaseapp.com'),
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'impostor-468e0',
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'impostor-468e0.appspot.com',
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '706542941882',

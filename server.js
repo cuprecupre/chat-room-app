@@ -4,6 +4,7 @@ const socketIo = require('socket.io');
 const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const words = require('./words');
 const Game = require('./Game');
@@ -173,6 +174,20 @@ app.use(express.static(clientDist, {
     if (path.match(/\.html$/)) {
       res.setHeader('Cache-Control', 'public, max-age=3600');
     }
+  }
+}));
+
+// Firebase Auth Proxy - permite que signInWithRedirect funcione en Safari iOS
+// Safari bloquea cookies de terceros, por lo que necesitamos que /__/auth/*
+// sea servido desde el mismo dominio que la app
+app.use('/__', createProxyMiddleware({
+  target: 'https://impostor-468e0.firebaseapp.com',
+  changeOrigin: true,
+  secure: true,
+  logLevel: 'warn',
+  onProxyReq: (proxyReq, req, res) => {
+    // Asegurar que el host header sea el correcto para Firebase
+    proxyReq.setHeader('X-Forwarded-Host', req.headers.host);
   }
 }));
 
