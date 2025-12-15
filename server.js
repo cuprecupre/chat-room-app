@@ -220,14 +220,39 @@ app.post('/auth/google', async (req, res) => {
       picture: payload.picture ? 'presente' : 'ausente'
     });
 
-    // Crear custom token de Firebase usando el sub (Google user ID) como uid
-    const customToken = await admin.auth().createCustomToken(payload.sub, {
+    // IMPORTANTE: Buscar si ya existe un usuario con este email en Firebase
+    // Esto evita crear usuarios duplicados y mantiene compatibilidad con usuarios existentes
+    let uid = payload.sub; // Por defecto usar el Google sub
+
+    try {
+      const existingUser = await admin.auth().getUserByEmail(payload.email);
+      if (existingUser) {
+        // Usuario ya existe - usar su UID existente para mantener su cuenta
+        uid = existingUser.uid;
+        console.log('👤 [GIS] Usuario existente encontrado:', {
+          uid: existingUser.uid,
+          email: existingUser.email,
+          displayName: existingUser.displayName
+        });
+      }
+    } catch (getUserError) {
+      // Si el error es que no se encontró el usuario, está bien - es un usuario nuevo
+      if (getUserError.code === 'auth/user-not-found') {
+        console.log('🆕 [GIS] Usuario nuevo, se creará con Google sub como UID');
+      } else {
+        // Otro error - logear pero continuar
+        console.warn('⚠️ [GIS] Error buscando usuario existente:', getUserError.message);
+      }
+    }
+
+    // Crear custom token de Firebase usando el UID correcto
+    const customToken = await admin.auth().createCustomToken(uid, {
       email: payload.email,
       name: payload.name,
       picture: payload.picture
     });
 
-    console.log('✅ [GIS] Custom token de Firebase creado');
+    console.log('✅ [GIS] Custom token de Firebase creado para UID:', uid);
 
     // Redirect al cliente con el token como parámetro
     // El cliente usará signInWithCustomToken para iniciar sesión
