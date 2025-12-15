@@ -7,5 +7,12 @@ export default defineConfig({
   server: {
     host: true, // Permite conexiones desde la red local
     port: 5173,
+    proxy: {
+      // Proxy para OAuth callback y otras rutas de autenticación
+      '/auth': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
   },
 })

@@ -116,7 +116,7 @@ export function useAuth() {
   }, []);
 
   // Login con Google OAuth 2.0 (redirect directo a accounts.google.com)
-  const GOOGLE_CLIENT_ID = '706542941882-483ctnm99nl51g174gj09srt1m7rmogd.apps.googleusercontent.com';
+  const GOOGLE_CLIENT_ID = '706542941882-483ctnm99nl51g174gj09srt1m7rmoqd.apps.googleusercontent.com';
 
   const login = useCallback(() => {
     console.log('� Redirigiendo a Google OAuth...');

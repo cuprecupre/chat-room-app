@@ -1,3 +1,9 @@
+require('dotenv').config();
+console.log('🔧 [DEBUG] Variables cargadas:', {
+  PORT: process.env.PORT,
+  GOOG_SECRET_EXISTS: !!process.env.GOOGLE_CLIENT_SECRET,
+  CWD: process.cwd()
+});
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -268,7 +274,7 @@ app.post('/auth/google', async (req, res) => {
 
 // --- Google OAuth 2.0 Callback Endpoint ---
 // Recibe el código de autorización después del redirect de Google y lo intercambia por tokens
-const GOOGLE_CLIENT_ID = '706542941882-483ctnm99nl51g174gj09srt1m7rmogd.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = '706542941882-483ctnm99nl51g174gj09srt1m7rmoqd.apps.googleusercontent.com';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 app.get('/auth/google/callback', async (req, res) => {
@@ -293,12 +299,20 @@ app.get('/auth/google/callback', async (req, res) => {
       return res.redirect('/?error=server_config_error');
     }
 
-    // Determinar el redirect_uri basado en el origen de la petición
-    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-    const host = req.headers.host;
-    const redirectUri = `${protocol}://${host}/auth/google/callback`;
+    // Determinar el redirect_uri
+    let redirectUri;
 
-    console.log('🔄 [OAuth] Intercambiando código por tokens...');
+    // En desarrollo local, forzar el puerto 5173 que es el que usa el frontend
+    if (req.headers.host && req.headers.host.includes('localhost')) {
+      redirectUri = 'http://localhost:5173/auth/google/callback';
+    } else {
+      // En producción, usar el host de la petición
+      const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+      const host = req.headers.host;
+      redirectUri = `${protocol}://${host}/auth/google/callback`;
+    }
+
+    console.log('🔄 [OAuth] Intercambiando código por tokens...', { redirectUri });
 
     // Intercambiar código por tokens usando Google OAuth 2.0 token endpoint
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {

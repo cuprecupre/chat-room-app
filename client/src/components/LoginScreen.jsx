@@ -4,7 +4,7 @@ import { Spinner } from './ui/Spinner';
 import heroImg from '../assets/impostor-home.png';
 
 // Google OAuth 2.0 Configuration
-const GOOGLE_CLIENT_ID = '706542941882-483ctnm99nl51g174gj09srt1m7rmogd.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = '706542941882-483ctnm99nl51g174gj09srt1m7rmoqd.apps.googleusercontent.com';
 
 // Construir la URL de autorización de Google OAuth 2.0
 function buildGoogleOAuthUrl() {
