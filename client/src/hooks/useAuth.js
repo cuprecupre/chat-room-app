@@ -1,21 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
-import { auth, provider, ensurePersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onIdTokenChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from '../lib/firebase';
+import { auth, ensurePersistence, signInWithCustomToken, onIdTokenChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from '../lib/firebase';
 import { saveToken, clearToken } from '../lib/tokenStorage';
+
+// Google OAuth Client ID (el mismo que está en Google Cloud Console)
+const GOOGLE_CLIENT_ID = '706542941882-483ctnm99nl51g174gj09srt1m7rmogd.apps.googleusercontent.com';
 
 export function useAuth() {
   // Verificar si Firebase ya tiene un usuario en memoria (evita parpadeo en recargas)
   const hasCurrentUser = auth.currentUser !== null;
-  const hasRedirect = typeof window !== 'undefined' && sessionStorage.getItem('auth:redirect') === '1';
 
   const [user, setUser] = useState(auth.currentUser); // Inicializar con usuario actual si existe
-  const [loading, setLoading] = useState(hasRedirect && !hasCurrentUser); // Solo loading si hay redirect Y no hay usuario
+  const [loading, setLoading] = useState(!hasCurrentUser); // Solo loading si no hay usuario
   const [error, setError] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
     let authResolved = false;
     let tokenRefreshInterval = null;
-    let redirectCheckInterval = null;
 
     const unsubscribe = onIdTokenChanged(auth, async (u) => {
       authResolved = true;
@@ -54,71 +55,53 @@ export function useAuth() {
       }
     });
 
-    // Manejar posible flujo de redirect en navegadores móviles
-    const handleRedirect = async () => {
+    // Manejar custom token de Google Identity Services (viene de /auth/google)
+    const handleGISToken = async () => {
       try {
-        console.log('🔄 Verificando resultado de redirect...');
-        const result = await getRedirectResult(auth);
-        if (result) {
-          console.log('✅ Redirect exitoso:', result.user?.displayName);
-          authResolved = true;
+        const urlParams = new URLSearchParams(window.location.search);
+        const authToken = urlParams.get('authToken');
+        const errorParam = urlParams.get('error');
+
+        // Limpiar URL de parámetros de auth
+        if (authToken || errorParam) {
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+
+        if (errorParam) {
+          console.error('❌ Error de autenticación:', errorParam);
           if (isMounted) {
-            setUser(result.user);
+            setError('Error al iniciar sesión con Google. Inténtalo de nuevo.');
             setLoading(false);
           }
-        } else {
-          console.log('ℹ️ No hay resultado de redirect');
+          return;
+        }
+
+        if (authToken) {
+          console.log('🔐 Custom token recibido de GIS, iniciando sesión con Firebase...');
+          setLoading(true);
+
+          await ensurePersistence();
+          const userCredential = await signInWithCustomToken(auth, authToken);
+
+          console.log('✅ Sesión iniciada con custom token:', userCredential.user?.uid);
+          authResolved = true;
+
+          if (isMounted) {
+            setUser(userCredential.user);
+            setLoading(false);
+          }
         }
       } catch (err) {
-        console.error('❌ Error en redirect:', err?.message);
+        console.error('❌ Error procesando custom token:', err);
         if (isMounted) {
-          setError(err?.message || 'Error al procesar autenticación');
+          setError('Error al completar el inicio de sesión.');
           setLoading(false);
         }
       }
-      try { sessionStorage.removeItem('auth:redirect'); } catch (_) { }
     };
 
     // Ejecutar inmediatamente
-    handleRedirect();
-
-    // También verificar periódicamente en caso de que el redirect tarde
-    redirectCheckInterval = setInterval(async () => {
-      if (!authResolved && isMounted) {
-        try {
-          const result = await getRedirectResult(auth);
-          if (result) {
-            console.log('✅ Redirect detectado en verificación periódica:', result.user?.displayName);
-            authResolved = true;
-            setUser(result.user);
-            setLoading(false);
-            clearInterval(redirectCheckInterval);
-          }
-        } catch (err) {
-          console.log('ℹ️ Verificación periódica de redirect:', err?.message);
-        }
-      }
-    }, 1000); // Verificar cada segundo
-
-    // Listener para cuando la página se vuelve visible (regresa del redirect)
-    const handleVisibilityChange = async () => {
-      if (document.visibilityState === 'visible' && !authResolved && isMounted) {
-        console.log('👁️ Página visible, verificando redirect...');
-        try {
-          const result = await getRedirectResult(auth);
-          if (result) {
-            console.log('✅ Redirect detectado al volver a la página:', result.user?.displayName);
-            authResolved = true;
-            setUser(result.user);
-            setLoading(false);
-          }
-        } catch (err) {
-          console.log('ℹ️ Verificación al volver a la página:', err?.message);
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    handleGISToken();
 
     // Timeout de seguridad solo si la autenticación no se resuelve
     const timeout = setTimeout(() => {
@@ -131,62 +114,38 @@ export function useAuth() {
       isMounted = false;
       clearTimeout(timeout);
       if (tokenRefreshInterval) clearInterval(tokenRefreshInterval);
-      if (redirectCheckInterval) clearInterval(redirectCheckInterval);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
       unsubscribe();
     };
   }, []);
 
+  // Login con Google Identity Services (redirect mode)
   const login = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      console.log('🔄 Iniciando proceso de login...');
+      console.log('🔄 Iniciando proceso de login con Google Identity Services...');
 
-      // Configurar persistencia antes del login
-      console.log('📝 Configurando persistencia...');
-      await ensurePersistence();
-
-      // SOLUCIÓN: Redirección para evitar problemas de popup en móviles
-      console.log('🚀 Iniciando login con redirección...');
-
-      // Marcar que estamos en proceso de redirect para mostrar loading al volver
-      try {
-        sessionStorage.setItem('auth:redirect', '1');
-      } catch (_) {
-        // sessionStorage puede fallar en modo privado de algunos navegadores
+      // Verificar que GIS esté cargado
+      if (!window.google?.accounts?.id) {
+        throw new Error('Google Identity Services no está cargado. Recarga la página.');
       }
 
-      // Redirigir a Google Auth
-      // Nota: signInWithRedirect no retorna, el navegador redirige a Google
-      await signInWithRedirect(auth, provider);
+      // Inicializar GIS con redirect mode
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        ux_mode: 'redirect',
+        login_uri: `${window.location.origin}/auth/google`,
+      });
 
-      // Este código no se ejecutará porque el navegador redirige
-      console.log('✅ Redirigiendo a Google...');
+      console.log('🚀 Redirigiendo a Google...');
+
+      // Iniciar el flujo de autenticación con prompt
+      window.google.accounts.id.prompt();
+
     } catch (err) {
-      console.error('❌ Error en login:', err?.code || err?.message);
-
-      let errorMessage = 'No se pudo iniciar sesión.';
-
-      if (err?.code === 'auth/redirect-cancelled-by-user') {
-        errorMessage = 'La autenticación fue cancelada.';
-      } else if (err?.code === 'auth/unauthorized-domain') {
-        errorMessage = 'Este dominio no está autorizado en Firebase. Verifica la configuración.';
-      } else if (err?.code === 'auth/operation-not-allowed') {
-        errorMessage = 'El proveedor de Google no está habilitado en Firebase.';
-      } else if (err?.code === 'auth/network-request-failed') {
-        errorMessage = 'Error de red. Verifica tu conexión a internet.';
-      } else if (err?.message) {
-        errorMessage = err.message;
-      }
-
-      // Limpiar marca de redirect si hay error
-      try {
-        sessionStorage.removeItem('auth:redirect');
-      } catch (_) { }
-
-      setError(errorMessage);
+      console.error('❌ Error en login:', err?.message);
+      setError(err?.message || 'No se pudo iniciar sesión.');
       setLoading(false);
     }
   }, []);

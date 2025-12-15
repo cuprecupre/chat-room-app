@@ -1,14 +1,10 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, onIdTokenChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCustomToken, onAuthStateChanged, onIdTokenChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyCs-vni2Zme9_K_mZgZkft2o9iytR541lQ',
-  // Usar el dominio de la app para que el proxy funcione en Safari iOS
-  // En producción: impostor.me, en desarrollo: localhost:5173
-  authDomain: typeof window !== 'undefined' && window.location.host
-    ? window.location.host
-    : (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'impostor-468e0.firebaseapp.com'),
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'impostor-468e0.firebaseapp.com',
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'impostor-468e0',
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'impostor-468e0.appspot.com',
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '706542941882',
@@ -39,4 +35,4 @@ async function ensurePersistence() {
   }
 }
 
-export { app, auth, db, provider, ensurePersistence, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, onIdTokenChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile };
+export { app, auth, db, provider, ensurePersistence, signInWithPopup, signInWithRedirect, signInWithCustomToken, getRedirectResult, onAuthStateChanged, onIdTokenChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile };

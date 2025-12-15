@@ -4,6 +4,7 @@ const socketIo = require('socket.io');
 const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const words = require('./words');
@@ -177,19 +178,66 @@ app.use(express.static(clientDist, {
   }
 }));
 
-// Firebase Auth Proxy - permite que signInWithRedirect funcione en Safari iOS
-// Safari bloquea cookies de terceros, por lo que necesitamos que /__/auth/*
-// sea servido desde el mismo dominio que la app
-app.use('/__', createProxyMiddleware({
-  target: 'https://impostor-468e0.firebaseapp.com',
-  changeOrigin: true,
-  secure: true,
-  logLevel: 'warn',
-  onProxyReq: (proxyReq, req, res) => {
-    // Asegurar que el host header sea el correcto para Firebase
-    proxyReq.setHeader('X-Forwarded-Host', req.headers.host);
+// Middleware para cookies (necesario para CSRF de Google Identity Services)
+app.use(cookieParser());
+
+// Middleware para parsear body de formularios (POST de Google Identity Services)
+app.use(express.urlencoded({ extended: true }));
+
+// --- Google Identity Services Redirect Endpoint ---
+// Recibe el credential de Google después del redirect y crea un custom Firebase token
+app.post('/auth/google', async (req, res) => {
+  try {
+    const { credential, g_csrf_token } = req.body;
+
+    console.log('🔐 [GIS] Recibido credential de Google Identity Services');
+
+    // Verificar CSRF token
+    const cookieCsrf = req.cookies.g_csrf_token;
+    if (!g_csrf_token || !cookieCsrf || g_csrf_token !== cookieCsrf) {
+      console.error('❌ [GIS] CSRF token mismatch');
+      return res.redirect('/?error=csrf_mismatch');
+    }
+
+    if (!credential) {
+      console.error('❌ [GIS] No credential recibido');
+      return res.redirect('/?error=no_credential');
+    }
+
+    // Decodificar el JWT de Google (el payload está en base64)
+    const parts = credential.split('.');
+    if (parts.length !== 3) {
+      console.error('❌ [GIS] Credential inválido');
+      return res.redirect('/?error=invalid_credential');
+    }
+
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+
+    console.log('✅ [GIS] Token decodificado:', {
+      sub: payload.sub,
+      email: payload.email,
+      name: payload.name,
+      picture: payload.picture ? 'presente' : 'ausente'
+    });
+
+    // Crear custom token de Firebase usando el sub (Google user ID) como uid
+    const customToken = await admin.auth().createCustomToken(payload.sub, {
+      email: payload.email,
+      name: payload.name,
+      picture: payload.picture
+    });
+
+    console.log('✅ [GIS] Custom token de Firebase creado');
+
+    // Redirect al cliente con el token como parámetro
+    // El cliente usará signInWithCustomToken para iniciar sesión
+    res.redirect(`/?authToken=${encodeURIComponent(customToken)}&name=${encodeURIComponent(payload.name || '')}&photo=${encodeURIComponent(payload.picture || '')}`);
+
+  } catch (error) {
+    console.error('❌ [GIS] Error en /auth/google:', error);
+    res.redirect('/?error=auth_failed');
   }
-}));
+});
 
 // Servir archivos estáticos de la carpeta public (root)
 // Esto asegura que robots.txt y sitemap.xml se sirvan correctamente
