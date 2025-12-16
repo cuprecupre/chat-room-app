@@ -146,26 +146,31 @@ export function useAuth() {
   // Login con Google OAuth 2.0 (redirect directo a accounts.google.com)
   const GOOGLE_CLIENT_ID = '706542941882-483ctnm99nl51g174gj09srt1m7rmoqd.apps.googleusercontent.com';
 
-  const login = useCallback(() => {
+  const login = useCallback((explicitGameId) => {
     console.log('🔑 Redirigiendo a Google OAuth...');
 
     const redirectUri = `${window.location.origin}/auth/google/callback`;
 
     // Capturar gameId actual si existe para preservarlo tras el login
-    // Check both query params (legacy) AND path params (new /join/:gameId)
-    const url = new URL(window.location);
-    let currentGameId = url.searchParams.get('gameId');
+    // Safety check: ignore if explicitGameId is an Event object (UI issue)
+    let gameIdToPreserve = (explicitGameId && typeof explicitGameId !== 'object') ? explicitGameId : null;
 
-    // If no gameId in query params, check if we're on /join/:gameId route
-    if (!currentGameId) {
-      const pathMatch = url.pathname.match(/^\/join\/([A-Za-z0-9]+)$/);
-      if (pathMatch) {
-        currentGameId = pathMatch[1];
-        console.log('🎮 Detected gameId from /join/ path:', currentGameId);
+    if (!gameIdToPreserve) {
+      // Check both query params (legacy) AND path params (new /join/:gameId)
+      const url = new URL(window.location);
+      gameIdToPreserve = url.searchParams.get('gameId');
+
+      // If no gameId in query params, check if we're on /join/:gameId route
+      if (!gameIdToPreserve) {
+        const pathMatch = url.pathname.match(/^\/join\/([A-Za-z0-9]+)$/);
+        if (pathMatch) {
+          gameIdToPreserve = pathMatch[1];
+          console.log('🎮 Detected gameId from /join/ path:', gameIdToPreserve);
+        }
       }
     }
 
-    const state = currentGameId ? JSON.stringify({ gameId: currentGameId }) : undefined;
+    const state = gameIdToPreserve ? JSON.stringify({ gameId: gameIdToPreserve }) : undefined;
 
     const params = new URLSearchParams({
       client_id: GOOGLE_CLIENT_ID,

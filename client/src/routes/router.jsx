@@ -10,6 +10,7 @@ import { Invitation } from '../pages/public/Invitation';
 import { AppLayout } from '../pages/app/Layout';
 import { Dashboard } from '../pages/app/Dashboard';
 import { Game } from '../pages/app/Game';
+import { WaitingRoom } from '../pages/app/WaitingRoom';
 
 // Guards
 import { ProtectedRoute } from './ProtectedRoute';
@@ -68,6 +69,10 @@ export const router = createBrowserRouter([
             {
                 path: 'game/:gameId',
                 element: <Game />,
+            },
+            {
+                path: 'wait/:gameId',
+                element: <WaitingRoom />,
             },
         ],
     },

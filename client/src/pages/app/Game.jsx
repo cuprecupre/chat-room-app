@@ -110,12 +110,43 @@ export function Game() {
         emit('cast-vote', { gameId: gameState.gameId, targetId });
     }, [emit, gameState]);
 
-    // Error state
-    if (joinError) {
+    // Clear join error if we successfully joined the target game
+    useEffect(() => {
+        if (gameState?.gameId === gameId && joinError) {
+            clearJoinError();
+        }
+    }, [gameState?.gameId, gameId, joinError, clearJoinError]);
+
+    // Error state - special handling for in-progress games
+    // Only show error if we are NOT in the game we are looking for
+    if (joinError && gameState?.gameId !== gameId) {
+        // Check if it's an in-progress error (object with type)
+        if (typeof joinError === 'object' && joinError.type === 'in-progress') {
+            return (
+                <div className="text-center py-12 space-y-6 max-w-md mx-auto">
+                    <h2 className="text-2xl font-serif text-neutral-50 mb-3">No puedes entrar a una partida en curso</h2>
+                    <p className="text-neutral-300">
+                        La partida ya comenzó. Puedes crear una nueva para invitar a tus amigos.
+                    </p>
+                    <button
+                        onClick={() => {
+                            clearJoinError();
+                            navigate('/app');
+                        }}
+                        className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                    >
+                        Ir al inicio
+                    </button>
+                </div>
+            );
+        }
+
+        // Generic error (backward compatible with string errors)
+        const errorMessage = typeof joinError === 'string' ? joinError : joinError.message;
         return (
             <div className="text-center py-12 space-y-4">
                 <h2 className="text-2xl font-serif text-neutral-50">No se pudo unir</h2>
-                <p className="text-neutral-400">{joinError}</p>
+                <p className="text-neutral-400">{errorMessage}</p>
                 <button
                     onClick={() => { clearJoinError(); navigate('/app'); }}
                     className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"

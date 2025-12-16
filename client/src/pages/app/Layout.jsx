@@ -10,6 +10,7 @@ import { useSocket } from '../../hooks/useSocket';
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Toaster } from '../../components/Toaster';
 import { InstructionsModal } from '../../components/InstructionsModal';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { Avatar } from '../../components/ui/Avatar';
 import { Button } from '../../components/ui/Button';
 import { Spinner } from '../../components/ui/Spinner';
@@ -23,6 +24,9 @@ export function AppLayout() {
 
     const [menuOpen, setMenuOpen] = useState(false);
     const [instructionsOpen, setInstructionsOpen] = useState(false);
+    const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+    const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [showConnectingLoader, setShowConnectingLoader] = useState(false);
     const [isStuck, setIsStuck] = useState(false);
     const menuRef = useRef(null);
@@ -86,6 +90,44 @@ export function AppLayout() {
         await logout();
         navigate('/');
     }, [logout, emit, gameState, navigate]);
+
+    const handleLogoutConfirm = useCallback(async () => {
+        // Use 'logout' event to clean ALL games (not just current one)
+        emit('logout', () => {
+            console.log('[Logout] Server confirmed logout, proceeding with Firebase logout');
+        });
+
+        // Clear local storage
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // Firebase logout and navigate
+        await logout();
+        navigate('/');
+    }, [logout, emit, navigate]);
+
+    const handleLeaveConfirm = useCallback(() => {
+        // Clear URL immediately
+        window.history.replaceState({}, '', '/app');
+
+        // Set flag to prevent auto-redirect on reload
+        sessionStorage.setItem('justLeftGame', 'true');
+
+        // Emit leave-game event
+        emit('leave-game', gameState.gameId, () => {
+            // After server acknowledges, force reload for clean state
+            window.location.href = '/app';
+        });
+
+        // Fallback: force reload if callback doesn't fire
+        setTimeout(() => {
+            window.location.href = '/app';
+        }, 2000);
+    }, [emit, gameState]);
+
+    const handleEndGameConfirm = useCallback(() => {
+        emit('end-game', gameState.gameId);
+    }, [emit, gameState]);
 
     const forceExit = useCallback(() => {
         if (gameState?.gameId) {
@@ -152,6 +194,35 @@ export function AppLayout() {
             <Toaster />
             <InstructionsModal isOpen={instructionsOpen} onClose={() => setInstructionsOpen(false)} />
 
+            {/* Confirmation Modals */}
+            <ConfirmModal
+                isOpen={showLeaveConfirm}
+                onClose={() => setShowLeaveConfirm(false)}
+                onConfirm={handleLeaveConfirm}
+                title="¿Abandonar partida?"
+                message="Se perderá tu progreso en esta ronda."
+                confirmText="Abandonar"
+                variant="danger"
+            />
+            <ConfirmModal
+                isOpen={showEndGameConfirm}
+                onClose={() => setShowEndGameConfirm(false)}
+                onConfirm={handleEndGameConfirm}
+                title="¿Terminar partida?"
+                message="Esto finalizará la partida para todos los jugadores."
+                confirmText="Terminar"
+                variant="danger"
+            />
+            <ConfirmModal
+                isOpen={showLogoutConfirm}
+                onClose={() => setShowLogoutConfirm(false)}
+                onConfirm={handleLogoutConfirm}
+                title="¿Cerrar sesión?"
+                message="Serás desconectado de la partida actual."
+                confirmText="Cerrar sesión"
+                variant="danger"
+            />
+
             <div className="w-full max-w-4xl mx-auto p-6 sm:p-6 lg:p-8">
                 {/* Header */}
                 <header className="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
@@ -193,7 +264,7 @@ export function AppLayout() {
                                                     <button
                                                         onClick={() => {
                                                             setMenuOpen(false);
-                                                            emit('end-game', gameState.gameId);
+                                                            setShowEndGameConfirm(true);
                                                         }}
                                                         className="w-full text-left px-3 py-2 text-sm text-orange-400 hover:bg-orange-400/10 rounded-lg transition-colors"
                                                     >
@@ -205,23 +276,7 @@ export function AppLayout() {
                                                 <button
                                                     onClick={() => {
                                                         setMenuOpen(false);
-
-                                                        // Clear URL immediately
-                                                        window.history.replaceState({}, '', '/app');
-
-                                                        // Set flag to prevent auto-redirect on reload
-                                                        sessionStorage.setItem('justLeftGame', 'true');
-
-                                                        // Emit leave-game event
-                                                        emit('leave-game', gameState.gameId, () => {
-                                                            // After server acknowledges, force reload for clean state
-                                                            window.location.href = '/app';
-                                                        });
-
-                                                        // Fallback: force reload if callback doesn't fire
-                                                        setTimeout(() => {
-                                                            window.location.href = '/app';
-                                                        }, 2000);
+                                                        setShowLeaveConfirm(true);
                                                     }}
                                                     className="w-full text-left px-3 py-2 text-sm text-yellow-400 hover:bg-yellow-400/10 rounded-lg transition-colors"
                                                 >
@@ -230,8 +285,14 @@ export function AppLayout() {
                                             </>
                                         )}
 
+                                        {/* Divider */}
+                                        <div className="my-1 border-t border-white/10"></div>
+
                                         <button
-                                            onClick={handleLogout}
+                                            onClick={() => {
+                                                setMenuOpen(false);
+                                                setShowLogoutConfirm(true);
+                                            }}
                                             className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
                                         >
                                             🚪 Cerrar sesión

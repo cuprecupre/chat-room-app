@@ -558,6 +558,8 @@ const userHeartbeats = {};
 // Users who explicitly left games - prevents auto-rejoin on reconnect: { [uid]: true }
 // This is cleared after a short period once we're sure they're in a clean state
 const explicitlyLeftUsers = {};
+// Players waiting for in-progress games: { gameId: [ {uid, name, photoURL, socketId} ] }
+const waitingPlayers = {};
 
 // Helper to find which game a user belongs to (global scope)
 // Helper to find which game a user belongs to (global scope) - IGNORES 'left' players
@@ -749,10 +751,20 @@ io.on('connection', (socket) => {
     const gameToJoin = games[gameId];
     if (!gameToJoin) return socket.emit('error-message', 'La partida no existe.');
 
-    // No permitir unirse si la partida ya empezó (salvo que ya seas parte del juego)
-    const isAlreadyInGame = !!gameToJoin.getPlayer(user.uid);
-    if (gameToJoin.phase === 'playing' && !isAlreadyInGame) {
-      return socket.emit('error-message', 'No puedes unirte a una partida en curso.');
+    // No permitir unirse si la partida ya empezó (salvo que ya seas parte del juego Y activo)
+    // Se considera "en curso" cualquier fase que no sea 'lobby' ('playing', 'round_result', 'game_over')
+    // Nota: 'game_over' podría permitir unirse para la siguiente, pero por simplicidad mejor esperar a que el host de Restart
+    const existingPlayer = gameToJoin.getPlayer(user.uid);
+    // Solo consideramos que "ya está en el juego" si no está en estado 'left'
+    const isAlreadyInGame = existingPlayer && existingPlayer.status !== 'left';
+
+    if (gameToJoin.phase !== 'lobby' && !isAlreadyInGame) {
+      const host = gameToJoin.getPlayer(gameToJoin.hostId);
+      return socket.emit('game-in-progress', {
+        gameId,
+        message: 'Esta partida está en curso.',
+        hostName: host ? host.name : 'Anfitrión'
+      });
     }
 
     // Allow switching games - leave current game first if in one
@@ -769,6 +781,62 @@ io.on('connection', (socket) => {
     socket.join(gameId);
     emitGameState(gameToJoin);
     console.log(`User ${user.name} joined game ${gameId}`);
+  });
+
+  // --- Waiting Room Events ---
+
+  socket.on('wait-for-game', (gameId) => {
+    console.log(`[WaitingRoom] ${user.name} wants to wait for game ${gameId}`);
+    const game = games[gameId];
+    if (!game) {
+      return socket.emit('error-message', 'La partida no existe.');
+    }
+
+    // Initialize waiting list if needed
+    if (!waitingPlayers[gameId]) waitingPlayers[gameId] = [];
+
+    // Check if already waiting and update socketId (user may have reconnected)
+    const existing = waitingPlayers[gameId].find(p => p.uid === user.uid);
+    if (existing) {
+      existing.socketId = socket.id; // Update socketId in case of reconnection
+      console.log(`[WaitingRoom] Updated socketId for ${user.name} in game ${gameId}`);
+    } else {
+      waitingPlayers[gameId].push({
+        uid: user.uid,
+        name: user.name,
+        photoURL: user.photoURL || null,
+        socketId: socket.id
+      });
+      console.log(`[WaitingRoom] ${user.name} added to waiting list for game ${gameId}`);
+    }
+
+    // Join waiting room channel
+    socket.join(`waiting-${gameId}`);
+
+    // Emit updated list to all waiting players
+    io.to(`waiting-${gameId}`).emit('waiting-room-updated', {
+      gameId,
+      waitingPlayers: waitingPlayers[gameId],
+      gamePhase: game.phase
+    });
+  });
+
+  socket.on('leave-waiting-room', (gameId) => {
+    console.log(`[WaitingRoom] ${user.name} leaving waiting room for game ${gameId}`);
+
+    if (waitingPlayers[gameId]) {
+      waitingPlayers[gameId] = waitingPlayers[gameId].filter(p => p.uid !== user.uid);
+
+      // Leave waiting room channel
+      socket.leave(`waiting-${gameId}`);
+
+      // Notify remaining waiters
+      io.to(`waiting-${gameId}`).emit('waiting-room-updated', {
+        gameId,
+        waitingPlayers: waitingPlayers[gameId],
+        gamePhase: games[gameId]?.phase
+      });
+    }
   });
 
   // Generic handler for game actions to reduce boilerplate
@@ -790,7 +858,47 @@ io.on('connection', (socket) => {
 
   socket.on('start-game', (gameId) => handleGameAction(gameId, g => g.startGame(user.uid)));
   socket.on('end-game', (gameId) => handleGameAction(gameId, g => g.endGame(user.uid)));
-  socket.on('play-again', (gameId) => handleGameAction(gameId, g => g.playAgain(user.uid)));
+
+  socket.on('play-again', (gameId) => {
+    handleGameAction(gameId, g => g.playAgain(user.uid));
+
+    // After play-again, game should be in 'lobby' phase - auto-join waiting players
+    const game = games[gameId];
+    if (game && game.phase === 'lobby' && waitingPlayers[gameId]?.length > 0) {
+      console.log(`[WaitingRoom] Auto-joining ${waitingPlayers[gameId].length} waiting players to game ${gameId}`);
+
+      const waiting = [...waitingPlayers[gameId]]; // Copy array
+      waiting.forEach(player => {
+        try {
+          game.addPlayer({
+            uid: player.uid,
+            name: player.name,
+            photoURL: player.photoURL
+          });
+
+          // Get the socket for this player and join them to the game room
+          const playerSocket = io.sockets.sockets.get(player.socketId);
+          if (playerSocket) {
+            playerSocket.join(gameId);
+            console.log(`[WaitingRoom] Joined ${player.name} to game room ${gameId}`);
+          }
+
+          // Notify player they've been auto-joined
+          io.to(player.socketId).emit('auto-joined', { gameId });
+
+          console.log(`[WaitingRoom] Auto-joined ${player.name} to game ${gameId}`);
+        } catch (error) {
+          console.error(`[WaitingRoom] Failed to auto-join ${player.name}:`, error.message);
+        }
+      });
+
+      // Clear waiting list
+      waitingPlayers[gameId] = [];
+
+      // Emit updated game state
+      emitGameState(game);
+    }
+  });
 
   // Voting endpoint
   socket.on('cast-vote', ({ gameId, targetId }) => {
@@ -832,13 +940,24 @@ io.on('connection', (socket) => {
       delete pendingDisconnects[user.uid];
     }
 
-    // Use the new leaveGame method which sets status to 'left'
+    // CLEAN ALL GAMES: Mark user as 'left' in ALL games to prevent auto-reconnection
+    console.log(`[Leave] Cleaning all games for user ${user.name}...`);
+    Object.values(games).forEach(g => {
+      const player = g.getPlayer(user.uid);
+      if (player && player.status !== 'left') {
+        g.setPlayerStatus(user.uid, 'left');
+        g.persist();
+        console.log(`[Leave] Marked ${user.name} as left in game ${g.gameId}`);
+      }
+    });
+
+    // Use the new leaveGame method for the specific game (for host transfer, etc.)
     const newHostInfo = game.leaveGame(user.uid);
 
     // 1. Reset leaving player state - send null BEFORE leaving room
     socket.emit('game-state', null);
 
-    console.log(`[Leave] User ${user.name} marked as left in game data.`);
+    console.log(`[Leave] User ${user.name} marked as left in all games.`);
 
     socket.leave(gameId);
 
@@ -859,7 +978,7 @@ io.on('connection', (socket) => {
     }
 
     // 4. Acknowledge completion
-    console.log(`User ${user.name} successfully left game ${gameId}`);
+    console.log(`User ${user.name} successfully left all games`);
     safeCallback();
   });
 
@@ -920,6 +1039,23 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${user.name}`);
+
+    // Clean up from waiting rooms
+    Object.keys(waitingPlayers).forEach(gameId => {
+      const initialLength = waitingPlayers[gameId].length;
+      waitingPlayers[gameId] = waitingPlayers[gameId].filter(p => p.uid !== user.uid);
+
+      if (waitingPlayers[gameId].length < initialLength) {
+        console.log(`[WaitingRoom] Removed ${user.name} from waiting list for game ${gameId}`);
+        // Notify remaining waiters
+        io.to(`waiting-${gameId}`).emit('waiting-room-updated', {
+          gameId,
+          waitingPlayers: waitingPlayers[gameId],
+          gamePhase: games[gameId]?.phase
+        });
+      }
+    });
+
     const userGame = findUserGame(user.uid);
     if (userGame) {
       // Check if user was recently active (within last 2 minutes)

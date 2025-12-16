@@ -124,7 +124,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                 <div>
                     {!invitedGameId && (
                         <Button
-                            onClick={onLogin}
+                            onClick={() => onLogin(invitedGameId)}
                             variant="primary"
                             size="sm"
                             className="w-auto !px-6 !py-1 !h-9 text-sm disabled:opacity-50 disabled:cursor-not-allowed rounded-full flex items-center gap-2"
@@ -168,7 +168,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                         <div className="space-y-3 pt-4">
                             {/* Google Button */}
                             <Button
-                                onClick={onLogin}
+                                onClick={() => onLogin(invitedGameId)}
                                 disabled={isLoading}
                                 variant="outline"
                                 size="lg"
@@ -266,7 +266,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10 animate-fadeIn animate-delay-600 w-full max-w-md mx-auto sm:max-w-none">
                             <div className="w-full sm:w-auto min-w-[240px]">
                                 <Button
-                                    onClick={onLogin}
+                                    onClick={() => onLogin(invitedGameId)}
                                     disabled={isLoading}
                                     variant="outline"
                                     size="lg"
@@ -580,7 +580,7 @@ export function LandingPage({ onLogin, onGoToEmailAuth, isLoading, onOpenInstruc
                     <p className="text-lg text-neutral-400 max-w-xl mx-auto">Únete ahora y demuestra tus habilidades de decepción. No necesitas instalar nada.</p>
                     <div className="flex justify-center pt-4">
                         <Button
-                            onClick={onLogin}
+                            onClick={() => onLogin(invitedGameId)}
                             disabled={isLoading}
                             variant="outline"
                             className="bg-orange-600 border-orange-500 text-white hover:bg-orange-500 shadow-lg shadow-orange-900/20 px-8 h-12 text-base font-semibold transform hover:scale-105 transition-all duration-300 rounded-full w-auto"

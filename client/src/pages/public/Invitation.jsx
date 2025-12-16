@@ -21,6 +21,9 @@ export function Invitation() {
     const [hostName, setHostName] = useState(null);
     const [joiningAttempted, setJoiningAttempted] = useState(false);
 
+    // Confirm Switch Modal State
+    const [showSwitchConfirm, setShowSwitchConfirm] = useState(false);
+
     // Fetch game preview info
     useEffect(() => {
         if (!gameId) return;
@@ -48,19 +51,14 @@ export function Invitation() {
     }, [gameId]);
 
     // Auto-join when authenticated and connected
-    // Handle three cases:
-    // 1. No current game -> join invited game
-    // 2. Already in the invited game -> redirect
-    // 3. In a different game -> leave and join invited game
     useEffect(() => {
-        if (!user || !connected || !gameId || joinError) return;
+        if (!user || !connected || !gameId || joinError || showSwitchConfirm) return;
 
         // Don't auto-join if user just explicitly left a game
         const justLeft = sessionStorage.getItem('justLeftGame');
         if (justLeft) {
             console.log('[Invitation] User just left, clearing flag before auto-join');
             sessionStorage.removeItem('justLeftGame');
-            // Don't return - allow join since this is an explicit invitation page
         }
 
         const currentGameId = gameState?.gameId;
@@ -70,16 +68,12 @@ export function Invitation() {
             return;
         }
 
-        // Case 3: In a different game - leave it first, then join the invited one
-        if (currentGameId && currentGameId !== gameId && !joiningAttempted) {
-            console.log('🔄 Leaving current game', currentGameId, 'to join invited game', gameId);
-            emit('leave-game', currentGameId);
-            // Small delay to ensure leave is processed before join
-            setTimeout(() => {
-                console.log('🔄 Auto-joining invited game:', gameId);
-                emit('join-game', gameId);
-            }, 500);
-            setJoiningAttempted(true);
+        // Case 3: In a different game - ASK CONFIRMATION
+        if (currentGameId && currentGameId !== gameId) {
+            if (!joiningAttempted) {
+                console.log('🔄 User in another game, asking for confirmation...');
+                setShowSwitchConfirm(true);
+            }
             return;
         }
 
@@ -89,7 +83,7 @@ export function Invitation() {
             emit('join-game', gameId);
             setJoiningAttempted(true);
         }
-    }, [user, connected, gameId, gameState?.gameId, joinError, joiningAttempted, emit]);
+    }, [user, connected, gameId, gameState?.gameId, joinError, joiningAttempted, emit, showSwitchConfirm]);
 
     // Redirect to game room once joined
     useEffect(() => {
@@ -103,6 +97,33 @@ export function Invitation() {
         // Store gameId in session and redirect to login
         sessionStorage.setItem('pendingGameId', gameId);
         navigate('/login?mode=email');
+    };
+
+    // Confirm Switch Action
+    const handleConfirmSwitch = () => {
+        // Leave current game then join new one
+        if (gameState?.gameId) {
+            emit('leave-game', gameState.gameId);
+        }
+        // Small delay to ensure clean state on server
+        setTimeout(() => {
+            emit('join-game', gameId);
+            setJoiningAttempted(true);
+            setShowSwitchConfirm(false);
+        }, 300);
+    };
+
+    // Create New Game Action (Alternative to waiting)
+    const handleCreateNewGame = () => {
+        // Creating a game will auto-join it
+        emit('create-game');
+        // Navigate to app base, enabling Layout to redirect to new game when state updates
+        navigate('/app');
+    };
+
+    // Wait Action
+    const handleWait = () => {
+        navigate(`/app/wait/${gameId}`);
     };
 
     // Loading auth state
@@ -129,15 +150,100 @@ export function Invitation() {
         );
     }
 
-    // Error joining game
+    // Modal: Confirm Switch Game
+    if (showSwitchConfirm) {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950 text-white">
+                <div className="w-full max-w-sm mx-auto text-center space-y-6 px-6">
+                    <div className="flex justify-center">
+                        <img
+                            src={bellImg}
+                            alt="Invitación"
+                            className="w-24 h-24 rounded-full object-cover ring-4 ring-orange-500/30 shadow-2xl animate-pulse-slow"
+                        />
+                    </div>
+                    <div>
+                        <h2 className="text-3xl font-serif text-neutral-50 mb-4">¡Te han invitado!</h2>
+                        <p className="text-neutral-300 text-lg leading-relaxed">
+                            <span className="font-bold text-orange-400">{hostName || 'Un anfitrión'}</span> te invita a su partida.
+                            <br /><span className="text-sm text-neutral-500 mt-2 block">¿Quieres abandonar tu partida actual para unirte?</span>
+                        </p>
+                    </div>
+                    <div className="space-y-3 pt-4">
+                        <Button
+                            onClick={handleConfirmSwitch}
+                            variant="primary"
+                            size="lg"
+                            className="w-full text-lg shadow-orange-900/20 shadow-lg"
+                        >
+                            Unirme a la partida
+                        </Button>
+                        <Button
+                            onClick={() => navigate('/app')}
+                            variant="ghost"
+                            size="md"
+                            className="w-full text-neutral-500 hover:text-neutral-300"
+                        >
+                            Cancelar
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Error joining game (including In Progress)
     if (joinError) {
         let errorTitle = "No se pudo unir";
-        let errorMsg = joinError;
+        let errorMsg = typeof joinError === 'string' ? joinError : joinError.message || 'Error desconocido';
+        const errorString = typeof joinError === 'string' ? joinError : joinError.message || '';
+        const isGameInProgress = /partida en curso/i.test(errorString) || joinError.type === 'in-progress';
 
-        if (/partida en curso/i.test(joinError)) {
-            errorTitle = "Partida ya iniciada";
-            errorMsg = "Lo sentimos, esta partida ya comenzó y no acepta nuevos jugadores.";
-        } else if (/no existe/i.test(joinError)) {
+        // Use hostName from error payload if available, else fallback to preview
+        const displayHostName = joinError.hostName || hostName || 'el anfitrión';
+
+        if (isGameInProgress) {
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950 text-white">
+                    <div className="w-full max-w-sm mx-auto text-center space-y-6 px-6">
+                        <div className="flex justify-center mb-2">
+                            <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center ring-1 ring-red-500/30 shadow-lg shadow-red-900/20">
+                                <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-serif text-neutral-50 mb-3">Partida en curso</h2>
+                            <p className="text-neutral-400 leading-relaxed">
+                                La partida de <span className="text-orange-400 font-bold">{displayHostName}</span> ya está en curso y no te puedes unir.
+                                <br /><br />
+                                Puedes crear una nueva partida para jugar con tus amigos.
+                            </p>
+                        </div>
+                        <div className="space-y-3 pt-2">
+                            <Button
+                                onClick={handleCreateNewGame}
+                                variant="primary"
+                                className="w-full"
+                            >
+                                Crear nueva partida
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    clearJoinError();
+                                    navigate('/app');
+                                }}
+                                variant="ghost"
+                                className="w-full text-neutral-500"
+                            >
+                                Volver al inicio
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            );
+        } else if (/no existe/i.test(errorString)) {
             errorTitle = "Enlace no válido";
             errorMsg = "No encontramos esta partida. Es posible que el anfitrión la haya cerrado.";
         }

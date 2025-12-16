@@ -234,6 +234,19 @@ export function useSocket(user) {
           }
         });
 
+        // Escuchar evento especial cuando la partida está en curso
+        socket.on('game-in-progress', (data) => {
+          console.log('Game in progress:', data);
+          if (isMounted) {
+            setJoinError({
+              type: 'in-progress',
+              gameId: data.gameId,
+              message: data.message,
+              hostName: data.hostName
+            });
+          }
+        });
+
         socket.on('session-replaced', (message) => {
           console.log('Session replaced:', message);
           window.dispatchEvent(new CustomEvent('app:toast', { detail: message }));
@@ -246,6 +259,19 @@ export function useSocket(user) {
             window.history.replaceState({}, '', url.toString());
           }
         });
+
+        // Waiting room events
+        socket.on('waiting-room-updated', (data) => {
+          console.log('[Socket] Waiting room updated:', data);
+          window.dispatchEvent(new CustomEvent('socket:waiting-room-updated', { detail: data }));
+        });
+
+        socket.on('auto-joined', (data) => {
+          console.log('[Socket] Auto-joined to game:', data.gameId);
+          window.dispatchEvent(new CustomEvent('socket:auto-joined', { detail: data }));
+          // Note: WaitingRoom component will handle navigation
+        });
+
 
         // Escuchar toasts del servidor (ej: cambio de host)
         socket.on('toast', (message) => {

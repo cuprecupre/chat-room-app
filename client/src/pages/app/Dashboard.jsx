@@ -9,7 +9,7 @@ import { useCallback, useEffect } from 'react';
 import { Lobby } from '../../components/Lobby';
 
 export function Dashboard() {
-    const { user, gameState, emit } = useOutletContext();
+    const { user, gameState, emit, clearJoinError } = useOutletContext();
     const navigate = useNavigate();
 
     // If user is already in a game, redirect to game room
@@ -36,8 +36,9 @@ export function Dashboard() {
     }, [navigate]);
 
     const handleCreateGame = useCallback((options) => {
+        clearJoinError(); // Clean any previous error state
         emit('create-game', options);
-    }, [emit]);
+    }, [emit, clearJoinError]);
 
     const handleLogout = useCallback(async () => {
         // Logout is handled by AppLayout

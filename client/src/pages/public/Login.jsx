@@ -86,7 +86,29 @@ export function Login() {
                         variant="primary"
                         size="lg"
                         className="w-full"
-                        onClick={login}
+                        onClick={() => {
+                            // Extract gameId from 'from' path to ensure it persists through OAuth
+                            let pendingGameId = null;
+                            if (from) {
+                                // Try /app/game/:id
+                                const gameMatch = from.match(/\/app\/game\/([A-Za-z0-9]+)/);
+                                if (gameMatch) pendingGameId = gameMatch[1];
+
+                                // Try /join/:id
+                                if (!pendingGameId) {
+                                    const joinMatch = from.match(/\/join\/([A-Za-z0-9]+)/);
+                                    if (joinMatch) pendingGameId = joinMatch[1];
+                                }
+
+                                // Try query param ?gameId=
+                                if (!pendingGameId && from.includes('?')) {
+                                    const search = new URLSearchParams(from.split('?')[1]);
+                                    pendingGameId = search.get('gameId');
+                                }
+                            }
+                            console.log('Login attempt with pendingGameId:', pendingGameId);
+                            login(pendingGameId);
+                        }}
                     >
                         <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                             <path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />

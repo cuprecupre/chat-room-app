@@ -28,7 +28,8 @@ class Game {
     this.roundPlayers = []; // uids activos en la ronda actual
 
     // Opciones del juego
-    this.showImpostorHint = options.showImpostorHint !== undefined ? options.showImpostorHint : true;
+    const safeOptions = options || {};
+    this.showImpostorHint = safeOptions.showImpostorHint !== undefined ? safeOptions.showImpostorHint : true;
 
     // Sistema de vueltas
     this.currentTurn = 1;
@@ -283,8 +284,27 @@ class Game {
         this.persist();
         return;
       } else if (existingPlayer.status === PLAYER_STATUS.ACTIVE) {
-        // Already active - nothing to do
-        console.log(`[Game ${this.gameId}] Player ${user.name} already active`);
+        // Already active - but update name/photo in case they changed
+        this.players[user.uid].name = user.name;
+        this.players[user.uid].photoURL = user.photoURL || null;
+        this.formerPlayers[user.uid] = {
+          name: user.name,
+          photoURL: user.photoURL || null
+        };
+        this.persist();
+        console.log(`[Game ${this.gameId}] Player ${user.name} already active (name/photo updated)`);
+        return;
+      } else if (existingPlayer.status === PLAYER_STATUS.WAITING_REJOIN) {
+        // Player is reconnecting - change status back to ACTIVE
+        this.players[user.uid].name = user.name;
+        this.players[user.uid].photoURL = user.photoURL || null;
+        this.players[user.uid].status = PLAYER_STATUS.ACTIVE;
+        this.formerPlayers[user.uid] = {
+          name: user.name,
+          photoURL: user.photoURL || null
+        };
+        this.persist();
+        console.log(`[Game ${this.gameId}] Player ${user.name} reconnected (waiting_rejoin -> active)`);
         return;
       }
     }
@@ -322,9 +342,13 @@ class Game {
    * Actualiza el orden base (OB) ordenando jugadores activos por joinedAt (ASC)
    */
   updatePlayerOrder() {
-    // Get active players and sort by joinedAt
-    const activePlayers = this.getActivePlayersArray();
-    const sortedPlayers = activePlayers.sort((a, b) => {
+    // Get active AND waiting_rejoin players and sort by joinedAt
+    // We include waiting_rejoin so they appear in the player list UI
+    const playersList = Object.entries(this.players)
+      .filter(([uid, p]) => p.status === PLAYER_STATUS.ACTIVE || p.status === PLAYER_STATUS.WAITING_REJOIN)
+      .map(([uid, p]) => ({ uid, ...p }));
+
+    const sortedPlayers = playersList.sort((a, b) => {
       return (a.joinedAt || 0) - (b.joinedAt || 0);
     });
     this.playerOrder = sortedPlayers.map(p => p.uid);
