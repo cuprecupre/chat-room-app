@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react";
+import { showToast } from "../lib/toast";
 
 export function useCopyToClipboard() {
     const isMobile = useMemo(() => {
@@ -24,9 +25,7 @@ export function useCopyToClipboard() {
                         return;
                     }
                     console.error("Error sharing:", err);
-                    window.dispatchEvent(
-                        new CustomEvent("app:toast", { detail: "No se pudo compartir" })
-                    );
+                    showToast("No se pudo compartir");
                     return;
                 }
             }
@@ -35,9 +34,7 @@ export function useCopyToClipboard() {
             try {
                 if (navigator.clipboard && window.isSecureContext) {
                     await navigator.clipboard.writeText(url);
-                    window.dispatchEvent(
-                        new CustomEvent("app:toast", { detail: "Enlace copiado" })
-                    );
+                    showToast("Enlace copiado");
                 } else {
                     const textArea = document.createElement("textarea");
                     textArea.value = url;
@@ -49,9 +46,7 @@ export function useCopyToClipboard() {
                     document.body.removeChild(textArea);
 
                     if (successful) {
-                        window.dispatchEvent(
-                            new CustomEvent("app:toast", { detail: "Enlace copiado" })
-                        );
+                        showToast("Enlace copiado");
                     }
                 }
             } catch (err) {
@@ -79,9 +74,7 @@ export function useCopyToClipboard() {
                         return;
                     }
                     console.error("Error sharing:", err);
-                    window.dispatchEvent(
-                        new CustomEvent("app:toast", { detail: "No se pudo compartir" })
-                    );
+                    showToast("No se pudo compartir");
                     return;
                 }
             }
@@ -90,9 +83,7 @@ export function useCopyToClipboard() {
             try {
                 if (navigator.clipboard && window.isSecureContext) {
                     await navigator.clipboard.writeText(gameId);
-                    window.dispatchEvent(
-                        new CustomEvent("app:toast", { detail: "Código copiado" })
-                    );
+                    showToast("Código copiado");
                 } else {
                     const textArea = document.createElement("textarea");
                     textArea.value = gameId;
@@ -104,9 +95,7 @@ export function useCopyToClipboard() {
                     document.body.removeChild(textArea);
 
                     if (successful) {
-                        window.dispatchEvent(
-                            new CustomEvent("app:toast", { detail: "Código copiado" })
-                        );
+                        showToast("Código copiado");
                     }
                 }
             } catch (err) {

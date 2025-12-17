@@ -1,52 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { Toaster as HotToaster } from 'react-hot-toast';
 
 export function Toaster() {
-  const [visible, setVisible] = useState(false);
-  const [message, setMessage] = useState('');
-  const [isError, setIsError] = useState(false);
-
-  useEffect(() => {
-    const handleToast = (e) => {
-      const msg = e.detail;
-      setMessage(msg);
-      
-      // Detectar si es un mensaje de error
-      const errorKeywords = [
-        'no puedes',
-        'no existe',
-        'no perteneces',
-        'partida en curso',
-        'error',
-        'eliminado',
-        'no está',
-        'no se puede',
-        'solo el host'
-      ];
-      
-      const isErrorMessage = errorKeywords.some(keyword => 
-        msg.toLowerCase().includes(keyword.toLowerCase())
-      );
-      
-      setIsError(isErrorMessage);
-      setVisible(true);
-      setTimeout(() => {
-        setVisible(false);
-      }, 3000);
-    };
-
-    window.addEventListener('app:toast', handleToast);
-    return () => window.removeEventListener('app:toast', handleToast);
-  }, []);
-
   return (
-    <div className={`fixed top-5 left-1/2 -translate-x-1/2 ${
-      isError ? 'bg-red-900/90' : 'bg-green-800'
-    } text-white px-6 py-3 rounded-full shadow-lg text-center transition-all duration-300 ease-out transform z-[9999] ${
-      visible 
-        ? 'opacity-100 translate-y-0' 
-        : 'opacity-0 -translate-y-2'
-    }`}>
-      {message}
-    </div>
+    <HotToaster
+      position="top-center"
+      toastOptions={{
+        className: '',
+        style: {},
+        icon: null,
+      }}
+      containerStyle={{
+        top: 20,
+      }}
+    />
   );
 }

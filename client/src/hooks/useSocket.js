@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import { getToken, saveToken, isTokenExpired } from '../lib/tokenStorage';
+import { showToast } from '../lib/toast';
 
 export function useSocket(user) {
   const socketRef = useRef(null);
@@ -141,9 +142,7 @@ export function useSocket(user) {
             } catch (refreshError) {
               console.error('❌ No se pudo refrescar el token:', refreshError);
               // Mostrar mensaje al usuario
-              window.dispatchEvent(new CustomEvent('app:toast', {
-                detail: 'Tu sesión expiró. Por favor, vuelve a iniciar sesión.'
-              }));
+              showToast('Tu sesión expiró. Por favor, vuelve a iniciar sesión.');
             }
           }
         });
@@ -225,7 +224,7 @@ export function useSocket(user) {
             if (isMounted) setJoinError(message);
           } else {
             // Solo mostrar toast para otros errores
-            window.dispatchEvent(new CustomEvent('app:toast', { detail: message }));
+            showToast(message);
           }
 
           // MODIFICADO: NO borrar la URL si es "partida en curso" o "no existe"
@@ -242,7 +241,7 @@ export function useSocket(user) {
 
         socket.on('session-replaced', (message) => {
           console.log('Session replaced:', message);
-          window.dispatchEvent(new CustomEvent('app:toast', { detail: message }));
+          showToast(message);
           // Clear game state and redirect to lobby
           if (isMounted) {
             setGameState(null);
@@ -256,7 +255,7 @@ export function useSocket(user) {
         // Escuchar toasts del servidor (ej: cambio de host)
         socket.on('toast', (message) => {
           console.log('[Socket] Toast from server:', message);
-          window.dispatchEvent(new CustomEvent('app:toast', { detail: message }));
+          showToast(message);
         });
 
       } catch (error) {

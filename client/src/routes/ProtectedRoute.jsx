@@ -5,6 +5,7 @@ import { Button } from "../components/ui/Button";
 import heroImg from "../assets/impostor-home.png";
 import bellImg from "../assets/bell.png";
 import { ROUTES } from "./routes";
+import { showToast } from "../lib/toast";
 
 export function ProtectedRoute({ user, connected, emit, gameState }) {
     const [isStuck, setIsStuck] = useState(false);
@@ -51,11 +52,7 @@ export function ProtectedRoute({ user, connected, emit, gameState }) {
         window.history.replaceState({}, "", url.toString());
 
         // Show toast immediately
-        window.dispatchEvent(
-            new CustomEvent("app:toast", {
-                detail: "Sesión reiniciada. Vuelve al lobby.",
-            })
-        );
+        showToast("Sesión reiniciada. Vuelve al lobby.");
 
         const handleCleanExit = () => {
             window.location.reload();
