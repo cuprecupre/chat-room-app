@@ -480,9 +480,6 @@ class Game {
       // Si ya estamos en la vuelta 3, el impostor gana
       if (this.currentTurn >= this.maxTurns) {
         console.log(`[Game ${this.gameId}] Vuelta 3 completada sin eliminación. ¡El impostor gana!`);
-        // Dar puntos al impostor por sobrevivir la última vuelta (vuelta 3 = 4 puntos)
-        this.playerScores[this.impostorId] = (this.playerScores[this.impostorId] || 0) + 4;
-        this.lastRoundScores[this.impostorId] = (this.lastRoundScores[this.impostorId] || 0) + 4;
         this.endRound(false); // Impostor gana
       } else {
         console.log(`[Game ${this.gameId}] Empate: siguiente vuelta sin puntos.`);
@@ -503,8 +500,14 @@ class Game {
       console.log(`[Game ${this.gameId}] ¡El impostor fue descubierto!`);
       this.endRound(true); // Amigos ganan
     } else {
-      // Era un amigo, continuar o terminar
-      if (this.currentTurn >= this.maxTurns) {
+      // Era un amigo, verificar cuántos quedan
+      const activePlayers = this.getActivePlayers();
+
+      // Si solo quedan 2 jugadores (impostor + 1 amigo), el impostor gana automáticamente
+      if (activePlayers.length <= 2) {
+        console.log(`[Game ${this.gameId}] Solo quedan 2 jugadores. ¡El impostor gana automáticamente!`);
+        this.endRound(false); // Impostor gana
+      } else if (this.currentTurn >= this.maxTurns) {
         console.log(`[Game ${this.gameId}] Tercera vuelta completada. ¡El impostor gana!`);
         this.endRound(false); // Impostor gana
       } else {
@@ -581,8 +584,13 @@ class Game {
       });
     } else {
       // Impostor ganó
-      // Los puntos por sobrevivir cada vuelta ya fueron dados durante el juego (2, 3, 4 puntos)
-      // No hay puntos adicionales
+      // Dar puntos finales al impostor por ganar la ronda
+      // Los puntos por sobrevivir vueltas intermedias ya fueron dados en startNextTurn
+      // Pero los puntos por la vuelta final (donde ganó) se dan aquí
+      const finalTurnPoints = this.currentTurn + 1; // Vuelta actual + 1 = puntos (V1=2, V2=3, V3=4)
+      this.playerScores[this.impostorId] = (this.playerScores[this.impostorId] || 0) + finalTurnPoints;
+      this.lastRoundScores[this.impostorId] = (this.lastRoundScores[this.impostorId] || 0) + finalTurnPoints;
+      console.log(`[Game ${this.gameId}] Impostor gana la ronda en vuelta ${this.currentTurn}: +${finalTurnPoints} puntos`);
 
       // Dar puntos a amigos que votaron correctamente (aunque no ganaron)
       this.turnHistory.forEach(turn => {
