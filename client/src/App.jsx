@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { useSocket } from './hooks/useSocket';
-import { useAppAssetsPreloader } from './hooks/useImagePreloader';
 import { LandingPage } from './components/LandingPage';
 import { EmailAuthScreen } from './components/EmailAuthScreen';
 import { Lobby } from './components/Lobby';
@@ -48,8 +47,6 @@ export default function App() {
   // Check if user is accessing showcase route
   const isShowcaseRoute = window.location.pathname === '/ui-showcase';
 
-  // Precargar assets de la app
-  const { isLoading: assetsLoading } = useAppAssetsPreloader();
   const menuRef = useRef(null);
   const lastLoggedUid = useRef(null); // Para evitar logs duplicados
   const hasLoggedNoUser = useRef(false); // Para evitar log infinito de "no hay usuario"

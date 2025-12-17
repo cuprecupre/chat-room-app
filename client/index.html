@@ -29,11 +29,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Trocchi&display=swap" rel="stylesheet">
 
-  <!-- Preload de imágenes críticas -->
-  <link rel="preload" as="image" href="/src/assets/card.png">
-  <link rel="preload" as="image" href="/src/assets/card-back.png">
-  <link rel="preload" as="image" href="/src/assets/dual-impostor.png">
-  <link rel="preload" as="image" href="/src/assets/bell.png">
   <!-- Bloquea zoom por gesto y por doble-tap -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 
@@ -103,27 +98,6 @@
   <!-- End Google Tag Manager (noscript) -->
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
-
-  <!-- Eruda mobile console for debugging - Only loads when ?debug=true is in URL -->
-  <script>
-    (function () {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('debug') === 'true') {
-        console.log('🔧 Eruda debug mode activado - Cargando consola móvil...');
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/eruda';
-        script.onload = function () {
-          eruda.init();
-          console.log('✅ Eruda cargado exitosamente');
-          console.log('📱 Para ver los logs, toca el ícono de Eruda en la esquina inferior derecha');
-        };
-        script.onerror = function () {
-          console.error('❌ Error al cargar Eruda desde CDN');
-        };
-        document.body.appendChild(script);
-      }
-    })();
-  </script>
 </body>
 
 </html>
