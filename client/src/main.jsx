@@ -15,8 +15,6 @@ if (import.meta.env.DEV === 'true') {
   });
 }
 
-
-
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
