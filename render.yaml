@@ -5,7 +5,7 @@ services:
     env: node
     branch: main
     buildCommand: npm install && npm run build
-    startCommand: npm run start --workspace=@impostor/server
+    startCommand: node apps/server/src/index.js
 
   # Servicio de Desarrollo
   - type: web
@@ -13,4 +13,4 @@ services:
     env: node
     branch: develop
     buildCommand: npm install && npm run build
-    startCommand: npm run start --workspace=@impostor/server
+    startCommand: node apps/server/src/index.js
