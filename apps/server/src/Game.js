@@ -1,5 +1,5 @@
 const { getRandomWordWithCategory } = require('./words');
-const dbService = require('./server/services/db');
+const dbService = require('./services/db');
 
 class Game {
   constructor(hostUser, options = {}) {
@@ -711,3 +711,4 @@ class Game {
 }
 
 module.exports = Game;
+

@@ -116,3 +116,4 @@ class DBService {
 
 // Export singleton
 module.exports = new DBService();
+

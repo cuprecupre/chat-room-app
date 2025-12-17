@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -28,18 +30,20 @@ const Game = require('./Game');
     }
   }
   const candidates = [
-    './firebase-service-account.json',
-    './serviceAccountKey.json',
+    path.join(__dirname, '..', 'firebase-service-account.json'),
+    path.join(__dirname, '..', 'serviceAccountKey.json'),
   ];
   for (const p of candidates) {
-    try {
-      const serviceAccount = require(p);
-      admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-      console.log(`Firebase Admin inicializado con ${p}.`);
-      initialized = true;
-      break;
-    } catch (_) {
-      // continuar con siguiente candidato
+    if (!initialized) {
+      try {
+        const serviceAccount = require(p);
+        admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+        console.log(`Firebase Admin inicializado con ${p}.`);
+        initialized = true;
+        break;
+      } catch (_) {
+        // continuar con siguiente candidato
+      }
     }
   }
   if (!initialized) {
@@ -55,7 +59,7 @@ const Game = require('./Game');
   }
 })();
 
-const dbService = require('./server/services/db');
+const dbService = require('./services/db');
 
 // --- Configuration & Services Initialization ---
 // Robust check: trim whitespace and lowercase to avoid " true" or "True" failures
@@ -142,7 +146,7 @@ const verifyFirebaseToken = async (req, res, next) => {
 
 
 // --- Server Setup: serve only the React (shadcn) app build ---
-const clientDist = path.join(__dirname, 'client', 'dist');
+const clientDist = path.join(__dirname, '..', '..', 'client', 'dist');
 
 // Sirve og.png con no-cache para forzar refresco en scrapers (WhatsApp)
 app.get('/og.png', (req, res) => {
@@ -176,9 +180,6 @@ app.use(express.static(clientDist, {
   }
 }));
 
-// Servir archivos estáticos de la carpeta public (root)
-// Esto asegura que robots.txt y sitemap.xml se sirvan correctamente
-app.use(express.static(path.join(__dirname, 'public')));
 
 // CORS for API endpoints in development
 app.use('/api', (req, res, next) => {
@@ -249,7 +250,7 @@ app.get('*', (req, res, next) => {
   if (!fs.existsSync(indexPath)) {
     return res
       .status(500)
-      .send('Client build not found. Run "npm run build" inside the client/ folder.');
+      .send('Client build not found. Run "npm run build" inside the apps/client/ folder.');
   }
   try {
     const raw = fs.readFileSync(indexPath, 'utf8');
@@ -670,3 +671,4 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+

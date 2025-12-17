@@ -1,6 +1,6 @@
 // Word service - loads word data from JSON file
 const path = require('path');
-const wordCategories = require('./data/words.json');
+const wordCategories = require('../data/words.json');
 
 // Flatten word categories into array of {word, category} objects
 const wordsFlat = Object.entries(wordCategories).flatMap(([category, arr]) => 
@@ -21,3 +21,4 @@ module.exports = {
   words: wordsFlat, 
   getRandomWordWithCategory 
 };
+

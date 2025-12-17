@@ -4,23 +4,13 @@ services:
     name: impostor-app-production
     env: node
     branch: main
-    buildCommand: npm install --include=dev && cd client && npm install --include=dev && npm run build
-    startCommand: node server.js
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: ENABLE_DB_PERSISTENCE
-        value: false # Activar manualmente en Dashboard cuando estemos listos
+    buildCommand: npm install && npm run build
+    startCommand: npm run start --workspace=@impostor/server
 
-  # Servicio de Staging
+  # Servicio de Desarrollo
   - type: web
-    name: impostor-app-staging
+    name: impostor-app-develop
     env: node
     branch: develop
-    buildCommand: npm install --include=dev && cd client && npm install --include=dev && npm run build
-    startCommand: node server.js
-    envVars:
-      - key: NODE_ENV
-        value: staging
-      - key: ENABLE_DB_PERSISTENCE
-        value: true # Activado para pruebas en Staging
+    buildCommand: npm install && npm run build
+    startCommand: npm run start --workspace=@impostor/server
