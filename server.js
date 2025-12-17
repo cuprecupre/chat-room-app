@@ -242,6 +242,19 @@ app.get('/api/game/:gameId', async (req, res) => {
   });
 });
 
+// API Endpoint for server stats (real-time from memory)
+app.get('/api/stats', (req, res) => {
+  res.json({
+    connectedUsers: Object.keys(userSockets).length,
+    activeGames: Object.keys(games).length,
+    totalConnections: stats.totalConnections,
+    gamesCreated: stats.gamesCreated,
+    peakConcurrentUsers: stats.peakConcurrentUsers,
+    serverUptime: Math.floor((Date.now() - stats.serverStartTime) / 1000), // seconds
+    timestamp: Date.now()
+  });
+});
+
 // SPA fallback con inyección de OG absoluta
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/socket.io/')) return next();
@@ -293,6 +306,49 @@ const userHeartbeats = {};
 // Users who explicitly left games - prevents auto-rejoin on reconnect: { [uid]: true }
 // This is cleared after a short period once we're sure they're in a clean state
 const explicitlyLeftUsers = {};
+
+// --- Stats Tracking (in-memory with periodic Firestore sync) ---
+const stats = {
+  totalConnections: 0,      // Total connections since server start
+  gamesCreated: 0,          // Total games created since server start
+  gamesCompleted: 0,        // Total games completed since server start
+  peakConcurrentUsers: 0,   // Peak concurrent users
+  serverStartTime: Date.now()
+};
+
+// Update peak concurrent users
+const updatePeakUsers = () => {
+  const currentUsers = Object.keys(userSockets).length;
+  if (currentUsers > stats.peakConcurrentUsers) {
+    stats.peakConcurrentUsers = currentUsers;
+  }
+};
+
+// Sync stats to Firestore every 5 minutes
+const STATS_SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes
+setInterval(async () => {
+  if (!ENABLE_DB_PERSISTENCE) return;
+
+  try {
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const docRef = admin.firestore().collection('stats').doc(today);
+
+    await docRef.set({
+      date: today,
+      totalConnections: stats.totalConnections,
+      gamesCreated: stats.gamesCreated,
+      gamesCompleted: stats.gamesCompleted,
+      peakConcurrentUsers: stats.peakConcurrentUsers,
+      currentConnectedUsers: Object.keys(userSockets).length,
+      currentActiveGames: Object.keys(games).length,
+      lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    console.log(`📊 [Stats] Synced to Firestore: ${Object.keys(userSockets).length} users, ${Object.keys(games).length} games`);
+  } catch (error) {
+    console.error('⚠️ [Stats] Failed to sync:', error.message);
+  }
+}, STATS_SYNC_INTERVAL);
 
 // Helper to find which game a user belongs to (global scope)
 const findUserGame = (userId) => Object.values(games).find(g => g.players.some(p => p.uid === userId));
@@ -356,6 +412,10 @@ io.use(async (socket, next) => {
 io.on('connection', (socket) => {
   const user = socket.user;
   console.log(`User connected: ${user.name} (${user.uid})`);
+
+  // Track stats
+  stats.totalConnections++;
+  updatePeakUsers();
 
   // Handle multiple sessions: if user already has a socket, disconnect the old one
   if (userSockets[user.uid]) {
@@ -447,6 +507,7 @@ io.on('connection', (socket) => {
     socket.join(newGame.gameId);
     emitGameState(newGame);
     console.log(`Game created: ${newGame.gameId} by ${user.name} with options:`, options);
+    stats.gamesCreated++;
   });
 
   socket.on('join-game', (gameId) => {
