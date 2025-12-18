@@ -27,18 +27,8 @@ const socketAuthMiddleware = async (socket, next) => {
     const clientIp = socket.handshake.headers["x-forwarded-for"] || socket.handshake.address;
     const userAgent = socket.handshake.headers["user-agent"];
 
-    console.log("🔐 [AUTH] Intento de conexión:", {
-        socketId: socket.id,
-        ip: clientIp,
-        userAgent: userAgent ? userAgent.substring(0, 100) : "N/A",
-        hasToken: !!token,
-        tokenLength: token ? token.length : 0,
-        name: name || "N/A",
-        hasPhotoURL: !!photoURL,
-    });
-
     if (!token) {
-        console.error("❌ [AUTH] Error: No se proporcionó token", {
+        console.error("❌ [AUTH] No token provided -", {
             socketId: socket.id,
             ip: clientIp,
         });
@@ -46,17 +36,9 @@ const socketAuthMiddleware = async (socket, next) => {
     }
 
     try {
-        console.log("🔍 [AUTH] Verificando token con Firebase Admin...");
         const decodedToken = await admin.auth().verifyIdToken(token);
-        console.log("✅ [AUTH] Token verificado exitosamente:", {
-            uid: decodedToken.uid,
-            email: decodedToken.email,
-            name: decodedToken.name || name,
-            emailVerified: decodedToken.email_verified,
-            authTime: new Date(decodedToken.auth_time * 1000).toISOString(),
-            issuedAt: new Date(decodedToken.iat * 1000).toISOString(),
-            expiresAt: new Date(decodedToken.exp * 1000).toISOString(),
-        });
+        // Simplified auth log - only show essential info
+        console.log(`✅ [AUTH] ${name || decodedToken.name} (${decodedToken.uid})`);
 
         socket.user = {
             uid: decodedToken.uid,
