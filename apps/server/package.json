@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "type": "commonjs",
   "scripts": {
+    "build": "echo 'No build needed for server'",
     "start": "node src/index.js",
     "dev": "NODE_ENV=development node src/index.js",
     "test": "jest --runInBand"
