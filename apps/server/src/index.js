@@ -27,6 +27,13 @@ const app = createExpressApp();
 // --- Register API Routes ---
 app.use("/api", apiRoutes);
 
+// --- SPA Fallback (must be after API routes) ---
+const path = require("path");
+const clientBuildPath = path.join(__dirname, "../../client/dist");
+app.get("*", (req, res) => {
+    res.sendFile(path.join(clientBuildPath, "index.html"));
+});
+
 // --- Create HTTP Server ---
 const server = http.createServer(app);
 
