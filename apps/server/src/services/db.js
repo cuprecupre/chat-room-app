@@ -53,6 +53,20 @@ class DBService {
     }
 
     /**
+     * Deletes a game from Firestore.
+     */
+    async deleteGameState(gameId) {
+        if (!this.db) return;
+
+        try {
+            await this.db.collection(this.collectionName).doc(gameId).delete();
+        } catch (error) {
+            console.error(`⚠️ [DB Service] Delete failed for ${gameId}: ${error.message}`);
+            throw error;
+        }
+    }
+
+    /**
      * Retrieves all active games for server restart recovery.
      */
     async getActiveGames() {

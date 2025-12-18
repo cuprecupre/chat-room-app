@@ -109,6 +109,11 @@ function handleCreateGame(socket, user, options = {}) {
         userGame.removePlayer(user.uid);
         socket.leave(userGame.gameId);
         gameManager.emitGameState(userGame);
+
+        // Schedule cleanup if game is now empty
+        if (userGame.players.length === 0) {
+            gameManager.scheduleEmptyGameCleanup(userGame.gameId);
+        }
     }
 
     const newGame = gameManager.createGame(user, options);
@@ -139,11 +144,20 @@ function handleJoinGame(io, socket, user, gameId) {
         userGame.removePlayer(user.uid);
         socket.leave(userGame.gameId);
         gameManager.emitGameState(userGame);
+
+        // Schedule cleanup if game is now empty
+        if (userGame.players.length === 0) {
+            gameManager.scheduleEmptyGameCleanup(userGame.gameId);
+        }
     }
 
     gameToJoin.addPlayer(user);
     socket.join(gameId);
     gameManager.emitGameState(gameToJoin);
+
+    // Cancel any pending cleanup for this game (player rejoined)
+    gameManager.cancelEmptyGameCleanup(gameId);
+
     console.log(`User ${user.name} joined game ${gameId}`);
 }
 
@@ -227,6 +241,9 @@ function handleLeaveGame(io, socket, user, gameId, callback) {
         } else {
             gameManager.emitToast(gameId, `${user.name} ha abandonado el juego`);
         }
+    } else {
+        // Game is now empty - schedule for cleanup
+        gameManager.scheduleEmptyGameCleanup(gameId);
     }
 
     console.log(`User ${user.name} successfully left game ${gameId}`);
@@ -279,6 +296,9 @@ function handleDisconnect(io, socket, user) {
                     } else {
                         gameManager.emitToast(userGame.gameId, `${userName} se ha desconectado`);
                     }
+                } else {
+                    // Game is now empty - schedule for cleanup
+                    gameManager.scheduleEmptyGameCleanup(userGame.gameId);
                 }
             },
             gracePeriod

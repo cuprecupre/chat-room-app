@@ -12,6 +12,8 @@ class GameManager {
         this.games = {};
         // Socket.IO instance (set during initialization)
         this.io = null;
+        // Track pending game deletions { [gameId]: timeoutId }
+        this.pendingDeletions = {};
     }
 
     /**
@@ -116,6 +118,75 @@ class GameManager {
      */
     getGameCount() {
         return Object.keys(this.games).length;
+    }
+
+    /**
+     * Schedule delayed deletion of an empty game.
+     * If players rejoin within the grace period, the deletion is cancelled.
+     * @param {string} gameId - The game to schedule for deletion
+     * @param {number} delayMs - Delay in milliseconds (default: 5 minutes)
+     */
+    scheduleEmptyGameCleanup(gameId, delayMs = 5 * 60 * 1000) {
+        // Cancel any existing deletion timer for this game
+        if (this.pendingDeletions[gameId]) {
+            clearTimeout(this.pendingDeletions[gameId]);
+            delete this.pendingDeletions[gameId];
+        }
+
+        const game = this.games[gameId];
+        if (!game) return;
+
+        // Only schedule cleanup if game is truly empty
+        if (game.players.length > 0) {
+            console.log(
+                `[Cleanup] Game ${gameId} has ${game.players.length} players, skipping cleanup`
+            );
+            return;
+        }
+
+        console.log(
+            `⏳ [Cleanup] Empty game ${gameId} scheduled for deletion in ${delayMs / 1000 / 60} minutes`
+        );
+
+        const timeoutId = setTimeout(() => {
+            const currentGame = this.games[gameId];
+
+            // Double-check game still exists and is still empty
+            if (!currentGame) {
+                console.log(`[Cleanup] Game ${gameId} already removed`);
+                delete this.pendingDeletions[gameId];
+                return;
+            }
+
+            if (currentGame.players.length > 0) {
+                console.log(
+                    `[Cleanup] Game ${gameId} has ${currentGame.players.length} players, cancelling deletion`
+                );
+                delete this.pendingDeletions[gameId];
+                return;
+            }
+
+            // Delete from memory only (keep in Firestore for recovery)
+            delete this.games[gameId];
+            delete this.pendingDeletions[gameId];
+
+            console.log(`🗑️  [Cleanup] Removed empty game ${gameId} from memory (kept in Firestore)`);
+
+        }, delayMs);
+
+        this.pendingDeletions[gameId] = timeoutId;
+    }
+
+    /**
+     * Cancel scheduled deletion for a game (called when player rejoins).
+     * @param {string} gameId - The game to cancel deletion for
+     */
+    cancelEmptyGameCleanup(gameId) {
+        if (this.pendingDeletions[gameId]) {
+            clearTimeout(this.pendingDeletions[gameId]);
+            delete this.pendingDeletions[gameId];
+            console.log(`✅ [Cleanup] Cancelled deletion for game ${gameId} (player rejoined)`);
+        }
     }
 }
 
