@@ -106,8 +106,6 @@ function processVotingResults(game) {
             console.log(
                 `[Game ${game.gameId}] Vuelta 3 completada sin eliminación. ¡El impostor gana!`
             );
-            game.playerScores[game.impostorId] = (game.playerScores[game.impostorId] || 0) + 4;
-            game.lastRoundScores[game.impostorId] = (game.lastRoundScores[game.impostorId] || 0) + 4;
             endRound(game, false);
         } else {
             console.log(`[Game ${game.gameId}] Empate: siguiente vuelta sin puntos.`);
@@ -127,7 +125,14 @@ function processVotingResults(game) {
         console.log(`[Game ${game.gameId}] ¡El impostor fue descubierto!`);
         endRound(game, true);
     } else {
-        if (game.currentTurn >= game.maxTurns) {
+        // Era un amigo, verificar cuántos quedan
+        const activePlayers = getActivePlayers(game);
+
+        // Si solo quedan 2 jugadores (impostor + 1 amigo), el impostor gana automáticamente
+        if (activePlayers.length <= 2) {
+            console.log(`[Game ${game.gameId}] Solo quedan 2 jugadores. ¡El impostor gana automáticamente!`);
+            endRound(game, false);
+        } else if (game.currentTurn >= game.maxTurns) {
             console.log(`[Game ${game.gameId}] Tercera vuelta completada. ¡El impostor gana!`);
             endRound(game, false);
         } else {

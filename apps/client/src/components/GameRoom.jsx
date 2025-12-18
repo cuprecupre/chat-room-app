@@ -157,13 +157,19 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                                     )}
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex flex-col">
                                         <span
                                             className={`font-medium ${isWinner ? "text-orange-400" : ""}`}
                                         >
                                             {p.name}
                                             {p.uid === currentUserId ? " (Tú)" : ""}
                                         </span>
+                                        {/* Indicador de eliminado en vista de puntuación */}
+                                        {isRoundResult && isEliminated && (
+                                            <span className="text-xs text-red-400 font-medium">Eliminado</span>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center gap-2">
                                         {/* Indicador de jugador inicial */}
                                         {isPlaying && startingPlayerId === p.uid && (
                                             <span

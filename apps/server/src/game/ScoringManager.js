@@ -21,8 +21,13 @@ function calculateRoundScores(game, friendsWon) {
         });
     } else {
         // Impostor ganó
-        // Los puntos por sobrevivir cada vuelta ya fueron dados durante el juego (2, 3, 4 puntos)
-        // No hay puntos adicionales
+        // Dar puntos finales al impostor por ganar la ronda
+        // Los puntos por sobrevivir vueltas intermedias ya fueron dados en startNextTurn
+        // Pero los puntos por la vuelta final (donde ganó) se dan aquí
+        const finalTurnPoints = game.currentTurn + 1; // Vuelta actual + 1 = puntos (V1=2, V2=3, V3=4)
+        game.playerScores[game.impostorId] = (game.playerScores[game.impostorId] || 0) + finalTurnPoints;
+        game.lastRoundScores[game.impostorId] = (game.lastRoundScores[game.impostorId] || 0) + finalTurnPoints;
+        console.log(`[Game ${game.gameId}] Impostor gana la ronda en vuelta ${game.currentTurn}: +${finalTurnPoints} puntos`);
 
         // Dar puntos a amigos que votaron correctamente (aunque no ganaron)
         game.turnHistory.forEach((turn) => {
