@@ -4,7 +4,7 @@ services:
     name: impostor-app-production
     env: node
     branch: main
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci && npm run build
     startCommand: node apps/server/src/index.js
 
   # Servicio de Desarrollo
@@ -12,5 +12,5 @@ services:
     name: impostor-app-develop
     env: node
     branch: develop
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci && npm run build
     startCommand: node apps/server/src/index.js
