@@ -1,6 +1,7 @@
 const express = require("express");
 const gameManager = require("../services/gameManager");
 const dbService = require("../services/db");
+const statsManager = require("../services/statsManager");
 
 const router = express.Router();
 
@@ -53,6 +54,14 @@ router.get("/game/:gameId", async (req, res) => {
         playerCount: playerCount,
         status: status,
     });
+});
+
+/**
+ * GET /api/stats
+ * Get real-time server statistics
+ */
+router.get("/stats", (req, res) => {
+    res.json(statsManager.getStats());
 });
 
 module.exports = router;

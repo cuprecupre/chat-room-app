@@ -1,5 +1,6 @@
 const gameManager = require("../services/gameManager");
 const sessionManager = require("../services/sessionManager");
+const statsManager = require("../services/statsManager");
 
 // Grace period constants
 const MOBILE_GRACE_PERIOD = 300000; // 5 minutes for mobile users
@@ -11,6 +12,10 @@ const INACTIVE_GRACE_PERIOD = 60000; // 1 minute for inactive users
 function registerSocketHandlers(io, socket) {
     const user = socket.user;
     console.log(`User connected: ${user.name} (${user.uid})`);
+
+    // Track stats
+    statsManager.incrementConnections();
+    statsManager.updatePeakUsers();
 
     // Handle multiple sessions: disconnect old socket if exists
     const oldSocketId = sessionManager.getUserSocket(user.uid);
@@ -109,6 +114,7 @@ function handleCreateGame(socket, user, options = {}) {
     const newGame = gameManager.createGame(user, options);
     socket.join(newGame.gameId);
     gameManager.emitGameState(newGame);
+    statsManager.incrementGamesCreated();
     console.log(`Game created: ${newGame.gameId} by ${user.name} with options:`, options);
 }
 

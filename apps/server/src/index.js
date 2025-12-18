@@ -13,6 +13,8 @@ const { socketAuthMiddleware } = require("./middleware/auth");
 const apiRoutes = require("./routes/api");
 const dbService = require("./services/db");
 const gameManager = require("./services/gameManager");
+const sessionManager = require("./services/sessionManager");
+const statsManager = require("./services/statsManager");
 const { registerSocketHandlers } = require("./handlers/socketHandlers");
 
 // --- Configuration ---
@@ -43,6 +45,9 @@ const io = createSocketServer(server);
 // --- Initialize GameManager with Socket.IO ---
 gameManager.initialize(io);
 
+// --- Initialize StatsManager ---
+statsManager.initialize(sessionManager, gameManager);
+
 // --- Socket.IO Authentication Middleware ---
 io.use(socketAuthMiddleware);
 
@@ -53,6 +58,12 @@ io.on("connection", (socket) => {
 
 // --- Recover Games from Database ---
 gameManager.recoverGames();
+
+// --- Sync Stats to Firestore (every 5 minutes) ---
+const STATS_SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes
+setInterval(() => {
+    statsManager.syncToFirestore();
+}, STATS_SYNC_INTERVAL);
 
 // --- Start Server ---
 server.listen(PORT, () => {
