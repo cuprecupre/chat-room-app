@@ -35,4 +35,3 @@ export const routeConfig = [
         isProtected: true,
     },
 ];
-

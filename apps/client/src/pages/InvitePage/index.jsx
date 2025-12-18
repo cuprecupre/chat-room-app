@@ -29,7 +29,9 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
                         />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-serif text-neutral-50 mb-4">¡Te han invitado!</h2>
+                        <h2 className="text-3xl font-serif text-neutral-50 mb-4">
+                            ¡Te han invitado!
+                        </h2>
                         <p className="text-neutral-300 text-lg leading-relaxed">
                             Has recibido un enlace para unirte a la partida de{" "}
                             <span className="font-mono font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded">
@@ -103,7 +105,9 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
                             </div>
                         </div>
                         <div>
-                            <h2 className="text-2xl font-serif text-neutral-50 mb-3">{errorTitle}</h2>
+                            <h2 className="text-2xl font-serif text-neutral-50 mb-3">
+                                {errorTitle}
+                            </h2>
                             <p className="text-neutral-400 leading-relaxed">{errorMsg}</p>
                         </div>
                         <div className="space-y-3 pt-2">
@@ -139,7 +143,9 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
                         />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-serif text-neutral-50 mb-4">¡Te han invitado!</h2>
+                        <h2 className="text-3xl font-serif text-neutral-50 mb-4">
+                            ¡Te han invitado!
+                        </h2>
                         <p className="text-neutral-300 text-lg leading-relaxed">
                             Has recibido un enlace para unirte a la partida de{" "}
                             <span className="font-mono font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded">
@@ -186,4 +192,3 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
 
     return null;
 }
-

@@ -11,8 +11,8 @@ El problema del login con Google en iOS Safari se debe a las **políticas de pri
 ```javascript
 // En firebase.js - YA IMPLEMENTADO
 const firebaseConfig = {
-  authDomain: window.location.hostname, // Usar dominio de la app
-  // ... resto de configuración
+    authDomain: window.location.hostname, // Usar dominio de la app
+    // ... resto de configuración
 };
 ```
 
@@ -25,19 +25,21 @@ const firebaseConfig = {
 3. Ve a **APIs & Services** → **Credentials**
 4. Encuentra tu **OAuth 2.0 Client ID**
 5. En **Authorized redirect URIs**, agrega:
-   ```
-   https://tu-dominio.com/__/auth/handler
-   ```
-   Donde `tu-dominio.com` es donde está alojada tu app.
+    ```
+    https://tu-dominio.com/__/auth/handler
+    ```
+    Donde `tu-dominio.com` es donde está alojada tu app.
 
 ### 3. URLs de Redirección por Dominio
 
 #### Para Desarrollo Local:
+
 ```
 http://localhost:5173/__/auth/handler
 ```
 
 #### Para Producción (ejemplo):
+
 ```
 https://tu-app.vercel.app/__/auth/handler
 https://tu-app.netlify.app/__/auth/handler
@@ -47,12 +49,14 @@ https://tu-dominio.com/__/auth/handler
 ## Cómo Funciona la Solución
 
 ### Antes (Problemático):
+
 ```
 Tu App → firebaseapp.com → Google → firebaseapp.com → Tu App
          ↑ Safari bloquea este paso (cookies de terceros)
 ```
 
 ### Después (Solucionado):
+
 ```
 Tu App → Tu App/__/auth → Google → Tu App/__/auth → Tu App
         ↑ Mismo dominio, Safari no bloquea
@@ -63,7 +67,7 @@ Tu App → Tu App/__/auth → Google → Tu App/__/auth → Tu App
 ✅ **Compatible con Safari iOS**: No hay cookies de terceros  
 ✅ **Mejor UX**: Redirect funciona en todos los dispositivos  
 ✅ **Solución permanente**: No depende de workarounds  
-✅ **Mantiene funcionalidad**: No afecta la jugabilidad  
+✅ **Mantiene funcionalidad**: No afecta la jugabilidad
 
 ## Verificación
 

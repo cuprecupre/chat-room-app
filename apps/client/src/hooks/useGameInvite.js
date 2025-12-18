@@ -52,4 +52,3 @@ export function useGameInvite(gameState) {
         clearPreview: () => setPreviewHostName(null),
     };
 }
-

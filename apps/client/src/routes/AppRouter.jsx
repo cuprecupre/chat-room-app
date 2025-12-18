@@ -37,7 +37,15 @@ function HomeRouteHandler({ user }) {
     return null;
 }
 
-function GameRouteHandler({ gameState, user, emit, joinGame, joinError, clearJoinError, ...props }) {
+function GameRouteHandler({
+    gameState,
+    user,
+    emit,
+    joinGame,
+    joinError,
+    clearJoinError,
+    ...props
+}) {
     const location = useLocation();
     const urlGameId = new URLSearchParams(location.search).get("gameId");
 
@@ -63,20 +71,20 @@ function GameRouteHandler({ gameState, user, emit, joinGame, joinError, clearJoi
     return <Navigate to={ROUTES.LOBBY} replace />;
 }
 
-function AppRoutes({ 
-    user, 
-    loading, 
-    error, 
-    login, 
-    loginWithEmail, 
-    registerWithEmail, 
-    logout, 
+function AppRoutes({
+    user,
+    loading,
+    error,
+    login,
+    loginWithEmail,
+    registerWithEmail,
+    logout,
     clearError,
     connected,
     gameState,
     emit,
     joinError,
-    clearJoinError
+    clearJoinError,
 }) {
     const navigate = useNavigate();
     const location = useLocation();
@@ -132,13 +140,13 @@ function AppRoutes({
     useEffect(() => {
         const currentGameId = gameState?.gameId;
         const wasInLobby = location.pathname === ROUTES.LOBBY;
-        
+
         // If a new game ID appears and we're in the lobby, navigate to game
         if (currentGameId && currentGameId !== prevGameIdRef.current && wasInLobby) {
             console.log("🎮 Navigating to game:", currentGameId);
             navigate(`${ROUTES.GAME}?gameId=${currentGameId}`);
         }
-        
+
         prevGameIdRef.current = currentGameId;
     }, [gameState?.gameId, location.pathname, navigate]);
 
@@ -316,4 +324,3 @@ export function AppRouter() {
         </BrowserRouter>
     );
 }
-

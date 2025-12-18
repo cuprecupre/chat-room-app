@@ -6,8 +6,8 @@
 
 Usamos dos ramas principales:
 
-*   **`main`**: Código de **PRODUCCIÓN**. Estable. Lo que ven los usuarios. **Nunca hacer push directo aquí (excepto hotfixes urgentes).**
-*   **`develop`**: Código de **STAGING** (Pruebas). Aquí integramos las nuevas funcionalidades para probarlas en el entorno de staging.
+- **`main`**: Código de **PRODUCCIÓN**. Estable. Lo que ven los usuarios. **Nunca hacer push directo aquí (excepto hotfixes urgentes).**
+- **`develop`**: Código de **STAGING** (Pruebas). Aquí integramos las nuevas funcionalidades para probarlas en el entorno de staging.
 
 ### Flujo de Trabajo para Nuevas Features
 
@@ -19,10 +19,10 @@ Usamos dos ramas principales:
     ```
 2.  Desarrollar y hacer commits.
 3.  **Abrir un Pull Request (PR)** hacia `develop`.
-    *   GitHub Actions ejecutará los tests automáticamente.
+    - GitHub Actions ejecutará los tests automáticamente.
 4.  Una vez aprobado y mergeado a `develop`:
-    *   Se desplegará automáticamente en el entorno de **Staging**.
-    *   Verificar en Render (buscar el servicio de staging).
+    - Se desplegará automáticamente en el entorno de **Staging**.
+    - Verificar en Render (buscar el servicio de staging).
 
 ### Paso a Producción
 
@@ -31,5 +31,5 @@ Usamos dos ramas principales:
 
 ## Estándares
 
-*   **Commits**: Usar mensajes claros.
-*   **Tests**: Si agregas lógica nueva, agrega tests unitarios. Ejecuta `npm test` antes de subir.
+- **Commits**: Usar mensajes claros.
+- **Tests**: Si agregas lógica nueva, agrega tests unitarios. Ejecuta `npm test` antes de subir.

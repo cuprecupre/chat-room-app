@@ -1,16 +1,16 @@
 services:
-  # Servicio de Producción
-  - type: web
-    name: impostor-app-production
-    env: node
-    branch: main
-    buildCommand: npm ci --include=dev && npm run build
-    startCommand: node apps/server/src/index.js
+    # Servicio de Producción
+    - type: web
+      name: impostor-app-production
+      env: node
+      branch: main
+      buildCommand: npm ci --include=dev && npm run build
+      startCommand: node apps/server/src/index.js
 
-  # Servicio de Desarrollo
-  - type: web
-    name: impostor-app-develop
-    env: node
-    branch: develop
-    buildCommand: npm ci --include=dev && npm run build
-    startCommand: node apps/server/src/index.js
+    # Servicio de Desarrollo
+    - type: web
+      name: impostor-app-develop
+      env: node
+      branch: develop
+      buildCommand: npm ci --include=dev && npm run build
+      startCommand: node apps/server/src/index.js

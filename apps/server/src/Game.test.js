@@ -1,11 +1,11 @@
-const Game = require('./Game');
+const Game = require("./Game");
 
 // Mock user objects for testing
-const hostUser = { uid: 'host123', name: 'Host Player' };
-const player2 = { uid: 'player456', name: 'Player Two' };
-const player3 = { uid: 'player789', name: 'Player Three' };
+const hostUser = { uid: "host123", name: "Host Player" };
+const player2 = { uid: "player456", name: "Player Two" };
+const player3 = { uid: "player789", name: "Player Three" };
 
-describe('Game Logic', () => {
+describe("Game Logic", () => {
     let game;
 
     beforeEach(() => {
@@ -13,34 +13,36 @@ describe('Game Logic', () => {
         game = new Game(hostUser);
     });
 
-    test('should create a new game with a host', () => {
+    test("should create a new game with a host", () => {
         expect(game.hostId).toBe(hostUser.uid);
         expect(game.players).toHaveLength(1);
         expect(game.players[0].uid).toBe(hostUser.uid);
-        expect(game.phase).toBe('lobby');
+        expect(game.phase).toBe("lobby");
     });
 
-    test('should add a new player to the game', () => {
+    test("should add a new player to the game", () => {
         game.addPlayer(player2);
         expect(game.players).toHaveLength(2);
-        expect(game.players.some(p => p.uid === player2.uid)).toBe(true);
+        expect(game.players.some((p) => p.uid === player2.uid)).toBe(true);
     });
 
-    test('should not add a duplicate player', () => {
+    test("should not add a duplicate player", () => {
         game.addPlayer(hostUser);
         expect(game.players).toHaveLength(1);
     });
 
-    test('should throw an error if a non-host tries to start the game', () => {
+    test("should throw an error if a non-host tries to start the game", () => {
         game.addPlayer(player2);
-        expect(() => game.startGame(player2.uid)).toThrow('Solo el host puede iniciar la partida.');
+        expect(() => game.startGame(player2.uid)).toThrow("Solo el host puede iniciar la partida.");
     });
 
-    test('should throw an error if trying to start with less than 2 players', () => {
-        expect(() => game.startGame(hostUser.uid)).toThrow('Se necesitan al menos 2 jugadores para empezar.');
+    test("should throw an error if trying to start with less than 2 players", () => {
+        expect(() => game.startGame(hostUser.uid)).toThrow(
+            "Se necesitan al menos 2 jugadores para empezar."
+        );
     });
 
-    describe('when game starts correctly', () => {
+    describe("when game starts correctly", () => {
         beforeEach(() => {
             game.addPlayer(player2);
             game.addPlayer(player3);
@@ -48,58 +50,58 @@ describe('Game Logic', () => {
         });
 
         test('should change phase to "game"', () => {
-            expect(game.phase).toBe('playing');
+            expect(game.phase).toBe("playing");
         });
 
-        test('should assign one impostor', () => {
-            expect(game.impostorId).not.toBe('');
-            const impostorExists = game.players.some(p => p.uid === game.impostorId);
+        test("should assign one impostor", () => {
+            expect(game.impostorId).not.toBe("");
+            const impostorExists = game.players.some((p) => p.uid === game.impostorId);
             expect(impostorExists).toBe(true);
         });
 
-        test('should select a secret word', () => {
-            expect(game.secretWord).not.toBe('');
+        test("should select a secret word", () => {
+            expect(game.secretWord).not.toBe("");
         });
 
-        test('should return correct state for impostor', () => {
+        test("should return correct state for impostor", () => {
             const impostorState = game.getStateFor(game.impostorId);
-            expect(impostorState.role).toBe('impostor');
-            expect(impostorState.secretWord).toBe('Descubre la palabra secreta');
+            expect(impostorState.role).toBe("impostor");
+            expect(impostorState.secretWord).toBe("Descubre la palabra secreta");
         });
 
-        test('should return correct state for friends', () => {
-            const friend = game.players.find(p => p.uid !== game.impostorId);
+        test("should return correct state for friends", () => {
+            const friend = game.players.find((p) => p.uid !== game.impostorId);
             const friendState = game.getStateFor(friend.uid);
-            expect(friendState.role).toBe('amigo');
+            expect(friendState.role).toBe("amigo");
             expect(friendState.secretWord).toBe(game.secretWord);
         });
     });
 
-    test('should end the game and reveal impostor and word', () => {
+    test("should end the game and reveal impostor and word", () => {
         game.addPlayer(player2);
         game.startGame(hostUser.uid);
         game.endGame(hostUser.uid);
 
-        expect(game.phase).toBe('game_over');
+        expect(game.phase).toBe("game_over");
         const finalState = game.getStateFor(hostUser.uid);
         expect(finalState.impostorName).toBeDefined();
         expect(finalState.secretWord).toBe(game.secretWord);
     });
 
-    test('should reset the game for a new round (play again)', () => {
+    test("should reset the game for a new round (play again)", () => {
         game.addPlayer(player2);
         game.startGame(hostUser.uid);
         game.endGame(hostUser.uid);
         game.playAgain(hostUser.uid);
 
         // Update: playAgain now starts a new round immediately
-        expect(game.phase).toBe('playing');
-        expect(game.impostorId).not.toBe('');
-        expect(game.secretWord).not.toBe('');
+        expect(game.phase).toBe("playing");
+        expect(game.impostorId).not.toBe("");
+        expect(game.secretWord).not.toBe("");
         expect(game.players).toHaveLength(2); // Players should remain for the next round
     });
 
-    test('should not allow the same player to be impostor more than 2 times in a row', () => {
+    test("should not allow the same player to be impostor more than 2 times in a row", () => {
         // Agregar jugadores para tener 3 en total
         game.addPlayer(player2);
         game.addPlayer(player3);
@@ -123,12 +125,12 @@ describe('Game Logic', () => {
             // Verificar que no hay 3 impostores consecutivos iguales
             if (impostorSequence.length >= 3) {
                 const lastThree = impostorSequence.slice(-3);
-                const allSame = lastThree.every(id => id === lastThree[0]);
+                const allSame = lastThree.every((id) => id === lastThree[0]);
                 expect(allSame).toBe(false);
             }
 
             // Resetear para la siguiente ronda
-            game.phase = 'lobby';
+            game.phase = "lobby";
             game.roundCount = 0;
         }
 
@@ -136,7 +138,7 @@ describe('Game Logic', () => {
         expect(game.impostorHistory.length).toBeGreaterThan(0);
     });
 
-    test('selectImpostorWithLimit should exclude player who was impostor last 2 times', () => {
+    test("selectImpostorWithLimit should exclude player who was impostor last 2 times", () => {
         game.addPlayer(player2);
         game.addPlayer(player3);
 
@@ -158,8 +160,8 @@ describe('Game Logic', () => {
         expect(selections.has(hostUser.uid) || selections.has(player3.uid)).toBe(true);
     });
 
-    describe('Host Transfer', () => {
-        test('should transfer host to next player in order when host leaves', () => {
+    describe("Host Transfer", () => {
+        test("should transfer host to next player in order when host leaves", () => {
             game.addPlayer(player2);
             game.addPlayer(player3);
 
@@ -174,21 +176,21 @@ describe('Game Logic', () => {
             expect(game.hostId).toBe(player2.uid);
             expect(newHostInfo).not.toBeNull();
             expect(newHostInfo.uid).toBe(player2.uid);
-            expect(newHostInfo.name).toBe('Player Two');
+            expect(newHostInfo.name).toBe("Player Two");
         });
 
-        test('should return newHostInfo with correct name', () => {
+        test("should return newHostInfo with correct name", () => {
             game.addPlayer(player2);
 
             const newHostInfo = game.removePlayer(hostUser.uid);
 
             expect(newHostInfo).toEqual({
                 uid: player2.uid,
-                name: 'Player Two'
+                name: "Player Two",
             });
         });
 
-        test('should transfer host to player3 if player2 also left', () => {
+        test("should transfer host to player3 if player2 also left", () => {
             game.addPlayer(player2);
             game.addPlayer(player3);
 
@@ -199,10 +201,10 @@ describe('Game Logic', () => {
             const newHostInfo = game.removePlayer(player2.uid);
             expect(game.hostId).toBe(player3.uid);
             expect(newHostInfo.uid).toBe(player3.uid);
-            expect(newHostInfo.name).toBe('Player Three');
+            expect(newHostInfo.name).toBe("Player Three");
         });
 
-        test('should return null when non-host leaves', () => {
+        test("should return null when non-host leaves", () => {
             game.addPlayer(player2);
             game.addPlayer(player3);
 
@@ -214,7 +216,7 @@ describe('Game Logic', () => {
             expect(game.hostId).toBe(hostUser.uid);
         });
 
-        test('should handle host leaving when only one player remains', () => {
+        test("should handle host leaving when only one player remains", () => {
             game.addPlayer(player2);
 
             const newHostInfo = game.removePlayer(hostUser.uid);
@@ -224,19 +226,23 @@ describe('Game Logic', () => {
             expect(newHostInfo.uid).toBe(player2.uid);
         });
 
-        test('should use playerOrder (join order) not array index', () => {
+        test("should use playerOrder (join order) not array index", () => {
             // player3 se une primero, luego player2
             const gameWithDifferentOrder = new Game(hostUser);
             gameWithDifferentOrder.addPlayer(player3); // Se une primero
             gameWithDifferentOrder.addPlayer(player2); // Se une después
 
-            expect(gameWithDifferentOrder.playerOrder).toEqual([hostUser.uid, player3.uid, player2.uid]);
+            expect(gameWithDifferentOrder.playerOrder).toEqual([
+                hostUser.uid,
+                player3.uid,
+                player2.uid,
+            ]);
 
             // Cuando host abandona, player3 (quien llegó primero) debe ser el nuevo host
             const newHostInfo = gameWithDifferentOrder.removePlayer(hostUser.uid);
 
             expect(gameWithDifferentOrder.hostId).toBe(player3.uid);
-            expect(newHostInfo.name).toBe('Player Three');
+            expect(newHostInfo.name).toBe("Player Three");
         });
     });
 });

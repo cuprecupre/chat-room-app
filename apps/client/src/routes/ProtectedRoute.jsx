@@ -87,10 +87,12 @@ export function ProtectedRoute({ user, connected, emit, gameState }) {
                         />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-serif text-neutral-50 mb-2">Conexión perdida</h2>
+                        <h2 className="text-2xl font-serif text-neutral-50 mb-2">
+                            Conexión perdida
+                        </h2>
                         <p className="text-neutral-400">
-                            No se puede conectar al servidor. Esto puede deberse a problemas de red o
-                            el servidor está inactivo.
+                            No se puede conectar al servidor. Esto puede deberse a problemas de red
+                            o el servidor está inactivo.
                         </p>
                     </div>
                     <div className="space-y-3 px-6">
@@ -120,7 +122,9 @@ export function ProtectedRoute({ user, connected, emit, gameState }) {
                         <Spinner size="md" />
                         <div>
                             <p>Conectando al servidor</p>
-                            <p className="text-sm text-neutral-400 mt-1">Estableciendo conexión...</p>
+                            <p className="text-sm text-neutral-400 mt-1">
+                                Estableciendo conexión...
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -136,4 +140,3 @@ export function ProtectedRoute({ user, connected, emit, gameState }) {
     // User is authenticated and connected, render child routes
     return <Outlet />;
 }
-

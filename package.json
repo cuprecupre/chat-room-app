@@ -1,21 +1,26 @@
 {
-  "name": "impostor-game",
-  "version": "1.0.0",
-  "private": true,
-  "packageManager": "npm@11.1.0",
-  "workspaces": [
-    "apps/*"
-  ],
-  "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "start": "npm run start --workspace=@impostor/server",
-    "test": "npm run test --workspace=@impostor/server"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "dependencies": {
-    "turbo": "^2.3.3"
-  }
+    "name": "impostor-game",
+    "version": "1.0.0",
+    "private": true,
+    "packageManager": "npm@11.1.0",
+    "workspaces": [
+        "apps/*"
+    ],
+    "scripts": {
+        "dev": "turbo dev",
+        "build": "turbo build",
+        "start": "npm run start --workspace=@impostor/server",
+        "test": "npm run test --workspace=@impostor/server",
+        "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md,yaml,yml}\"",
+        "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,md,yaml,yml}\""
+    },
+    "engines": {
+        "node": ">=18"
+    },
+    "dependencies": {
+        "turbo": "^2.3.3"
+    },
+    "devDependencies": {
+        "prettier": "^3.7.4"
+    }
 }

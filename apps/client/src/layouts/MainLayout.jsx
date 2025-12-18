@@ -223,7 +223,10 @@ export function MainLayout({
                                 >
                                     Sí, abandonar
                                 </Button>
-                                <Button onClick={() => setShowLeaveGameModal(false)} variant="outline">
+                                <Button
+                                    onClick={() => setShowLeaveGameModal(false)}
+                                    variant="outline"
+                                >
                                     Cancelar
                                 </Button>
                             </div>
@@ -253,7 +256,10 @@ export function MainLayout({
                                 >
                                     Sí, finalizar
                                 </Button>
-                                <Button onClick={() => setShowEndGameModal(false)} variant="outline">
+                                <Button
+                                    onClick={() => setShowEndGameModal(false)}
+                                    variant="outline"
+                                >
                                     Cancelar
                                 </Button>
                             </div>
@@ -264,4 +270,3 @@ export function MainLayout({
         </div>
     );
 }
-

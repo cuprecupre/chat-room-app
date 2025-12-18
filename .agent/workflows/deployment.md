@@ -16,16 +16,16 @@ Archivo `render.yaml` define el servicio:
 
 ```yaml
 services:
-  - type: web
-    name: impostor-game
-    runtime: node
-    plan: free
-    buildCommand: npm install
-    startCommand: npm start
-    autoDeploy: true
-    envVars:
-      - key: NODE_ENV
-        value: production
+    - type: web
+      name: impostor-game
+      runtime: node
+      plan: free
+      buildCommand: npm install
+      startCommand: npm start
+      autoDeploy: true
+      envVars:
+          - key: NODE_ENV
+            value: production
 ```
 
 ### Variables de Entorno en Render
@@ -37,16 +37,16 @@ Configurar en el panel de Render (Settings → Environment):
 1. **NODE_ENV**: `production`
 2. **PORT**: `10000` (Render asigna automáticamente, pero se puede especificar)
 3. **CLIENT_ORIGINS**: URLs autorizadas separadas por coma
-   - Ejemplo: `https://impostor-game.onrender.com,https://tu-dominio.com`
+    - Ejemplo: `https://impostor-game.onrender.com,https://tu-dominio.com`
 4. **FIREBASE_SERVICE_ACCOUNT**: JSON completo de la cuenta de servicio
-   - Copiar el contenido completo del archivo `firebase-service-account.json`
-   - Pegar como string en una sola línea
+    - Copiar el contenido completo del archivo `firebase-service-account.json`
+    - Pegar como string en una sola línea
 
 **OAuth (Google Cloud Console):**
 
 5. Configurar redirect URIs en Google OAuth:
-   - `https://tu-dominio.onrender.com/__/auth/handler`
-   - Ver más en: `docs/historical/FIREBASE_DOMAIN_SOLUTION.md`
+    - `https://tu-dominio.onrender.com/__/auth/handler`
+    - Ver más en: `docs/historical/FIREBASE_DOMAIN_SOLUTION.md`
 
 ## Proceso de Deployment
 
@@ -55,23 +55,24 @@ Configurar en el panel de Render (Settings → Environment):
 El proyecto tiene `autoDeploy: true`, por lo que:
 
 1. **Hacer push a `main`**:
-   ```bash
-   git add .
-   git commit -m "Descripción del cambio"
-   git push origin main
-   ```
+
+    ```bash
+    git add .
+    git commit -m "Descripción del cambio"
+    git push origin main
+    ```
 
 2. **Render detecta el push** y automáticamente:
-   - Clona el repositorio
-   - Ejecuta `npm install` (buildCommand)
-   - Ejecuta el postinstall hook que builds el cliente
-   - Inicia el servidor con `npm start`
+    - Clona el repositorio
+    - Ejecuta `npm install` (buildCommand)
+    - Ejecuta el postinstall hook que builds el cliente
+    - Inicia el servidor con `npm start`
 
 3. **Monitorear deployment**:
-   - Ve a Render Dashboard
-   - Click en el servicio "impostor-game"
-   - Ve a "Logs" para ver el progreso
-   - Espera a que el estado cambie a "Live"
+    - Ve a Render Dashboard
+    - Click en el servicio "impostor-game"
+    - Ve a "Logs" para ver el progreso
+    - Espera a que el estado cambie a "Live"
 
 ### Deployment Manual
 
@@ -164,6 +165,7 @@ git push origin main --force
 ### Métricas
 
 Render proporciona métricas básicas:
+
 - CPU usage
 - Memory usage
 - Request count
@@ -177,8 +179,8 @@ Acceso: Render Dashboard → Metrics
 
 1. Revisar logs de build en Render
 2. Verificar que `package.json` tiene scripts correctos:
-   - `"postinstall": "npm run build"`
-   - `"build": "cd client && npm install && npm run build"`
+    - `"postinstall": "npm run build"`
+    - `"build": "cd client && npm install && npm run build"`
 3. Verificar que todas las dependencias están en `dependencies`, no solo en `devDependencies`
 
 ### Error: "Application Error" o 503
@@ -204,16 +206,16 @@ Acceso: Render Dashboard → Metrics
 Si quieres usar un dominio personalizado:
 
 1. **En Render**:
-   - Ve a Settings → Custom Domain
-   - Agrega tu dominio
-   - Configura DNS según instrucciones
+    - Ve a Settings → Custom Domain
+    - Agrega tu dominio
+    - Configura DNS según instrucciones
 
 2. **En Google OAuth**:
-   - Agrega el nuevo dominio a Authorized domains
-   - Agrega redirect URI: `https://tu-dominio.com/__/auth/handler`
+    - Agrega el nuevo dominio a Authorized domains
+    - Agrega redirect URI: `https://tu-dominio.com/__/auth/handler`
 
 3. **En Variables de Entorno**:
-   - Actualiza `CLIENT_ORIGINS` para incluir el nuevo dominio
+    - Actualiza `CLIENT_ORIGINS` para incluir el nuevo dominio
 
 ## Checklist Pre-Deployment
 

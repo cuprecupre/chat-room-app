@@ -1,4 +1,4 @@
-const admin = require('firebase-admin');
+const admin = require("firebase-admin");
 
 class DBService {
     constructor() {
@@ -17,7 +17,7 @@ class DBService {
         this.enabled = options.enabled === true;
 
         if (!this.enabled) {
-            console.log('🚧 [DB Service] Persistence is DISABLED (Feature Flag off).');
+            console.log("🚧 [DB Service] Persistence is DISABLED (Feature Flag off).");
             return;
         }
 
@@ -25,10 +25,15 @@ class DBService {
             // Assumes firebase-admin has been initialized in server.js
             this.db = admin.firestore();
             this.db.settings({ ignoreUndefinedProperties: true }); // Robustness fix for "undefined" errors
-            this.collectionName = options.collectionName || 'dev_games';
-            console.log(`✅ [DB Service] Persistence ENABLED. Targets collection: '${this.collectionName}'`);
+            this.collectionName = options.collectionName || "games";
+            console.log(
+                `✅ [DB Service] Persistence ENABLED. Targets collection: '${this.collectionName}'`
+            );
         } catch (e) {
-            console.error('❌ [DB Service] Failed to initialize Firestore instance. Disabling persistence.', e.message);
+            console.error(
+                "❌ [DB Service] Failed to initialize Firestore instance. Disabling persistence.",
+                e.message
+            );
             this.enabled = false;
         }
     }
@@ -47,7 +52,7 @@ class DBService {
             // Add metadata
             const payload = {
                 ...state,
-                updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
             };
 
             // If it's a new document, add createdAt
@@ -92,8 +97,9 @@ class DBService {
             // An alternative is to just get all and filter, or store a dedicated 'active' boolean.
             // For now, let's try the simple query. If it fails due to index, we'll log it.
             // A safer approach regarding indexes is query phase 'in' ['lobby', 'playing', 'round_result']
-            const snapshot = await this.db.collection(this.collectionName)
-                .where('phase', 'in', ['lobby', 'playing', 'round_result'])
+            const snapshot = await this.db
+                .collection(this.collectionName)
+                .where("phase", "in", ["lobby", "playing", "round_result"])
                 .get();
 
             if (snapshot.empty) {
@@ -101,7 +107,7 @@ class DBService {
             }
 
             const games = [];
-            snapshot.forEach(doc => {
+            snapshot.forEach((doc) => {
                 games.push({ gameId: doc.id, ...doc.data() });
             });
 
@@ -116,4 +122,3 @@ class DBService {
 
 // Export singleton
 module.exports = new DBService();
-
