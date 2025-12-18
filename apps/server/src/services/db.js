@@ -59,19 +59,45 @@ class DBService {
         if (!this.db) return [];
 
         try {
+            // Only recover games updated in the last 3 hours (configurable via env)
+            const recoveryWindowHours = parseInt(process.env.GAME_RECOVERY_HOURS || "3");
+            const cutoffTime = new Date(Date.now() - recoveryWindowHours * 60 * 60 * 1000);
+
             const snapshot = await this.db
                 .collection(this.collectionName)
                 .where("phase", "in", ["lobby", "playing", "round_result"])
+                .where("updatedAt", ">", cutoffTime)
+                .orderBy("updatedAt", "desc")
+                .limit(1000) // Safety limit to prevent loading too many games
                 .get();
 
-            if (snapshot.empty) return [];
+            if (snapshot.empty) {
+                console.log("✅ [DB Service] No active games to recover.");
+                return [];
+            }
 
             const games = [];
+            let skippedEmpty = 0;
+
             snapshot.forEach((doc) => {
-                games.push({ gameId: doc.id, ...doc.data() });
+                const data = doc.data();
+                const playerCount = data.players ? data.players.length : 0;
+
+                // Only recover games with at least 1 player
+                if (playerCount > 0) {
+                    games.push({ gameId: doc.id, ...data });
+                } else {
+                    skippedEmpty++;
+                }
             });
 
-            console.log(`✅ [DB Service] Recovered ${games.length} active games.`);
+            if (skippedEmpty > 0) {
+                console.log(`⏭️  [DB Service] Skipped ${skippedEmpty} empty games (0 players).`);
+            }
+
+            console.log(
+                `✅ [DB Service] Recovered ${games.length} active games (updated within last ${recoveryWindowHours}h).`
+            );
             return games;
         } catch (error) {
             console.error(`❌ [DB Service] Failed to recover games: ${error.message}`);
