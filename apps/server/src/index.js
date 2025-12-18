@@ -7,7 +7,7 @@ const { initializeFirebase } = require("./config/firebase");
 initializeFirebase();
 
 // Import configuration and services
-const { createExpressApp, setupSpaFallback } = require("./config/express");
+const { createExpressApp } = require("./config/express");
 const { createSocketServer } = require("./config/socketio");
 const { socketAuthMiddleware } = require("./middleware/auth");
 const apiRoutes = require("./routes/api");
@@ -17,26 +17,15 @@ const { registerSocketHandlers } = require("./handlers/socketHandlers");
 
 // --- Configuration ---
 const PORT = process.env.PORT || 3000;
-const ENABLE_DB_PERSISTENCE =
-    String(process.env.ENABLE_DB_PERSISTENCE || "")
-        .trim()
-        .toLowerCase() === "true";
-const DB_COLLECTION_NAME = "games";
 
 // --- Initialize Services ---
-dbService.initialize({
-    enabled: ENABLE_DB_PERSISTENCE,
-    collectionName: DB_COLLECTION_NAME,
-});
+dbService.initialize();
 
 // --- Create Express App ---
 const app = createExpressApp();
 
 // --- Register API Routes ---
 app.use("/api", apiRoutes);
-
-// --- Setup SPA Fallback (must be after API routes) ---
-setupSpaFallback(app);
 
 // --- Create HTTP Server ---
 const server = http.createServer(app);
@@ -56,9 +45,7 @@ io.on("connection", (socket) => {
 });
 
 // --- Recover Games from Database ---
-if (ENABLE_DB_PERSISTENCE) {
-    gameManager.recoverGames();
-}
+gameManager.recoverGames();
 
 // --- Start Server ---
 server.listen(PORT, () => {
