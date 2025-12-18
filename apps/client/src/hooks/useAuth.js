@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
     auth,
     provider,
     ensurePersistence,
-    signInWithPopup,
     signInWithRedirect,
+    signInWithPopup,
     getRedirectResult,
     onIdTokenChanged,
     signOut,
@@ -20,17 +20,32 @@ export function useAuth() {
     const hasRedirect =
         typeof window !== "undefined" && sessionStorage.getItem("auth:redirect") === "1";
 
+    console.log("🔍 [useAuth] Initialization:", {
+        hasCurrentUser,
+        hasRedirect,
+        currentUserUid: auth.currentUser?.uid,
+        sessionStorageFlag: sessionStorage.getItem("auth:redirect"),
+    });
+
     const [user, setUser] = useState(auth.currentUser); // Inicializar con usuario actual si existe
     const [loading, setLoading] = useState(hasRedirect && !hasCurrentUser); // Solo loading si hay redirect Y no hay usuario
     const [error, setError] = useState(null);
+    const redirectCheckRef = useRef(false);
 
     useEffect(() => {
+        console.log("🔄 [useAuth] useEffect mounted");
         let isMounted = true;
         let authResolved = false;
         let tokenRefreshInterval = null;
         let redirectCheckInterval = null;
 
         const unsubscribe = onIdTokenChanged(auth, async (u) => {
+            console.log("🔔 [onIdTokenChanged] Triggered:", {
+                uid: u?.uid,
+                displayName: u?.displayName,
+                email: u?.email,
+                authResolved,
+            });
             authResolved = true;
             if (isMounted) {
                 setUser(u);
@@ -63,6 +78,7 @@ export function useAuth() {
                         console.error("❌ Error obteniendo token inicial:", error);
                     }
                 } else {
+                    console.log("🚪 No hay usuario, limpiando token");
                     // Si no hay usuario, limpiar token y detener refresh
                     clearToken();
                     if (tokenRefreshInterval) clearInterval(tokenRefreshInterval);
@@ -72,9 +88,30 @@ export function useAuth() {
 
         // Manejar posible flujo de redirect en navegadores móviles
         const handleRedirect = async () => {
+            if (redirectCheckRef.current) {
+                 console.log("🚫 [handleRedirect] Skipping - already checked in this session");
+                 return;
+            }
+            redirectCheckRef.current = true;
+
             try {
-                console.log("🔄 Verificando resultado de redirect...");
+                console.log("🔄 [handleRedirect] Iniciando verificación de redirect...");
+                console.log("🔍 [handleRedirect] Estado antes de getRedirectResult:", {
+                    hasRedirectFlag: sessionStorage.getItem("auth:redirect"),
+                    currentUser: auth.currentUser?.uid,
+                    authResolved,
+                });
+
                 const result = await getRedirectResult(auth);
+
+                console.log("📥 [handleRedirect] getRedirectResult response:", {
+                    hasResult: !!result,
+                    user: result?.user?.uid,
+                    displayName: result?.user?.displayName,
+                    email: result?.user?.email,
+                    providerId: result?.providerId,
+                });
+
                 if (result) {
                     console.log("✅ Redirect exitoso:", result.user?.displayName);
                     authResolved = true;
@@ -83,28 +120,40 @@ export function useAuth() {
                         setLoading(false);
                     }
                 } else {
-                    console.log("ℹ️ No hay resultado de redirect");
+                    console.log("ℹ️ No hay resultado de redirect (getRedirectResult returned null)");
                 }
             } catch (err) {
-                console.error("❌ Error en redirect:", err?.message);
+                console.error("❌ Error en redirect:", {
+                    message: err?.message,
+                    code: err?.code,
+                    stack: err?.stack,
+                });
                 if (isMounted) {
                     setError(err?.message || "Error al procesar autenticación");
                     setLoading(false);
                 }
             }
             try {
+                console.log("🧹 Limpiando sessionStorage flag");
                 sessionStorage.removeItem("auth:redirect");
             } catch (_) {}
         };
 
         // Ejecutar inmediatamente
+        console.log("⏱️ Ejecutando handleRedirect inmediatamente...");
         handleRedirect();
 
         // También verificar periódicamente en caso de que el redirect tarde
+        console.log("⏰ Configurando verificación periódica cada 1 segundo...");
         redirectCheckInterval = setInterval(async () => {
             if (!authResolved && isMounted) {
+                console.log("🔁 [Periodic Check] Verificando redirect...", { authResolved });
                 try {
                     const result = await getRedirectResult(auth);
+                    console.log("📥 [Periodic Check] Result:", {
+                        hasResult: !!result,
+                        user: result?.user?.uid,
+                    });
                     if (result) {
                         console.log(
                             "✅ Redirect detectado en verificación periódica:",
@@ -123,10 +172,19 @@ export function useAuth() {
 
         // Listener para cuando la página se vuelve visible (regresa del redirect)
         const handleVisibilityChange = async () => {
+            console.log("👁️ [visibilitychange] Event:", {
+                visibilityState: document.visibilityState,
+                authResolved,
+                isMounted,
+            });
             if (document.visibilityState === "visible" && !authResolved && isMounted) {
                 console.log("👁️ Página visible, verificando redirect...");
                 try {
                     const result = await getRedirectResult(auth);
+                    console.log("📥 [visibilitychange] Result:", {
+                        hasResult: !!result,
+                        user: result?.user?.uid,
+                    });
                     if (result) {
                         console.log(
                             "✅ Redirect detectado al volver a la página:",
@@ -168,28 +226,24 @@ export function useAuth() {
         try {
             console.log("🔄 Iniciando proceso de login...");
 
-            // Configurar persistencia antes del login
-            console.log("📝 Configurando persistencia...");
-            await ensurePersistence();
+            // Use Popup in Development (or if explicitly enabled via ENV) to avoid Redirect issues
+            const usePopup = import.meta.env.DEV || import.meta.env.VITE_AUTH_USE_POPUP === "true";
 
-            // SOLUCIÓN: Popup simple sin fallback complicado
-            console.log("🚀 Iniciando login con popup...");
-
-            // Allow mocking for E2E tests
-            const performSignIn = window.mockSignInWithPopup
-                ? () => window.mockSignInWithPopup(auth, provider)
-                : () => signInWithPopup(auth, provider);
-
-            const result = await performSignIn();
-
-            // If we are mocking, we need to manually update state because onIdTokenChanged won't fire
-            if (window.mockSignInWithPopup && result?.user) {
-                console.log("🎭 Mock Login: Manually setting user state");
-                setUser(result.user);
-                setLoading(false);
+            if (usePopup) {
+                console.log("🚀 Iniciando login con POPUP (Development/Hybrid Mode)...");
+                const result = await signInWithPopup(auth, provider);
+                console.log("✅ Popup login exitoso:", result.user?.displayName);
+                // State updates handled by onIdTokenChanged
+            } else {
+                console.log("🚀 Iniciando login con REDIRECT (Production Mode)...");
+                
+                // Marcar que estamos iniciando un redirect
+                sessionStorage.setItem("auth:redirect", "1");
+                
+                // Redirigir a Google para autenticación
+                await signInWithRedirect(auth, provider);
+                console.log("🌐 Redirigiendo a Google...");
             }
-
-            console.log("✅ Login exitoso");
         } catch (err) {
             console.error("❌ Error en login:", err?.code || err?.message);
 
@@ -198,26 +252,26 @@ export function useAuth() {
             if (err?.message === "TIMEOUT") {
                 errorMessage =
                     "El login tardó demasiado. Verifica tu conexión y que el dominio esté autorizado en Firebase.";
-            } else if (err?.code === "auth/popup-blocked") {
-                errorMessage =
-                    "El popup fue bloqueado por el navegador. Habilita los popups e inténtalo de nuevo.";
-            } else if (err?.code === "auth/popup-closed-by-user") {
-                errorMessage = "El popup fue cerrado antes de completar el login.";
             } else if (err?.code === "auth/unauthorized-domain") {
                 errorMessage =
                     "Este dominio no está autorizado en Firebase. Verifica la configuración.";
             } else if (err?.code === "auth/operation-not-allowed") {
                 errorMessage = "El proveedor de Google no está habilitado en Firebase.";
-            } else if (err?.code === "auth/cancelled-popup-request") {
-                errorMessage = "Se canceló la solicitud de popup anterior.";
             } else if (err?.code === "auth/network-request-failed") {
                 errorMessage = "Error de red. Verifica tu conexión a internet.";
+            } else if (err?.code === "auth/cancelled-popup-request") {
+                errorMessage = "Se canceló la solicitud de autenticación.";
             } else if (err?.message) {
                 errorMessage = err.message;
             }
 
             setError(errorMessage);
             setLoading(false);
+
+            // Limpiar flag de redirect si falla
+            try {
+                sessionStorage.removeItem("auth:redirect");
+            } catch (_) {}
         }
     }, []);
 
