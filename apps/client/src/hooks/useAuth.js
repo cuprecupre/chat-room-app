@@ -58,6 +58,18 @@ export function useAuth() {
                         saveToken(token);
                         console.log("🔑 Token guardado después de auth state change");
 
+                        // Restore pending gameId from sessionStorage after OAuth login
+                        const pendingGameId = sessionStorage.getItem("pendingGameId");
+                        if (pendingGameId) {
+                            console.log("🔗 Restaurando gameId pendiente:", pendingGameId);
+                            sessionStorage.removeItem("pendingGameId");
+                            const url = new URL(window.location);
+                            if (!url.searchParams.has("gameId")) {
+                                url.searchParams.set("gameId", pendingGameId);
+                                window.history.replaceState({}, "", url.toString());
+                            }
+                        }
+
                         // Configurar refresh automático del token cada 50 minutos
                         if (tokenRefreshInterval) clearInterval(tokenRefreshInterval);
                         tokenRefreshInterval = setInterval(
@@ -89,8 +101,8 @@ export function useAuth() {
         // Manejar posible flujo de redirect en navegadores móviles
         const handleRedirect = async () => {
             if (redirectCheckRef.current) {
-                 console.log("🚫 [handleRedirect] Skipping - already checked in this session");
-                 return;
+                console.log("🚫 [handleRedirect] Skipping - already checked in this session");
+                return;
             }
             redirectCheckRef.current = true;
 
@@ -136,7 +148,7 @@ export function useAuth() {
             try {
                 console.log("🧹 Limpiando sessionStorage flag");
                 sessionStorage.removeItem("auth:redirect");
-            } catch (_) {}
+            } catch (_) { }
         };
 
         // Ejecutar inmediatamente
@@ -236,10 +248,17 @@ export function useAuth() {
                 // State updates handled by onIdTokenChanged
             } else {
                 console.log("🚀 Iniciando login con REDIRECT (Production Mode)...");
-                
+
                 // Marcar que estamos iniciando un redirect
                 sessionStorage.setItem("auth:redirect", "1");
-                
+
+                // Save pending gameId before OAuth redirect
+                const urlGameId = new URLSearchParams(window.location.search).get("gameId");
+                if (urlGameId) {
+                    console.log("🔗 Guardando gameId pendiente:", urlGameId);
+                    sessionStorage.setItem("pendingGameId", urlGameId);
+                }
+
                 // Redirigir a Google para autenticación
                 await signInWithRedirect(auth, provider);
                 console.log("🌐 Redirigiendo a Google...");
@@ -271,7 +290,7 @@ export function useAuth() {
             // Limpiar flag de redirect si falla
             try {
                 sessionStorage.removeItem("auth:redirect");
-            } catch (_) {}
+            } catch (_) { }
         }
     }, []);
 
