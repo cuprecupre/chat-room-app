@@ -15,6 +15,7 @@ import { LobbyPage } from "../pages/LobbyPage";
 import { GamePage } from "../pages/GamePage";
 import { RulesPage } from "../pages/RulesPage";
 import { InvitePage } from "../pages/InvitePage";
+import { InviteLandingPage } from "../pages/InviteLandingPage";
 import { ROUTES } from "./routes";
 import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
 import heroImg from "../assets/impostor-home.png";
@@ -174,16 +175,34 @@ function AppRoutes({
                     <Route
                         path={ROUTES.HOME}
                         element={
-                            user ? (
-                                <HomeRouteHandler user={user} />
-                            ) : (
-                                <LandingPage
-                                    onLogin={login}
-                                    isLoading={loading}
-                                    onOpenInstructions={() => setInstructionsOpen(true)}
-                                    onOpenFeedback={() => setFeedbackOpen(true)}
-                                />
-                            )
+                            (() => {
+                                const urlGameId = new URLSearchParams(window.location.search).get("gameId");
+
+                                // If there's a gameId and user is NOT logged in, show InviteLandingPage
+                                if (urlGameId && !user) {
+                                    return (
+                                        <InviteLandingPage
+                                            onLogin={login}
+                                            isLoading={loading}
+                                        />
+                                    );
+                                }
+
+                                // If user is logged in, use HomeRouteHandler
+                                if (user) {
+                                    return <HomeRouteHandler user={user} />;
+                                }
+
+                                // Otherwise show LandingPage
+                                return (
+                                    <LandingPage
+                                        onLogin={login}
+                                        isLoading={loading}
+                                        onOpenInstructions={() => setInstructionsOpen(true)}
+                                        onOpenFeedback={() => setFeedbackOpen(true)}
+                                    />
+                                );
+                            })()
                         }
                     />
                     <Route

@@ -69,9 +69,11 @@ export function ProtectedRoute({ user, connected, emit, gameState }) {
         }
     };
 
-    // Redirect to home if no user
+    // Redirect to home if no user (preserve gameId for invitation flow)
     if (!user) {
-        return <Navigate to={ROUTES.HOME} replace />;
+        const urlGameId = new URLSearchParams(window.location.search).get("gameId");
+        const redirectTo = urlGameId ? `${ROUTES.HOME}?gameId=${urlGameId}` : ROUTES.HOME;
+        return <Navigate to={redirectTo} replace />;
     }
 
     // Show stuck connection screen
