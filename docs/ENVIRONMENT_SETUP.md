@@ -61,6 +61,7 @@ Esta guía documenta cómo configurar los 3 entornos independientes del proyecto
 | `VITE_APP_FIREBASE_STORAGE_BUCKET` | Firebase Console → `storageBucket` |
 | `VITE_APP_FIREBASE_MESSAGING_SENDER_ID` | Firebase Console → `messagingSenderId` |
 | `VITE_APP_FIREBASE_APP_ID` | Firebase Console → `appId` |
+| `VITE_AUTH_USE_POPUP` | Valor fijo: `true` (usa popup en lugar de redirect para login - el redirect tiene problemas conocidos) |
 
 ### 2.2 Variables para `impostor-app-staging`
 
