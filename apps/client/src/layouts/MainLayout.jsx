@@ -200,6 +200,7 @@ export function MainLayout({
                 gameId={gameState?.gameId}
                 onCopyLink={onCopyLink}
                 isMobile={isMobile}
+                onLeaveGame={() => setShowLeaveGameModal(true)}
             />
 
             {/* Modal de confirmación para abandonar juego */}
