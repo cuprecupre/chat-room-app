@@ -1,15 +1,14 @@
-
-import { useState } from 'react';
-import { db } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { Button } from './ui/Button';
+import { useState } from "react";
+import { db } from "../lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { Button } from "./ui/Button";
 import ReCAPTCHA from "react-google-recaptcha";
 
 export function FeedbackModal({ isOpen, onClose, user }) {
-    const [message, setMessage] = useState('');
-    const [type, setType] = useState('bug'); // bug, suggestion, other
+    const [message, setMessage] = useState("");
+    const [type, setType] = useState("bug"); // bug, suggestion, other
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [status, setStatus] = useState('idle'); // idle, success, error
+    const [status, setStatus] = useState("idle"); // idle, success, error
     const [errorObject, setErrorObject] = useState(null);
     const [captchaVerified, setCaptchaVerified] = useState(false);
 
@@ -20,38 +19,38 @@ export function FeedbackModal({ isOpen, onClose, user }) {
         if (!message.trim()) return;
 
         setIsSubmitting(true);
-        setStatus('idle');
+        setStatus("idle");
 
         try {
             // Timeout de 10 segundos para evitar que se quede colgado
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Request timed out')), 10000)
+                setTimeout(() => reject(new Error("Request timed out")), 10000)
             );
 
             await Promise.race([
-                addDoc(collection(db, 'feedback'), {
+                addDoc(collection(db, "feedback"), {
                     message,
                     type,
-                    userId: user?.uid || 'anonymous',
-                    userEmail: user?.email || 'anonymous',
+                    userId: user?.uid || "anonymous",
+                    userEmail: user?.email || "anonymous",
                     createdAt: serverTimestamp(),
                     userAgent: navigator.userAgent,
                     url: window.location.href,
-                    version: 'v1.0.0'
+                    version: "v1.0.0",
                 }),
-                timeoutPromise
+                timeoutPromise,
             ]);
 
-            setStatus('success');
-            setMessage('');
+            setStatus("success");
+            setMessage("");
             setTimeout(() => {
                 onClose();
-                setStatus('idle');
+                setStatus("idle");
             }, 2000);
         } catch (error) {
-            console.error('Error sending feedback:', error);
+            console.error("Error sending feedback:", error);
             setErrorObject(error);
-            setStatus('error');
+            setStatus("error");
         } finally {
             setIsSubmitting(false);
         }
@@ -71,10 +70,12 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                         </button>
                     </div>
 
-                    {status === 'success' ? (
+                    {status === "success" ? (
                         <div className="text-center py-8">
                             <div className="text-5xl mb-4">✨</div>
-                            <h4 className="text-xl font-bold text-green-400 mb-2">¡Mensaje enviado!</h4>
+                            <h4 className="text-xl font-bold text-green-400 mb-2">
+                                ¡Mensaje enviado!
+                            </h4>
                             <p className="text-neutral-400">Gracias por ayudarnos a mejorar.</p>
                         </div>
                     ) : (
@@ -94,8 +95,18 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                                         <option value="other">💭 Otros</option>
                                     </select>
                                     <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-neutral-400">
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        <svg
+                                            className="w-5 h-5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M19 9l-7 7-7-7"
+                                            />
                                         </svg>
                                     </div>
                                 </div>
@@ -114,9 +125,10 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                                 />
                             </div>
 
-                            {status === 'error' && (
+                            {status === "error" && (
                                 <p className="text-red-400 text-sm bg-red-400/10 p-2 rounded">
-                                    {(errorObject && errorObject.message) || 'Hubo un error al enviar el mensaje. Inténtalo de nuevo.'}
+                                    {(errorObject && errorObject.message) ||
+                                        "Hubo un error al enviar el mensaje. Inténtalo de nuevo."}
                                 </p>
                             )}
 
@@ -142,7 +154,7 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                                     disabled={isSubmitting || !message.trim() || !captchaVerified}
                                     className="flex-1"
                                 >
-                                    {isSubmitting ? 'Enviando...' : 'Enviar'}
+                                    {isSubmitting ? "Enviando..." : "Enviar"}
                                 </Button>
                             </div>
                         </form>

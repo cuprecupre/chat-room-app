@@ -34,10 +34,10 @@ Crear archivos `*.test.js` en la raíz o en `__tests__/`:
 
 ```javascript
 // Ejemplo: MyFeature.test.js
-describe('MyFeature', () => {
-  test('should do something', () => {
-    expect(true).toBe(true);
-  });
+describe("MyFeature", () => {
+    test("should do something", () => {
+        expect(true).toBe(true);
+    });
 });
 ```
 
@@ -49,14 +49,15 @@ Este test DEBE ejecutarse SIEMPRE antes de hacer push a `main`.
 
 1. Servidor corriendo localmente (ver `.agent/workflows/development.md`)
 2. Dos navegadores:
-   - **Navegador A**: Normal (Chrome/Safari)
-   - **Navegador B**: Ventana de incógnito
+    - **Navegador A**: Normal (Chrome/Safari)
+    - **Navegador B**: Ventana de incógnito
 
 ### Checklist de Smoke Test
 
 #### 1. Login y Autenticación
 
 **Navegador A:**
+
 - [ ] Abrir http://localhost:5173
 - [ ] Click en "Continuar con Google"
 - [ ] Completar login con cuenta de prueba
@@ -64,6 +65,7 @@ Este test DEBE ejecutarse SIEMPRE antes de hacer push a `main`.
 - [ ] Verificar que NO hay errores en consola
 
 **Navegador B (Incógnito):**
+
 - [ ] Abrir http://localhost:5173
 - [ ] Login con otra cuenta Google
 - [ ] Verificar login exitoso
@@ -71,12 +73,14 @@ Este test DEBE ejecutarse SIEMPRE antes de hacer push a `main`.
 #### 2. Crear y Unirse a Partida
 
 **Navegador A:**
+
 - [ ] Click en "Crear Partida"
 - [ ] Verificar que se muestra el código de sala
 - [ ] Verificar que apareces en la lista de jugadores
 - [ ] Copiar el código de sala
 
 **Navegador B:**
+
 - [ ] Click en "Unirse a Partida"
 - [ ] Pegar el código de sala
 - [ ] Click en "Unirse"
@@ -85,22 +89,26 @@ Este test DEBE ejecutarse SIEMPRE antes de hacer push a `main`.
 #### 3. Iniciar Juego y Verificar Roles
 
 **Navegador A (como host):**
+
 - [ ] Click en "Iniciar Juego"
 - [ ] Verificar que se asigna un rol (Amigo o Impostor)
 - [ ] Si eres Amigo: verificar que ves la palabra secreta
 - [ ] Si eres Impostor: verificar que ves la pista/categoría
 
 **Navegador B:**
+
 - [ ] Verificar que se asigna un rol
 - [ ] Verificar que el estado del juego se sincroniza
 
 **Consola del Servidor:**
+
 - [ ] Sin errores
 - [ ] Logs muestran roles asignados correctamente
 
 #### 4. Sistema de Turnos
 
 **Ambos navegadores:**
+
 - [ ] Verificar que el jugador inicial tiene el icono 🎯
 - [ ] Verificar que la lista de jugadores está ordenada
 - [ ] Verificar que el orden es consistente en ambas ventanas
@@ -108,14 +116,17 @@ Este test DEBE ejecutarse SIEMPRE antes de hacer push a `main`.
 #### 5. Votación
 
 **Navegador A:**
+
 - [ ] Click en un jugador para votar
 - [ ] Verificar que tu voto se registra
 
 **Navegador B:**
+
 - [ ] Votar por un jugador
 - [ ] Verificar que se actualiza el contador de votos
 
 **Ambos navegadores:**
+
 - [ ] Una vez todos votan, verificar que se procesan resultados
 - [ ] Si hay eliminado: verificar que se marca correctamente
 - [ ] Si hay empate: verificar que pasa a siguiente vuelta
@@ -124,28 +135,33 @@ Este test DEBE ejecutarse SIEMPRE antes de hacer push a `main`.
 #### 6. Reconexión y Periodo de Gracia
 
 **Navegador B:**
+
 - [ ] Cerrar la pestaña completa (simular desconexión)
 - [ ] Esperar 3-5 segundos
 
 **Navegador A:**
+
 - [ ] Verificar que el jugador B aparece como "desconectado"
 - [ ] Verificar que el juego NO lo elimina inmediatamente
 
 **Navegador B:**
+
 - [ ] Reabrir http://localhost:5173
 - [ ] Login con la misma cuenta
 - [ ] Verificar que reconecta automáticamente
 - [ ] Verificar que el estado del juego se restaura
 
 **Consola del Servidor:**
+
 - [ ] Verificar logs de "User disconnected" y "User reconnected"
 - [ ] Sin errores
 
 #### 7. Finalizar Ronda
 
 **Continuar votando hasta:**
+
 - [ ] Eliminar al impostor (victoria de amigos)
-  - O bien: Sobrevivir 3 vueltas (victoria del impostor)
+    - O bien: Sobrevivir 3 vueltas (victoria del impostor)
 - [ ] Verificar que se muestra pantalla de resultados
 - [ ] Verificar que los puntos se asignan correctamente
 - [ ] Verificar que se muestra la palabra secreta
@@ -153,6 +169,7 @@ Este test DEBE ejecutarse SIEMPRE antes de hacer push a `main`.
 #### 8. Jugar Otra Vez
 
 **Navegador A:**
+
 - [ ] Click en "Jugar Otra Vez"
 - [ ] Verificar que se resetea el estado
 - [ ] Verificar que se asignan nuevos roles
@@ -161,20 +178,24 @@ Este test DEBE ejecutarse SIEMPRE antes de hacer push a `main`.
 #### 9. Abandonar Partida
 
 **Navegador B:**
+
 - [ ] Click en "Abandonar"
 - [ ] Verificar que sales de la partida
 
 **Navegador A:**
+
 - [ ] Verificar que el jugador B ya no aparece en la lista
 - [ ] Verificar que el orden de jugadores se actualiza
 
 #### 10. Verificación de Consolas
 
 **Consola del Navegador (ambos):**
+
 - [ ] Sin errores (los warnings son aceptables)
 - [ ] Solo logs informativos
 
 **Consola del Servidor:**
+
 - [ ] Sin errores ni excepciones
 - [ ] Solo logs de eventos normales
 
@@ -185,10 +206,12 @@ Este test DEBE ejecutarse SIEMPRE antes de hacer push a `main`.
 El login con Google tiene particularidades en iOS Safari.
 
 **Setup:**
+
 1. Servidor accesible desde red local o túnel (ej: ngrok)
 2. Dispositivo iOS con Safari
 
 **Test:**
+
 - [ ] Abrir la URL en Safari iOS
 - [ ] Click en "Continuar con Google"
 - [ ] Verificar que se abre la página de Google (no popup)
@@ -209,22 +232,26 @@ El login con Google tiene particularidades en iOS Safari.
 Cuando hagas cambios en archivos críticos, verifica que no rompiste nada:
 
 ### Cambios en `server.js`
+
 - [ ] Ejecutar smoke test completo
 - [ ] Verificar autenticación
 - [ ] Verificar Socket.IO connections
 
 ### Cambios en `Game.js`
+
 - [ ] Ejecutar `npm test` (Game.test.js)
 - [ ] Ejecutar smoke test completo
 - [ ] Verificar lógica de votación
 - [ ] Verificar sistema de puntos
 
 ### Cambios en `App.jsx` o componentes principales
+
 - [ ] Smoke test completo
 - [ ] Verificar todas las pantallas
 - [ ] Verificar responsive design (móvil y desktop)
 
 ### Cambios en Firebase/Autenticación
+
 - [ ] Login en desktop (popup)
 - [ ] Login en móvil (redirect)
 - [ ] Logout
@@ -242,6 +269,7 @@ node test-mobile-login.js
 ### Memory Leaks
 
 Verificar en Chrome DevTools:
+
 1. Performance → Memory
 2. Tomar heap snapshot inicial
 3. Jugar varias rondas

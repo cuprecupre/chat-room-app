@@ -15,6 +15,7 @@ import { LobbyPage } from "../pages/LobbyPage";
 import { GamePage } from "../pages/GamePage";
 import { RulesPage } from "../pages/RulesPage";
 import { InvitePage } from "../pages/InvitePage";
+import { InviteLandingPage } from "../pages/InviteLandingPage";
 import { ROUTES } from "./routes";
 import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
 import heroImg from "../assets/impostor-home.png";
@@ -37,7 +38,15 @@ function HomeRouteHandler({ user }) {
     return null;
 }
 
-function GameRouteHandler({ gameState, user, emit, joinGame, joinError, clearJoinError, ...props }) {
+function GameRouteHandler({
+    gameState,
+    user,
+    emit,
+    joinGame,
+    joinError,
+    clearJoinError,
+    ...props
+}) {
     const location = useLocation();
     const urlGameId = new URLSearchParams(location.search).get("gameId");
 
@@ -63,20 +72,20 @@ function GameRouteHandler({ gameState, user, emit, joinGame, joinError, clearJoi
     return <Navigate to={ROUTES.LOBBY} replace />;
 }
 
-function AppRoutes({ 
-    user, 
-    loading, 
-    error, 
-    login, 
-    loginWithEmail, 
-    registerWithEmail, 
-    logout, 
+function AppRoutes({
+    user,
+    loading,
+    error,
+    login,
+    loginWithEmail,
+    registerWithEmail,
+    logout,
     clearError,
     connected,
     gameState,
     emit,
     joinError,
-    clearJoinError
+    clearJoinError,
 }) {
     const navigate = useNavigate();
     const location = useLocation();
@@ -132,13 +141,13 @@ function AppRoutes({
     useEffect(() => {
         const currentGameId = gameState?.gameId;
         const wasInLobby = location.pathname === ROUTES.LOBBY;
-        
+
         // If a new game ID appears and we're in the lobby, navigate to game
         if (currentGameId && currentGameId !== prevGameIdRef.current && wasInLobby) {
             console.log("🎮 Navigating to game:", currentGameId);
             navigate(`${ROUTES.GAME}?gameId=${currentGameId}`);
         }
-        
+
         prevGameIdRef.current = currentGameId;
     }, [gameState?.gameId, location.pathname, navigate]);
 
@@ -166,16 +175,34 @@ function AppRoutes({
                     <Route
                         path={ROUTES.HOME}
                         element={
-                            user ? (
-                                <HomeRouteHandler user={user} />
-                            ) : (
-                                <LandingPage
-                                    onLogin={login}
-                                    isLoading={loading}
-                                    onOpenInstructions={() => setInstructionsOpen(true)}
-                                    onOpenFeedback={() => setFeedbackOpen(true)}
-                                />
-                            )
+                            (() => {
+                                const urlGameId = new URLSearchParams(window.location.search).get("gameId");
+
+                                // If there's a gameId and user is NOT logged in, show InviteLandingPage
+                                if (urlGameId && !user) {
+                                    return (
+                                        <InviteLandingPage
+                                            onLogin={login}
+                                            isLoading={loading}
+                                        />
+                                    );
+                                }
+
+                                // If user is logged in, use HomeRouteHandler
+                                if (user) {
+                                    return <HomeRouteHandler user={user} />;
+                                }
+
+                                // Otherwise show LandingPage
+                                return (
+                                    <LandingPage
+                                        onLogin={login}
+                                        isLoading={loading}
+                                        onOpenInstructions={() => setInstructionsOpen(true)}
+                                        onOpenFeedback={() => setFeedbackOpen(true)}
+                                    />
+                                );
+                            })()
                         }
                     />
                     <Route
@@ -316,4 +343,3 @@ export function AppRouter() {
         </BrowserRouter>
     );
 }
-

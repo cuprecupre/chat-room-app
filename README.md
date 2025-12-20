@@ -5,11 +5,13 @@ Un juego multijugador en tiempo real donde los jugadores intentan descubrir qui�
 ## 🚀 Inicio Rápido
 
 ### Opción 1: Script Automático (Recomendado)
+
 ```bash
 ./start.sh
 ```
 
 ### Opción 2: Manual (2 terminales)
+
 ```bash
 # Terminal 1 - Backend
 node server.js
@@ -33,38 +35,38 @@ El juego mantiene un **orden base** determinado por el momento en que cada jugad
 
 - **Orden base**: Inmutable (salvo altas/bajas de jugadores)
 - **Jugador inicial**: Rota en cada ronda siguiendo el orden
-  - Ronda 1: Empieza el primer jugador que se unió
-  - Ronda 2: Empieza el segundo jugador
-  - Ronda 3: Empieza el tercer jugador, y así sucesivamente
+    - Ronda 1: Empieza el primer jugador que se unió
+    - Ronda 2: Empieza el segundo jugador
+    - Ronda 3: Empieza el tercer jugador, y así sucesivamente
 - **Indicador visual**: Un icono 🎯 marca al jugador que debe iniciar cada ronda
 - **Lista de jugadores**: Se muestra ordenada con el jugador inicial siempre en la posición 1º
 
 ### Mecánica del Juego
 
-1. **Reparto de roles**: 
-   - Un jugador es seleccionado aleatoriamente como **impostor**
-   - Los demás son **amigos** y reciben la palabra secreta
-   - El impostor solo recibe una pista sobre la categoría
+1. **Reparto de roles**:
+    - Un jugador es seleccionado aleatoriamente como **impostor**
+    - Los demás son **amigos** y reciben la palabra secreta
+    - El impostor solo recibe una pista sobre la categoría
 
 2. **Rondas de conversación**:
-   - El jugador inicial empieza la ronda (presencial)
-   - Cada jugador da pistas sobre la palabra
-   - El impostor debe disimular sin conocer la palabra exacta
+    - El jugador inicial empieza la ronda (presencial)
+    - Cada jugador da pistas sobre la palabra
+    - El impostor debe disimular sin conocer la palabra exacta
 
 3. **Votaciones** (3 vueltas):
-   - **Vuelta 1, 2 y 3**: Los jugadores votan para eliminar al sospechoso
-   - Los jugadores eliminados no pueden votar en siguientes vueltas
-   - Si hay empate, se pasa a la siguiente vuelta sin eliminación
-   - Si eliminan al impostor: **Los amigos ganan**
-   - Si no lo eliminan en 3 vueltas: **El impostor gana**
+    - **Vuelta 1, 2 y 3**: Los jugadores votan para eliminar al sospechoso
+    - Los jugadores eliminados no pueden votar en siguientes vueltas
+    - Si hay empate, se pasa a la siguiente vuelta sin eliminación
+    - Si eliminan al impostor: **Los amigos ganan**
+    - Si no lo eliminan en 3 vueltas: **El impostor gana**
 
 4. **Puntuación**:
-   - Amigos: +1 punto por votar correctamente al impostor
-   - Amigos: +1 punto adicional si expulsan al impostor
-   - Impostor: +2 puntos por sobrevivir la vuelta 1
-   - Impostor: +3 puntos por sobrevivir la vuelta 2  
-   - Impostor: +4 puntos por sobrevivir la vuelta 3
-   - El juego continúa hasta que un jugador alcance **15 puntos** o se completen **3 partidas**
+    - Amigos: +1 punto por votar correctamente al impostor
+    - Amigos: +1 punto adicional si expulsan al impostor
+    - Impostor: +2 puntos por sobrevivir la vuelta 1
+    - Impostor: +3 puntos por sobrevivir la vuelta 2
+    - Impostor: +4 puntos por sobrevivir la vuelta 3
+    - El juego continúa hasta que un jugador alcance **15 puntos** o se completen **3 partidas**
 
 ### Reconexión y Desconexiones
 
@@ -75,6 +77,7 @@ El juego mantiene un **orden base** determinado por el momento en que cada jugad
 ## 🛠️ Desarrollo
 
 ### Instalación
+
 ```bash
 # Instalar dependencias del servidor
 npm install
@@ -85,6 +88,7 @@ npm install
 ```
 
 ### Scripts Disponibles
+
 - `./start.sh` - Inicia ambos servidores automáticamente
 - `node server.js` - Solo servidor backend
 - `cd client && npm run dev` - Solo servidor frontend

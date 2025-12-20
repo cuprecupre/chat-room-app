@@ -78,11 +78,13 @@ GOOGLE_APPLICATION_CREDENTIALS=./firebase-service-account.json
 Inicia servidor backend + cliente Vite con hot reload:
 
 // turbo
+
 ```bash
 ./start.sh
 ```
 
 Este script:
+
 - Inicia el servidor backend en puerto 3000 (o PORT desde .env)
 - Inicia Vite dev server en puerto 5173
 - Ambos corren concurrentemente con logs coloreados
@@ -100,11 +102,13 @@ Acceso: http://localhost:4000/
 ### Opción C: Backend + Vite por Separado
 
 Terminal 1 (Backend):
+
 ```bash
 PORT=4000 npm run dev
 ```
 
 Terminal 2 (Frontend con hot reload):
+
 ```bash
 cd client
 npm run dev -- --port 5174 --strictPort
@@ -128,17 +132,17 @@ Abre http://localhost:5173 (o el puerto que corresponda) y verifica:
 - Los archivos están en `client/src/`
 - Con Vite dev server, los cambios se reflejan automáticamente (hot reload)
 - Los componentes principales:
-  - `App.jsx` - Componente principal y routing
-  - `components/` - Componentes de UI
-  - `hooks/` - React hooks personalizados
-  - `lib/` - Utilidades y configuración (Firebase)
+    - `App.jsx` - Componente principal y routing
+    - `components/` - Componentes de UI
+    - `hooks/` - React hooks personalizados
+    - `lib/` - Utilidades y configuración (Firebase)
 
 ### Desarrollo de Backend
 
 - Archivos principales:
-  - `server.js` - Servidor Express + Socket.IO
-  - `Game.js` - Lógica del juego
-  - `words.js` - Palabras del juego
+    - `server.js` - Servidor Express + Socket.IO
+    - `Game.js` - Lógica del juego
+    - `words.js` - Palabras del juego
 - Reiniciar el servidor manualmente tras cambios (no hay hot reload en backend)
 
 ## 8. Testing Durante Desarrollo
@@ -177,6 +181,7 @@ Si usaste `start.sh`:
 ```
 
 O manualmente:
+
 - `Ctrl + C` en cada terminal
 - Verificar que no quedan procesos: `lsof -nP -iTCP:3000 -sTCP:LISTEN`
 

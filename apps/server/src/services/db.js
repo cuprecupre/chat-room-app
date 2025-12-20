@@ -1,111 +1,117 @@
-const admin = require('firebase-admin');
+const admin = require("firebase-admin");
 
 class DBService {
     constructor() {
         this.db = null;
-        this.collectionName = null;
-        this.enabled = false;
+        this.collectionName = "games";
     }
 
     /**
-     * Initializes the DB Service with configuration options.
-     * @param {Object} options
-     * @param {boolean} options.enabled - Whether persistence is enabled via feature flag.
-     * @param {string} options.collectionName - Name of the Firestore collection (e.g., 'games', 'dev_games').
+     * Initializes the DB Service.
      */
-    initialize(options = {}) {
-        this.enabled = options.enabled === true;
-
-        if (!this.enabled) {
-            console.log('🚧 [DB Service] Persistence is DISABLED (Feature Flag off).');
-            return;
-        }
-
+    initialize() {
         try {
-            // Assumes firebase-admin has been initialized in server.js
             this.db = admin.firestore();
-            this.db.settings({ ignoreUndefinedProperties: true }); // Robustness fix for "undefined" errors
-            this.collectionName = options.collectionName || 'dev_games';
-            console.log(`✅ [DB Service] Persistence ENABLED. Targets collection: '${this.collectionName}'`);
+            this.db.settings({ ignoreUndefinedProperties: true });
+            console.log(`✅ [DB Service] Initialized. Collection: '${this.collectionName}'`);
         } catch (e) {
-            console.error('❌ [DB Service] Failed to initialize Firestore instance. Disabling persistence.', e.message);
-            this.enabled = false;
+            console.error("❌ [DB Service] Failed to initialize Firestore:", e.message);
         }
     }
 
     /**
      * Upserts the game state to Firestore.
-     * Uses set({merge: true}) to allow partial updates if needed, though usually we send full state.
-     * Silently catches errors to prevent game loop interruption (DEFENSIVE CODING).
      */
     async saveGameState(gameId, state) {
-        if (!this.enabled || !this.db) return;
+        if (!this.db) return;
 
         try {
             const docRef = this.db.collection(this.collectionName).doc(gameId);
-
-            // Add metadata
             const payload = {
                 ...state,
-                updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
             };
-
-            // If it's a new document, add createdAt
-            // We can't easily feel if it's new without a read, but we can set it if missing?
-            // For simplicity, we just merge. If we want createdAt, we should ideally include it in the state object passed from Game.js
-            // or use a pre-condition. For now, updatedAt is sufficient for most debug needs.
-
             await docRef.set(payload, { merge: true });
         } catch (error) {
-            // Log but don't crash
             console.error(`⚠️ [DB Service] Save failed for ${gameId}: ${error.message}`);
         }
     }
 
     /**
      * Retrieves game state for recovery.
-     * Returns null if not found or error.
      */
     async getGameState(gameId) {
-        if (!this.enabled || !this.db) return null;
+        if (!this.db) return null;
 
         try {
             const doc = await this.db.collection(this.collectionName).doc(gameId).get();
-            if (!doc.exists) {
-                return null;
-            }
-            return doc.data();
+            return doc.exists ? doc.data() : null;
         } catch (error) {
             console.error(`⚠️ [DB Service] Load failed for ${gameId}: ${error.message}`);
             return null;
         }
     }
+
     /**
-     * Retrieves all games that are not 'game_over'.
-     * Used for server restart recovery.
+     * Deletes a game from Firestore.
      */
-    async getActiveGames() {
-        if (!this.enabled || !this.db) return [];
+    async deleteGameState(gameId) {
+        if (!this.db) return;
 
         try {
-            // NOTE: '!=' queries in Firestore have limitations and might require indexes.
-            // An alternative is to just get all and filter, or store a dedicated 'active' boolean.
-            // For now, let's try the simple query. If it fails due to index, we'll log it.
-            // A safer approach regarding indexes is query phase 'in' ['lobby', 'playing', 'round_result']
-            const snapshot = await this.db.collection(this.collectionName)
-                .where('phase', 'in', ['lobby', 'playing', 'round_result'])
+            await this.db.collection(this.collectionName).doc(gameId).delete();
+        } catch (error) {
+            console.error(`⚠️ [DB Service] Delete failed for ${gameId}: ${error.message}`);
+            throw error;
+        }
+    }
+
+    /**
+     * Retrieves all active games for server restart recovery.
+     */
+    async getActiveGames() {
+        if (!this.db) return [];
+
+        try {
+            // Only recover games updated in the last 3 hours (configurable via env)
+            const recoveryWindowHours = parseInt(process.env.GAME_RECOVERY_HOURS || "3");
+            const cutoffTime = new Date(Date.now() - recoveryWindowHours * 60 * 60 * 1000);
+
+            const snapshot = await this.db
+                .collection(this.collectionName)
+                .where("phase", "in", ["lobby", "playing", "round_result"])
+                .where("updatedAt", ">", cutoffTime)
+                .orderBy("updatedAt", "desc")
+                .limit(1000) // Safety limit to prevent loading too many games
                 .get();
 
             if (snapshot.empty) {
+                console.log("✅ [DB Service] No active games to recover.");
                 return [];
             }
 
             const games = [];
-            snapshot.forEach(doc => {
-                games.push({ gameId: doc.id, ...doc.data() });
+            let skippedEmpty = 0;
+
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const playerCount = data.players ? data.players.length : 0;
+
+                // Only recover games with at least 1 player
+                if (playerCount > 0) {
+                    games.push({ gameId: doc.id, ...data });
+                } else {
+                    skippedEmpty++;
+                }
             });
 
-            console.log(`✅ [DB Service] Recovered ${games.length} active games.`);
+            if (skippedEmpty > 0) {
+                console.log(`⏭️  [DB Service] Skipped ${skippedEmpty} empty games (0 players).`);
+            }
+
+            console.log(
+                `✅ [DB Service] Recovered ${games.length} active games (updated within last ${recoveryWindowHours}h).`
+            );
             return games;
         } catch (error) {
             console.error(`❌ [DB Service] Failed to recover games: ${error.message}`);
@@ -114,6 +120,4 @@ class DBService {
     }
 }
 
-// Export singleton
 module.exports = new DBService();
-

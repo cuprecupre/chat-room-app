@@ -19,4 +19,3 @@ export function LandingPage({ onLogin, isLoading, onOpenInstructions, onOpenFeed
         />
     );
 }
-

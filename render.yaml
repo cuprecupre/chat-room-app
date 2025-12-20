@@ -1,16 +1,78 @@
 services:
-  # Servicio de Producción
-  - type: web
-    name: impostor-app-production
-    env: node
-    branch: main
-    buildCommand: npm ci --include=dev && npm run build
-    startCommand: node apps/server/src/index.js
+    # ============================================
+    # PRODUCCIÓN - Usuarios reales
+    # Rama: main
+    # Deploy: MANUAL (tú controlas desde Render Dashboard)
+    # ============================================
+    - type: web
+      name: impostor-app-production
+      runtime: node
+      plan: free
+      branch: main
+      autoDeploy: false
+      buildCommand: npm ci --include=dev && npm run build
+      startCommand: node apps/server/src/index.js
+      envVars:
+          - key: NODE_ENV
+            value: production
+          # Las siguientes variables se configuran manualmente en Render Dashboard:
+          # - FIREBASE_SERVICE_ACCOUNT (JSON del proyecto Firebase de producción)
+          # - CLIENT_ORIGINS (URL de producción)
+          # - VITE_APP_FIREBASE_API_KEY
+          # - VITE_APP_FIREBASE_AUTH_DOMAIN
+          # - VITE_APP_FIREBASE_PROJECT_ID
+          # - VITE_APP_FIREBASE_STORAGE_BUCKET
+          # - VITE_APP_FIREBASE_MESSAGING_SENDER_ID
+          # - VITE_APP_FIREBASE_APP_ID
 
-  # Servicio de Desarrollo
-  - type: web
-    name: impostor-app-develop
-    env: node
-    branch: develop
-    buildCommand: npm ci --include=dev && npm run build
-    startCommand: node apps/server/src/index.js
+    # ============================================
+    # STAGING - Pruebas pre-producción / QA
+    # Rama: staging
+    # Deploy: AUTOMÁTICO (cada push a staging despliega)
+    # ============================================
+    - type: web
+      name: impostor-app-staging
+      runtime: node
+      plan: free
+      branch: staging
+      autoDeploy: true
+      buildCommand: npm ci --include=dev && npm run build
+      startCommand: node apps/server/src/index.js
+      envVars:
+          - key: NODE_ENV
+            value: staging
+          # Las siguientes variables se configuran manualmente en Render Dashboard:
+          # - FIREBASE_SERVICE_ACCOUNT (JSON del proyecto Firebase de staging)
+          # - CLIENT_ORIGINS (URL de staging)
+          # - VITE_APP_FIREBASE_API_KEY
+          # - VITE_APP_FIREBASE_AUTH_DOMAIN
+          # - VITE_APP_FIREBASE_PROJECT_ID
+          # - VITE_APP_FIREBASE_STORAGE_BUCKET
+          # - VITE_APP_FIREBASE_MESSAGING_SENDER_ID
+          # - VITE_APP_FIREBASE_APP_ID
+
+    # ============================================
+    # DESARROLLO - Features en desarrollo
+    # Rama: develop
+    # Deploy: AUTOMÁTICO (cada push a develop despliega)
+    # ============================================
+    - type: web
+      name: impostor-app-develop
+      runtime: node
+      plan: free
+      branch: develop
+      autoDeploy: true
+      buildCommand: npm ci --include=dev && npm run build
+      startCommand: node apps/server/src/index.js
+      envVars:
+          - key: NODE_ENV
+            value: development
+          # Las siguientes variables se configuran manualmente en Render Dashboard:
+          # - FIREBASE_SERVICE_ACCOUNT (JSON del proyecto Firebase de desarrollo)
+          # - CLIENT_ORIGINS (URL de desarrollo)
+          # - VITE_APP_FIREBASE_API_KEY
+          # - VITE_APP_FIREBASE_AUTH_DOMAIN
+          # - VITE_APP_FIREBASE_PROJECT_ID
+          # - VITE_APP_FIREBASE_STORAGE_BUCKET
+          # - VITE_APP_FIREBASE_MESSAGING_SENDER_ID
+          # - VITE_APP_FIREBASE_APP_ID
