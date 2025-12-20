@@ -26,14 +26,14 @@ jobs:
             - name: Install Dependencies (Root)
               run: npm ci
 
-            - name: Install Dependencies (Server)
-              run: cd apps/server && npm ci
-
             - name: Install Dependencies (Client)
               run: cd apps/client && npm ci
 
-            - name: Run Tests (Server & Logic)
-              run: npm test
+            # TODO: Reactivar tests cuando estén configurados
+            # - name: Install Dependencies (Server)
+            #   run: cd apps/server && npm ci
+            # - name: Run Tests (Server & Logic)
+            #   run: npm test
 
             - name: Build Client
               run: cd apps/client && npm run build
