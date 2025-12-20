@@ -26,6 +26,9 @@ jobs:
             - name: Install Dependencies (Root)
               run: npm ci
 
+            - name: Install Dependencies (Server)
+              run: cd apps/server && npm ci
+
             - name: Install Dependencies (Client)
               run: cd apps/client && npm ci
 
