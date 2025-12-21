@@ -525,13 +525,13 @@ export function GameRoom({
                     {isHost ? (
                         /* HOST VIEW */
                         <>
-                            <h2 className="text-3xl font-serif text-neutral-50 leading-tight">
+                            <h2 className="text-4xl font-serif text-neutral-50 leading-tight">
                                 Invita a tus amigos
                                 <br />
                                 para empezar
                             </h2>
 
-                            <div className="w-full space-y-4">
+                            <div className="w-full space-y-4 mt-8">
                                 <Button
                                     onClick={onCopyLink}
                                     variant="outline"
@@ -577,36 +577,45 @@ export function GameRoom({
                                 </div>
                             </div>
 
-                            {/* Botón fijo solo en mobile */}
-                            <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-neutral-950 via-neutral-950/95 to-transparent sm:hidden z-40">
-                                <div className="max-w-sm mx-auto">
-                                    <Button
-                                        onClick={onStartGame}
-                                        disabled={state.players.length < 2}
-                                        variant="primary"
-                                        size="md"
-                                        className="w-full shadow-lg"
-                                    >
-                                        Comenzar juego
-                                    </Button>
+                            {/* Botón fijo solo en mobile con overlay gradiente premium (como Siguiente partida) */}
+                            <div className="fixed bottom-0 left-0 right-0 sm:hidden z-40">
+                                <div className="h-10 bg-gradient-to-t from-neutral-950/80 via-neutral-950/40 to-transparent"></div>
+                                <div className="bg-neutral-950 px-4 pb-8">
+                                    <div className="max-w-sm mx-auto">
+                                        <Button
+                                            onClick={onStartGame}
+                                            disabled={state.players.length < 2}
+                                            variant="primary"
+                                            size="md"
+                                            className="w-full shadow-lg"
+                                        >
+                                            Comenzar juego
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                         </>
                     ) : (
                         /* GUEST VIEW */
                         <>
-                            <h2 className="text-3xl font-serif text-neutral-50 leading-tight">
+                            <h2 className="text-4xl font-serif text-neutral-50 leading-tight">
                                 La partida empezará pronto
                             </h2>
 
-                            <div className="space-y-6">
+                            <div className="space-y-6 mt-8">
                                 <p className="text-lg text-neutral-400 animate-pulse">
                                     Espera hasta que{" "}
                                     <span className="text-orange-400 font-regular">
                                         {state.players.find((p) => p.uid === state.hostId)?.name ||
                                             "el anfitrión"}
-                                    </span>{" "}
-                                    inicie la partida.
+                                    </span>
+                                    <br />
+                                    inicie la partida
+                                    <span className="inline-flex ml-1">
+                                        <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                                        <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                                        <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                                    </span>
                                 </p>
 
                                 <div className="w-full">
