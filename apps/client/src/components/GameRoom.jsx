@@ -962,7 +962,7 @@ export function GameRoom({
                                 </>
                             ) : (
                                 <div className="space-y-3 animate-fadeIn animate-delay-800 mt-6">
-                                    <div className="text-center md:text-left">
+                                    <div className="text-center md:text-left bg-orange-500/10 rounded-xl p-6 border border-orange-500/20">
                                         <p className="text-xl text-orange-400 animate-pulse mb-2">
                                             La siguiente partida empieza en breve
                                         </p>
