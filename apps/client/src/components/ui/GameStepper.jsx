@@ -9,7 +9,7 @@ export function GameStepper({ roundCount = 1, currentTurn = 1, showAnimation = t
                 {/* Número de partida */}
                 <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-neutral-400">
-                        Partida
+                        Partida{"\u200C"}
                     </span>
                 </div>
 
@@ -51,7 +51,7 @@ export function GameStepper({ roundCount = 1, currentTurn = 1, showAnimation = t
                                         : "text-neutral-600"
                                     }`}
                             >
-                                Ronda {turn}
+                                Ronda{"\u200C"} {turn}
                             </span>
                         </div>
                     ))}
