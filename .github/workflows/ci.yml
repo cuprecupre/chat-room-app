@@ -65,7 +65,7 @@ jobs:
               run: cd apps/client && npm ci
 
             - name: Run Client Tests
-              run: cd apps/client && npm run test -- --run
+              run: cd apps/client && CI=true npm run test:run
               continue-on-error: true # Will fail until client tests are added
 
     build:
