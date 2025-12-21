@@ -101,6 +101,12 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
 
     return (
         <div className="w-full rounded-lg md:flex-1 md:flex md:flex-col">
+            {/* Indicador de quién empieza la ronda */}
+            {isPlaying && startingPlayerId && (
+                <p className="text-sm text-neutral-400 mb-4 text-center md:text-left">
+                    ☀️ <span className="text-white">{players.find((p) => p.uid === startingPlayerId)?.name || "Alguien"}</span> da la primera pista
+                </p>
+            )}
             <ul className="space-y-2">
                 {sortedPlayers.map((p, index) => {
                     const isEliminated = eliminatedPlayers.includes(p.uid);
@@ -250,6 +256,17 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                     );
                 })}
             </ul>
+
+            {/* Pasos del juego */}
+            {isPlaying && (
+                <div className="mt-6 mb-4 space-y-1 text-center md:text-left">
+                    <p className="text-neutral-500 text-sm">
+                        1. Descubre tu carta<br />
+                        2. Da una pista cuando sea tu turno<br />
+                        3. Vota para descubrir al impostor
+                    </p>
+                </div>
+            )}
 
             {/* Enlace de ayuda solo durante la fase playing */}
             {isPlaying && (
@@ -775,7 +792,7 @@ export function GameRoom({
                                             onClick={triggerReveal}
                                             variant="outline"
                                             size="sm"
-                                            className="gap-2 !w-auto"
+                                            className="gap-2 !w-auto !border-orange-500 !text-orange-400 hover:!bg-orange-500/10"
                                         >
                                             <svg
                                                 className="w-4 h-4"
@@ -808,16 +825,6 @@ export function GameRoom({
                                         className={`text-center md:text-left mb-5 ${showRestOfUI ? "animate-fadeIn animate-delay-400" : "opacity-0 pointer-events-none"}`}
                                     >
                                         <h2 className="text-3xl font-serif text-neutral-50">Ronda de pistas y votos</h2>
-                                    </div>
-                                    <div className="mb-6 space-y-1 text-center md:text-left">
-                                        <p className="text-neutral-400 text-sm">
-                                            Vota al jugador que creas que es impostor tras la ronda de pistas
-                                        </p>
-                                        <p className="text-xs text-neutral-400 mt-2">
-                                            <span className="inline-flex items-center gap-1.5 bg-white/5 px-3 py-1 rounded-full">
-                                                ☀️ {state.players.find((p) => p.uid === state.startingPlayerId)?.name || "Alguien"} empieza la partida
-                                            </span>
-                                        </p>
                                     </div>
                                     <PlayerList
                                         players={state.players}
