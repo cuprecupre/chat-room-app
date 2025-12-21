@@ -4,6 +4,7 @@ import { Link, Share, Info } from "lucide-react";
 import { Button } from "./ui/Button";
 import { Avatar } from "./ui/Avatar";
 import { Modal } from "./ui/Modal";
+import { GameStepper } from "./ui/GameStepper";
 import { Footer } from "./Footer";
 import keyImg from "../assets/llave.png";
 import dualImpostorImg from "../assets/dual-impostor.png";
@@ -98,7 +99,7 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
 
     // Determinar qué título mostrar (solo en fases playing/result/game_over)
     const isLobby = !isPlaying && !showScores;
-    let headerText = isPlaying ? "Vota al jugador que creas impostor" : "";
+    let headerText = isPlaying ? "Dale tu voto al jugador que creas que es impostor" : "";
     if (showScores) {
         headerText = isGameOver ? "Resto de jugadores" : "Puntuación parcial";
     }
@@ -337,7 +338,7 @@ function HelpLink({ onOpenInstructions }) {
                     </div>
 
                     <div className="text-sm text-neutral-500 border-l-2 border-neutral-700 pl-4">
-                        Los que votan bien ganan puntos. Si eres impostor y sobrevives, ganas puntos. Si no eres impostor y te votan, quedas fuera de la ronda.
+                        Los que votan bien ganan puntos. Si eres impostor y sobrevives, ganas puntos. Si no eres impostor pero la mayoría te vota, quedas eliminado de la ronda.
                     </div>
 
                     <div className="space-y-3">
@@ -680,29 +681,13 @@ export function GameRoom({
                             </div>
                         )}
 
-                        {/* Indicador de partida y ronda - arriba a la izquierda, todo en una línea */}
-                        <div
-                            className={`w-full max-w-4xl mx-auto mb-6 ${showRestOfUI ? "animate-fadeIn animate-delay-200" : "opacity-0 pointer-events-none"}`}
-                        >
-                            <div className="flex items-center gap-3 md:justify-start justify-center">
-                                <p className="text-xs text-neutral-500">
-                                    Partida {state.roundCount || 1} · Ronda {state.currentTurn} de {state.maxTurns}
-                                </p>
-                                {/* Stepper de rondas */}
-                                <div className="flex items-center gap-1.5">
-                                    {[1, 2, 3].map((turn) => (
-                                        <div
-                                            key={turn}
-                                            className={`w-2 h-2 rounded-full transition-all ${state.currentTurn === turn
-                                                ? "bg-orange-500 scale-125"
-                                                : state.currentTurn > turn
-                                                    ? "bg-green-500/50"
-                                                    : "bg-white/20"
-                                                }`}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
+                        {/* Stepper de partida y rondas */}
+                        <div className={`w-full ${showRestOfUI ? "" : "opacity-0 pointer-events-none"}`}>
+                            <GameStepper
+                                roundCount={state.roundCount || 1}
+                                currentTurn={state.currentTurn}
+                                showAnimation={showRestOfUI}
+                            />
                         </div>
 
                         {/* Layout responsive: grid de 2 columnas en md+, stack en mobile */}
@@ -838,7 +823,7 @@ export function GameRoom({
                             >
                                 <div className="md:sticky md:top-24 md:flex-1 md:flex md:flex-col">
                                     <h2 className="text-2xl font-serif text-neutral-50 mb-5 text-center md:text-left">
-                                        Jugadores
+                                        Votación
                                     </h2>
                                     <PlayerList
                                         players={state.players}
