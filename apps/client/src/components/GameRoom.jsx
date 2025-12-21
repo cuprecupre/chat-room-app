@@ -97,33 +97,10 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
         return myVote === playerId;
     };
 
-    // Determinar qué título mostrar (solo en fases playing/result/game_over)
-    const isLobby = !isPlaying && !showScores;
-    let headerText = isPlaying ? "Dale tu voto al jugador que creas que es impostor" : "";
-    if (showScores) {
-        headerText = isGameOver ? "Resto de jugadores" : "Puntuación parcial";
-    }
 
-    // Subtítulo descriptivo para la fase de playing
-    const showOrderSubtitle = isPlaying && playerOrder.length > 0;
 
     return (
         <div className="w-full rounded-lg md:flex-1 md:flex md:flex-col">
-            {/* Solo mostrar header si no estamos en lobby */}
-            {!isLobby && (
-                <div className="mb-5 text-center md:text-left">
-                    <p
-                        className={`${isPlaying || showScores ? "text-base font-regular text-neutral-200" : "text-sm font-regular text-neutral-500"}`}
-                    >
-                        {headerText}
-                    </p>
-                    {showOrderSubtitle && (
-                        <p className="text-xs text-neutral-400 mt-1">
-                            ☀️ Jugador que empieza la partida
-                        </p>
-                    )}
-                </div>
-            )}
             <ul className="space-y-2">
                 {sortedPlayers.map((p, index) => {
                     const isEliminated = eliminatedPlayers.includes(p.uid);
@@ -297,10 +274,10 @@ function HelpLink({ onOpenInstructions }) {
         <>
             <button
                 onClick={() => setShowModal(true)}
-                className="mt-4 md:mt-auto text-sm text-neutral-500 hover:text-orange-400 transition-colors underline underline-offset-2 w-full text-center md:text-left flex items-center justify-center md:justify-start gap-1.5"
+                className="mt-10 md:mt-auto text-sm text-orange-400 hover:text-orange-300 transition-colors underline underline-offset-2 w-full text-center md:text-left flex items-center justify-center md:justify-start gap-1.5"
             >
                 <Info className="w-4 h-4" />
-                Cómo jugar
+                ¿Cómo jugar?
             </button>
 
             <Modal
@@ -691,14 +668,10 @@ export function GameRoom({
                         </div>
 
                         {/* Layout responsive: grid de 2 columnas en md+, stack en mobile */}
-                        <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-10 md:items-stretch">
+                        <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-0 md:gap-10 md:items-stretch">
                             {/* Columna izquierda: Carta */}
-                            <div className="w-full max-w-xs mx-auto md:max-w-none">
-                                <div
-                                    className={`text-center md:text-left mb-5 ${showRestOfUI ? "animate-fadeIn animate-delay-400" : "opacity-0 pointer-events-none"}`}
-                                >
-                                    <h2 className="text-3xl font-serif text-neutral-50">Tu carta</h2>
-                                </div>
+                            <div className="w-full max-w-xs mx-auto md:max-w-none pt-8 md:pt-6 pb-8 md:pb-0 border-b border-white/10 md:border-b-0">
+
                                 <div className="space-y-3">
                                     <div className={`${showCardEntrance ? "animate-cardEntrance" : ""}`}>
                                         <div
@@ -808,23 +781,35 @@ export function GameRoom({
                                                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                                                 />
                                             </svg>
-                                            <span>Voltear carta</span>
+                                            <span>Descubre tu carta</span>
                                         </Button>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Divider - horizontal en mobile, vertical en desktop */}
-                            <div className="h-px w-full md:h-auto md:w-px bg-white/10 md:self-stretch"></div>
+                            {/* Divider - horizontal en mobile (oculto por nuevo pb-8), vertical en desktop */}
+                            <div className="hidden md:block h-px w-full md:h-auto md:w-px bg-white/10 md:self-stretch"></div>
 
                             {/* Columna derecha: Lista de jugadores */}
                             <div
-                                className={`w-full max-w-sm mx-auto md:max-w-none md:flex md:flex-col ${showRestOfUI ? "animate-fadeIn animate-delay-800" : "opacity-0 pointer-events-none"}`}
+                                className={`w-full max-w-sm mx-auto md:max-w-none md:flex md:flex-col pt-8 md:pt-6 ${showRestOfUI ? "animate-fadeIn animate-delay-800" : "opacity-0 pointer-events-none"}`}
                             >
                                 <div className="md:sticky md:top-24 md:flex-1 md:flex md:flex-col">
-                                    <h2 className="text-3xl font-serif text-neutral-50 mb-5 text-center md:text-left">
-                                        Votación
-                                    </h2>
+                                    <div
+                                        className={`text-center md:text-left mb-5 ${showRestOfUI ? "animate-fadeIn animate-delay-400" : "opacity-0 pointer-events-none"}`}
+                                    >
+                                        <h2 className="text-3xl font-serif text-neutral-50">Ronda de pistas y votos</h2>
+                                    </div>
+                                    <div className="mb-6 space-y-1 text-center md:text-left">
+                                        <p className="text-neutral-400 text-sm">
+                                            Vota al jugador que creas que es impostor tras la ronda de pistas
+                                        </p>
+                                        <p className="text-xs text-neutral-400 mt-2">
+                                            <span className="inline-flex items-center gap-1.5 bg-white/5 px-3 py-1 rounded-full">
+                                                ☀️ {state.players.find((p) => p.uid === state.startingPlayerId)?.name || "Alguien"} empieza la partida
+                                            </span>
+                                        </p>
+                                    </div>
                                     <PlayerList
                                         players={state.players}
                                         currentUserId={user.uid}
@@ -854,23 +839,23 @@ export function GameRoom({
                         </div>
                     </div>
 
-                    {/* Layout responsive: grid de 2 columnas en md+, stack en mobile */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-start">
+                    {/* Layout responsive: grid de 2 columnas en md+, stack en mobile (items-stretch por defecto) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-10">
                         {/* Columna izquierda: Resultado */}
-                        <div className="w-full max-w-sm mx-auto md:max-w-none">
+                        <div className="w-full max-w-sm mx-auto md:max-w-none flex flex-col">
                             <h2 className="text-3xl font-serif text-neutral-50 mb-5 text-center md:text-left">
                                 Resultado de la partida
                             </h2>
 
                             {/* Revelar impostor y palabra */}
-                            <div className="bg-white/5 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400">
-                                <div className="space-y-6 text-center md:text-left">
+                            <div className="bg-white/5 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400 h-full">
+                                <div className="space-y-6 text-center">
                                     <div>
                                         <span className="text-xs tracking-wider uppercase text-neutral-400">
                                             El impostor era
                                         </span>
                                         {/* Avatar del impostor */}
-                                        <div className="flex justify-center md:justify-start my-4">
+                                        <div className="flex justify-center my-4">
                                             {state.players &&
                                                 (() => {
                                                     const impostor = state.players.find(
@@ -903,13 +888,17 @@ export function GameRoom({
                         </div>
 
                         {/* Columna derecha: Puntuación y botones */}
-                        <div className="w-full max-w-sm mx-auto md:max-w-none">
+                        <div className="w-full max-w-sm mx-auto md:max-w-none flex flex-col">
                             <h2 className="text-3xl font-serif text-neutral-50 mb-5 text-center md:text-left">
                                 Puntuación
                             </h2>
 
+
                             {/* Puntuación */}
-                            <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-600">
+                            <div className="bg-white/5 rounded-xl p-6 animate-fadeIn animate-delay-600 h-full">
+                                <p className="text-neutral-400 text-xs tracking-wider uppercase mb-5 text-center md:text-left">
+                                    {state.phase === "game_over" ? "Resto de jugadores" : "Puntuación parcial"}
+                                </p>
                                 <PlayerList
                                     players={state.players}
                                     currentUserId={user.uid}
@@ -920,15 +909,21 @@ export function GameRoom({
                                 />
                             </div>
 
-                            {/* Botón o mensaje de espera */}
-                            {isHost ? (
-                                <>
-                                    <div className="space-y-3 animate-fadeIn animate-delay-800 mt-6">
-                                        {/* Texto y botón visible solo en desktop */}
-                                        <div className="hidden sm:block">
-                                            <p className="text-center text-sm text-orange-400 animate-pulse mb-2">
-                                                Lanza la siguiente partida para continuar
-                                            </p>
+
+                        </div>
+                    </div>
+
+                    {/* Botón o mensaje de espera - Fila completa debajo de las columnas */}
+                    <div className="w-full max-w-sm md:max-w-2xl mx-auto mt-8">
+                        {isHost ? (
+                            <>
+                                <div className="space-y-3 animate-fadeIn animate-delay-800">
+                                    {/* Texto y botón visible solo en desktop */}
+                                    <div className="hidden sm:block text-center">
+                                        <p className="text-sm text-orange-400 animate-pulse mb-3">
+                                            Lanza la siguiente partida para continuar
+                                        </p>
+                                        <div className="max-w-xs mx-auto">
                                             <Button
                                                 onClick={onPlayAgain}
                                                 variant="primary"
@@ -939,50 +934,51 @@ export function GameRoom({
                                             </Button>
                                         </div>
                                     </div>
+                                </div>
 
-                                    {/* Botón fijo solo en mobile con overlay gradiente */}
-                                    <div className="fixed bottom-0 left-0 right-0 sm:hidden z-40">
-                                        <div className="h-10 bg-gradient-to-t from-neutral-950/80 via-neutral-950/40 to-transparent"></div>
-                                        <div className="bg-neutral-950 px-4 pb-6 pt-2">
-                                            <div className="max-w-sm mx-auto">
-                                                <Button
-                                                    onClick={onPlayAgain}
-                                                    variant="primary"
-                                                    size="md"
-                                                    className="w-full shadow-lg"
-                                                >
-                                                    Siguiente partida
-                                                </Button>
-                                                <p className="text-center text-sm text-orange-400 animate-pulse mt-3">
-                                                    Lanza la siguiente partida para continuar
-                                                </p>
-                                            </div>
+                                {/* Botón fijo solo en mobile con overlay gradiente */}
+                                <div className="fixed bottom-0 left-0 right-0 sm:hidden z-40">
+                                    <div className="h-10 bg-gradient-to-t from-neutral-950/80 via-neutral-950/40 to-transparent"></div>
+                                    <div className="bg-neutral-950 px-4 pb-6 pt-2">
+                                        <div className="max-w-sm mx-auto">
+                                            <Button
+                                                onClick={onPlayAgain}
+                                                variant="primary"
+                                                size="md"
+                                                className="w-full shadow-lg"
+                                            >
+                                                Siguiente partida
+                                            </Button>
+                                            <p className="text-center text-sm text-orange-400 animate-pulse mt-3">
+                                                Lanza la siguiente partida para continuar
+                                            </p>
                                         </div>
                                     </div>
-                                </>
-                            ) : (
-                                <div className="space-y-3 animate-fadeIn animate-delay-800 mt-6">
-                                    <div className="text-center md:text-left bg-orange-500/10 rounded-xl p-6 border border-orange-500/20">
-                                        <p className="text-xl text-orange-400 animate-pulse mb-2">
-                                            La siguiente partida empieza en breve
-                                        </p>
-                                        <p className="text-sm text-neutral-400">
-                                            Espera a que el anfitrión{" "}
-                                            <span className="font-semibold text-neutral-300">
-                                                {state.players.find((p) => p.uid === state.hostId)?.name ||
-                                                    "desconocido"}
-                                            </span>{" "}
-                                            inicie la siguiente partida
-                                            <span className="inline-flex ml-1">
-                                                <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
-                                                <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
-                                                <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
-                                            </span>
-                                        </p>
-                                    </div>
                                 </div>
-                            )}
-                        </div>
+                            </>
+                        ) : (
+                            <div className="space-y-3 animate-fadeIn animate-delay-800">
+                                <div className="text-center rounded-xl p-6 border border-orange-500/60 bg-neutral-900/50 backdrop-blur-sm">
+                                    <p className="text-xl text-orange-400 animate-pulse mb-2">
+                                        La siguiente partida empieza en breve
+                                    </p>
+
+                                    <p className="text-sm text-neutral-400">
+                                        Espera a que el anfitrión{" "}
+                                        <span className="font-semibold text-neutral-300">
+                                            {state.players.find((p) => p.uid === state.hostId)?.name ||
+                                                "desconocido"}
+                                        </span>{" "}
+                                        inicie la siguiente partida
+                                        <span className="inline-flex ml-1">
+                                            <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                                            <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                                            <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
 
