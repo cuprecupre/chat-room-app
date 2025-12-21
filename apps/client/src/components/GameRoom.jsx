@@ -1,15 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link, Share } from "lucide-react";
+import { Link, Share, Info } from "lucide-react";
 // removed icons from labels
 import { Button } from "./ui/Button";
 import { Avatar } from "./ui/Avatar";
+import { Modal } from "./ui/Modal";
+import { GameStepper } from "./ui/GameStepper";
 import { Footer } from "./Footer";
 import keyImg from "../assets/llave.png";
 import dualImpostorImg from "../assets/dual-impostor.png";
 import cardImg from "../assets/card.png";
 import cardBackImg from "../assets/card-back.png";
 
-function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onVote }) {
+function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onVote, onOpenInstructions }) {
     const isPlaying = gameState?.phase === "playing";
     const isRoundResult = gameState?.phase === "round_result";
     const isGameOver = gameState?.phase === "game_over";
@@ -34,9 +36,9 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
     const isTie = gameState?.winner === "Empate";
     const winners = isTie
         ? (() => {
-              const maxScore = Math.max(...Object.values(playerScores));
-              return players.filter((player) => (playerScores[player.uid] || 0) === maxScore);
-          })()
+            const maxScore = Math.max(...Object.values(playerScores));
+            return players.filter((player) => (playerScores[player.uid] || 0) === maxScore);
+        })()
         : [];
 
     // Si hay 3 o más ganadores, no hay ganadores reales
@@ -95,28 +97,10 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
         return myVote === playerId;
     };
 
-    // Determinar qué título mostrar (solo en fases playing/result/game_over)
-    const isLobby = !isPlaying && !showScores;
-    let headerText = isPlaying ? "Vota al jugador que creas impostor" : "";
-    if (showScores) {
-        headerText = isGameOver ? "Resto de jugadores" : "Puntuación parcial";
-    }
 
-    // Subtítulo descriptivo para la fase de playing
-    const showOrderSubtitle = isPlaying && playerOrder.length > 0;
 
     return (
-        <div className="w-full rounded-lg">
-            {/* Solo mostrar header si no estamos en lobby */}
-            {!isLobby && (
-                <div className="mb-3 text-center">
-                    <p
-                        className={`${isPlaying || showScores ? "text-base font-regular text-neutral-200" : "text-sm font-regular text-neutral-500"}`}
-                    >
-                        {headerText}
-                    </p>
-                </div>
-            )}
+        <div className="w-full rounded-lg md:flex-1 md:flex md:flex-col">
             <ul className="space-y-2">
                 {sortedPlayers.map((p, index) => {
                     const isEliminated = eliminatedPlayers.includes(p.uid);
@@ -237,13 +221,12 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                                             variant="outline"
                                             size="sm"
                                             disabled={iVotedForThisPlayer && !canChangeVote}
-                                            className={`!w-auto gap-2 px-4 ${
-                                                iVotedForThisPlayer
-                                                    ? canChangeVote
-                                                        ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
-                                                        : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
-                                                    : ""
-                                            }`}
+                                            className={`!w-auto gap-2 px-4 ${iVotedForThisPlayer
+                                                ? canChangeVote
+                                                    ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
+                                                    : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
+                                                : ""
+                                                }`}
                                         >
                                             <svg
                                                 className="w-4 h-4"
@@ -267,15 +250,93 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                     );
                 })}
             </ul>
-            {/* Subtítulo al final de la lista */}
-            {showOrderSubtitle && (
-                <p className="text-xs text-neutral-400 mt-3 text-center">
-                    ☀️ Jugador que empieza la partida
-                </p>
+
+            {/* Enlace de ayuda solo durante la fase playing */}
+            {isPlaying && (
+                <HelpLink onOpenInstructions={onOpenInstructions} />
             )}
-            {/* Divider para separar del footer */}
-            {isPlaying && <div className="w-full h-px bg-neutral-800 mt-10"></div>}
+
         </div>
+    );
+}
+
+function HelpLink({ onOpenInstructions }) {
+    const [showModal, setShowModal] = useState(false);
+
+    const handleOpenFullRules = () => {
+        setShowModal(false);
+        if (onOpenInstructions) {
+            onOpenInstructions();
+        }
+    };
+
+    return (
+        <>
+            <button
+                onClick={() => setShowModal(true)}
+                className="mt-10 md:mt-auto text-sm text-orange-400 hover:text-orange-300 transition-colors underline underline-offset-2 w-full text-center md:text-left flex items-center justify-center md:justify-start gap-1.5"
+            >
+                <Info className="w-4 h-4" />
+                ¿Cómo jugar?
+            </button>
+
+            <Modal
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+                title="¿Qué debo hacer?"
+                size="lg"
+            >
+                <div className="space-y-6">
+                    <div className="space-y-4 text-neutral-300">
+                        <p className="flex gap-3">
+                            <span className="text-orange-400 font-semibold">1.</span>
+                            <span>Voltea tu carta y descubre si eres <strong className="text-white">amigo</strong> (verás la palabra secreta) o <strong className="text-orange-400">impostor</strong> (no la verás).</span>
+                        </p>
+                        <p className="flex gap-3">
+                            <span className="text-orange-400 font-semibold">2.</span>
+                            <span>Cada jugador dice una pista en voz alta. Empieza el que tenga el ☀️ indicado en el listado de jugadores.</span>
+                        </p>
+                        <p className="flex gap-3">
+                            <span className="text-orange-400 font-semibold">3.</span>
+                            <span>
+                                <strong className="text-white">Si eres amigo:</strong> Da una pista sutil que demuestre que conoces la palabra, pero sin revelarla.
+                                <br />
+                                <strong className="text-orange-400">Si eres impostor:</strong> Finge que la conoces usando pistas vagas o que imiten a otros.
+                            </span>
+                        </p>
+                        <p className="flex gap-3">
+                            <span className="text-orange-400 font-semibold">4.</span>
+                            <span>Cuando todos hayan dado su pista, ¡es hora de votar!</span>
+                        </p>
+                        <p className="flex gap-3">
+                            <span className="text-orange-400 font-semibold">5.</span>
+                            <span>Vota a quien creas que es el impostor. Si eres tú, intenta incriminar a otro.</span>
+                        </p>
+                    </div>
+
+                    <div className="text-sm text-neutral-500 border-l-2 border-neutral-700 pl-4">
+                        Los que votan bien ganan puntos. Si eres impostor y sobrevives, ganas puntos. Si no eres impostor pero la mayoría te vota, quedas eliminado de la ronda.
+                    </div>
+
+                    <div className="space-y-3">
+                        <Button
+                            onClick={() => setShowModal(false)}
+                            variant="primary"
+                            size="md"
+                            className="w-full"
+                        >
+                            Entendido
+                        </Button>
+                        <button
+                            onClick={handleOpenFullRules}
+                            className="w-full text-sm text-neutral-500 hover:text-orange-400 transition-colors underline underline-offset-2"
+                        >
+                            Ver reglas completas del juego
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+        </>
     );
 }
 
@@ -450,7 +511,7 @@ export function GameRoom({
     }, [state.phase]);
 
     return (
-        <div className="w-full flex flex-col items-center space-y-6">
+        <div className="w-full flex flex-col items-center space-y-3 md:space-y-6">
             {state.phase === "lobby" && (
                 <div className="w-full max-w-sm mx-auto text-center space-y-4 pb-24 sm:pb-0">
                     {/* Header Image - 50% smaller (w-28 h-28) */}
@@ -464,13 +525,13 @@ export function GameRoom({
                     {isHost ? (
                         /* HOST VIEW */
                         <>
-                            <h2 className="text-3xl font-serif text-neutral-50 leading-tight">
+                            <h2 className="text-4xl font-serif text-neutral-50 leading-tight">
                                 Invita a tus amigos
                                 <br />
                                 para empezar
                             </h2>
 
-                            <div className="w-full space-y-4">
+                            <div className="w-full space-y-4 mt-8">
                                 <Button
                                     onClick={onCopyLink}
                                     variant="outline"
@@ -516,36 +577,45 @@ export function GameRoom({
                                 </div>
                             </div>
 
-                            {/* Botón fijo solo en mobile */}
-                            <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-neutral-950 via-neutral-950/95 to-transparent sm:hidden z-40">
-                                <div className="max-w-sm mx-auto">
-                                    <Button
-                                        onClick={onStartGame}
-                                        disabled={state.players.length < 2}
-                                        variant="primary"
-                                        size="md"
-                                        className="w-full shadow-lg"
-                                    >
-                                        Comenzar juego
-                                    </Button>
+                            {/* Botón fijo solo en mobile con overlay gradiente premium (como Siguiente partida) */}
+                            <div className="fixed bottom-0 left-0 right-0 sm:hidden z-40">
+                                <div className="h-10 bg-gradient-to-t from-neutral-950/80 via-neutral-950/40 to-transparent"></div>
+                                <div className="bg-neutral-950 px-4 pb-8">
+                                    <div className="max-w-sm mx-auto">
+                                        <Button
+                                            onClick={onStartGame}
+                                            disabled={state.players.length < 2}
+                                            variant="primary"
+                                            size="md"
+                                            className="w-full shadow-lg"
+                                        >
+                                            Comenzar juego
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                         </>
                     ) : (
                         /* GUEST VIEW */
                         <>
-                            <h2 className="text-3xl font-serif text-neutral-50 leading-tight">
+                            <h2 className="text-4xl font-serif text-neutral-50 leading-tight">
                                 La partida empezará pronto
                             </h2>
 
-                            <div className="space-y-6">
+                            <div className="space-y-6 mt-8">
                                 <p className="text-lg text-neutral-400 animate-pulse">
                                     Espera hasta que{" "}
                                     <span className="text-orange-400 font-regular">
                                         {state.players.find((p) => p.uid === state.hostId)?.name ||
                                             "el anfitrión"}
-                                    </span>{" "}
-                                    inicie la partida.
+                                    </span>
+                                    <br />
+                                    inicie la partida
+                                    <span className="inline-flex ml-1">
+                                        <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                                        <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                                        <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                                    </span>
                                 </p>
 
                                 <div className="w-full">
@@ -589,310 +659,338 @@ export function GameRoom({
             {((state.phase === "playing" && state.role && state.currentTurn && state.maxTurns) ||
                 (state.phase === "round_result" && (!state.impostorName || !state.secretWord)) ||
                 (state.phase === "game_over" && state.winner === undefined)) && (
-                <>
-                    {/* Overlay de carga cuando estamos esperando datos (solo si estamos en playing cargando datos) */}
-                    {state.phase === "playing" && (!state.role || !state.currentTurn) && (
-                        <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm animate-fadeIn">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-400"></div>
-                        </div>
-                    )}
+                    <>
+                        {/* Overlay de carga cuando estamos esperando datos (solo si estamos en playing cargando datos) */}
+                        {state.phase === "playing" && (!state.role || !state.currentTurn) && (
+                            <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm animate-fadeIn">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-400"></div>
+                            </div>
+                        )}
 
-                    {/* Indicador de partida y ronda */}
-                    <div
-                        className={`w-full max-w-sm mx-auto mb-4 ${showRestOfUI ? "animate-fadeIn animate-delay-200" : "opacity-0 pointer-events-none"}`}
-                    >
-                        <p className="text-center text-xs text-neutral-500 mb-3">
-                            Partida {state.roundCount || 1} • Ronda {state.currentTurn} de{" "}
-                            {state.maxTurns}
-                        </p>
-                        {/* Stepper de rondas */}
-                        <div className="flex items-center justify-center gap-1.5">
-                            {[1, 2, 3].map((turn) => (
-                                <div
-                                    key={turn}
-                                    className={`w-2 h-2 rounded-full transition-all ${
-                                        state.currentTurn === turn
-                                            ? "bg-orange-500 scale-125"
-                                            : state.currentTurn > turn
-                                              ? "bg-green-500/50"
-                                              : "bg-white/20"
-                                    }`}
-                                />
-                            ))}
+                        {/* Stepper de partida y rondas */}
+                        <div className={`w-full ${showRestOfUI ? "" : "opacity-0 pointer-events-none"}`}>
+                            <GameStepper
+                                roundCount={state.roundCount || 1}
+                                currentTurn={state.currentTurn}
+                                showAnimation={showRestOfUI}
+                            />
                         </div>
-                    </div>
 
-                    <div
-                        className={`w-full max-w-sm mx-auto text-center mb-5 ${showRestOfUI ? "animate-fadeIn animate-delay-400" : "opacity-0 pointer-events-none"}`}
-                    >
-                        <h2 className="text-2xl font-serif text-neutral-50">Tu carta</h2>
-                    </div>
-                    <div className="w-full max-w-sm mx-auto space-y-3">
-                        <div className={`${showCardEntrance ? "animate-cardEntrance" : ""}`}>
-                            <div
-                                className={`flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full ${cardAnimating ? "animate-card-float-complete" : ""}`}
-                            >
-                                <div
-                                    className={`flip-card-inner h-full cursor-pointer ${reveal ? "is-flipped" : ""}`}
-                                    onClick={triggerReveal}
-                                    title="Toca para voltear la carta"
-                                >
-                                    {/* Frente completo (card completa con imagen) */}
-                                    <div className="flip-card-front">
-                                        <div className="h-full flex items-center justify-center">
-                                            <img
-                                                src={cardImg}
-                                                alt="Frente de la carta"
-                                                className="w-full h-full object-cover rounded-xl pointer-events-none"
-                                                title="Ver mi carta"
-                                            />
-                                        </div>
-                                    </div>
-                                    {/* Dorso completo (card completa con información) */}
-                                    <div className="flip-card-back">
-                                        <div className="relative h-full flex flex-col items-center justify-center rounded-xl overflow-hidden">
-                                            {/* Imagen de fondo */}
-                                            <img
-                                                src={cardBackImg}
-                                                alt="Fondo del dorso"
-                                                className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-                                            />
-                                            {/* Contenido sobre la imagen */}
+                        {/* Layout responsive: grid de 2 columnas en md+, stack en mobile */}
+                        <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-0 md:gap-10 md:items-stretch">
+                            {/* Columna izquierda: Carta */}
+                            <div className="w-full max-w-xs mx-auto md:max-w-none pt-8 md:pt-6 pb-8 md:pb-0 border-b border-white/10 md:border-b-0">
+
+                                <div className="space-y-3">
+                                    <div className={`${showCardEntrance ? "animate-cardEntrance" : ""}`}>
+                                        <div
+                                            className={`flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full ${cardAnimating ? "animate-card-float-complete" : ""}`}
+                                        >
                                             <div
-                                                className="relative z-10 text-center p-8 backdrop-blur-sm rounded-xl pointer-events-none"
-                                                title="Volver al frente"
+                                                className={`flip-card-inner h-full cursor-pointer ${reveal ? "is-flipped" : ""}`}
+                                                onClick={triggerReveal}
+                                                title="Toca para voltear la carta"
                                             >
-                                                <div className="space-y-4">
-                                                    <div>
-                                                        <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-orange-400">
-                                                            <span>Tu rol</span>
-                                                        </div>
-                                                        <p className="text-xl font-serif mt-1 text-white">
-                                                            {capitalize(state.role)}
-                                                        </p>
+                                                {/* Frente completo (card completa con imagen) */}
+                                                <div className="flip-card-front">
+                                                    <div className="h-full flex items-center justify-center">
+                                                        <img
+                                                            src={cardImg}
+                                                            alt="Frente de la carta"
+                                                            className="w-full h-full object-cover rounded-xl pointer-events-none"
+                                                            title="Ver mi carta"
+                                                        />
                                                     </div>
-
-                                                    {/* Línea separadora */}
-                                                    <div className="w-full h-px bg-white/20"></div>
-
-                                                    {state.role === "impostor" ? (
-                                                        <>
-                                                            {state.secretCategory && (
+                                                </div>
+                                                {/* Dorso completo (card completa con información) */}
+                                                <div className="flip-card-back">
+                                                    <div className="relative h-full flex flex-col items-center justify-center rounded-xl overflow-hidden">
+                                                        {/* Imagen de fondo */}
+                                                        <img
+                                                            src={cardBackImg}
+                                                            alt="Fondo del dorso"
+                                                            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                                                        />
+                                                        {/* Contenido sobre la imagen */}
+                                                        <div
+                                                            className="relative z-10 text-center p-8 backdrop-blur-sm rounded-xl pointer-events-none"
+                                                            title="Volver al frente"
+                                                        >
+                                                            <div className="space-y-4">
                                                                 <div>
-                                                                    <div className="flex flex-col items-center justify-center gap-1 text-xs tracking-wider text-orange-400">
-                                                                        <span className="uppercase">
-                                                                            Pista:
-                                                                        </span>
-                                                                        <span className="normal-case">
-                                                                            La palabra secreta está
-                                                                            relacionada con...
-                                                                        </span>
+                                                                    <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-orange-400">
+                                                                        <span>Tu rol</span>
                                                                     </div>
-                                                                    <p className="font-serif text-xl mt-1 text-white underline decoration-dotted underline-offset-4">
-                                                                        {capitalize(
-                                                                            state.secretCategory
-                                                                        )}
+                                                                    <p className="text-xl font-serif mt-1 text-white">
+                                                                        {capitalize(state.role)}
                                                                     </p>
                                                                 </div>
-                                                            )}
-                                                        </>
-                                                    ) : (
-                                                        <div>
-                                                            <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-orange-400">
-                                                                <span>Palabra secreta</span>
+
+                                                                {/* Línea separadora */}
+                                                                <div className="w-full h-px bg-white/20"></div>
+
+                                                                {state.role === "impostor" ? (
+                                                                    <>
+                                                                        {state.secretCategory && (
+                                                                            <div>
+                                                                                <div className="flex flex-col items-center justify-center gap-1 text-xs tracking-wider text-orange-400">
+                                                                                    <span className="uppercase">
+                                                                                        Pista:
+                                                                                    </span>
+                                                                                    <span className="normal-case">
+                                                                                        La palabra secreta está
+                                                                                        relacionada con...
+                                                                                    </span>
+                                                                                </div>
+                                                                                <p className="font-serif text-xl mt-1 text-white underline decoration-dotted underline-offset-4">
+                                                                                    {capitalize(
+                                                                                        state.secretCategory
+                                                                                    )}
+                                                                                </p>
+                                                                            </div>
+                                                                        )}
+                                                                    </>
+                                                                ) : (
+                                                                    <div>
+                                                                        <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-orange-400">
+                                                                            <span>Palabra secreta</span>
+                                                                        </div>
+                                                                        <p className="font-serif text-xl mt-1 text-white">
+                                                                            {capitalize(state.secretWord)}
+                                                                        </p>
+                                                                    </div>
+                                                                )}
                                                             </div>
-                                                            <p className="font-serif text-xl mt-1 text-white">
-                                                                {capitalize(state.secretWord)}
-                                                            </p>
                                                         </div>
-                                                    )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                    {/* Botón Girar carta */}
+                                    <div
+                                        className={`flex justify-center mt-6 ${showRestOfUI ? "animate-fadeIn animate-delay-600" : "opacity-0 pointer-events-none"}`}
+                                    >
+                                        <Button
+                                            onClick={triggerReveal}
+                                            variant="outline"
+                                            size="sm"
+                                            className="gap-2 !w-auto"
+                                        >
+                                            <svg
+                                                className="w-4 h-4"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                                />
+                                            </svg>
+                                            <span>Descubre tu carta</span>
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Divider - horizontal en mobile (oculto por nuevo pb-8), vertical en desktop */}
+                            <div className="hidden md:block h-px w-full md:h-auto md:w-px bg-white/10 md:self-stretch"></div>
+
+                            {/* Columna derecha: Lista de jugadores */}
+                            <div
+                                className={`w-full max-w-sm mx-auto md:max-w-none md:flex md:flex-col pt-8 md:pt-6 ${showRestOfUI ? "animate-fadeIn animate-delay-800" : "opacity-0 pointer-events-none"}`}
+                            >
+                                <div className="md:sticky md:top-24 md:flex-1 md:flex md:flex-col">
+                                    <div
+                                        className={`text-center md:text-left mb-5 ${showRestOfUI ? "animate-fadeIn animate-delay-400" : "opacity-0 pointer-events-none"}`}
+                                    >
+                                        <h2 className="text-3xl font-serif text-neutral-50">Ronda de pistas y votos</h2>
+                                    </div>
+                                    <div className="mb-6 space-y-1 text-center md:text-left">
+                                        <p className="text-neutral-400 text-sm">
+                                            Vota al jugador que creas que es impostor tras la ronda de pistas
+                                        </p>
+                                        <p className="text-xs text-neutral-400 mt-2">
+                                            <span className="inline-flex items-center gap-1.5 bg-white/5 px-3 py-1 rounded-full">
+                                                ☀️ {state.players.find((p) => p.uid === state.startingPlayerId)?.name || "Alguien"} empieza la partida
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <PlayerList
+                                        players={state.players}
+                                        currentUserId={user.uid}
+                                        isHost={isHost}
+                                        onCopyLink={onCopyLink}
+                                        gameState={state}
+                                        onVote={onVote}
+                                        onOpenInstructions={onOpenInstructions}
+                                    />
                                 </div>
                             </div>
                         </div>
-                        {/* Botón Girar carta */}
-                        <div
-                            className={`flex justify-center mt-6 ${showRestOfUI ? "animate-fadeIn animate-delay-600" : "opacity-0 pointer-events-none"}`}
-                        >
-                            <button
-                                onClick={triggerReveal}
-                                className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm text-neutral-400 hover:text-neutral-300 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150 border border-neutral-600/30 hover:border-neutral-500/50"
-                            >
-                                <svg
-                                    className="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                                    />
-                                </svg>
-                                <span>Voltear carta</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div
-                        className={`w-full max-w-sm mx-auto mt-4 ${showRestOfUI ? "animate-fadeIn animate-delay-800" : "opacity-0 pointer-events-none"}`}
-                    >
-                        <PlayerList
-                            players={state.players}
-                            currentUserId={user.uid}
-                            isHost={isHost}
-                            onCopyLink={onCopyLink}
-                            gameState={state}
-                            onVote={onVote}
-                        />
-                    </div>
-                </>
-            )}
+                    </>
+                )}
 
             {/* Resultado de partida */}
             {state.phase === "round_result" && state.impostorName && state.secretWord && (
-                <div className="w-full max-w-sm mx-auto animate-fadeIn">
-                    <div className="w-full px-4 py-6 space-y-6">
-                        <div className="text-center space-y-4 animate-scaleIn animate-delay-200">
+                <div className="w-full max-w-4xl mx-auto animate-fadeIn">
+                    {/* Header con partida info - alineado a la izquierda */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-3 md:justify-start justify-center">
                             {state.roundCount && state.maxRounds && (
-                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 rounded-full">
-                                    <span className="text-sm font-semibold text-orange-400">
-                                        Partida {state.roundCount} de {state.maxRounds}
-                                    </span>
-                                </div>
+                                <span className="text-xs text-neutral-500">
+                                    Partida {state.roundCount} de {state.maxRounds}
+                                </span>
                             )}
-                            <h2 className="text-3xl font-serif text-neutral-50">
+                        </div>
+                    </div>
+
+                    {/* Layout responsive: grid de 2 columnas en md+, stack en mobile (items-stretch por defecto) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-10">
+                        {/* Columna izquierda: Resultado */}
+                        <div className="w-full max-w-sm mx-auto md:max-w-none flex flex-col">
+                            <h2 className="text-3xl font-serif text-neutral-50 mb-5 text-center md:text-left">
                                 Resultado de la partida
                             </h2>
-                        </div>
 
-                        {/* Revelar impostor y palabra */}
-                        <div className="bg-white/5 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400">
-                            <div className="space-y-6 text-center">
-                                <div>
-                                    <span className="text-xs tracking-wider uppercase text-neutral-400">
-                                        El impostor era
-                                    </span>
-                                    {/* Avatar del impostor */}
-                                    <div className="flex justify-center my-4">
-                                        {state.players &&
-                                            (() => {
-                                                const impostor = state.players.find(
-                                                    (p) => p.uid === state.impostorId
-                                                );
-                                                return impostor ? (
-                                                    <Avatar
-                                                        photoURL={impostor.photoURL}
-                                                        displayName={impostor.name}
-                                                        size="lg"
-                                                        className="ring-4 ring-orange-400/50 shadow-lg"
-                                                    />
-                                                ) : null;
-                                            })()}
+                            {/* Revelar impostor y palabra */}
+                            <div className="bg-white/5 rounded-xl p-6 backdrop-blur-md animate-fadeIn animate-delay-400 h-full">
+                                <div className="space-y-6 text-center">
+                                    <div>
+                                        <span className="text-xs tracking-wider uppercase text-neutral-400">
+                                            El impostor era
+                                        </span>
+                                        {/* Avatar del impostor */}
+                                        <div className="flex justify-center my-4">
+                                            {state.players &&
+                                                (() => {
+                                                    const impostor = state.players.find(
+                                                        (p) => p.uid === state.impostorId
+                                                    );
+                                                    return impostor ? (
+                                                        <Avatar
+                                                            photoURL={impostor.photoURL}
+                                                            displayName={impostor.name}
+                                                            size="lg"
+                                                            className="ring-4 ring-orange-400/50 shadow-lg"
+                                                        />
+                                                    ) : null;
+                                                })()}
+                                        </div>
+                                        <p className="font-serif text-2xl text-orange-400 mt-2">
+                                            {state.impostorName}
+                                        </p>
                                     </div>
-                                    <p className="font-serif text-2xl text-orange-400 mt-2">
-                                        {state.impostorName}
-                                    </p>
-                                </div>
-                                <div className="pt-4 border-t border-white/10">
-                                    <span className="text-xs tracking-wider uppercase text-neutral-400">
-                                        Palabra secreta
-                                    </span>
-                                    <p className="font-serif text-2xl text-white mt-2">
-                                        {capitalize(state.secretWord)}
-                                    </p>
+                                    <div className="pt-4 border-t border-white/10">
+                                        <span className="text-xs tracking-wider uppercase text-neutral-400">
+                                            Palabra secreta
+                                        </span>
+                                        <p className="font-serif text-2xl text-white mt-2">
+                                            {capitalize(state.secretWord)}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Puntuación */}
-                        <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-600">
-                            <PlayerList
-                                players={state.players}
-                                currentUserId={user.uid}
-                                isHost={isHost}
-                                onCopyLink={onCopyLink}
-                                gameState={state}
-                                onVote={onVote}
-                            />
-                        </div>
+                        {/* Columna derecha: Puntuación y botones */}
+                        <div className="w-full max-w-sm mx-auto md:max-w-none flex flex-col">
+                            <h2 className="text-3xl font-serif text-neutral-50 mb-5 text-center md:text-left">
+                                Puntuación
+                            </h2>
 
-                        {/* Botón o mensaje de espera */}
+
+                            {/* Puntuación */}
+                            <div className="bg-white/5 rounded-xl p-6 animate-fadeIn animate-delay-600 h-full">
+                                <p className="text-neutral-400 text-xs tracking-wider uppercase mb-5 text-center md:text-left">
+                                    {state.phase === "game_over" ? "Resto de jugadores" : "Puntuación parcial"}
+                                </p>
+                                <PlayerList
+                                    players={state.players}
+                                    currentUserId={user.uid}
+                                    isHost={isHost}
+                                    onCopyLink={onCopyLink}
+                                    gameState={state}
+                                    onVote={onVote}
+                                />
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    {/* Botón o mensaje de espera - Fila completa debajo de las columnas */}
+                    <div className="w-full max-w-sm md:max-w-2xl mx-auto mt-8">
                         {isHost ? (
-                            <div className="space-y-3 animate-fadeIn animate-delay-800">
-                                <Button
-                                    onClick={onPlayAgain}
-                                    variant="primary"
-                                    size="md"
-                                    className="w-full"
-                                >
-                                    Siguiente partida
-                                </Button>
-                                <Button
-                                    onClick={() => setShowLeaveGameModal(true)}
-                                    variant="ghost"
-                                    size="md"
-                                    className="w-full gap-2"
-                                >
-                                    <span>Abandonar juego</span>
-                                    <svg
-                                        className="w-5 h-5"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                                        />
-                                    </svg>
-                                </Button>
-                            </div>
+                            <>
+                                <div className="space-y-3 animate-fadeIn animate-delay-800">
+                                    {/* Texto y botón visible solo en desktop */}
+                                    <div className="hidden sm:block text-center">
+                                        <p className="text-sm text-orange-400 animate-pulse mb-3">
+                                            Lanza la siguiente partida para continuar
+                                        </p>
+                                        <div className="max-w-xs mx-auto">
+                                            <Button
+                                                onClick={onPlayAgain}
+                                                variant="primary"
+                                                size="md"
+                                                className="w-full"
+                                            >
+                                                Siguiente partida
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Botón fijo solo en mobile con overlay gradiente */}
+                                <div className="fixed bottom-0 left-0 right-0 sm:hidden z-40">
+                                    <div className="h-10 bg-gradient-to-t from-neutral-950/80 via-neutral-950/40 to-transparent"></div>
+                                    <div className="bg-neutral-950 px-4 pb-6 pt-2">
+                                        <div className="max-w-sm mx-auto">
+                                            <Button
+                                                onClick={onPlayAgain}
+                                                variant="primary"
+                                                size="md"
+                                                className="w-full shadow-lg"
+                                            >
+                                                Siguiente partida
+                                            </Button>
+                                            <p className="text-center text-sm text-orange-400 animate-pulse mt-3">
+                                                Lanza la siguiente partida para continuar
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
                         ) : (
                             <div className="space-y-3 animate-fadeIn animate-delay-800">
-                                <div className="text-center text-neutral-400 text-sm animate-text-pulse">
-                                    Esperando a que el anfitrión (
-                                    <span className="font-semibold text-neutral-300">
-                                        {state.players.find((p) => p.uid === state.hostId)?.name ||
-                                            "desconocido"}
-                                    </span>
-                                    ) <br />
-                                    inicie la siguiente partida
+                                <div className="text-center rounded-xl p-6 border border-orange-500/60 bg-neutral-900/50 backdrop-blur-sm">
+                                    <p className="text-xl text-orange-400 animate-pulse mb-2">
+                                        La siguiente partida empieza en breve
+                                    </p>
+
+                                    <p className="text-sm text-neutral-400">
+                                        Espera a que el anfitrión{" "}
+                                        <span className="font-semibold text-neutral-300">
+                                            {state.players.find((p) => p.uid === state.hostId)?.name ||
+                                                "desconocido"}
+                                        </span>{" "}
+                                        inicie la siguiente partida
+                                        <span className="inline-flex ml-1">
+                                            <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                                            <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                                            <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                                        </span>
+                                    </p>
                                 </div>
-                                <Button
-                                    onClick={() => setShowLeaveGameModal(true)}
-                                    variant="ghost"
-                                    size="md"
-                                    className="w-full gap-2"
-                                >
-                                    <span>Abandonar juego</span>
-                                    <svg
-                                        className="w-5 h-5"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                                        />
-                                    </svg>
-                                </Button>
                             </div>
                         )}
-
-                        {/* Divider para separar del footer */}
-                        <div className="w-full h-px bg-neutral-800 mt-10"></div>
                     </div>
+
+
                 </div>
             )}
 
@@ -1010,22 +1108,26 @@ export function GameRoom({
                                 {allPlayers.filter(
                                     (p) => !winnerPlayers.some((w) => w.uid === p.uid)
                                 ).length > 0 && (
-                                    <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
-                                        <PlayerList
-                                            players={allPlayers.filter(
-                                                (p) => !winnerPlayers.some((w) => w.uid === p.uid)
-                                            )}
-                                            currentUserId={user.uid}
-                                            isHost={isHost}
-                                            onCopyLink={onCopyLink}
-                                            gameState={state}
-                                            onVote={onVote}
-                                        />
-                                    </div>
-                                )}
+                                        <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
+                                            <PlayerList
+                                                players={allPlayers.filter(
+                                                    (p) => !winnerPlayers.some((w) => w.uid === p.uid)
+                                                )}
+                                                currentUserId={user.uid}
+                                                isHost={isHost}
+                                                onCopyLink={onCopyLink}
+                                                gameState={state}
+                                                onVote={onVote}
+                                            />
+                                        </div>
+                                    )}
 
-                                {isHost && (
-                                    <div className="animate-fadeIn animate-delay-600">
+                                <div className="animate-fadeIn animate-delay-600 flex flex-col items-center">
+                                    <p className="text-xl font-medium text-white mb-4">
+                                        ¿Quieres volver a jugar?
+                                    </p>
+
+                                    {isHost ? (
                                         <Button
                                             onClick={() => {
                                                 console.log("🎮 Click en Nuevo Juego", {
@@ -1037,10 +1139,21 @@ export function GameRoom({
                                             variant="primary"
                                             size="md"
                                         >
-                                            Nuevo juego
+                                            Empezar nuevo juego
                                         </Button>
-                                    </div>
-                                )}
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-4 text-center max-w-sm">
+                                            <p className="text-neutral-400 text-sm leading-relaxed">
+                                                Espera aquí a que el anfitrión comience un juego nuevo o, si prefieres, puedes <button
+                                                    onClick={() => onLeaveGame()}
+                                                    className="text-orange-400 hover:text-orange-300 underline underline-offset-2 transition-colors cursor-pointer bg-transparent border-0 p-0 inline font-medium"
+                                                >
+                                                    abandonar la partida
+                                                </button> para crear tu propio juego e invitar a tus amigos.
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     );
@@ -1089,79 +1202,74 @@ export function GameRoom({
             )}
 
             {/* Modal de confirmación para terminar juego */}
-            {showEndGameModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
-                    <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full">
-                        <div className="text-center space-y-4">
-                            <h3 className="text-xl font-serif text-neutral-50">
-                                ¿Finalizar juego?
-                            </h3>
-                            <p className="text-neutral-400">
-                                Esta acción finalizará el juego para todos los jugadores. ¿Estás
-                                seguro?
-                            </p>
-                            <div className="flex gap-3 pt-2">
-                                <Button
-                                    onClick={() => setShowEndGameModal(false)}
-                                    variant="outline"
-                                    size="md"
-                                    className="flex-1"
-                                >
-                                    Cancelar
-                                </Button>
-                                <Button
-                                    onClick={() => {
-                                        setShowEndGameModal(false);
-                                        onEndGame();
-                                    }}
-                                    variant="primary"
-                                    size="md"
-                                    className="flex-1"
-                                >
-                                    Terminar
-                                </Button>
-                            </div>
-                        </div>
+            <Modal
+                isOpen={showEndGameModal}
+                onClose={() => setShowEndGameModal(false)}
+                title="¿Finalizar juego?"
+                size="sm"
+            >
+                <div className="text-center space-y-4">
+                    <p className="text-neutral-400">
+                        Esta acción finalizará el juego para todos los jugadores. ¿Estás seguro?
+                    </p>
+                    <div className="flex gap-3 pt-2">
+                        <Button
+                            onClick={() => setShowEndGameModal(false)}
+                            variant="outline"
+                            size="md"
+                            className="flex-1"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setShowEndGameModal(false);
+                                onEndGame();
+                            }}
+                            variant="primary"
+                            size="md"
+                            className="flex-1"
+                        >
+                            Terminar
+                        </Button>
                     </div>
                 </div>
-            )}
+            </Modal>
 
             {/* Modal de confirmación para abandonar juego */}
-            {showLeaveGameModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
-                    <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full">
-                        <div className="text-center space-y-4">
-                            <h3 className="text-xl font-serif text-neutral-50">
-                                ¿Abandonar juego?
-                            </h3>
-                            <p className="text-neutral-400">
-                                Saldrás del juego y volverás al lobby. ¿Estás seguro?
-                            </p>
-                            <div className="flex gap-3 pt-2">
-                                <Button
-                                    onClick={() => setShowLeaveGameModal(false)}
-                                    variant="outline"
-                                    size="md"
-                                    className="flex-1"
-                                >
-                                    Cancelar
-                                </Button>
-                                <Button
-                                    onClick={() => {
-                                        setShowLeaveGameModal(false);
-                                        onLeaveGame();
-                                    }}
-                                    variant="primary"
-                                    size="md"
-                                    className="flex-1"
-                                >
-                                    Abandonar
-                                </Button>
-                            </div>
-                        </div>
+            <Modal
+                isOpen={showLeaveGameModal}
+                onClose={() => setShowLeaveGameModal(false)}
+                title="¿Abandonar juego?"
+                size="sm"
+            >
+                <div className="text-center space-y-4">
+                    <p className="text-neutral-400">
+                        Saldrás del juego y volverás al lobby. ¿Estás seguro?
+                    </p>
+                    <div className="flex gap-3 pt-2">
+                        <Button
+                            onClick={() => setShowLeaveGameModal(false)}
+                            variant="outline"
+                            size="md"
+                            className="flex-1"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setShowLeaveGameModal(false);
+                                onLeaveGame();
+                            }}
+                            variant="primary"
+                            size="md"
+                            className="flex-1"
+                        >
+                            Abandonar
+                        </Button>
                     </div>
                 </div>
-            )}
+            </Modal>
         </div>
     );
 }
