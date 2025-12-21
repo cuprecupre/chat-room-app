@@ -21,10 +21,9 @@ export function InvitationCard({
                         <img
                             src={heroImg}
                             alt="Invitación"
-                            className={`w-24 h-24 rounded-full object-cover ring-4 shadow-2xl ${isError
-                                    ? "ring-red-500/20 grayscale"
-                                    : "ring-orange-500/30"
-                                }`}
+                            className={`w-24 h-24 rounded-full object-cover ring-4 shadow-2xl ${
+                                isError ? "ring-red-500/20 grayscale" : "ring-orange-500/30"
+                            }`}
                         />
                         {isError && (
                             <div className="absolute -bottom-2 -right-2 bg-neutral-900 rounded-full p-2 border border-neutral-800">
@@ -36,9 +35,7 @@ export function InvitationCard({
 
                 {/* Title */}
                 <div>
-                    <h2 className="text-3xl font-serif text-neutral-50 mb-4">
-                        {title}
-                    </h2>
+                    <h2 className="text-3xl font-serif text-neutral-50 mb-4">{title}</h2>
                     <p className="text-neutral-300 text-lg leading-relaxed">
                         {!isError && (
                             <>
@@ -50,9 +47,7 @@ export function InvitationCard({
                                 <br />
                             </>
                         )}
-                        <span className="text-sm text-neutral-500 mt-2 block">
-                            {subtitle}
-                        </span>
+                        <span className="text-sm text-neutral-500 mt-2 block">{subtitle}</span>
                     </p>
                 </div>
 

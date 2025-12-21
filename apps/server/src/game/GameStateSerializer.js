@@ -93,11 +93,7 @@ function getStateForPlayer(game, userId) {
             const winnerId = checkGameOver(game);
             const winner = game.players.find((p) => p.uid === winnerId);
             const formerWinner = game.formerPlayers[winnerId];
-            baseState.winner = winner
-                ? winner.name
-                : formerWinner
-                  ? formerWinner.name
-                  : "Empate";
+            baseState.winner = winner ? winner.name : formerWinner ? formerWinner.name : "Empate";
             baseState.winnerId = winnerId;
         }
     }
