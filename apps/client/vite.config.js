@@ -8,6 +8,11 @@ export default defineConfig({
         environment: "jsdom",
         setupFiles: ["./src/__tests__/setup.js"],
         include: ["src/**/*.{test,spec}.{js,jsx}"],
+        // CI optimizations
+        testTimeout: 10000,
+        hookTimeout: 10000,
+        teardownTimeout: 1000,
+        isolate: false,
         coverage: {
             provider: "v8",
             reporter: ["text", "json", "html"],
