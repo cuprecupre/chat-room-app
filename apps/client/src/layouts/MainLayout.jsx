@@ -2,6 +2,7 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Avatar } from "../components/ui/Avatar";
 import { Button } from "../components/ui/Button";
+import { Modal } from "../components/ui/Modal";
 import { Footer } from "../components/Footer";
 import { ROUTES } from "../routes/routes";
 
@@ -200,73 +201,70 @@ export function MainLayout({
                 gameId={gameState?.gameId}
                 onCopyLink={onCopyLink}
                 isMobile={isMobile}
+                onLeaveGame={() => setShowLeaveGameModal(true)}
             />
 
             {/* Modal de confirmación para abandonar juego */}
-            {showLeaveGameModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
-                    <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full">
-                        <div className="text-center space-y-4">
-                            <h3 className="text-xl font-serif text-neutral-50">
-                                ¿Abandonar la partida?
-                            </h3>
-                            <p className="text-neutral-400">
-                                Si abandonas, perderás tu progreso en esta partida.
-                            </p>
-                            <div className="space-y-2 pt-2">
-                                <Button
-                                    onClick={() => {
-                                        setShowLeaveGameModal(false);
-                                        leaveGame();
-                                    }}
-                                    variant="danger"
-                                >
-                                    Sí, abandonar
-                                </Button>
-                                <Button
-                                    onClick={() => setShowLeaveGameModal(false)}
-                                    variant="outline"
-                                >
-                                    Cancelar
-                                </Button>
-                            </div>
-                        </div>
+            <Modal
+                isOpen={showLeaveGameModal}
+                onClose={() => setShowLeaveGameModal(false)}
+                title="¿Abandonar la partida?"
+                size="sm"
+            >
+                <div className="text-center space-y-4">
+                    <p className="text-neutral-400">
+                        Si abandonas, perderás tu progreso en esta partida.
+                    </p>
+                    <div className="space-y-2 pt-2">
+                        <Button
+                            onClick={() => {
+                                setShowLeaveGameModal(false);
+                                leaveGame();
+                            }}
+                            variant="danger"
+                        >
+                            Sí, abandonar
+                        </Button>
+                        <Button
+                            onClick={() => setShowLeaveGameModal(false)}
+                            variant="outline"
+                        >
+                            Cancelar
+                        </Button>
                     </div>
                 </div>
-            )}
+            </Modal>
 
             {/* Modal de confirmación para finalizar juego */}
-            {showEndGameModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
-                    <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full">
-                        <div className="text-center space-y-4">
-                            <h3 className="text-xl font-serif text-neutral-50">
-                                ¿Finalizar el juego?
-                            </h3>
-                            <p className="text-neutral-400">
-                                Esto terminará la partida para todos los jugadores.
-                            </p>
-                            <div className="space-y-2 pt-2">
-                                <Button
-                                    onClick={() => {
-                                        setShowEndGameModal(false);
-                                        endGame();
-                                    }}
-                                    variant="danger"
-                                >
-                                    Sí, finalizar
-                                </Button>
-                                <Button
-                                    onClick={() => setShowEndGameModal(false)}
-                                    variant="outline"
-                                >
-                                    Cancelar
-                                </Button>
-                            </div>
-                        </div>
+            <Modal
+                isOpen={showEndGameModal}
+                onClose={() => setShowEndGameModal(false)}
+                title="¿Finalizar el juego?"
+                size="sm"
+            >
+                <div className="text-center space-y-4">
+                    <p className="text-neutral-400">
+                        Esto terminará la partida para todos los jugadores.
+                    </p>
+                    <div className="space-y-2 pt-2">
+                        <Button
+                            onClick={() => {
+                                setShowEndGameModal(false);
+                                endGame();
+                            }}
+                            variant="danger"
+                        >
+                            Sí, finalizar
+                        </Button>
+                        <Button
+                            onClick={() => setShowEndGameModal(false)}
+                            variant="outline"
+                        >
+                            Cancelar
+                        </Button>
                     </div>
                 </div>
-            )}
+            </Modal>
         </div>
     );
 }

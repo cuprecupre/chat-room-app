@@ -1,27 +1,14 @@
 import React from "react";
-import { Link, Share } from "lucide-react";
+import { LogOut } from "lucide-react";
 
-export function Footer({ onOpenInstructions, onOpenFeedback, gameId, onCopyLink, isMobile }) {
+export function Footer({ onOpenInstructions, onOpenFeedback, gameId, isMobile, onLeaveGame }) {
     return (
-        <footer className="w-full py-6 px-6 relative z-10">
+        <footer className="w-full pt-6 pb-40 sm:pb-6 px-6 relative z-10">
+            {/* Divider para separar del contenido */}
+            <div className="max-w-4xl mx-auto w-full h-px bg-neutral-800 mb-6"></div>
             <div className="flex flex-col gap-4">
-                {/* Botones globales (Compartir / Reglas / Feedback) */}
+                {/* Botones globales (Reglas / Feedback / Abandonar) */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-                    {gameId && (
-                        <button
-                            onClick={onCopyLink}
-                            className="inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"
-                        >
-                            {isMobile ? (
-                                <Share className="w-5 h-5" />
-                            ) : (
-                                <Link className="w-5 h-5" />
-                            )}
-                            <span>
-                                {isMobile ? "Compartir invitación" : "Copiar enlace de la partida"}
-                            </span>
-                        </button>
-                    )}
 
                     <button
                         onClick={onOpenInstructions}
@@ -62,6 +49,16 @@ export function Footer({ onOpenInstructions, onOpenFeedback, gameId, onCopyLink,
                         </svg>
                         <span>Enviar sugerencias</span>
                     </button>
+
+                    {gameId && onLeaveGame && (
+                        <button
+                            onClick={onLeaveGame}
+                            className="inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"
+                        >
+                            <LogOut className="w-5 h-5" />
+                            <span>Abandonar partida</span>
+                        </button>
+                    )}
                 </div>
             </div>
         </footer>
