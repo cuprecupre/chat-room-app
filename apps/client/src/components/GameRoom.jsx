@@ -1,15 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link, Share } from "lucide-react";
+import { Link, Share, Info } from "lucide-react";
 // removed icons from labels
 import { Button } from "./ui/Button";
 import { Avatar } from "./ui/Avatar";
+import { Modal } from "./ui/Modal";
 import { Footer } from "./Footer";
 import keyImg from "../assets/llave.png";
 import dualImpostorImg from "../assets/dual-impostor.png";
 import cardImg from "../assets/card.png";
 import cardBackImg from "../assets/card-back.png";
 
-function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onVote }) {
+function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onVote, onOpenInstructions }) {
     const isPlaying = gameState?.phase === "playing";
     const isRoundResult = gameState?.phase === "round_result";
     const isGameOver = gameState?.phase === "game_over";
@@ -106,10 +107,10 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
     const showOrderSubtitle = isPlaying && playerOrder.length > 0;
 
     return (
-        <div className="w-full rounded-lg">
+        <div className="w-full rounded-lg md:flex-1 md:flex md:flex-col">
             {/* Solo mostrar header si no estamos en lobby */}
             {!isLobby && (
-                <div className="mb-3 text-center md:text-left">
+                <div className="mb-5 text-center md:text-left">
                     <p
                         className={`${isPlaying || showScores ? "text-base font-regular text-neutral-200" : "text-sm font-regular text-neutral-500"}`}
                     >
@@ -272,8 +273,92 @@ function PlayerList({ players, currentUserId, isHost, onCopyLink, gameState, onV
                 })}
             </ul>
 
+            {/* Enlace de ayuda solo durante la fase playing */}
+            {isPlaying && (
+                <HelpLink onOpenInstructions={onOpenInstructions} />
+            )}
 
         </div>
+    );
+}
+
+function HelpLink({ onOpenInstructions }) {
+    const [showModal, setShowModal] = useState(false);
+
+    const handleOpenFullRules = () => {
+        setShowModal(false);
+        if (onOpenInstructions) {
+            onOpenInstructions();
+        }
+    };
+
+    return (
+        <>
+            <button
+                onClick={() => setShowModal(true)}
+                className="mt-4 md:mt-auto text-sm text-neutral-500 hover:text-orange-400 transition-colors underline underline-offset-2 w-full text-center md:text-left flex items-center justify-center md:justify-start gap-1.5"
+            >
+                <Info className="w-4 h-4" />
+                Cómo jugar
+            </button>
+
+            <Modal
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+                title="¿Qué debo hacer?"
+                size="lg"
+            >
+                <div className="space-y-6">
+                    <div className="space-y-4 text-neutral-300">
+                        <p className="flex gap-3">
+                            <span className="text-orange-400 font-semibold">1.</span>
+                            <span>Voltea tu carta y descubre si eres <strong className="text-white">amigo</strong> (verás la palabra secreta) o <strong className="text-orange-400">impostor</strong> (no la verás).</span>
+                        </p>
+                        <p className="flex gap-3">
+                            <span className="text-orange-400 font-semibold">2.</span>
+                            <span>Cada jugador dice una pista en voz alta. Empieza el que tenga el ☀️ indicado en el listado de jugadores.</span>
+                        </p>
+                        <p className="flex gap-3">
+                            <span className="text-orange-400 font-semibold">3.</span>
+                            <span>
+                                <strong className="text-white">Si eres amigo:</strong> Da una pista sutil que demuestre que conoces la palabra, pero sin revelarla.
+                                <br />
+                                <strong className="text-orange-400">Si eres impostor:</strong> Finge que la conoces usando pistas vagas o que imiten a otros.
+                            </span>
+                        </p>
+                        <p className="flex gap-3">
+                            <span className="text-orange-400 font-semibold">4.</span>
+                            <span>Cuando todos hayan dado su pista, ¡es hora de votar!</span>
+                        </p>
+                        <p className="flex gap-3">
+                            <span className="text-orange-400 font-semibold">5.</span>
+                            <span>Vota a quien creas que es el impostor. Si eres tú, intenta incriminar a otro.</span>
+                        </p>
+                    </div>
+
+                    <div className="text-sm text-neutral-500 border-l-2 border-neutral-700 pl-4">
+                        Los que votan bien ganan puntos. Si eres impostor y sobrevives, ganas puntos. Si no eres impostor y te votan, quedas fuera de la ronda.
+                    </div>
+
+                    <div className="space-y-3">
+                        <Button
+                            onClick={() => setShowModal(false)}
+                            variant="primary"
+                            size="md"
+                            className="w-full"
+                        >
+                            Entendido
+                        </Button>
+                        <button
+                            onClick={handleOpenFullRules}
+                            className="w-full text-sm text-neutral-500 hover:text-orange-400 transition-colors underline underline-offset-2"
+                        >
+                            Ver reglas completas del juego
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+        </>
     );
 }
 
@@ -621,7 +706,7 @@ export function GameRoom({
                         </div>
 
                         {/* Layout responsive: grid de 2 columnas en md+, stack en mobile */}
-                        <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-start">
+                        <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-10 md:items-stretch">
                             {/* Columna izquierda: Carta */}
                             <div className="w-full max-w-sm mx-auto md:max-w-none">
                                 <div
@@ -719,9 +804,11 @@ export function GameRoom({
                                     <div
                                         className={`flex justify-center mt-6 ${showRestOfUI ? "animate-fadeIn animate-delay-600" : "opacity-0 pointer-events-none"}`}
                                     >
-                                        <button
+                                        <Button
                                             onClick={triggerReveal}
-                                            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm text-neutral-400 hover:text-neutral-300 hover:bg-white/10 active:bg-white/20 active:scale-95 rounded-3xl transition-all duration-150 border border-neutral-600/30 hover:border-neutral-500/50"
+                                            variant="outline"
+                                            size="sm"
+                                            className="gap-2 !w-auto"
                                         >
                                             <svg
                                                 className="w-4 h-4"
@@ -737,16 +824,19 @@ export function GameRoom({
                                                 />
                                             </svg>
                                             <span>Voltear carta</span>
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
 
+                            {/* Divider - horizontal en mobile, vertical en desktop */}
+                            <div className="h-px w-full md:h-auto md:w-px bg-white/10 md:self-stretch"></div>
+
                             {/* Columna derecha: Lista de jugadores */}
                             <div
-                                className={`w-full max-w-sm mx-auto md:max-w-none ${showRestOfUI ? "animate-fadeIn animate-delay-800" : "opacity-0 pointer-events-none"}`}
+                                className={`w-full max-w-sm mx-auto md:max-w-none md:flex md:flex-col ${showRestOfUI ? "animate-fadeIn animate-delay-800" : "opacity-0 pointer-events-none"}`}
                             >
-                                <div className="md:sticky md:top-24">
+                                <div className="md:sticky md:top-24 md:flex-1 md:flex md:flex-col">
                                     <h2 className="text-2xl font-serif text-neutral-50 mb-5 text-center md:text-left">
                                         Jugadores
                                     </h2>
@@ -757,6 +847,7 @@ export function GameRoom({
                                         onCopyLink={onCopyLink}
                                         gameState={state}
                                         onVote={onVote}
+                                        onOpenInstructions={onOpenInstructions}
                                     />
                                 </div>
                             </div>
@@ -1106,79 +1197,74 @@ export function GameRoom({
             )}
 
             {/* Modal de confirmación para terminar juego */}
-            {showEndGameModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
-                    <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full">
-                        <div className="text-center space-y-4">
-                            <h3 className="text-xl font-serif text-neutral-50">
-                                ¿Finalizar juego?
-                            </h3>
-                            <p className="text-neutral-400">
-                                Esta acción finalizará el juego para todos los jugadores. ¿Estás
-                                seguro?
-                            </p>
-                            <div className="flex gap-3 pt-2">
-                                <Button
-                                    onClick={() => setShowEndGameModal(false)}
-                                    variant="outline"
-                                    size="md"
-                                    className="flex-1"
-                                >
-                                    Cancelar
-                                </Button>
-                                <Button
-                                    onClick={() => {
-                                        setShowEndGameModal(false);
-                                        onEndGame();
-                                    }}
-                                    variant="primary"
-                                    size="md"
-                                    className="flex-1"
-                                >
-                                    Terminar
-                                </Button>
-                            </div>
-                        </div>
+            <Modal
+                isOpen={showEndGameModal}
+                onClose={() => setShowEndGameModal(false)}
+                title="¿Finalizar juego?"
+                size="sm"
+            >
+                <div className="text-center space-y-4">
+                    <p className="text-neutral-400">
+                        Esta acción finalizará el juego para todos los jugadores. ¿Estás seguro?
+                    </p>
+                    <div className="flex gap-3 pt-2">
+                        <Button
+                            onClick={() => setShowEndGameModal(false)}
+                            variant="outline"
+                            size="md"
+                            className="flex-1"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setShowEndGameModal(false);
+                                onEndGame();
+                            }}
+                            variant="primary"
+                            size="md"
+                            className="flex-1"
+                        >
+                            Terminar
+                        </Button>
                     </div>
                 </div>
-            )}
+            </Modal>
 
             {/* Modal de confirmación para abandonar juego */}
-            {showLeaveGameModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
-                    <div className="bg-neutral-900 rounded-xl p-6 mx-4 max-w-sm w-full">
-                        <div className="text-center space-y-4">
-                            <h3 className="text-xl font-serif text-neutral-50">
-                                ¿Abandonar juego?
-                            </h3>
-                            <p className="text-neutral-400">
-                                Saldrás del juego y volverás al lobby. ¿Estás seguro?
-                            </p>
-                            <div className="flex gap-3 pt-2">
-                                <Button
-                                    onClick={() => setShowLeaveGameModal(false)}
-                                    variant="outline"
-                                    size="md"
-                                    className="flex-1"
-                                >
-                                    Cancelar
-                                </Button>
-                                <Button
-                                    onClick={() => {
-                                        setShowLeaveGameModal(false);
-                                        onLeaveGame();
-                                    }}
-                                    variant="primary"
-                                    size="md"
-                                    className="flex-1"
-                                >
-                                    Abandonar
-                                </Button>
-                            </div>
-                        </div>
+            <Modal
+                isOpen={showLeaveGameModal}
+                onClose={() => setShowLeaveGameModal(false)}
+                title="¿Abandonar juego?"
+                size="sm"
+            >
+                <div className="text-center space-y-4">
+                    <p className="text-neutral-400">
+                        Saldrás del juego y volverás al lobby. ¿Estás seguro?
+                    </p>
+                    <div className="flex gap-3 pt-2">
+                        <Button
+                            onClick={() => setShowLeaveGameModal(false)}
+                            variant="outline"
+                            size="md"
+                            className="flex-1"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setShowLeaveGameModal(false);
+                                onLeaveGame();
+                            }}
+                            variant="primary"
+                            size="md"
+                            className="flex-1"
+                        >
+                            Abandonar
+                        </Button>
                     </div>
                 </div>
-            )}
+            </Modal>
         </div>
     );
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { db } from "../lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Button } from "./ui/Button";
+import { Modal } from "./ui/Modal";
 import ReCAPTCHA from "react-google-recaptcha";
 
 export function FeedbackModal({ isOpen, onClose, user }) {
@@ -11,8 +12,6 @@ export function FeedbackModal({ isOpen, onClose, user }) {
     const [status, setStatus] = useState("idle"); // idle, success, error
     const [errorObject, setErrorObject] = useState(null);
     const [captchaVerified, setCaptchaVerified] = useState(false);
-
-    if (!isOpen) return null;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -57,110 +56,102 @@ export function FeedbackModal({ isOpen, onClose, user }) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-            <div className="bg-neutral-900 rounded-xl w-full max-w-md shadow-2xl ring-1 ring-white/10 overflow-hidden">
-                <div className="p-6">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xl font-serif text-white">Enviar sugerencias</h3>
-                        <button
-                            onClick={onClose}
-                            className="text-neutral-400 hover:text-white transition-colors"
-                        >
-                            ✕
-                        </button>
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title="Enviar sugerencias"
+            size="md"
+        >
+            {status === "success" ? (
+                <div className="text-center py-8">
+                    <div className="text-5xl mb-4">✨</div>
+                    <h4 className="text-xl font-bold text-green-400 mb-2">
+                        ¡Mensaje enviado!
+                    </h4>
+                    <p className="text-neutral-400">Gracias por ayudarnos a mejorar.</p>
+                </div>
+            ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-neutral-300 mb-2">
+                            Tipo de mensaje
+                        </label>
+                        <div className="relative">
+                            <select
+                                value={type}
+                                onChange={(e) => setType(e.target.value)}
+                                className="w-full appearance-none bg-neutral-800 text-white border border-neutral-700 rounded-lg py-2.5 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
+                            >
+                                <option value="bug">🚨 Problema</option>
+                                <option value="suggestion">💡 Idea</option>
+                                <option value="other">💭 Otros</option>
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-neutral-400">
+                                <svg
+                                    className="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M19 9l-7 7-7-7"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
                     </div>
 
-                    {status === "success" ? (
-                        <div className="text-center py-8">
-                            <div className="text-5xl mb-4">✨</div>
-                            <h4 className="text-xl font-bold text-green-400 mb-2">
-                                ¡Mensaje enviado!
-                            </h4>
-                            <p className="text-neutral-400">Gracias por ayudarnos a mejorar.</p>
-                        </div>
-                    ) : (
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-neutral-300 mb-2">
-                                    Tipo de mensaje
-                                </label>
-                                <div className="relative">
-                                    <select
-                                        value={type}
-                                        onChange={(e) => setType(e.target.value)}
-                                        className="w-full appearance-none bg-neutral-800 text-white border border-neutral-700 rounded-lg py-2.5 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
-                                    >
-                                        <option value="bug">🚨 Problema</option>
-                                        <option value="suggestion">💡 Idea</option>
-                                        <option value="other">💭 Otros</option>
-                                    </select>
-                                    <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-neutral-400">
-                                        <svg
-                                            className="w-5 h-5"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M19 9l-7 7-7-7"
-                                            />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
+                    <div>
+                        <label className="block text-sm font-medium text-neutral-300 mb-2">
+                            Tu comentario
+                        </label>
+                        <textarea
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            placeholder="Cuéntanos qué ha pasado o qué te gustaría ver..."
+                            className="w-full h-32 bg-neutral-950 border border-neutral-700 rounded-lg p-3 text-white placeholder-neutral-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none transition-all"
+                            required
+                        />
+                    </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-neutral-300 mb-2">
-                                    Tu comentario
-                                </label>
-                                <textarea
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Cuéntanos qué ha pasado o qué te gustaría ver..."
-                                    className="w-full h-32 bg-neutral-950 border border-neutral-700 rounded-lg p-3 text-white placeholder-neutral-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none transition-all"
-                                    required
-                                />
-                            </div>
-
-                            {status === "error" && (
-                                <p className="text-red-400 text-sm bg-red-400/10 p-2 rounded">
-                                    {(errorObject && errorObject.message) ||
-                                        "Hubo un error al enviar el mensaje. Inténtalo de nuevo."}
-                                </p>
-                            )}
-
-                            <div className="flex justify-center py-2">
-                                <ReCAPTCHA
-                                    sitekey="6LfyhSQsAAAAAPzBaA09vL6sXcIDTqArPC301LQg"
-                                    onChange={(val) => setCaptchaVerified(!!val)}
-                                    theme="dark"
-                                />
-                            </div>
-
-                            <div className="flex gap-3 pt-2">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={onClose}
-                                    className="flex-1"
-                                >
-                                    Cancelar
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    disabled={isSubmitting || !message.trim() || !captchaVerified}
-                                    className="flex-1"
-                                >
-                                    {isSubmitting ? "Enviando..." : "Enviar"}
-                                </Button>
-                            </div>
-                        </form>
+                    {status === "error" && (
+                        <p className="text-red-400 text-sm bg-red-400/10 p-2 rounded">
+                            {(errorObject && errorObject.message) ||
+                                "Hubo un error al enviar el mensaje. Inténtalo de nuevo."}
+                        </p>
                     )}
-                </div>
-            </div>
-        </div>
+
+                    <div className="flex justify-center py-2">
+                        <ReCAPTCHA
+                            sitekey="6LfyhSQsAAAAAPzBaA09vL6sXcIDTqArPC301LQg"
+                            onChange={(val) => setCaptchaVerified(!!val)}
+                            theme="dark"
+                        />
+                    </div>
+
+                    <div className="flex gap-3 pt-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={onClose}
+                            className="flex-1"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            type="submit"
+                            disabled={isSubmitting || !message.trim() || !captchaVerified}
+                            className="flex-1"
+                        >
+                            {isSubmitting ? "Enviando..." : "Enviar"}
+                        </Button>
+                    </div>
+                </form>
+            )}
+        </Modal>
     );
 }
+
