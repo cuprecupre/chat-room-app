@@ -3,7 +3,7 @@ import React from "react";
 export function GameStepper({ roundCount = 1, currentTurn = 1, showAnimation = true }) {
     return (
         <div
-            className={`w-full max-w-4xl mx-auto ${showAnimation ? "animate-fadeIn animate-delay-200" : ""}`}
+            className={`w-full max-w-4xl mx-auto -mt-3 md:mt-0 ${showAnimation ? "animate-fadeIn animate-delay-200" : ""}`}
         >
             <div className="flex items-center gap-4 justify-center">
                 {/* Número de partida */}
@@ -58,7 +58,7 @@ export function GameStepper({ roundCount = 1, currentTurn = 1, showAnimation = t
                 </div>
             </div>
             {/* Divider */}
-            <div className="h-px w-full bg-white/10 mt-6"></div>
+            <div className="h-px w-full bg-white/10 mt-3 md:mt-6"></div>
         </div>
     );
 }

@@ -534,7 +534,7 @@ export function GameRoom({
     }, [state.phase]);
 
     return (
-        <div className="w-full flex flex-col items-center space-y-6">
+        <div className="w-full flex flex-col items-center space-y-3 md:space-y-6">
             {state.phase === "lobby" && (
                 <div className="w-full max-w-sm mx-auto text-center space-y-4 pb-24 sm:pb-0">
                     {/* Header Image - 50% smaller (w-28 h-28) */}
@@ -693,11 +693,11 @@ export function GameRoom({
                         {/* Layout responsive: grid de 2 columnas en md+, stack en mobile */}
                         <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-10 md:items-stretch">
                             {/* Columna izquierda: Carta */}
-                            <div className="w-full max-w-sm mx-auto md:max-w-none">
+                            <div className="w-full max-w-xs mx-auto md:max-w-none">
                                 <div
                                     className={`text-center md:text-left mb-5 ${showRestOfUI ? "animate-fadeIn animate-delay-400" : "opacity-0 pointer-events-none"}`}
                                 >
-                                    <h2 className="text-2xl font-serif text-neutral-50">Tu carta</h2>
+                                    <h2 className="text-3xl font-serif text-neutral-50">Tu carta</h2>
                                 </div>
                                 <div className="space-y-3">
                                     <div className={`${showCardEntrance ? "animate-cardEntrance" : ""}`}>
@@ -822,7 +822,7 @@ export function GameRoom({
                                 className={`w-full max-w-sm mx-auto md:max-w-none md:flex md:flex-col ${showRestOfUI ? "animate-fadeIn animate-delay-800" : "opacity-0 pointer-events-none"}`}
                             >
                                 <div className="md:sticky md:top-24 md:flex-1 md:flex md:flex-col">
-                                    <h2 className="text-2xl font-serif text-neutral-50 mb-5 text-center md:text-left">
+                                    <h2 className="text-3xl font-serif text-neutral-50 mb-5 text-center md:text-left">
                                         Votación
                                     </h2>
                                     <PlayerList
@@ -858,7 +858,7 @@ export function GameRoom({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-start">
                         {/* Columna izquierda: Resultado */}
                         <div className="w-full max-w-sm mx-auto md:max-w-none">
-                            <h2 className="text-2xl font-serif text-neutral-50 mb-5 text-center md:text-left">
+                            <h2 className="text-3xl font-serif text-neutral-50 mb-5 text-center md:text-left">
                                 Resultado de la partida
                             </h2>
 
@@ -904,7 +904,7 @@ export function GameRoom({
 
                         {/* Columna derecha: Puntuación y botones */}
                         <div className="w-full max-w-sm mx-auto md:max-w-none">
-                            <h2 className="text-2xl font-serif text-neutral-50 mb-5 text-center md:text-left">
+                            <h2 className="text-3xl font-serif text-neutral-50 mb-5 text-center md:text-left">
                                 Puntuación
                             </h2>
 
@@ -963,7 +963,7 @@ export function GameRoom({
                             ) : (
                                 <div className="space-y-3 animate-fadeIn animate-delay-800 mt-6">
                                     <div className="text-center md:text-left">
-                                        <p className="text-xl font-serif text-orange-400 animate-pulse mb-2">
+                                        <p className="text-xl text-orange-400 animate-pulse mb-2">
                                             La siguiente partida empieza en breve
                                         </p>
                                         <p className="text-sm text-neutral-400">
@@ -1117,8 +1117,12 @@ export function GameRoom({
                                         </div>
                                     )}
 
-                                {isHost && (
-                                    <div className="animate-fadeIn animate-delay-600">
+                                <div className="animate-fadeIn animate-delay-600 flex flex-col items-center">
+                                    <p className="text-xl font-medium text-white mb-4">
+                                        ¿Quieres volver a jugar?
+                                    </p>
+
+                                    {isHost ? (
                                         <Button
                                             onClick={() => {
                                                 console.log("🎮 Click en Nuevo Juego", {
@@ -1130,10 +1134,21 @@ export function GameRoom({
                                             variant="primary"
                                             size="md"
                                         >
-                                            Nuevo juego
+                                            Empezar nuevo juego
                                         </Button>
-                                    </div>
-                                )}
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-4 text-center max-w-sm">
+                                            <p className="text-neutral-400 text-sm leading-relaxed">
+                                                Espera aquí a que el anfitrión comience un juego nuevo o, si prefieres, puedes <button
+                                                    onClick={() => onLeaveGame()}
+                                                    className="text-orange-400 hover:text-orange-300 underline underline-offset-2 transition-colors cursor-pointer bg-transparent border-0 p-0 inline font-medium"
+                                                >
+                                                    abandonar la partida
+                                                </button> para crear tu propio juego e invitar a tus amigos.
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     );
