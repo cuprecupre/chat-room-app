@@ -9,7 +9,6 @@ export function Footer({ onOpenInstructions, onOpenFeedback, gameId, isMobile, o
             <div className="flex flex-col gap-4">
                 {/* Botones globales (Reglas / Feedback / Abandonar) */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-
                     <button
                         onClick={onOpenInstructions}
                         className="inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"

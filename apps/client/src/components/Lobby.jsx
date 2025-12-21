@@ -18,7 +18,9 @@ export function Lobby({ onCreateGame }) {
                     className="mx-auto w-56 h-56 rounded-full object-cover shadow-lg ring-1 ring-white/10"
                     loading="lazy"
                 />
-                <h2 className="text-4xl font-serif text-neutral-50 tracking-tight">¿Listos para jugar?</h2>
+                <h2 className="text-4xl font-serif text-neutral-50 tracking-tight">
+                    ¿Listos para jugar?
+                </h2>
                 <div className="space-y-4">
                     <p className="text-lg text-neutral-50 leading-relaxed max-w-md mx-auto">
                         Crea una partida rápida e invita a tus amigos para descubrir al impostor.
@@ -46,12 +48,14 @@ export function Lobby({ onCreateGame }) {
                         <button
                             type="button"
                             onClick={() => setShowImpostorHint(!showImpostorHint)}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 focus:ring-offset-neutral-950 ${showImpostorHint ? "bg-orange-500" : "bg-neutral-700"
-                                }`}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 focus:ring-offset-neutral-950 ${
+                                showImpostorHint ? "bg-orange-500" : "bg-neutral-700"
+                            }`}
                         >
                             <span
-                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${showImpostorHint ? "translate-x-6" : "translate-x-1"
-                                    }`}
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                                    showImpostorHint ? "translate-x-6" : "translate-x-1"
+                                }`}
                             />
                         </button>
                     </label>

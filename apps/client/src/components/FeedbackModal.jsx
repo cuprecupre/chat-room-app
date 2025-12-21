@@ -56,18 +56,11 @@ export function FeedbackModal({ isOpen, onClose, user }) {
     };
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={onClose}
-            title="Enviar sugerencias"
-            size="md"
-        >
+        <Modal isOpen={isOpen} onClose={onClose} title="Enviar sugerencias" size="md">
             {status === "success" ? (
                 <div className="text-center py-8">
                     <div className="text-5xl mb-4">✨</div>
-                    <h4 className="text-xl font-bold text-green-400 mb-2">
-                        ¡Mensaje enviado!
-                    </h4>
+                    <h4 className="text-xl font-bold text-green-400 mb-2">¡Mensaje enviado!</h4>
                     <p className="text-neutral-400">Gracias por ayudarnos a mejorar.</p>
                 </div>
             ) : (
@@ -154,4 +147,3 @@ export function FeedbackModal({ isOpen, onClose, user }) {
         </Modal>
     );
 }
-

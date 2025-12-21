@@ -85,10 +85,12 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
 
         if (/partida en curso/i.test(joinError)) {
             errorTitle = "Partida ya iniciada";
-            errorMsg = "Lo sentimos, esta partida ya comenzó y no acepta nuevos jugadores en este momento.";
+            errorMsg =
+                "Lo sentimos, esta partida ya comenzó y no acepta nuevos jugadores en este momento.";
         } else if (/no existe/i.test(joinError)) {
             errorTitle = "Enlace no válido";
-            errorMsg = "No encontramos esta partida. Es posible que el anfitrión la haya cerrado o el enlace sea incorrecto.";
+            errorMsg =
+                "No encontramos esta partida. Es posible que el anfitrión la haya cerrado o el enlace sea incorrecto.";
         }
 
         return (

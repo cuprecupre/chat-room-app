@@ -40,6 +40,7 @@ How changes will be verified
 - Specify which functionalities will be tested locally
 - Detail manual or automated verification steps
 - Example:
+
     ```markdown
     ### Local Testing
 
