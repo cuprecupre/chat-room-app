@@ -170,8 +170,9 @@ class GameManager {
             delete this.games[gameId];
             delete this.pendingDeletions[gameId];
 
-            console.log(`🗑️  [Cleanup] Removed empty game ${gameId} from memory (kept in Firestore)`);
-
+            console.log(
+                `🗑️  [Cleanup] Removed empty game ${gameId} from memory (kept in Firestore)`
+            );
         }, delayMs);
 
         this.pendingDeletions[gameId] = timeoutId;

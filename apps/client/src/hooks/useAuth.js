@@ -132,7 +132,9 @@ export function useAuth() {
                         setLoading(false);
                     }
                 } else {
-                    console.log("ℹ️ No hay resultado de redirect (getRedirectResult returned null)");
+                    console.log(
+                        "ℹ️ No hay resultado de redirect (getRedirectResult returned null)"
+                    );
                 }
             } catch (err) {
                 console.error("❌ Error en redirect:", {
@@ -148,7 +150,7 @@ export function useAuth() {
             try {
                 console.log("🧹 Limpiando sessionStorage flag");
                 sessionStorage.removeItem("auth:redirect");
-            } catch (_) { }
+            } catch (_) {}
         };
 
         // Ejecutar inmediatamente
@@ -290,7 +292,7 @@ export function useAuth() {
             // Limpiar flag de redirect si falla
             try {
                 sessionStorage.removeItem("auth:redirect");
-            } catch (_) { }
+            } catch (_) {}
         }
     }, []);
 

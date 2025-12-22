@@ -92,7 +92,8 @@ function startNextTurn(game, wasTie = false) {
         const previousTurn = game.currentTurn - 1;
         const points = previousTurn + 1;
         game.playerScores[game.impostorId] = (game.playerScores[game.impostorId] || 0) + points;
-        game.lastRoundScores[game.impostorId] = (game.lastRoundScores[game.impostorId] || 0) + points;
+        game.lastRoundScores[game.impostorId] =
+            (game.lastRoundScores[game.impostorId] || 0) + points;
         console.log(
             `[Game ${game.gameId}] Impostor sobrevivió vuelta ${previousTurn}: +${points} puntos`
         );

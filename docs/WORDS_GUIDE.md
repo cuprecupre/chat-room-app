@@ -12,15 +12,8 @@ apps/server/data/words.json
 
 ```json
 {
-    "Nombre de Categoría": [
-        "palabra1",
-        "palabra2",
-        "palabra3"
-    ],
-    "Otra Categoría": [
-        "palabra1",
-        "palabra2"
-    ]
+    "Nombre de Categoría": ["palabra1", "palabra2", "palabra3"],
+    "Otra Categoría": ["palabra1", "palabra2"]
 }
 ```
 
@@ -30,29 +23,29 @@ apps/server/data/words.json
 
 ### ✅ Palabras válidas
 
-| Criterio | Descripción |
-|----------|-------------|
-| **Español neutro** | Palabras entendidas en todos los países hispanohablantes |
-| **Sin regionalismos** | Evitar palabras que solo se usan en un país o región |
-| **Sin lunfardos** | No usar jerga local (ej: "pibe", "guagua", "plata" como dinero) |
-| **Universales** | Cualquier hispanohablante debería conocer la palabra |
-| **Sustantivos preferidos** | Priorizar sustantivos sobre verbos o adjetivos |
-| **Minúsculas** | Todas las palabras en minúsculas (excepto nombres propios) |
+| Criterio                   | Descripción                                                     |
+| -------------------------- | --------------------------------------------------------------- |
+| **Español neutro**         | Palabras entendidas en todos los países hispanohablantes        |
+| **Sin regionalismos**      | Evitar palabras que solo se usan en un país o región            |
+| **Sin lunfardos**          | No usar jerga local (ej: "pibe", "guagua", "plata" como dinero) |
+| **Universales**            | Cualquier hispanohablante debería conocer la palabra            |
+| **Sustantivos preferidos** | Priorizar sustantivos sobre verbos o adjetivos                  |
+| **Minúsculas**             | Todas las palabras en minúsculas (excepto nombres propios)      |
 
 ### ❌ Palabras a evitar
 
-| Evitar | Usar en su lugar |
-|--------|-----------------|
-| carro | automóvil, coche |
-| pibe, chaval | chico, joven |
-| guagua, camión, colectivo | autobús |
-| plata (dinero) | dinero |
-| computador | computadora, ordenador |
-| celular | teléfono móvil |
-| pollera | falda |
-| chompa | suéter, jersey |
-| frutilla | fresa |
-| durazno | melocotón |
+| Evitar                    | Usar en su lugar       |
+| ------------------------- | ---------------------- |
+| carro                     | automóvil, coche       |
+| pibe, chaval              | chico, joven           |
+| guagua, camión, colectivo | autobús                |
+| plata (dinero)            | dinero                 |
+| computador                | computadora, ordenador |
+| celular                   | teléfono móvil         |
+| pollera                   | falda                  |
+| chompa                    | suéter, jersey         |
+| frutilla                  | fresa                  |
+| durazno                   | melocotón              |
 
 ### Casos especiales
 
@@ -76,6 +69,7 @@ git checkout -b feature/add-words-[descripcion]
 ### 2. Editar el archivo
 
 Abrir `apps/server/data/words.json` y:
+
 - Añadir palabras a categorías existentes
 - O crear nuevas categorías
 
@@ -122,12 +116,12 @@ Crear PR hacia `develop` para revisión.
 
 ## Estadísticas actuales
 
-| Métrica | Valor |
-|---------|-------|
-| Categorías | 30 |
-| Palabras por categoría | 100 |
-| Total palabras | 3,000 |
-| Tamaño archivo | ~60 KB |
+| Métrica                | Valor  |
+| ---------------------- | ------ |
+| Categorías             | 30     |
+| Palabras por categoría | 100    |
+| Total palabras         | 3,000  |
+| Tamaño archivo         | ~60 KB |
 
 ---
 
