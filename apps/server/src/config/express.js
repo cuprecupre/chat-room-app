@@ -1,10 +1,12 @@
 const express = require("express");
 const cors = require("cors");
+const compression = require("compression");
 const path = require("path");
 
 function createExpressApp() {
     const app = express();
     app.use(express.json());
+    app.use(compression());
     app.use("/api", cors());
 
     // Serve static files from the client build directory

@@ -81,8 +81,8 @@ function getStateForPlayer(game, userId) {
         baseState.impostorName = impostor
             ? impostor.name
             : formerImpostor
-              ? formerImpostor.name
-              : "Jugador desconectado";
+                ? formerImpostor.name
+                : "Jugador desconectado";
         baseState.impostorId = game.impostorId;
         baseState.secretWord = game.secretWord;
         baseState.lastRoundScores = game.lastRoundScores;
@@ -99,7 +99,10 @@ function getStateForPlayer(game, userId) {
     }
 
     // Always include formerPlayers for showing scores
-    baseState.formerPlayers = game.formerPlayers;
+    // Only include formerPlayers in result phases to save bandwidth
+    if (game.phase === "round_result" || game.phase === "game_over") {
+        baseState.formerPlayers = game.formerPlayers;
+    }
 
     return baseState;
 }
