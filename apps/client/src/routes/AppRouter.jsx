@@ -1,24 +1,35 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useSocket } from "../hooks/useSocket";
 import { Toaster } from "../components/Toaster";
 import { Spinner } from "../components/ui/Spinner";
+import { PageLoader } from "../components/ui/PageLoader";
 import { InstructionsModal } from "../components/InstructionsModal";
 import { FeedbackModal } from "../components/FeedbackModal";
 import { MainLayout } from "../layouts/MainLayout";
 import { UnauthenticatedLayout } from "../layouts/UnauthenticatedLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
-import { LandingPage } from "../pages/LandingPage";
-import { EmailAuthPage } from "../pages/EmailAuthPage";
-import { LobbyPage } from "../pages/LobbyPage";
-import { GamePage } from "../pages/GamePage";
-import { RulesPage } from "../pages/RulesPage";
-import { InvitePage } from "../pages/InvitePage";
-import { InviteLandingPage } from "../pages/InviteLandingPage";
 import { ROUTES } from "./routes";
 import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
 import heroImg from "../assets/impostor-home.png";
+
+// Lazy-loaded pages for code splitting
+const LandingPage = lazy(() =>
+    import("../pages/LandingPage").then((m) => ({ default: m.LandingPage }))
+);
+const EmailAuthPage = lazy(() =>
+    import("../pages/EmailAuthPage").then((m) => ({ default: m.EmailAuthPage }))
+);
+const LobbyPage = lazy(() => import("../pages/LobbyPage").then((m) => ({ default: m.LobbyPage })));
+const GamePage = lazy(() => import("../pages/GamePage").then((m) => ({ default: m.GamePage })));
+const RulesPage = lazy(() => import("../pages/RulesPage").then((m) => ({ default: m.RulesPage })));
+const InvitePage = lazy(() =>
+    import("../pages/InvitePage").then((m) => ({ default: m.InvitePage }))
+);
+const InviteLandingPage = lazy(() =>
+    import("../pages/InviteLandingPage").then((m) => ({ default: m.InviteLandingPage }))
+);
 
 function HomeRouteHandler({ user }) {
     const location = useLocation();
@@ -169,111 +180,115 @@ function AppRoutes({
                 user={user}
             />
 
-            <Routes>
-                {/* Public routes */}
-                <Route element={<UnauthenticatedLayout />}>
-                    <Route
-                        path={ROUTES.HOME}
-                        element={(() => {
-                            const urlGameId = new URLSearchParams(window.location.search).get(
-                                "gameId"
-                            );
+            <Suspense fallback={<PageLoader />}>
+                <Routes>
+                    {/* Public routes */}
+                    <Route element={<UnauthenticatedLayout />}>
+                        <Route
+                            path={ROUTES.HOME}
+                            element={(() => {
+                                const urlGameId = new URLSearchParams(window.location.search).get(
+                                    "gameId"
+                                );
 
-                            // If there's a gameId and user is NOT logged in, show InviteLandingPage
-                            if (urlGameId && !user) {
-                                return <InviteLandingPage onLogin={login} isLoading={loading} />;
-                            }
+                                // If there's a gameId and user is NOT logged in, show InviteLandingPage
+                                if (urlGameId && !user) {
+                                    return (
+                                        <InviteLandingPage onLogin={login} isLoading={loading} />
+                                    );
+                                }
 
-                            // If user is logged in, use HomeRouteHandler
-                            if (user) {
-                                return <HomeRouteHandler user={user} />;
-                            }
+                                // If user is logged in, use HomeRouteHandler
+                                if (user) {
+                                    return <HomeRouteHandler user={user} />;
+                                }
 
-                            // Otherwise show LandingPage
-                            return (
-                                <LandingPage
-                                    onLogin={login}
-                                    isLoading={loading}
-                                    onOpenInstructions={() => setInstructionsOpen(true)}
-                                    onOpenFeedback={() => setFeedbackOpen(true)}
-                                />
-                            );
-                        })()}
-                    />
-                    <Route
-                        path={ROUTES.AUTH}
-                        element={
-                            user ? (
-                                <Navigate to={ROUTES.LOBBY} replace />
-                            ) : (
-                                <EmailAuthPage
-                                    onLoginWithEmail={loginWithEmail}
-                                    onRegisterWithEmail={registerWithEmail}
-                                    isLoading={loading}
-                                    error={error}
-                                    clearError={clearError}
-                                />
-                            )
-                        }
-                    />
-                    <Route path={ROUTES.RULES} element={<RulesPage />} />
-                </Route>
-
-                {/* Protected routes */}
-                <Route
-                    element={
-                        <ProtectedRoute
-                            user={user}
-                            connected={connected}
-                            emit={emit}
-                            gameState={gameState}
+                                // Otherwise show LandingPage
+                                return (
+                                    <LandingPage
+                                        onLogin={login}
+                                        isLoading={loading}
+                                        onOpenInstructions={() => setInstructionsOpen(true)}
+                                        onOpenFeedback={() => setFeedbackOpen(true)}
+                                    />
+                                );
+                            })()}
                         />
-                    }
-                >
+                        <Route
+                            path={ROUTES.AUTH}
+                            element={
+                                user ? (
+                                    <Navigate to={ROUTES.LOBBY} replace />
+                                ) : (
+                                    <EmailAuthPage
+                                        onLoginWithEmail={loginWithEmail}
+                                        onRegisterWithEmail={registerWithEmail}
+                                        isLoading={loading}
+                                        error={error}
+                                        clearError={clearError}
+                                    />
+                                )
+                            }
+                        />
+                        <Route path={ROUTES.RULES} element={<RulesPage />} />
+                    </Route>
+
+                    {/* Protected routes */}
                     <Route
                         element={
-                            <MainLayout
+                            <ProtectedRoute
                                 user={user}
-                                gameState={gameState}
+                                connected={connected}
                                 emit={emit}
-                                onLogout={logout}
-                                onOpenInstructions={() => setInstructionsOpen(true)}
-                                onOpenFeedback={() => setFeedbackOpen(true)}
-                                onCopyLink={handleCopyLink}
-                                isMobile={isMobile}
-                                isHost={isHost}
+                                gameState={gameState}
                             />
                         }
                     >
                         <Route
-                            path={ROUTES.LOBBY}
-                            element={<LobbyPage user={user} onCreateGame={createGame} />}
-                        />
-                        <Route
-                            path={ROUTES.GAME}
                             element={
-                                <GameRouteHandler
-                                    gameState={gameState}
+                                <MainLayout
                                     user={user}
+                                    gameState={gameState}
                                     emit={emit}
-                                    joinGame={joinGame}
-                                    joinError={joinError}
-                                    clearJoinError={clearJoinError}
+                                    onLogout={logout}
                                     onOpenInstructions={() => setInstructionsOpen(true)}
-                                    onStartGame={startGame}
-                                    onEndGame={endGame}
-                                    onPlayAgain={playAgain}
-                                    onLeaveGame={leaveGame}
-                                    onVote={castVote}
+                                    onOpenFeedback={() => setFeedbackOpen(true)}
+                                    onCopyLink={handleCopyLink}
+                                    isMobile={isMobile}
+                                    isHost={isHost}
                                 />
                             }
-                        />
+                        >
+                            <Route
+                                path={ROUTES.LOBBY}
+                                element={<LobbyPage user={user} onCreateGame={createGame} />}
+                            />
+                            <Route
+                                path={ROUTES.GAME}
+                                element={
+                                    <GameRouteHandler
+                                        gameState={gameState}
+                                        user={user}
+                                        emit={emit}
+                                        joinGame={joinGame}
+                                        joinError={joinError}
+                                        clearJoinError={clearJoinError}
+                                        onOpenInstructions={() => setInstructionsOpen(true)}
+                                        onStartGame={startGame}
+                                        onEndGame={endGame}
+                                        onPlayAgain={playAgain}
+                                        onLeaveGame={leaveGame}
+                                        onVote={castVote}
+                                    />
+                                }
+                            />
+                        </Route>
                     </Route>
-                </Route>
 
-                {/* Catch-all redirect to home */}
-                <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
-            </Routes>
+                    {/* Catch-all redirect to home */}
+                    <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+                </Routes>
+            </Suspense>
         </>
     );
 }
