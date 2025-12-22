@@ -11,7 +11,10 @@ function createExpressApp() {
     // Relative path: from apps/server/src/config/express.js -> apps/client/dist
     const clientBuildPath = path.join(__dirname, "../../../client/dist");
 
-    app.use(express.static(clientBuildPath));
+    app.use(express.static(clientBuildPath, {
+        maxAge: "1y",
+        immutable: true
+    }));
 
     return app;
 }
