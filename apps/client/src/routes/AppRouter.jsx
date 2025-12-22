@@ -14,6 +14,19 @@ import { ROUTES } from "./routes";
 import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
 import heroImg from "../assets/impostor-home.png";
 
+// Handle ChunkLoadError during deploys - auto reload when old chunks are gone
+if (typeof window !== "undefined") {
+    window.addEventListener("error", (e) => {
+        if (
+            e.message?.includes("Loading chunk") ||
+            e.message?.includes("Failed to fetch dynamically imported module")
+        ) {
+            console.warn("Chunk load failed, reloading page...");
+            window.location.reload();
+        }
+    });
+}
+
 // Lazy-loaded pages for code splitting
 const LandingPage = lazy(() =>
     import("../pages/LandingPage").then((m) => ({ default: m.LandingPage }))
