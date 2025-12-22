@@ -20,6 +20,26 @@ class DBService {
     }
 
     /**
+     * Checks if Firestore is healthy and responsive.
+     * @returns {Promise<{healthy: boolean, latencyMs: number|null, error: string|null}>}
+     */
+    async isHealthy() {
+        if (!this.db) {
+            return { healthy: false, latencyMs: null, error: "Firestore not initialized" };
+        }
+
+        const start = Date.now();
+        try {
+            // Perform a lightweight read to verify connectivity
+            await this.db.collection("_health").limit(1).get();
+            const latencyMs = Date.now() - start;
+            return { healthy: true, latencyMs, error: null };
+        } catch (e) {
+            return { healthy: false, latencyMs: null, error: e.message };
+        }
+    }
+
+    /**
      * Upserts the game state to Firestore.
      */
     async saveGameState(gameId, state) {

@@ -48,6 +48,12 @@ class Game {
         // Jugadores que abandonaron
         this.formerPlayers = {};
 
+        // Persistence Debounce
+        this._saveTimer = null;
+        this._hasPendingChanges = false;
+        this._lastSaveTime = 0;
+        this.SAVE_INTERVAL_MS = 2000; // Guardar máx cada 2 segundos
+
         if (!options.isRestoring) {
             PlayerManager.addPlayer(this, hostUser);
             this.persist();
@@ -90,6 +96,12 @@ class Game {
         game.impostorHistory = data.impostorHistory || [];
         game.formerPlayers = data.formerPlayers || {};
 
+        // Inicializar debounce properties en objeto recreado
+        game._saveTimer = null;
+        game._hasPendingChanges = false;
+        game._lastSaveTime = 0;
+        game.SAVE_INTERVAL_MS = 2000;
+
         console.log(
             `[Game Recovery] Game ${gameId} restored in phase '${game.phase}' with ${game.players.length} players:`,
             game.players.map((p) => p.name).join(", ")
@@ -101,8 +113,58 @@ class Game {
         return GameStateSerializer.getPersistenceState(this);
     }
 
+    /**
+     * Persist game state with debounce/throttle.
+     * Prevents flooding Firestore with writes during bursts (e.g. rapid voting).
+     */
     persist() {
-        dbService.saveGameState(this.gameId, this.getPersistenceState());
+        // Marcar que hay cambios pendientes
+        this._hasPendingChanges = true;
+
+        // Si ya hay un timer corriendo, esperamos a que se ejecute (coalescing)
+        if (this._saveTimer) {
+            return;
+        }
+
+        const now = Date.now();
+        const timeSinceLastSave = now - this._lastSaveTime;
+
+        // Si ha pasado suficiente tiempo desde el último guardado, guardar "casi" inmediatamente
+        // (usamos un pequeño delay de 100ms para agrupar cambios síncronos del mismo tick)
+        if (timeSinceLastSave >= this.SAVE_INTERVAL_MS) {
+            this._scheduleSave(100);
+        } else {
+            // Si no, programar para cuando se cumpla el intervalo
+            const delay = this.SAVE_INTERVAL_MS - timeSinceLastSave;
+            this._scheduleSave(delay);
+        }
+    }
+
+    _scheduleSave(delay) {
+        this._saveTimer = setTimeout(() => {
+            this._performSave();
+        }, delay);
+    }
+
+    async _performSave() {
+        // Limpiar timer y flag
+        this._saveTimer = null;
+
+        if (!this._hasPendingChanges) return;
+
+        try {
+            this._lastSaveTime = Date.now();
+            this._hasPendingChanges = false; // Reset flag antes de guardar (optimistic)
+
+            // Usar el servicio DB existente
+            await dbService.saveGameState(this.gameId, this.getPersistenceState());
+
+            // console.log(`[Game ${this.gameId}] State persisted (Throttled)`);
+        } catch (error) {
+            console.error(`[Game ${this.gameId}] Persist failed:`, error);
+            // Si falla, restaurar flag para intentar en la siguiente llamada
+            this._hasPendingChanges = true;
+        }
     }
 
     addPlayer(user) {
