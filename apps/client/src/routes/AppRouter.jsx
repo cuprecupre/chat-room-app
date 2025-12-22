@@ -174,36 +174,31 @@ function AppRoutes({
                 <Route element={<UnauthenticatedLayout />}>
                     <Route
                         path={ROUTES.HOME}
-                        element={
-                            (() => {
-                                const urlGameId = new URLSearchParams(window.location.search).get("gameId");
+                        element={(() => {
+                            const urlGameId = new URLSearchParams(window.location.search).get(
+                                "gameId"
+                            );
 
-                                // If there's a gameId and user is NOT logged in, show InviteLandingPage
-                                if (urlGameId && !user) {
-                                    return (
-                                        <InviteLandingPage
-                                            onLogin={login}
-                                            isLoading={loading}
-                                        />
-                                    );
-                                }
+                            // If there's a gameId and user is NOT logged in, show InviteLandingPage
+                            if (urlGameId && !user) {
+                                return <InviteLandingPage onLogin={login} isLoading={loading} />;
+                            }
 
-                                // If user is logged in, use HomeRouteHandler
-                                if (user) {
-                                    return <HomeRouteHandler user={user} />;
-                                }
+                            // If user is logged in, use HomeRouteHandler
+                            if (user) {
+                                return <HomeRouteHandler user={user} />;
+                            }
 
-                                // Otherwise show LandingPage
-                                return (
-                                    <LandingPage
-                                        onLogin={login}
-                                        isLoading={loading}
-                                        onOpenInstructions={() => setInstructionsOpen(true)}
-                                        onOpenFeedback={() => setFeedbackOpen(true)}
-                                    />
-                                );
-                            })()
-                        }
+                            // Otherwise show LandingPage
+                            return (
+                                <LandingPage
+                                    onLogin={login}
+                                    isLoading={loading}
+                                    onOpenInstructions={() => setInstructionsOpen(true)}
+                                    onOpenFeedback={() => setFeedbackOpen(true)}
+                                />
+                            );
+                        })()}
                     />
                     <Route
                         path={ROUTES.AUTH}

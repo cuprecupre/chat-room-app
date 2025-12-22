@@ -130,7 +130,9 @@ function processVotingResults(game) {
 
         // Si solo quedan 2 jugadores (impostor + 1 amigo), el impostor gana automáticamente
         if (activePlayers.length <= 2) {
-            console.log(`[Game ${game.gameId}] Solo quedan 2 jugadores. ¡El impostor gana automáticamente!`);
+            console.log(
+                `[Game ${game.gameId}] Solo quedan 2 jugadores. ¡El impostor gana automáticamente!`
+            );
             endRound(game, false);
         } else if (game.currentTurn >= game.maxTurns) {
             console.log(`[Game ${game.gameId}] Tercera vuelta completada. ¡El impostor gana!`);

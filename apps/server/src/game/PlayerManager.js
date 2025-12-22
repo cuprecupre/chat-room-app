@@ -43,9 +43,7 @@ function removePlayer(game, userId) {
     // Transferir host si el que se fue era el host
     let newHostInfo = null;
     if (wasHost && game.players.length > 0) {
-        const nextHostId = game.playerOrder.find((uid) =>
-            game.players.some((p) => p.uid === uid)
-        );
+        const nextHostId = game.playerOrder.find((uid) => game.players.some((p) => p.uid === uid));
         if (nextHostId) {
             game.hostId = nextHostId;
             const newHost = game.players.find((p) => p.uid === nextHostId);
@@ -53,7 +51,9 @@ function removePlayer(game, userId) {
                 uid: nextHostId,
                 name: newHost ? newHost.name : "Jugador",
             };
-            console.log(`[Game ${game.gameId}] Host transferido a ${newHostInfo.name} (${nextHostId})`);
+            console.log(
+                `[Game ${game.gameId}] Host transferido a ${newHostInfo.name} (${nextHostId})`
+            );
         }
     }
 
