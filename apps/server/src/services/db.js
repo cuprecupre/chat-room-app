@@ -8,7 +8,6 @@ class DBService {
 
     /**
      * Initializes the DB Service.
-     * In production, fails fast if Firestore cannot be initialized.
      */
     initialize() {
         try {
@@ -17,12 +16,6 @@ class DBService {
             console.log(`✅ [DB Service] Initialized. Collection: '${this.collectionName}'`);
         } catch (e) {
             console.error("❌ [DB Service] Failed to initialize Firestore:", e.message);
-
-            // In production, fail fast - don't run without persistence
-            if (process.env.NODE_ENV === "production") {
-                console.error("🛑 [DB Service] Critical: Cannot run without Firestore in production. Shutting down.");
-                process.exit(1);
-            }
         }
     }
 
