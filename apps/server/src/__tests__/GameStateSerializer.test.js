@@ -7,7 +7,10 @@ describe("GameStateSerializer", () => {
         mockGame = {
             gameId: "test-game",
             hostId: "user1",
-            players: [{ uid: "user1", name: "User 1" }, { uid: "user2", name: "User 2" }],
+            players: [
+                { uid: "user1", name: "User 1" },
+                { uid: "user2", name: "User 2" },
+            ],
             playerScores: { user1: 0, user2: 0 },
             roundCount: 1,
             maxRounds: 5,
@@ -20,14 +23,14 @@ describe("GameStateSerializer", () => {
             votes: {},
             lastRoundScores: {},
             formerPlayers: {
-                user3: { name: "Leaver", photoURL: null }
+                user3: { name: "Leaver", photoURL: null },
             },
             impostorId: "user2",
             secretWord: "Banana",
             secretCategory: "Fruta",
             currentTurn: 1,
             maxTurns: 3,
-            lastEliminatedInTurn: null
+            lastEliminatedInTurn: null,
         };
     });
 

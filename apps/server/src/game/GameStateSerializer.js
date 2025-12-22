@@ -81,8 +81,8 @@ function getStateForPlayer(game, userId) {
         baseState.impostorName = impostor
             ? impostor.name
             : formerImpostor
-                ? formerImpostor.name
-                : "Jugador desconectado";
+              ? formerImpostor.name
+              : "Jugador desconectado";
         baseState.impostorId = game.impostorId;
         baseState.secretWord = game.secretWord;
         baseState.lastRoundScores = game.lastRoundScores;

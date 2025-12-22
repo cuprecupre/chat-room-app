@@ -13,9 +13,13 @@ vi.mock("../ui/GameStepper", () => ({
 }));
 
 vi.mock("../ui/Modal", () => ({
-    Modal: ({ children, isOpen, title }) => (
-        isOpen ? <div data-testid="modal"><h1>{title}</h1>{children}</div> : null
-    ),
+    Modal: ({ children, isOpen, title }) =>
+        isOpen ? (
+            <div data-testid="modal">
+                <h1>{title}</h1>
+                {children}
+            </div>
+        ) : null,
 }));
 
 describe("GameRoom Bandwidth Optimization Integration", () => {
@@ -28,7 +32,7 @@ describe("GameRoom Bandwidth Optimization Integration", () => {
         hostId: "user1",
         players: [
             { uid: "user1", name: "Me", photoURL: "u1.jpg" },
-            { uid: "user2", name: "Other", photoURL: "u2.jpg" }
+            { uid: "user2", name: "Other", photoURL: "u2.jpg" },
         ],
         playerScores: { user1: 0, user2: 0 },
         lastRoundScores: {},
@@ -43,7 +47,7 @@ describe("GameRoom Bandwidth Optimization Integration", () => {
         activePlayers: ["user1", "user2"],
         canVote: true,
         // CRITICAL: formerPlayers is UNDEFINED here
-        formerPlayers: undefined
+        formerPlayers: undefined,
     };
 
     const mockHandlers = {
@@ -57,16 +61,9 @@ describe("GameRoom Bandwidth Optimization Integration", () => {
     };
 
     it("should render 'playing' phase correctly without formerPlayers in state", () => {
-        // This test confirms that removing formerPlayers from the payload 
+        // This test confirms that removing formerPlayers from the payload
         // does not cause a crash or render error in the main game view
-        render(
-            <GameRoom
-                state={slimPlayState}
-                user={mockUser}
-                isHost={true}
-                {...mockHandlers}
-            />
-        );
+        render(<GameRoom state={slimPlayState} user={mockUser} isHost={true} {...mockHandlers} />);
 
         // Verify player list still renders
         // Note: Avatar mock renders "Me", PlayerList text renders "Me (Tú)"
@@ -87,18 +84,11 @@ describe("GameRoom Bandwidth Optimization Integration", () => {
             playerScores: { user1: 10, user2: 5, user3: 2 },
             // Disconnected player who scored points
             formerPlayers: {
-                user3: { name: "Leaver", photoURL: null }
-            }
+                user3: { name: "Leaver", photoURL: null },
+            },
         };
 
-        render(
-            <GameRoom
-                state={gameOverState}
-                user={mockUser}
-                isHost={true}
-                {...mockHandlers}
-            />
-        );
+        render(<GameRoom state={gameOverState} user={mockUser} isHost={true} {...mockHandlers} />);
 
         // Should see the winner (Avatar + Name text = multiple elements with "Me")
         expect(screen.getAllByText("Me").length).toBeGreaterThan(0);

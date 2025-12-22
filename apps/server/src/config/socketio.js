@@ -5,7 +5,7 @@ function createSocketServer(httpServer) {
         cors: { origin: "*" },
         perMessageDeflate: {
             threshold: 1024, // Compress only if message > 1KB
-        }
+        },
     });
 }
 
