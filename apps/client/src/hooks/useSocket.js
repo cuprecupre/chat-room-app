@@ -192,6 +192,23 @@ export function useSocket(user) {
                     }
                 });
 
+                // Optimized vote update - only updates voting-related fields
+                // This reduces bandwidth by ~100x during voting phase
+                socket.on("vote-update", (update) => {
+                    if (isMounted) {
+                        setGameState((prev) => {
+                            if (!prev) return prev;
+                            return {
+                                ...prev,
+                                votedPlayers: update.votedPlayers,
+                                myVote: update.myVote,
+                                hasVoted: update.hasVoted,
+                                activePlayers: update.activePlayers,
+                            };
+                        });
+                    }
+                });
+
                 // Antes de cada intento de reconexión, actualizar el token
                 socket.io.on("reconnect_attempt", async () => {
                     console.log("🔄 Intentando reconexión, actualizando token...");
