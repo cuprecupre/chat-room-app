@@ -222,8 +222,19 @@ class Game {
             this.initialPlayerCount = this.players.length;
             this.maxRounds = 3;
             this.phase = "lobby";
+
+            // CRITICAL FIX: Limpiar formerPlayers para evitar que el estado crezca infinitamente (>1MB)
+            // Solo mantenemos en formerPlayers a los jugadores que están actualmente conectados
+            this.formerPlayers = {};
+            this.players.forEach((p) => {
+                this.formerPlayers[p.uid] = {
+                    name: p.name,
+                    photoURL: p.photoURL || null,
+                };
+            });
+
             console.log(
-                `[Game ${this.gameId}] ✅ Nueva partida iniciada desde game_over. Jugadores: ${this.initialPlayerCount}, Max rondas: ${this.maxRounds}`
+                `[Game ${this.gameId}] ✅ Nueva partida iniciada desde game_over. Memory cleaned. Jugadores: ${this.initialPlayerCount}`
             );
         } else {
             console.log(
