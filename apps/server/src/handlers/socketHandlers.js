@@ -183,6 +183,7 @@ function handleGameAction(socket, user, gameId, action) {
 
 /**
  * Handle voting.
+ * Optimized: sends minimal vote updates during voting, full state only on phase change.
  */
 function handleCastVote(socket, user, { gameId, targetId }) {
     const game = gameManager.getGame(gameId);
@@ -193,8 +194,15 @@ function handleCastVote(socket, user, { gameId, targetId }) {
         return socket.emit("error-message", "No perteneces a esta partida.");
     }
     try {
-        game.castVote(user.uid, targetId);
-        gameManager.emitGameState(game);
+        const { phaseChanged, allVoted } = game.castVote(user.uid, targetId);
+
+        if (phaseChanged) {
+            // Phase changed (round ended, next turn, etc.) - send full state
+            gameManager.emitGameState(game);
+        } else {
+            // Just a vote - send minimal update (~100x less data)
+            gameManager.emitVoteUpdate(game, user.uid, targetId);
+        }
     } catch (error) {
         console.error(`Vote failed for game ${gameId}:`, error.message);
         socket.emit("error-message", error.message);
