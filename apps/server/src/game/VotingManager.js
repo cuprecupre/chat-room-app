@@ -21,7 +21,7 @@ function castVote(game, voterId, targetId) {
             delete game.votes[voterId];
             console.log(`[Game ${game.gameId}] ${voterId} desmarcó su voto`);
         }
-        return;
+        return { phaseChanged: false, allVoted: false };
     }
 
     if (voterId === targetId) {
@@ -43,8 +43,16 @@ function castVote(game, voterId, targetId) {
         `[Game ${game.gameId}] ${voterId} ${isChangingVote ? "cambió su voto a" : "votó a"} ${targetId}`
     );
 
+    // Capturar fase antes de verificar votación
+    const phaseBefore = game.phase;
+
     // Verificar si todos han votado
-    checkIfAllVoted(game);
+    const allVoted = checkIfAllVoted(game);
+
+    // Determinar si la fase cambió (votación terminó)
+    const phaseChanged = game.phase !== phaseBefore;
+
+    return { phaseChanged, allVoted };
 }
 
 function checkIfAllVoted(game) {
@@ -54,7 +62,9 @@ function checkIfAllVoted(game) {
     if (votedPlayers.length === activePlayers.length) {
         console.log(`[Game ${game.gameId}] Todos han votado. Procesando resultados...`);
         processVotingResults(game);
+        return true;
     }
+    return false;
 }
 
 function processVotingResults(game) {

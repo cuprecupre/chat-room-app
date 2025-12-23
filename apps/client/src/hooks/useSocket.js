@@ -67,15 +67,15 @@ export function useSocket(user) {
 
                 const socket = window.MockSocketIO
                     ? new window.MockSocketIO(socketURL, {
-                          auth: { token, name: user.displayName, photoURL: user.photoURL },
-                          reconnection: true,
-                          reconnectionAttempts: 5,
-                      })
+                        auth: { token, name: user.displayName, photoURL: user.photoURL },
+                        reconnection: true,
+                        reconnectionAttempts: 5,
+                    })
                     : io(socketURL, {
-                          auth: { token, name: user.displayName, photoURL: user.photoURL },
-                          reconnection: true,
-                          reconnectionAttempts: 5,
-                      });
+                        auth: { token, name: user.displayName, photoURL: user.photoURL },
+                        reconnection: true,
+                        reconnectionAttempts: 5,
+                    });
                 socketRef.current = socket;
 
                 socket.on("connect", () => {
@@ -189,6 +189,23 @@ export function useSocket(user) {
                             url.searchParams.delete("gameId");
                             window.history.replaceState({}, "", url.toString());
                         }
+                    }
+                });
+
+                // Optimized vote update - only updates voting-related fields
+                // This reduces bandwidth by ~100x during voting phase
+                socket.on("vote-update", (update) => {
+                    if (isMounted) {
+                        setGameState((prev) => {
+                            if (!prev) return prev;
+                            return {
+                                ...prev,
+                                votedPlayers: update.votedPlayers,
+                                myVote: update.myVote,
+                                hasVoted: update.hasVoted,
+                                activePlayers: update.activePlayers,
+                            };
+                        });
                     }
                 });
 

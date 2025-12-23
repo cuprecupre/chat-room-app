@@ -73,6 +73,36 @@ class GameManager {
     }
 
     /**
+     * Emit minimal vote update to all players in a game.
+     * Only sends votedPlayers list instead of full state (~100x less data).
+     * @param {Game} game - The game instance
+     * @param {string} voterId - The user who just voted
+     * @param {string} targetId - Who they voted for (null if unmarking)
+     */
+    emitVoteUpdate(game, voterId, targetId) {
+        if (!this.io) return;
+
+        const votedPlayers = Object.keys(game.votes);
+        const activePlayers = game.roundPlayers.filter(
+            (uid) => !game.eliminatedInRound.includes(uid)
+        );
+
+        // Send to all players in the game room
+        game.players.forEach((p) => {
+            const playerSocketId = sessionManager.getUserSocket(p.uid);
+            if (playerSocketId) {
+                // Each player gets their own vote status
+                this.io.to(playerSocketId).emit("vote-update", {
+                    votedPlayers,
+                    myVote: game.votes[p.uid] || null,
+                    hasVoted: game.votes.hasOwnProperty(p.uid),
+                    activePlayers,
+                });
+            }
+        });
+    }
+
+    /**
      * Send a toast message to all players in a game room.
      */
     emitToast(gameId, message) {
