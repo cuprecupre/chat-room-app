@@ -67,15 +67,15 @@ export function useSocket(user) {
 
                 const socket = window.MockSocketIO
                     ? new window.MockSocketIO(socketURL, {
-                        auth: { token, name: user.displayName, photoURL: user.photoURL },
-                        reconnection: true,
-                        reconnectionAttempts: 5,
-                    })
+                          auth: { token, name: user.displayName, photoURL: user.photoURL },
+                          reconnection: true,
+                          reconnectionAttempts: 5,
+                      })
                     : io(socketURL, {
-                        auth: { token, name: user.displayName, photoURL: user.photoURL },
-                        reconnection: true,
-                        reconnectionAttempts: 5,
-                    });
+                          auth: { token, name: user.displayName, photoURL: user.photoURL },
+                          reconnection: true,
+                          reconnectionAttempts: 5,
+                      });
                 socketRef.current = socket;
 
                 socket.on("connect", () => {
