@@ -50,7 +50,6 @@ function createMockGame() {
         phase: "lobby",
         playerScores: { user1: 0, user2: 0, user3: 0 },
         lastRoundScores: {},
-        persist: jest.fn(), // Mock persist for RoundManager calls
     };
 }
 
