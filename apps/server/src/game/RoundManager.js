@@ -105,6 +105,9 @@ function startNextTurn(game, wasTie = false) {
         `[Game ${game.gameId}] ✅ Vuelta ${game.currentTurn} iniciada. lastEliminatedInTurn:`,
         game.lastEliminatedInTurn
     );
+
+    // Persist after turn change (important for recovery)
+    game.persist();
 }
 
 function endRound(game, friendsWon) {
@@ -121,6 +124,9 @@ function endRound(game, friendsWon) {
         game.phase = "round_result";
         console.log(`[Game ${game.gameId}] Ronda ${game.roundCount} terminada.`);
     }
+
+    // Persist after phase change (critical for recovery)
+    game.persist();
 }
 
 module.exports = {

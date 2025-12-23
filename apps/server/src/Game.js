@@ -247,7 +247,8 @@ class Game {
 
     castVote(voterId, targetId) {
         VotingManager.castVote(this, voterId, targetId);
-        this.persist();
+        // Removed persist() - votes will be saved when phase changes
+        // This reduces Firestore writes by ~50%
     }
 
     getActivePlayers() {
