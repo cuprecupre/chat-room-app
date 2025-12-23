@@ -180,10 +180,9 @@ function handleGameAction(socket, user, gameId, action) {
         socket.emit("error-message", error.message);
     }
 }
-
 /**
  * Handle voting.
- * Optimized: sends minimal vote updates during voting, full state only on phase change.
+ * Optimized: sends minimal vote updates during voting, full state only when voting completes.
  */
 function handleCastVote(socket, user, { gameId, targetId }) {
     const game = gameManager.getGame(gameId);
@@ -196,8 +195,9 @@ function handleCastVote(socket, user, { gameId, targetId }) {
     try {
         const { phaseChanged, allVoted } = game.castVote(user.uid, targetId);
 
-        if (phaseChanged) {
-            // Phase changed (round ended, next turn, etc.) - send full state
+        // Send full state when voting completes (phase change OR turn change)
+        // This ensures clients receive currentTurn updates for turn transitions
+        if (phaseChanged || allVoted) {
             gameManager.emitGameState(game);
         } else {
             // Just a vote - send minimal update (~100x less data)

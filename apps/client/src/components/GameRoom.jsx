@@ -240,10 +240,10 @@ function PlayerList({
                                             size="sm"
                                             disabled={iVotedForThisPlayer && !canChangeVote}
                                             className={`!w-auto gap-2 px-4 ${iVotedForThisPlayer
-                                                    ? canChangeVote
-                                                        ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
-                                                        : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
-                                                    : ""
+                                                ? canChangeVote
+                                                    ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
+                                                    : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
+                                                : ""
                                                 }`}
                                         >
                                             <svg
