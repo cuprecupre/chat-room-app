@@ -2,35 +2,13 @@
 
 ## 🔒 Resiliencia y Detección de Errores
 
-### 1. Health Check Endpoint
+### 1. Health Check Endpoint [COMPLETADO]
 
-- **Prioridad:** Alta
-- **Descripción:** Crear endpoint `/health` que verifique:
-    - Estado del servidor
-    - Conexión a Firestore activa
-    - Socket.IO funcionando
-- **Beneficio:** Render puede alertar si el servidor está degradado
+- **Estado:** ✅ Implementado en `/api/health`
+- **Descripción:** Endpoint que verifica estado del servidor, Firestore y Socket.IO.
+- **Beneficio:** Render puede alertar si el servidor está degradado.
 
-### 2. Fail-Fast en Producción
-
-- **Prioridad:** Alta
-- **Descripción:** Modificar `db.js` para detener el servidor si Firestore no inicializa en producción
-- **Archivo:** `apps/server/src/services/db.js`
-- **Cambio:**
-
-```javascript
-catch (e) {
-  console.error("❌ [DB Service] Failed to initialize Firestore:", e.message);
-  if (process.env.NODE_ENV === 'production') {
-    console.error("🛑 [DB Service] Critical: Shutting down server");
-    process.exit(1);
-  }
-}
-```
-
-- **Beneficio:** Evita que el servidor corra sin persistencia activa
-
-### 3. Test de Integración para DBService
+### 2. Test de Integración para DBService
 
 - **Prioridad:** Media
 - **Descripción:** Test que verifique que `dbService.initialize()` funciona correctamente
@@ -41,15 +19,21 @@ catch (e) {
 
 ## ⚡ Optimizaciones de Rendimiento
 
-### 4. Code Splitting (Lazy Loading)
+### 3. Code Splitting (Lazy Loading) [COMPLETADO]
 
-- **Prioridad:** Alta
-- **Descripción:** Dividir el bundle del cliente en chunks más pequeños
-- **Archivos:** `apps/client/src/routes/AppRouter.jsx`
+- **Estado:** ✅ Implementado en `AppRouter.jsx`
+- **Descripción:** Páginas cargadas bajo demanda con `React.lazy()` y `Suspense`.
+- **Beneficio:** Reduce tiempo de carga inicial.
+
+### 4. Play Again State Reset
+
+- **Prioridad:** Media
+- **Descripción:** Optimizar el reinicio de partida para no reenviar todo el estado
+- **Archivos:** `apps/server/src/Game.js`
 - **Cambios:**
-    - Usar `React.lazy()` para cargar páginas bajo demanda
-    - Implementar `Suspense` con fallback de loading
-- **Beneficio:** Reduce tiempo de carga inicial (~30-40% menos JS)
+    - Limpiar solo campos necesarios
+    - Mantener datos de jugadores conectados
+- **Beneficio:** Transición más rápida entre partidas
 
 ### 5. Delta Updates (Actualizaciones Incrementales)
 
@@ -61,17 +45,7 @@ catch (e) {
     - Enviar solo propiedades modificadas via Socket.IO
 - **Beneficio:** Reduce hasta 80% el bandwidth en actualizaciones frecuentes
 
-### 6. Play Again State Reset
-
-- **Prioridad:** Media
-- **Descripción:** Optimizar el reinicio de partida para no reenviar todo el estado
-- **Archivos:** `apps/server/src/Game.js`
-- **Cambios:**
-    - Limpiar solo campos necesarios
-    - Mantener datos de jugadores conectados
-- **Beneficio:** Transición más rápida entre partidas
-
-### 7. Binary Serialization (MessagePack)
+### 6. Binary Serialization (MessagePack)
 
 - **Prioridad:** Baja
 - **Descripción:** Usar MessagePack en vez de JSON para Socket.IO

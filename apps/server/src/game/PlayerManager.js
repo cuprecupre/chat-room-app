@@ -1,16 +1,25 @@
 function addPlayer(game, user) {
     if (!game.players.some((p) => p.uid === user.uid)) {
         const joinedAt = Date.now();
+        // Sanitize photoURL to avoid massive Base64 strings causing DB/Socket lag
+        let safePhotoURL = user.photoURL || null;
+        if (safePhotoURL && safePhotoURL.length > 500) {
+            console.warn(
+                `[PlayerManager] Warning: PhotoURL for ${user.uid} is too long (${safePhotoURL.length} chars). Truncating.`
+            );
+            safePhotoURL = null; // Discard invalid/huge URLs
+        }
+
         game.players.push({
             uid: user.uid,
             name: user.name,
-            photoURL: user.photoURL || null,
+            photoURL: safePhotoURL,
             joinedAt: joinedAt,
         });
         // Guardar copia de datos del jugador
         game.formerPlayers[user.uid] = {
             name: user.name,
-            photoURL: user.photoURL || null,
+            photoURL: safePhotoURL,
         };
         // Inicializar puntuación del jugador
         game.playerScores[user.uid] = 0;

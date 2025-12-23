@@ -101,6 +101,31 @@ function getStateForPlayer(game, userId) {
     // Always include formerPlayers for showing scores
     baseState.formerPlayers = game.formerPlayers;
 
+    // DIAGNOSTIC: Detect bloated state
+    try {
+        const jsonStr = JSON.stringify(baseState);
+        if (jsonStr.length > 50000) {
+            // Log if > 50KB (adjusted for visibility)
+            console.warn(
+                `[GameStateSerializer] ⚠️ LARGE STATE DETECTED: ${(jsonStr.length / 1024).toFixed(2)} KB`
+            );
+            console.warn(
+                ` - Players: ${(JSON.stringify(baseState.players).length / 1024).toFixed(2)} KB`
+            );
+            console.warn(
+                ` - FormerPlayers: ${(JSON.stringify(baseState.formerPlayers).length / 1024).toFixed(2)} KB`
+            );
+            console.warn(
+                ` - History/Voted: ${(JSON.stringify(baseState.turnHistory || []).length / 1024).toFixed(2)} KB`
+            );
+            console.warn(
+                ` - LastRoundScores: ${(JSON.stringify(baseState.lastRoundScores).length / 1024).toFixed(2)} KB`
+            );
+        }
+    } catch (e) {
+        console.error("[GameStateSerializer] Error analyzing state size:", e);
+    }
+
     return baseState;
 }
 
