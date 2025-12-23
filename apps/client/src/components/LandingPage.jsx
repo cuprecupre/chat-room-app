@@ -198,14 +198,17 @@ export function LandingPage({
                         </div>
                     </div>
 
-                    <h2 className="flex flex-col items-center gap-3 md:gap-4 animate-fadeIn animate-delay-400 drop-shadow-2xl">
+                    <h1 className="flex flex-col items-center gap-2 md:gap-3 animate-fadeIn animate-delay-400 drop-shadow-2xl">
+                        <span className="text-xl md:text-2xl font-serif font-normal text-neutral-400">
+                            Juega ahora a
+                        </span>
                         <span className="text-4xl md:text-6xl/tight lg:text-7xl/tight font-serif font-normal text-white">
-                            El Impostor está entre nosotros.
+                            El Impostor Online Gratis con tus amigos.
                         </span>
                         <span className="text-3xl md:text-5xl font-serif font-normal tracking-tight mt-1 bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600">
-                            ¿Podrás descubrirlo?
+                            Descubre quién miente.
                         </span>
-                    </h2>
+                    </h1>
 
                     <div className="space-y-2 mt-2">
                         <p className="text-base md:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed animate-fadeIn animate-delay-500 font-light">
@@ -346,9 +349,9 @@ export function LandingPage({
                 <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-orange-600/5 rounded-full blur-[100px] pointer-events-none" />
 
                 <div className="max-w-4xl mx-auto text-center mb-20 relative z-10">
-                    <h1 className="text-xl md:text-2xl text-orange-400 font-sans font-normal leading-relaxed animate-fadeIn">
-                        Juega ahora a El Impostor Online GRATIS con tus amigos.
-                    </h1>
+                    <h2 className="text-xl md:text-2xl text-orange-400 font-sans font-normal leading-relaxed animate-fadeIn">
+                        El juego viral de TikTok e Instagram. ¿Quién es el impostor?
+                    </h2>
                 </div>
 
                 <div className="max-w-7xl mx-auto relative z-10">
@@ -369,7 +372,7 @@ export function LandingPage({
                             <div className="absolute inset-0 pointer-events-none">
                                 <img
                                     src={cardImg}
-                                    alt=""
+                                    alt="Carta del juego impostor"
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                                 />
                             </div>
@@ -404,7 +407,7 @@ export function LandingPage({
                             <div className="absolute inset-0 pointer-events-none">
                                 <img
                                     src={dualImpostorImg}
-                                    alt=""
+                                    alt="Jugar al impostor online"
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                                 />
                             </div>
@@ -436,7 +439,7 @@ export function LandingPage({
                             <div className="absolute inset-0 pointer-events-none">
                                 <img
                                     src={clockImg}
-                                    alt=""
+                                    alt="Votación en el juego impostor"
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                                 />
                             </div>
@@ -534,23 +537,21 @@ export function LandingPage({
                             {reviews.map((review, index) => (
                                 <div
                                     key={index}
-                                    className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${
-                                        index === currentReview
-                                            ? "animate-verbatim-in z-10 relative"
-                                            : "animate-verbatim-out z-0 pointer-events-none absolute" // Keep absolute for exiting items to prevent layout jumps if they were different sizes, or just relative if strictly stacking
-                                    }`}
-                                    // Note: If we want the container to ALWAYS hold the height of the TALLEST, we should make them all relative (grid items).
-                                    // BUT, if we want them to cross-fade, one might need to be absolute to not push the other?
-                                    // Actually in CSS Grid, overlapping items (col-start-1 row-start-1) Sit on top of each other without pushing.
-                                    // So they act like layers. The grid cell grows to fit the tallest layer.
-                                    // So we can remove 'absolute' from here entirely!
+                                    className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${index === currentReview
+                                        ? "animate-verbatim-in z-10 relative"
+                                        : "animate-verbatim-out z-0 pointer-events-none absolute" // Keep absolute for exiting items to prevent layout jumps if they were different sizes, or just relative if strictly stacking
+                                        }`}
+                                // Note: If we want the container to ALWAYS hold the height of the TALLEST, we should make them all relative (grid items).
+                                // BUT, if we want them to cross-fade, one might need to be absolute to not push the other?
+                                // Actually in CSS Grid, overlapping items (col-start-1 row-start-1) Sit on top of each other without pushing.
+                                // So they act like layers. The grid cell grows to fit the tallest layer.
+                                // So we can remove 'absolute' from here entirely!
                                 >
                                     <div
-                                        className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${
-                                            index === currentReview
-                                                ? "animate-verbatim-in z-10 opacity-100"
-                                                : "animate-verbatim-out z-0 opacity-0 pointer-events-none"
-                                        }`}
+                                        className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${index === currentReview
+                                            ? "animate-verbatim-in z-10 opacity-100"
+                                            : "animate-verbatim-out z-0 opacity-0 pointer-events-none"
+                                            }`}
                                     >
                                         <div className="bg-neutral-950 border border-white/5 p-8 md:p-10 rounded-3xl relative overflow-hidden shadow-2xl mx-auto max-w-2xl">
                                             <div className="flex flex-col gap-6">
@@ -604,11 +605,10 @@ export function LandingPage({
                         {faqs.map((faq, index) => (
                             <div
                                 key={index}
-                                className={`group border rounded-2xl overflow-hidden transition-all duration-300 ${
-                                    openFaq === index
-                                        ? "bg-neutral-900 border-orange-500/50 ring-1 ring-orange-500/20"
-                                        : "border-white/10 hover:border-orange-500/30 hover:bg-neutral-900/50"
-                                }`}
+                                className={`group border rounded-2xl overflow-hidden transition-all duration-300 ${openFaq === index
+                                    ? "bg-neutral-900 border-orange-500/50 ring-1 ring-orange-500/20"
+                                    : "border-white/10 hover:border-orange-500/30 hover:bg-neutral-900/50"
+                                    }`}
                             >
                                 <button
                                     onClick={() => toggleFaq(index)}
@@ -638,11 +638,10 @@ export function LandingPage({
                                     </span>
                                 </button>
                                 <div
-                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                                        openFaq === index
-                                            ? "max-h-48 opacity-100"
-                                            : "max-h-0 opacity-0"
-                                    }`}
+                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${openFaq === index
+                                        ? "max-h-48 opacity-100"
+                                        : "max-h-0 opacity-0"
+                                        }`}
                                 >
                                     <div className="p-6 pt-0 text-neutral-300 leading-relaxed">
                                         {faq.answer}
