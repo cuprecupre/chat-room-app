@@ -12,7 +12,7 @@ import { UnauthenticatedLayout } from "../layouts/UnauthenticatedLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { ROUTES } from "./routes";
 import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
-import heroImg from "../assets/impostor-home.png";
+import heroImg from "../assets/impostor-home.jpg";
 
 // Handle ChunkLoadError during deploys - auto reload when old chunks are gone
 if (typeof window !== "undefined") {

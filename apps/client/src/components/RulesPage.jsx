@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "./ui/Button";
-import heroImg from "../assets/impostor-home.png";
+import heroImg from "../assets/impostor-home.jpg";
 
 export function RulesPage() {
     return (
