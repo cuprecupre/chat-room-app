@@ -1,4 +1,4 @@
-import heroImg from "../assets/impostor-home.png";
+import heroImg from "../assets/impostor-home.jpg";
 
 /**
  * InvitationCard - Shared UI component for invitation screens
@@ -21,9 +21,8 @@ export function InvitationCard({
                         <img
                             src={heroImg}
                             alt="Invitación"
-                            className={`w-24 h-24 rounded-full object-cover ring-4 shadow-2xl ${
-                                isError ? "ring-red-500/20 grayscale" : "ring-orange-500/30"
-                            }`}
+                            className={`w-24 h-24 rounded-full object-cover ring-4 shadow-2xl ${isError ? "ring-red-500/20 grayscale" : "ring-orange-500/30"
+                                }`}
                         />
                         {isError && (
                             <div className="absolute -bottom-2 -right-2 bg-neutral-900 rounded-full p-2 border border-neutral-800">
