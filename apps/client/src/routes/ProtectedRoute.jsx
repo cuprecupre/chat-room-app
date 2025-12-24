@@ -2,8 +2,8 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { Spinner } from "../components/ui/Spinner";
 import { Button } from "../components/ui/Button";
-import heroImg from "../assets/impostor-home.png";
-import bellImg from "../assets/bell.png";
+import heroImg from "../assets/impostor-home.jpg";
+import bellImg from "../assets/bell.jpg";
 import { ROUTES } from "./routes";
 import { showToast } from "../lib/toast";
 

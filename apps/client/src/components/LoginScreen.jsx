@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Button } from "./ui/Button";
 import { Spinner } from "./ui/Spinner";
-import heroImg from "../assets/impostor-home.png";
+import heroImg from "../assets/impostor-home.jpg";
 
 export function LoginScreen({
     onLogin,

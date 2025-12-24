@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "./ui/Button";
 import { Spinner } from "./ui/Spinner";
-import heroImg from "../assets/impostor-home.png";
+import heroImg from "../assets/impostor-home.jpg";
 
 const STORAGE_KEY = "emailAuth:state";
 
