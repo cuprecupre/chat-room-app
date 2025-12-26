@@ -43,7 +43,9 @@ function removePlayer(game, userId) {
 
     game.players = game.players.filter((p) => p.uid !== userId);
     game.roundPlayers = game.roundPlayers.filter((uid) => uid !== userId);
-    game.eliminatedInRound = game.eliminatedInRound.filter((uid) => uid !== userId);
+    if (game.eliminatedPlayers) {
+        game.eliminatedPlayers = game.eliminatedPlayers.filter((uid) => uid !== userId);
+    }
     delete game.votes[userId];
 
     // Actualizar orden base cuando un jugador se va
@@ -90,19 +92,21 @@ function calculateStartingPlayer(game) {
         return null;
     }
 
-    const roundIndex = (game.roundCount - 1) % eligiblePlayers.length;
+    const roundIndex = ((game.currentRound || 1) - 1) % eligiblePlayers.length;
     const startingPlayerId = eligiblePlayers[roundIndex];
 
     const startingPlayer = game.players.find((p) => p.uid === startingPlayerId);
     console.log(
-        `[Game ${game.gameId}] Ronda ${game.roundCount}: Jugador inicial = ${startingPlayer?.name} (índice ${roundIndex} de ${eligiblePlayers.length} elegibles)`
+        `[Game ${game.gameId}] Ronda ${game.currentRound}: Jugador inicial = ${startingPlayer?.name} (índice ${roundIndex} de ${eligiblePlayers.length} elegibles)`
     );
 
     return startingPlayerId;
 }
 
 function getActivePlayers(game) {
-    return game.roundPlayers.filter((uid) => !game.eliminatedInRound.includes(uid));
+    const eliminated = game.eliminatedPlayers || [];
+    const roundPlayers = game.roundPlayers || [];
+    return roundPlayers.filter((uid) => !eliminated.includes(uid));
 }
 
 module.exports = {

@@ -1,17 +1,39 @@
-const { endRound, startNextTurn } = require("./RoundManager");
+/**
+ * VotingManager - Nueva Versión
+ * 
+ * Cambios clave:
+ * - Empates: impostor SÍ recibe puntos y pasa a siguiente ronda
+ * - Muerte súbita: si quedan 2 jugadores, impostor gana
+ * - No hay "vueltas" dentro de rondas, cada ronda es una votación
+ */
+
+const { endRound, startNextRound, handleSuddenDeath } = require("./RoundManager");
+const { giveImpostorSurvivalPoints } = require("./ScoringManager");
 const { getActivePlayers } = require("./PlayerManager");
 
 function castVote(game, voterId, targetId) {
+    // Debug log
+    console.log(`[Vote Debug] Game ${game.gameId}:`, {
+        phase: game.phase,
+        roundPlayers: game.roundPlayers,
+        eliminatedPlayers: game.eliminatedPlayers,
+        voterId,
+        targetId
+    });
+
     // Validaciones
     if (game.phase !== "playing") {
         throw new Error("Solo puedes votar durante una ronda activa.");
     }
 
-    if (game.eliminatedInRound.includes(voterId)) {
+    const eliminated = game.eliminatedPlayers || [];
+    const roundPlayers = game.roundPlayers || [];
+
+    if (eliminated.includes(voterId)) {
         throw new Error("Los jugadores eliminados no pueden votar.");
     }
 
-    if (!game.roundPlayers.includes(voterId)) {
+    if (!roundPlayers.includes(voterId)) {
         throw new Error("No estás participando en esta ronda.");
     }
 
@@ -28,11 +50,11 @@ function castVote(game, voterId, targetId) {
         throw new Error("No puedes votarte a ti mismo.");
     }
 
-    if (game.eliminatedInRound.includes(targetId)) {
+    if (eliminated.includes(targetId)) {
         throw new Error("No puedes votar a un jugador eliminado.");
     }
 
-    if (!game.roundPlayers.includes(targetId)) {
+    if (!roundPlayers.includes(targetId)) {
         throw new Error("Ese jugador no está en esta ronda.");
     }
 
@@ -97,59 +119,67 @@ function processVotingResults(game) {
 
     console.log(`[Game ${game.gameId}] Más votados:`, mostVoted, `con ${maxVotes} votos`);
 
-    // Guardar historial
-    game.turnHistory.push({
-        turn: game.currentTurn,
+    // Guardar historial de la ronda
+    game.roundHistory = game.roundHistory || [];
+    game.roundHistory.push({
+        round: game.currentRound,
         votes: { ...game.votes },
         voteCount: { ...voteCount },
         eliminated: mostVoted.length === 1 ? mostVoted[0] : null,
-        tie: mostVoted.length > 1 || mostVoted.length === 0,
+        tie: mostVoted.length !== 1,
     });
 
-    // Manejar empate o sin votos
+    // Manejar empate o sin votos válidos
     if (mostVoted.length !== 1) {
         const reason =
             mostVoted.length === 0 ? "sin votos" : `empate entre: ${mostVoted.join(", ")}`;
         console.log(`[Game ${game.gameId}] No hay eliminación (${reason}).`);
 
-        if (game.currentTurn >= game.maxTurns) {
-            console.log(
-                `[Game ${game.gameId}] Vuelta 3 completada sin eliminación. ¡El impostor gana!`
-            );
-            endRound(game, false);
+        // NUEVO: En empate, el impostor SÍ recibe puntos
+        giveImpostorSurvivalPoints(game);
+
+        if (game.currentRound >= game.maxRounds) {
+            // Ronda 3 con empate: impostor gana (puntos ya dados arriba)
+            console.log(`[Game ${game.gameId}] Ronda 3 con empate. ¡El impostor gana!`);
+            game.winnerId = game.impostorId;
+            game.phase = "game_over";
+            game.persist();
         } else {
-            console.log(`[Game ${game.gameId}] Empate: siguiente vuelta sin puntos.`);
-            game.lastEliminatedInTurn = null;
-            startNextTurn(game, true);
+            // Siguiente ronda
+            console.log(`[Game ${game.gameId}] Empate: impostor recibe puntos. Siguiente ronda.`);
+            game.phase = "round_result";
+            game.persist();
         }
         return;
     }
 
-    // Expulsar al más votado
+    // Hay un jugador claramente más votado
     const eliminatedId = mostVoted[0];
-    game.eliminatedInRound.push(eliminatedId);
-    console.log(`[Game ${game.gameId}] ${eliminatedId} ha sido eliminado.`);
 
     // Verificar si era el impostor
     if (eliminatedId === game.impostorId) {
         console.log(`[Game ${game.gameId}] ¡El impostor fue descubierto!`);
-        endRound(game, true);
+        endRound(game, true);  // Amigos ganan
     } else {
-        // Era un amigo, verificar cuántos quedan
-        const activePlayers = getActivePlayers(game);
+        // Era un amigo - eliminarlo
+        game.eliminatedPlayers = game.eliminatedPlayers || [];
+        game.eliminatedPlayers.push(eliminatedId);
+        console.log(`[Game ${game.gameId}] ${eliminatedId} ha sido eliminado (era amigo).`);
 
-        // Si solo quedan 2 jugadores (impostor + 1 amigo), el impostor gana automáticamente
-        if (activePlayers.length <= 2) {
-            console.log(
-                `[Game ${game.gameId}] Solo quedan 2 jugadores. ¡El impostor gana automáticamente!`
-            );
-            endRound(game, false);
-        } else if (game.currentTurn >= game.maxTurns) {
-            console.log(`[Game ${game.gameId}] Tercera vuelta completada. ¡El impostor gana!`);
+        // Recalcular jugadores activos
+        const remainingPlayers = getActivePlayers(game);
+
+        // Verificar muerte súbita (solo quedan 2 jugadores = impostor + 1 amigo)
+        if (remainingPlayers.length <= 2) {
+            console.log(`[Game ${game.gameId}] ¡Muerte súbita! Solo quedan 2 jugadores.`);
+            handleSuddenDeath(game);
+        } else if (game.currentRound >= game.maxRounds) {
+            // Ronda 3 completada, impostor sobrevive
+            console.log(`[Game ${game.gameId}] Ronda 3 completada. ¡El impostor gana!`);
             endRound(game, false);
         } else {
-            game.lastEliminatedInTurn = eliminatedId;
-            startNextTurn(game);
+            // Impostor sobrevive, siguiente ronda
+            endRound(game, false);
         }
     }
 }

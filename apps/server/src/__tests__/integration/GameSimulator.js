@@ -1,6 +1,6 @@
 /**
  * GameSimulator - Utility for E2E game testing
- * LOCAL ONLY - Do not commit to repository
+ * Updated for new scoring system (no turns, 3 rounds, same impostor)
  */
 
 const Game = require("../../Game");
@@ -51,8 +51,9 @@ class GameSimulator {
 
     allVoteFor(targetIndex) {
         const results = [];
+        const eliminated = this.game.eliminatedPlayers || [];
         const activePlayers = this.game.roundPlayers.filter(
-            (uid) => !this.game.eliminatedInRound.includes(uid)
+            (uid) => !eliminated.includes(uid)
         );
         activePlayers.forEach((uid) => {
             const voterIndex = this.users.findIndex((u) => u.uid === uid);
@@ -69,8 +70,9 @@ class GameSimulator {
     }
 
     createTieVote() {
+        const eliminated = this.game.eliminatedPlayers || [];
         const activePlayers = this.game.roundPlayers.filter(
-            (uid) => !this.game.eliminatedInRound.includes(uid)
+            (uid) => !eliminated.includes(uid)
         );
         const results = [];
         activePlayers.forEach((uid, i) => {
@@ -83,17 +85,19 @@ class GameSimulator {
     }
 
     getState() {
+        const eliminated = this.game.eliminatedPlayers || [];
         return {
             phase: this.game.phase,
-            currentTurn: this.game.currentTurn,
-            roundCount: this.game.roundCount,
-            eliminatedInRound: this.game.eliminatedInRound,
-            lastEliminatedInTurn: this.game.lastEliminatedInTurn,
+            currentRound: this.game.currentRound,
+            maxRounds: this.game.maxRounds,
+            eliminatedPlayers: eliminated,
             impostorId: this.game.impostorId,
+            winnerId: this.game.winnerId,
             votes: { ...this.game.votes },
             playerCount: this.game.players.length,
+            playerScores: { ...this.game.playerScores },
             activePlayerCount: this.game.roundPlayers.filter(
-                (uid) => !this.game.eliminatedInRound.includes(uid)
+                (uid) => !eliminated.includes(uid)
             ).length,
         };
     }
@@ -107,12 +111,27 @@ class GameSimulator {
     }
 
     getNonImpostorIndex() {
+        const eliminated = this.game.eliminatedPlayers || [];
         return this.users.findIndex(
             (u) =>
                 u.uid !== this.game.impostorId &&
                 this.game.roundPlayers.includes(u.uid) &&
-                !this.game.eliminatedInRound.includes(u.uid)
+                !eliminated.includes(u.uid)
         );
+    }
+
+    continueToNextRound() {
+        if (this.game.phase === "round_result") {
+            this.game.continueToNextRound();
+            this._captureState("Continued to next round");
+        }
+        return this;
+    }
+
+    playAgain() {
+        this.game.playAgain(this.users[0].uid);
+        this._captureState("Started new match");
+        return this;
     }
 
     _captureState(action) {
@@ -123,7 +142,7 @@ class GameSimulator {
         console.log("\n=== Game State History ===");
         this.stateHistory.forEach((entry, i) => {
             console.log(`\n[${i}] ${entry.action}`);
-            console.log(`    Phase: ${entry.state.phase}, Turn: ${entry.state.currentTurn}`);
+            console.log(`    Phase: ${entry.state.phase}, Round: ${entry.state.currentRound}`);
         });
     }
 }

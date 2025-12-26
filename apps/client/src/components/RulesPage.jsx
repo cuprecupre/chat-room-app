@@ -112,16 +112,15 @@ export function RulesPage() {
                         <section className="space-y-4">
                             <h3 className="text-2xl text-orange-500 font-serif">Objetivo</h3>
                             <p className="text-neutral-300 text-lg leading-relaxed">
-                                Gana el primero en alcanzar{" "}
-                                <strong className="text-orange-400">15 puntos</strong>. Si tras 3
-                                partidas nadie llega, gana quien tenga más puntos.
+                                Cada partida tiene <strong className="text-orange-400">3 rondas</strong> con el mismo Impostor.
+                                El objetivo depende de tu rol:
                             </p>
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div className="bg-neutral-900 p-5 rounded-xl">
                                     <h4 className="text-white font-semibold mb-2">Como Amigo</h4>
                                     <p className="text-neutral-400">
-                                        Identificar y expulsar al Impostor para proteger la palabra
-                                        secreta.
+                                        Identificar y expulsar al Impostor antes de que termine la ronda 3.
+                                        Gana el <strong className="text-white">amigo con más puntos</strong>.
                                     </p>
                                 </div>
                                 <div className="bg-neutral-900 p-5 rounded-xl">
@@ -129,7 +128,7 @@ export function RulesPage() {
                                         Como Impostor
                                     </h4>
                                     <p className="text-neutral-400">
-                                        Fingir conocer la palabra, pasar desapercibido y sobrevivir.
+                                        Sobrevivir las 3 rondas sin ser descubierto. Si lo logras, <strong className="text-orange-400">ganas automáticamente</strong>.
                                     </p>
                                 </div>
                             </div>
@@ -209,9 +208,8 @@ export function RulesPage() {
                                             Resolución
                                         </h4>
                                         <p className="text-neutral-300">
-                                            Si el Impostor es expulsado, ganan los Amigos. Si se
-                                            expulsa a un Amigo, el Impostor gana puntos y sigue la
-                                            partida (hasta 3 rondas).
+                                            Si el Impostor es expulsado, gana el <strong className="text-white">amigo con más puntos</strong>.
+                                            Si un amigo es expulsado o hay empate, el Impostor recibe puntos y sigue la partida.
                                         </p>
                                     </div>
                                 </div>
@@ -228,14 +226,13 @@ export function RulesPage() {
                                     </h4>
                                     <ul className="text-neutral-300 space-y-2">
                                         <li>
-                                            • <strong>+1 punto</strong> por votar correctamente al
-                                            Impostor.
-                                        </li>
-                                        <li>
-                                            • <strong>+1 punto</strong> extra si el Impostor es
-                                            expulsado.
+                                            • <strong>+2 puntos</strong> por votar correctamente al
+                                            Impostor (individual).
                                         </li>
                                     </ul>
+                                    <p className="text-neutral-500 text-sm mt-3">
+                                        Máximo posible: 6 puntos (2 por ronda)
+                                    </p>
                                 </div>
                                 <div className="bg-orange-900/10 p-5 rounded-xl">
                                     <h4 className="text-orange-400 font-semibold mb-3 text-lg">
@@ -243,17 +240,23 @@ export function RulesPage() {
                                     </h4>
                                     <ul className="text-neutral-300 space-y-2">
                                         <li>
-                                            • <strong>+2 puntos</strong> por sobrevivir ronda 1.
+                                            • <strong>+3 puntos</strong> por sobrevivir ronda 1.
                                         </li>
                                         <li>
-                                            • <strong>+3 puntos</strong> por sobrevivir ronda 2.
+                                            • <strong>+2 puntos</strong> por sobrevivir ronda 2.
                                         </li>
                                         <li>
-                                            • <strong>+4 puntos</strong> por ganar (ronda 3 o
-                                            final).
+                                            • <strong>+2 puntos</strong> por ganar ronda 3.
                                         </li>
                                     </ul>
+                                    <p className="text-neutral-500 text-sm mt-3">
+                                        Máximo posible: 7 puntos
+                                    </p>
                                 </div>
+                            </div>
+                            <div className="bg-neutral-800/50 p-4 rounded-lg text-neutral-400 text-sm">
+                                <strong className="text-orange-400">Empates:</strong> Si hay empate en la votación,
+                                nadie es eliminado y el Impostor recibe sus puntos de esa ronda.
                             </div>
                         </section>
                     </div>

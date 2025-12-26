@@ -133,6 +133,7 @@ function AppRoutes({
     const startGame = useCallback(() => emit("start-game", gameState?.gameId), [emit, gameState]);
     const endGame = useCallback(() => emit("end-game", gameState?.gameId), [emit, gameState]);
     const playAgain = useCallback(() => emit("play-again", gameState?.gameId), [emit, gameState]);
+    const migrateGame = useCallback(() => emit("migrate-game", gameState?.gameId), [emit, gameState]);
     const leaveGame = useCallback(() => {
         if (gameState?.gameId) {
             // Remove gameId from URL immediately to prevent accidental reopen
@@ -341,6 +342,7 @@ function AppRoutes({
                                         onStartGame={startGame}
                                         onEndGame={endGame}
                                         onPlayAgain={playAgain}
+                                        onMigrateGame={migrateGame}
                                         onLeaveGame={leaveGame}
                                         onVote={castVote}
                                     />

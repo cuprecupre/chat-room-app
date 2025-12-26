@@ -28,7 +28,7 @@ function PlayerList({
     const canVote = isPlaying && gameState?.canVote;
     const hasVoted = gameState?.hasVoted;
     const votedPlayers = gameState?.votedPlayers || [];
-    const eliminatedPlayers = gameState?.eliminatedInRound || [];
+    const eliminatedPlayers = gameState?.eliminatedPlayers || [];
     const activePlayers = gameState?.activePlayers || [];
     const myVote = gameState?.myVote || null; // A quién voté yo
     const playerScores = gameState?.playerScores || {};
@@ -44,9 +44,9 @@ function PlayerList({
     const isTie = gameState?.winner === "Empate";
     const winners = isTie
         ? (() => {
-              const maxScore = Math.max(...Object.values(playerScores));
-              return players.filter((player) => (playerScores[player.uid] || 0) === maxScore);
-          })()
+            const maxScore = Math.max(...Object.values(playerScores));
+            return players.filter((player) => (playerScores[player.uid] || 0) === maxScore);
+        })()
         : [];
 
     // Si hay 3 o más ganadores, no hay ganadores reales
@@ -239,13 +239,12 @@ function PlayerList({
                                             variant="outline"
                                             size="sm"
                                             disabled={iVotedForThisPlayer && !canChangeVote}
-                                            className={`!w-auto gap-2 px-4 ${
-                                                iVotedForThisPlayer
-                                                    ? canChangeVote
-                                                        ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
-                                                        : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
-                                                    : ""
-                                            }`}
+                                            className={`!w-auto gap-2 px-4 ${iVotedForThisPlayer
+                                                ? canChangeVote
+                                                    ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
+                                                    : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
+                                                : ""
+                                                }`}
                                         >
                                             <svg
                                                 className="w-4 h-4"
@@ -391,6 +390,7 @@ export function GameRoom({
     onStartGame,
     onEndGame,
     onPlayAgain,
+    onMigrateGame,
     onLeaveGame,
     onCopyLink,
     onCopyGameCode,
@@ -403,7 +403,7 @@ export function GameRoom({
     const capitalize = (s) =>
         typeof s === "string" && s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s;
     const prevPlayersRef = useRef(state.players);
-    const prevTurnRef = useRef(state.currentTurn);
+    const prevTurnRef = useRef(state.currentRound);
     const prevPhaseRef = useRef(state.phase);
     const [reveal, setReveal] = useState(false);
     const [showTurnOverlay, setShowTurnOverlay] = useState(false);
@@ -452,23 +452,16 @@ export function GameRoom({
 
     // Detectar cambio de ronda y mostrar overlay
     useEffect(() => {
-        const prevTurn = prevTurnRef.current;
-        const currentTurn = state.currentTurn;
+        const prevRound = prevTurnRef.current;
+        const currentRound = state.currentRound;
 
         // Si la ronda cambió y es ronda 2 o superior (nueva ronda), mostrar overlay y resetear carta
-        if (state.phase === "playing" && prevTurn && currentTurn > prevTurn && currentTurn > 1) {
+        if (state.phase === "playing" && prevRound && currentRound > prevRound && currentRound > 1) {
             // Resetear carta al estado frontal
             setReveal(false);
 
-            // Buscar al jugador eliminado en la vuelta anterior
-            const lastEliminatedId = state.lastEliminatedInTurn;
-            if (lastEliminatedId) {
-                const eliminatedPlayer = state.players.find((p) => p.uid === lastEliminatedId);
-                setEliminatedPlayerInfo(eliminatedPlayer || null);
-            } else {
-                // No hubo eliminación (empate)
-                setEliminatedPlayerInfo(null);
-            }
+            // No hay jugador eliminado entre rondas (solo en round_result)
+            setEliminatedPlayerInfo(null);
 
             setShowTurnOverlay(true);
             setIsOverlayClosing(false);
@@ -487,8 +480,8 @@ export function GameRoom({
             }, 2700);
         }
 
-        prevTurnRef.current = currentTurn;
-    }, [state.currentTurn, state.phase, state.lastEliminatedInTurn, state.players]);
+        prevTurnRef.current = currentRound;
+    }, [state.currentRound, state.phase, state.players]);
 
     // Resetear carta cuando empieza una nueva partida (playing)
     useEffect(() => {
@@ -556,6 +549,61 @@ export function GameRoom({
 
     return (
         <div className="w-full flex flex-col items-center space-y-3 md:space-y-6">
+            {/* Pantalla de migración para partidas con sistema antiguo */}
+            {state.phase === "needs_migration" && (
+                <div className="w-full max-w-sm mx-auto text-center space-y-6 py-8">
+                    <div className="mx-auto w-24 h-24 bg-orange-500/20 rounded-full flex items-center justify-center">
+                        <span className="text-5xl">🔄</span>
+                    </div>
+
+                    <div className="space-y-3">
+                        <h2 className="text-3xl font-serif text-neutral-50">
+                            ¡Nueva versión disponible!
+                        </h2>
+                        <p className="text-neutral-400 text-lg leading-relaxed">
+                            Hemos mejorado el sistema de juego.
+                            <br />
+                            Tu partida anterior necesita actualizarse.
+                        </p>
+                    </div>
+
+                    <div className="bg-white/5 rounded-xl p-5 text-left space-y-3">
+                        <p className="text-neutral-300 text-sm">
+                            <strong className="text-orange-400">¿Qué pasará?</strong>
+                        </p>
+                        <ul className="text-neutral-400 text-sm space-y-2">
+                            <li className="flex items-start gap-2">
+                                <span className="text-green-400">✓</span>
+                                <span>Se creará una nueva sala automáticamente</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-green-400">✓</span>
+                                <span>Todos los jugadores serán movidos juntos</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-green-400">✓</span>
+                                <span>Podrán empezar una nueva partida inmediatamente</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {isHost ? (
+                        <Button
+                            onClick={onMigrateGame}
+                            variant="primary"
+                            size="lg"
+                            className="w-full"
+                        >
+                            Continuar a nueva sala
+                        </Button>
+                    ) : (
+                        <div className="text-neutral-500 text-sm animate-pulse">
+                            Esperando a que el anfitrión actualice la partida...
+                        </div>
+                    )}
+                </div>
+            )}
+
             {state.phase === "lobby" && (
                 <div className="w-full max-w-sm mx-auto text-center space-y-4 pb-24 sm:pb-0">
                     {/* Header Image - 50% smaller (w-28 h-28) */}
@@ -715,182 +763,182 @@ export function GameRoom({
             )}
 
             {/* Mostrar pantalla de playing si estamos en playing con datos completos, o esperando datos de resultado */}
-            {((state.phase === "playing" && state.role && state.currentTurn && state.maxTurns) ||
+            {((state.phase === "playing" && state.role && state.currentRound && state.maxRounds) ||
                 (state.phase === "round_result" && (!state.impostorName || !state.secretWord)) ||
                 (state.phase === "game_over" && state.winner === undefined)) && (
-                <>
-                    {/* Overlay de carga cuando estamos esperando datos (solo si estamos en playing cargando datos) */}
-                    {state.phase === "playing" && (!state.role || !state.currentTurn) && (
-                        <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm animate-fadeIn">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-400"></div>
+                    <>
+                        {/* Overlay de carga cuando estamos esperando datos (solo si estamos en playing cargando datos) */}
+                        {state.phase === "playing" && (!state.role || !state.currentRound) && (
+                            <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm animate-fadeIn">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-400"></div>
+                            </div>
+                        )}
+
+                        {/* Stepper de partida y rondas */}
+                        <div
+                            className={`w-full ${showRestOfUI ? "" : "opacity-0 pointer-events-none"}`}
+                        >
+                            <GameStepper
+                                roundCount={state.currentRound || 1}
+                                currentTurn={state.currentRound}
+                                showAnimation={showRestOfUI}
+                            />
                         </div>
-                    )}
 
-                    {/* Stepper de partida y rondas */}
-                    <div
-                        className={`w-full ${showRestOfUI ? "" : "opacity-0 pointer-events-none"}`}
-                    >
-                        <GameStepper
-                            roundCount={state.roundCount || 1}
-                            currentTurn={state.currentTurn}
-                            showAnimation={showRestOfUI}
-                        />
-                    </div>
-
-                    {/* Layout responsive: grid de 2 columnas en md+, stack en mobile */}
-                    <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-0 md:gap-10 md:items-stretch">
-                        {/* Columna izquierda: Carta */}
-                        <div className="w-full max-w-xs mx-auto md:max-w-none pt-8 md:pt-6 pb-8 md:pb-0 border-b border-white/10 md:border-b-0">
-                            <div className="space-y-3">
-                                <div
-                                    className={`${showCardEntrance ? "animate-cardEntrance" : ""}`}
-                                >
+                        {/* Layout responsive: grid de 2 columnas en md+, stack en mobile */}
+                        <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-0 md:gap-10 md:items-stretch">
+                            {/* Columna izquierda: Carta */}
+                            <div className="w-full max-w-xs mx-auto md:max-w-none pt-8 md:pt-6 pb-8 md:pb-0 border-b border-white/10 md:border-b-0">
+                                <div className="space-y-3">
                                     <div
-                                        className={`flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full ${cardAnimating ? "animate-card-float-complete" : ""}`}
+                                        className={`${showCardEntrance ? "animate-cardEntrance" : ""}`}
                                     >
                                         <div
-                                            className={`flip-card-inner h-full cursor-pointer ${reveal ? "is-flipped" : ""}`}
-                                            onClick={triggerReveal}
-                                            title="Toca para voltear la carta"
+                                            className={`flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full ${cardAnimating ? "animate-card-float-complete" : ""}`}
                                         >
-                                            {/* Frente completo (card completa con imagen) */}
-                                            <div className="flip-card-front">
-                                                <div className="h-full flex items-center justify-center">
-                                                    <img
-                                                        src={cardImg}
-                                                        alt="Frente de la carta"
-                                                        className="w-full h-full object-cover rounded-xl pointer-events-none"
-                                                        title="Ver mi carta"
-                                                    />
+                                            <div
+                                                className={`flip-card-inner h-full cursor-pointer ${reveal ? "is-flipped" : ""}`}
+                                                onClick={triggerReveal}
+                                                title="Toca para voltear la carta"
+                                            >
+                                                {/* Frente completo (card completa con imagen) */}
+                                                <div className="flip-card-front">
+                                                    <div className="h-full flex items-center justify-center">
+                                                        <img
+                                                            src={cardImg}
+                                                            alt="Frente de la carta"
+                                                            className="w-full h-full object-cover rounded-xl pointer-events-none"
+                                                            title="Ver mi carta"
+                                                        />
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            {/* Dorso completo (card completa con información) */}
-                                            <div className="flip-card-back">
-                                                <div className="relative h-full flex flex-col items-center justify-center rounded-xl overflow-hidden">
-                                                    {/* Imagen de fondo */}
-                                                    <img
-                                                        src={cardBackImg}
-                                                        alt="Fondo del dorso"
-                                                        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-                                                    />
-                                                    {/* Contenido sobre la imagen */}
-                                                    <div
-                                                        className="relative z-10 text-center p-8 backdrop-blur-sm rounded-xl pointer-events-none"
-                                                        title="Volver al frente"
-                                                    >
-                                                        <div className="space-y-4">
-                                                            <div>
-                                                                <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-orange-400">
-                                                                    <span>Tu rol</span>
-                                                                </div>
-                                                                <p className="text-xl font-serif mt-1 text-white">
-                                                                    {capitalize(state.role)}
-                                                                </p>
-                                                            </div>
-
-                                                            {/* Línea separadora */}
-                                                            <div className="w-full h-px bg-white/20"></div>
-
-                                                            {state.role === "impostor" ? (
-                                                                <>
-                                                                    {state.secretCategory && (
-                                                                        <div>
-                                                                            <div className="flex flex-col items-center justify-center gap-1 text-xs tracking-wider text-orange-400">
-                                                                                <span className="uppercase">
-                                                                                    Pista:
-                                                                                </span>
-                                                                                <span className="normal-case">
-                                                                                    La palabra
-                                                                                    secreta está
-                                                                                    relacionada
-                                                                                    con...
-                                                                                </span>
-                                                                            </div>
-                                                                            <p className="font-serif text-xl mt-1 text-white underline decoration-dotted underline-offset-4">
-                                                                                {capitalize(
-                                                                                    state.secretCategory
-                                                                                )}
-                                                                            </p>
-                                                                        </div>
-                                                                    )}
-                                                                </>
-                                                            ) : (
+                                                {/* Dorso completo (card completa con información) */}
+                                                <div className="flip-card-back">
+                                                    <div className="relative h-full flex flex-col items-center justify-center rounded-xl overflow-hidden">
+                                                        {/* Imagen de fondo */}
+                                                        <img
+                                                            src={cardBackImg}
+                                                            alt="Fondo del dorso"
+                                                            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                                                        />
+                                                        {/* Contenido sobre la imagen */}
+                                                        <div
+                                                            className="relative z-10 text-center p-8 backdrop-blur-sm rounded-xl pointer-events-none"
+                                                            title="Volver al frente"
+                                                        >
+                                                            <div className="space-y-4">
                                                                 <div>
                                                                     <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-orange-400">
-                                                                        <span>Palabra secreta</span>
+                                                                        <span>Tu rol</span>
                                                                     </div>
-                                                                    <p className="font-serif text-xl mt-1 text-white">
-                                                                        {capitalize(
-                                                                            state.secretWord
-                                                                        )}
+                                                                    <p className="text-xl font-serif mt-1 text-white">
+                                                                        {capitalize(state.role)}
                                                                     </p>
                                                                 </div>
-                                                            )}
+
+                                                                {/* Línea separadora */}
+                                                                <div className="w-full h-px bg-white/20"></div>
+
+                                                                {state.role === "impostor" ? (
+                                                                    <>
+                                                                        {state.secretCategory && (
+                                                                            <div>
+                                                                                <div className="flex flex-col items-center justify-center gap-1 text-xs tracking-wider text-orange-400">
+                                                                                    <span className="uppercase">
+                                                                                        Pista:
+                                                                                    </span>
+                                                                                    <span className="normal-case">
+                                                                                        La palabra
+                                                                                        secreta está
+                                                                                        relacionada
+                                                                                        con...
+                                                                                    </span>
+                                                                                </div>
+                                                                                <p className="font-serif text-xl mt-1 text-white underline decoration-dotted underline-offset-4">
+                                                                                    {capitalize(
+                                                                                        state.secretCategory
+                                                                                    )}
+                                                                                </p>
+                                                                            </div>
+                                                                        )}
+                                                                    </>
+                                                                ) : (
+                                                                    <div>
+                                                                        <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-orange-400">
+                                                                            <span>Palabra secreta</span>
+                                                                        </div>
+                                                                        <p className="font-serif text-xl mt-1 text-white">
+                                                                            {capitalize(
+                                                                                state.secretWord
+                                                                            )}
+                                                                        </p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                {/* Botón Girar carta */}
-                                <div
-                                    className={`flex justify-center mt-6 ${showRestOfUI ? "animate-fadeIn animate-delay-600" : "opacity-0 pointer-events-none"}`}
-                                >
-                                    <Button
-                                        onClick={triggerReveal}
-                                        variant="outline"
-                                        size="sm"
-                                        className="gap-2 !w-auto !border-orange-500 !text-orange-400 hover:!bg-orange-500/10"
+                                    {/* Botón Girar carta */}
+                                    <div
+                                        className={`flex justify-center mt-6 ${showRestOfUI ? "animate-fadeIn animate-delay-600" : "opacity-0 pointer-events-none"}`}
                                     >
-                                        <svg
-                                            className="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
+                                        <Button
+                                            onClick={triggerReveal}
+                                            variant="outline"
+                                            size="sm"
+                                            className="gap-2 !w-auto !border-orange-500 !text-orange-400 hover:!bg-orange-500/10"
                                         >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                                            />
-                                        </svg>
-                                        <span>Descubre tu carta</span>
-                                    </Button>
+                                            <svg
+                                                className="w-4 h-4"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                                />
+                                            </svg>
+                                            <span>Descubre tu carta</span>
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Divider - horizontal en mobile (oculto por nuevo pb-8), vertical en desktop */}
+                            <div className="hidden md:block h-px w-full md:h-auto md:w-px bg-white/10 md:self-stretch"></div>
+
+                            {/* Columna derecha: Lista de jugadores */}
+                            <div
+                                className={`w-full max-w-sm mx-auto md:max-w-none md:flex md:flex-col pt-8 md:pt-6 ${showRestOfUI ? "animate-fadeIn animate-delay-800" : "opacity-0 pointer-events-none"}`}
+                            >
+                                <div className="md:sticky md:top-24 md:flex-1 md:flex md:flex-col">
+                                    <div
+                                        className={`text-center md:text-left mb-5 ${showRestOfUI ? "animate-fadeIn animate-delay-400" : "opacity-0 pointer-events-none"}`}
+                                    >
+                                        <h2 className="text-3xl font-serif text-neutral-50">
+                                            Ronda de pistas y votos
+                                        </h2>
+                                    </div>
+                                    <PlayerList
+                                        players={state.players}
+                                        currentUserId={user.uid}
+                                        isHost={isHost}
+                                        onCopyLink={onCopyLink}
+                                        gameState={state}
+                                        onVote={onVote}
+                                        onOpenInstructions={onOpenInstructions}
+                                    />
                                 </div>
                             </div>
                         </div>
-
-                        {/* Divider - horizontal en mobile (oculto por nuevo pb-8), vertical en desktop */}
-                        <div className="hidden md:block h-px w-full md:h-auto md:w-px bg-white/10 md:self-stretch"></div>
-
-                        {/* Columna derecha: Lista de jugadores */}
-                        <div
-                            className={`w-full max-w-sm mx-auto md:max-w-none md:flex md:flex-col pt-8 md:pt-6 ${showRestOfUI ? "animate-fadeIn animate-delay-800" : "opacity-0 pointer-events-none"}`}
-                        >
-                            <div className="md:sticky md:top-24 md:flex-1 md:flex md:flex-col">
-                                <div
-                                    className={`text-center md:text-left mb-5 ${showRestOfUI ? "animate-fadeIn animate-delay-400" : "opacity-0 pointer-events-none"}`}
-                                >
-                                    <h2 className="text-3xl font-serif text-neutral-50">
-                                        Ronda de pistas y votos
-                                    </h2>
-                                </div>
-                                <PlayerList
-                                    players={state.players}
-                                    currentUserId={user.uid}
-                                    isHost={isHost}
-                                    onCopyLink={onCopyLink}
-                                    gameState={state}
-                                    onVote={onVote}
-                                    onOpenInstructions={onOpenInstructions}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </>
-            )}
+                    </>
+                )}
 
             {/* Resultado de partida */}
             {state.phase === "round_result" && state.impostorName && state.secretWord && (
@@ -1099,9 +1147,22 @@ export function GameRoom({
                     return (
                         <div className="w-full max-w-sm mx-auto animate-fadeIn">
                             <div className="w-full px-4 py-6 space-y-6">
+                                {/* Mensaje especial para partidas migradas */}
+                                {state.migratedFromOldSystem && (
+                                    <div className="bg-orange-500/20 border border-orange-500/50 rounded-lg p-4 text-center animate-fadeIn">
+                                        <p className="text-orange-300 text-sm">
+                                            🔄 <strong>¡Hemos mejorado el juego!</strong>
+                                        </p>
+                                        <p className="text-neutral-300 text-sm mt-1">
+                                            Tu partida anterior ha terminado por una actualización.
+                                            <br />
+                                            Inicia una nueva para probar las nuevas reglas.
+                                        </p>
+                                    </div>
+                                )}
                                 <div className="text-center space-y-4 animate-scaleIn animate-delay-200">
                                     <h2 className="text-4xl font-serif text-neutral-50">
-                                        Resultado final
+                                        {state.migratedFromOldSystem ? "Nueva versión disponible" : "Resultado final"}
                                     </h2>
                                 </div>
 
@@ -1178,19 +1239,19 @@ export function GameRoom({
                                 {allPlayers.filter(
                                     (p) => !winnerPlayers.some((w) => w.uid === p.uid)
                                 ).length > 0 && (
-                                    <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
-                                        <PlayerList
-                                            players={allPlayers.filter(
-                                                (p) => !winnerPlayers.some((w) => w.uid === p.uid)
-                                            )}
-                                            currentUserId={user.uid}
-                                            isHost={isHost}
-                                            onCopyLink={onCopyLink}
-                                            gameState={state}
-                                            onVote={onVote}
-                                        />
-                                    </div>
-                                )}
+                                        <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
+                                            <PlayerList
+                                                players={allPlayers.filter(
+                                                    (p) => !winnerPlayers.some((w) => w.uid === p.uid)
+                                                )}
+                                                currentUserId={user.uid}
+                                                isHost={isHost}
+                                                onCopyLink={onCopyLink}
+                                                gameState={state}
+                                                onVote={onVote}
+                                            />
+                                        </div>
+                                    )}
 
                                 <div className="animate-fadeIn animate-delay-600 flex flex-col items-center">
                                     <p className="text-xl font-medium text-white mb-4">
@@ -1241,7 +1302,7 @@ export function GameRoom({
                         className={`text-center space-y-8 max-w-md transition-all duration-300 ${isOverlayClosing ? "opacity-0 scale-95" : "animate-scaleIn"}`}
                     >
                         <h2 className="text-6xl font-serif text-orange-400">
-                            Ronda {state.currentTurn}
+                            Ronda {state.currentRound}
                         </h2>
 
                         {eliminatedPlayerInfo ? (

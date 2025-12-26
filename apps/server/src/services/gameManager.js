@@ -42,8 +42,45 @@ class GameManager {
     /**
      * Find which game a user belongs to.
      */
+    /**
+     * Find which game a user belongs to.
+     */
     findUserGame(userId) {
         return Object.values(this.games).find((g) => g.players.some((p) => p.uid === userId));
+    }
+
+    /**
+     * Ensures a user is removed from any OTHER game they might be in.
+     * This enforces the "One User, One Game" policy and prevents ghost sessions.
+     * @param {string} userId - The user's ID
+     * @param {string} [excludeGameId] - Optional game ID to exclude from cleanup (e.g. current game)
+     */
+    async cleanupUserPreviousGames(userId, excludeGameId = null) {
+        const gamesToRemove = Object.values(this.games).filter(
+            (g) => g.gameId !== excludeGameId && g.players.some((p) => p.uid === userId)
+        );
+
+        if (gamesToRemove.length === 0) return;
+
+        console.log(`[Cleanup] Removing user ${userId} from ${gamesToRemove.length} previous games...`);
+
+        for (const game of gamesToRemove) {
+            console.log(`[Cleanup] Removing ${userId} from game ${game.gameId}`);
+
+            // Remove player using the game's method (handles logic & persistence)
+            await game.removePlayer(userId);
+
+            // If game becomes empty, schedule cleanup
+            if (game.players.length === 0) {
+                this.scheduleEmptyGameCleanup(game.gameId, 1000); // Fast cleanup for deserted games
+            } else {
+                // Determine new host if needed
+                if (!game.hostId || !game.players.some(p => p.uid === game.hostId)) {
+                    // host migration is handled in removePlayer usually, but we ensure state is emitted
+                }
+                this.emitGameState(game);
+            }
+        }
     }
 
     /**
@@ -83,8 +120,10 @@ class GameManager {
         if (!this.io) return;
 
         const votedPlayers = Object.keys(game.votes);
-        const activePlayers = game.roundPlayers.filter(
-            (uid) => !game.eliminatedInRound.includes(uid)
+        const eliminated = game.eliminatedPlayers || [];
+        const roundPlayers = game.roundPlayers || [];
+        const activePlayers = roundPlayers.filter(
+            (uid) => !eliminated.includes(uid)
         );
 
         // Send to all players in the game room

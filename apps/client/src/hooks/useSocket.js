@@ -8,6 +8,7 @@ export function useSocket(user) {
     const [connected, setConnected] = useState(false);
     const [gameState, setGameState] = useState(null);
     const attemptedResumeRef = useRef(false);
+    const initialLoadRef = useRef(true);
     const hasLoggedWaitingDisplayName = useRef(false);
     const [joinError, setJoinError] = useState(null); // Nuevo estado para errores de unión
 
@@ -67,15 +68,15 @@ export function useSocket(user) {
 
                 const socket = window.MockSocketIO
                     ? new window.MockSocketIO(socketURL, {
-                          auth: { token, name: user.displayName, photoURL: user.photoURL },
-                          reconnection: true,
-                          reconnectionAttempts: 5,
-                      })
+                        auth: { token, name: user.displayName, photoURL: user.photoURL },
+                        reconnection: true,
+                        reconnectionAttempts: 5,
+                    })
                     : io(socketURL, {
-                          auth: { token, name: user.displayName, photoURL: user.photoURL },
-                          reconnection: true,
-                          reconnectionAttempts: 5,
-                      });
+                        auth: { token, name: user.displayName, photoURL: user.photoURL },
+                        reconnection: true,
+                        reconnectionAttempts: 5,
+                    });
                 socketRef.current = socket;
 
                 socket.on("connect", () => {
@@ -168,27 +169,40 @@ export function useSocket(user) {
                     const url = new URL(window.location);
                     if (newState?.gameId) {
                         const currentUrlId = url.searchParams.get("gameId");
-                        // Only update URL if empty or matching (don't overwrite if user is trying to join another game via URL)
-                        // App.jsx will handle the mismatch UI
-                        if (!currentUrlId || currentUrlId === newState.gameId) {
+
+                        // PROTECCIÓN INVITACIONES:
+                        // Si es la carga inicial y la URL tiene un ID diferente al que manda el servidor,
+                        // asumimos que el usuario quiere ir a esa URL (invitación) y NO sobrescribimos.
+                        // El useEffect de GamePage se encargará de hacer join a la URL correcta.
+                        if (initialLoadRef.current && currentUrlId && currentUrlId !== newState.gameId) {
+                            console.log(`[Socket] Ignoring URL update on initial load (Invitation detected): URL=${currentUrlId}, State=${newState.gameId}`);
+                        } else {
+                            // Comportamiento normal: Sincronizar URL con estado del servidor
+                            // Esto maneja migración (old->new) y navegación normal
+                            if (currentUrlId !== newState.gameId) {
+                                console.log(`[Socket] Updating URL gameId: ${currentUrlId} → ${newState.gameId}`);
+                            }
                             url.searchParams.set("gameId", newState.gameId);
                             window.history.replaceState({}, "", url.toString());
                         }
+
+                        initialLoadRef.current = false;
                     } else {
-                        // IMPORTANT: When receiving null state, ALWAYS clear the URL gameId
-                        // This happens when:
-                        // 1. User explicitly leaves the game
-                        // 2. User was removed from the game
-                        // 3. Game was deleted/ended
-                        // Clearing URL prevents the user from getting stuck trying to rejoin
                         const urlGameId = url.searchParams.get("gameId");
-                        if (urlGameId) {
-                            console.log(
-                                "[Socket] Clearing gameId from URL after receiving null state"
-                            );
+
+                        // PROTECCIÓN INVITACIONES:
+                        // Si entramos con un link ?gameId=XYZ y el servidor dice "no estás en partida",
+                        // NO borrar el ID, para permitir que el cliente intente unirse.
+                        if (initialLoadRef.current && urlGameId) {
+                            console.log(`[Socket] Preserving URL gameId on initial load (Invitation to new game): ${urlGameId}`);
+                        } else if (urlGameId) {
+                            // Solo borrar si NO es una invitación inicial (ej: partida borrada, kick)
+                            console.log("[Socket] Clearing gameId from URL after receiving null state");
                             url.searchParams.delete("gameId");
                             window.history.replaceState({}, "", url.toString());
                         }
+
+                        initialLoadRef.current = false;
                     }
                 });
 
