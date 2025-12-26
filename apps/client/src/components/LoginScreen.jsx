@@ -120,7 +120,7 @@ export function LoginScreen({
                             disabled={isLoading}
                             variant="outline"
                             size="md"
-                            className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                            className="bg-orange-600 border-orange-500 text-white hover:bg-orange-500"
                         >
                             <span className="mr-3 inline-flex items-center justify-center align-middle">
                                 <svg
