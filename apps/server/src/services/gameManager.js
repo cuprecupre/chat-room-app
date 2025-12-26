@@ -62,7 +62,9 @@ class GameManager {
 
         if (gamesToRemove.length === 0) return;
 
-        console.log(`[Cleanup] Removing user ${userId} from ${gamesToRemove.length} previous games...`);
+        console.log(
+            `[Cleanup] Removing user ${userId} from ${gamesToRemove.length} previous games...`
+        );
 
         for (const game of gamesToRemove) {
             console.log(`[Cleanup] Removing ${userId} from game ${game.gameId}`);
@@ -75,7 +77,7 @@ class GameManager {
                 this.scheduleEmptyGameCleanup(game.gameId, 1000); // Fast cleanup for deserted games
             } else {
                 // Determine new host if needed
-                if (!game.hostId || !game.players.some(p => p.uid === game.hostId)) {
+                if (!game.hostId || !game.players.some((p) => p.uid === game.hostId)) {
                     // host migration is handled in removePlayer usually, but we ensure state is emitted
                 }
                 this.emitGameState(game);
@@ -122,9 +124,7 @@ class GameManager {
         const votedPlayers = Object.keys(game.votes);
         const eliminated = game.eliminatedPlayers || [];
         const roundPlayers = game.roundPlayers || [];
-        const activePlayers = roundPlayers.filter(
-            (uid) => !eliminated.includes(uid)
-        );
+        const activePlayers = roundPlayers.filter((uid) => !eliminated.includes(uid));
 
         // Send to all players in the game room
         game.players.forEach((p) => {

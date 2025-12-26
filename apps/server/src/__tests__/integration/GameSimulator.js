@@ -52,9 +52,7 @@ class GameSimulator {
     allVoteFor(targetIndex) {
         const results = [];
         const eliminated = this.game.eliminatedPlayers || [];
-        const activePlayers = this.game.roundPlayers.filter(
-            (uid) => !eliminated.includes(uid)
-        );
+        const activePlayers = this.game.roundPlayers.filter((uid) => !eliminated.includes(uid));
         activePlayers.forEach((uid) => {
             const voterIndex = this.users.findIndex((u) => u.uid === uid);
             if (uid !== this.users[targetIndex].uid) {
@@ -71,9 +69,7 @@ class GameSimulator {
 
     createTieVote() {
         const eliminated = this.game.eliminatedPlayers || [];
-        const activePlayers = this.game.roundPlayers.filter(
-            (uid) => !eliminated.includes(uid)
-        );
+        const activePlayers = this.game.roundPlayers.filter((uid) => !eliminated.includes(uid));
         const results = [];
         activePlayers.forEach((uid, i) => {
             const voterIndex = this.users.findIndex((u) => u.uid === uid);
@@ -96,9 +92,8 @@ class GameSimulator {
             votes: { ...this.game.votes },
             playerCount: this.game.players.length,
             playerScores: { ...this.game.playerScores },
-            activePlayerCount: this.game.roundPlayers.filter(
-                (uid) => !eliminated.includes(uid)
-            ).length,
+            activePlayerCount: this.game.roundPlayers.filter((uid) => !eliminated.includes(uid))
+                .length,
         };
     }
 

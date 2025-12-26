@@ -1,6 +1,6 @@
 /**
  * GameStateSerializer - Nueva Versión
- * 
+ *
  * Actualizado para el nuevo sistema de rondas simples (sin vueltas)
  */
 
@@ -76,9 +76,7 @@ function getStateForPlayer(game, userId) {
             baseState.hasVoted = game.votes.hasOwnProperty(userId);
             baseState.votedPlayers = Object.keys(game.votes);
             baseState.myVote = game.votes[userId] || null;
-            baseState.activePlayers = game.roundPlayers.filter(
-                (uid) => !eliminated.includes(uid)
-            );
+            baseState.activePlayers = game.roundPlayers.filter((uid) => !eliminated.includes(uid));
             baseState.canVote = !eliminated.includes(userId);
         }
     } else if (game.phase === "round_result" || game.phase === "game_over") {
@@ -87,8 +85,8 @@ function getStateForPlayer(game, userId) {
         baseState.impostorName = impostor
             ? impostor.name
             : formerImpostor
-                ? formerImpostor.name
-                : "Jugador desconectado";
+              ? formerImpostor.name
+              : "Jugador desconectado";
         baseState.impostorId = game.impostorId;
         baseState.secretWord = game.secretWord;
         baseState.lastRoundScores = game.lastRoundScores;

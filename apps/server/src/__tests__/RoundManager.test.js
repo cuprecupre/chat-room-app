@@ -1,6 +1,6 @@
 /**
  * Tests for RoundManager - New System
- * 
+ *
  * New system:
  * - 1 match = 3 rounds max
  * - Same impostor for entire match

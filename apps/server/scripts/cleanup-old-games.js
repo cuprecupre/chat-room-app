@@ -15,7 +15,8 @@ const db = admin.firestore();
 
 async function cleanup() {
     // Borrar partidas con needs_migration
-    const needsMigration = await db.collection("games")
+    const needsMigration = await db
+        .collection("games")
         .where("phase", "==", "needs_migration")
         .get();
 
@@ -42,7 +43,7 @@ async function cleanup() {
     process.exit(0);
 }
 
-cleanup().catch(err => {
+cleanup().catch((err) => {
     console.error("Error:", err.message);
     process.exit(1);
 });

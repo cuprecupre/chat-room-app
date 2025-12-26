@@ -1,6 +1,6 @@
 /**
  * RoundManager - Nueva Versión
- * 
+ *
  * Estructura simplificada:
  * - 1 partida = máximo 3 rondas
  * - Mismo impostor durante toda la partida
@@ -9,7 +9,12 @@
  */
 
 const { getRandomWordWithCategory } = require("../words");
-const { giveImpostorSurvivalPoints, giveImpostorMaxPoints, calculateRoundScores, findWinner } = require("./ScoringManager");
+const {
+    giveImpostorSurvivalPoints,
+    giveImpostorMaxPoints,
+    calculateRoundScores,
+    findWinner,
+} = require("./ScoringManager");
 const { calculateStartingPlayer } = require("./PlayerManager");
 
 const MAX_ROUNDS = 3;
@@ -29,11 +34,11 @@ function selectImpostor(game) {
         );
     }
 
-    let candidates = game.players.map(p => p.uid).filter((uid) => uid !== excludedPlayer);
+    let candidates = game.players.map((p) => p.uid).filter((uid) => uid !== excludedPlayer);
 
     if (candidates.length === 0) {
         console.log(`[Game ${game.gameId}] No hay candidatos elegibles, permitiendo a todos`);
-        candidates = game.players.map(p => p.uid);
+        candidates = game.players.map((p) => p.uid);
     }
 
     // Fisher-Yates shuffle
@@ -61,7 +66,7 @@ function startNewMatch(game) {
     });
 
     // Inicializar estado de partida
-    game.currentRound = 0;  // Se incrementará a 1 en startNextRound
+    game.currentRound = 0; // Se incrementará a 1 en startNextRound
     game.maxRounds = MAX_ROUNDS;
     game.eliminatedPlayers = [];
     game.votes = {};
@@ -142,7 +147,9 @@ function endRound(game, impostorCaught) {
         } else {
             // Continuar a la siguiente ronda
             game.phase = "round_result";
-            console.log(`[Game ${game.gameId}] Ronda ${game.currentRound} terminada. Impostor sobrevive.`);
+            console.log(
+                `[Game ${game.gameId}] Ronda ${game.currentRound} terminada. Impostor sobrevive.`
+            );
         }
     }
 
@@ -167,5 +174,5 @@ module.exports = {
     startNextRound,
     endRound,
     handleSuddenDeath,
-    MAX_ROUNDS
+    MAX_ROUNDS,
 };

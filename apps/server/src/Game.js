@@ -21,7 +21,7 @@ class Game {
 
         // Sistema de rondas (nuevo: sin vueltas)
         this.currentRound = 0;
-        this.maxRounds = RoundManager.MAX_ROUNDS;  // 3
+        this.maxRounds = RoundManager.MAX_ROUNDS; // 3
         this.eliminatedPlayers = [];
 
         // Sistema de votación
@@ -87,7 +87,9 @@ class Game {
         const needsMigration = isOldSchema || isOldSystem;
 
         if (needsMigration) {
-            console.log(`[Game ${gameId}] ⚠️ OLD SYSTEM DETECTED (schemaVersion=${game.schemaVersion}) - Setting needs_migration`);
+            console.log(
+                `[Game ${gameId}] ⚠️ OLD SYSTEM DETECTED (schemaVersion=${game.schemaVersion}) - Setting needs_migration`
+            );
             game.phase = "needs_migration";
             game.currentRound = 0;
             game.eliminatedPlayers = [];
@@ -113,8 +115,8 @@ class Game {
         // MIGRACIÓN: Detectar partidas corruptas
         // 1. En playing pero sin roundPlayers
         // 2. En playing pero roundPlayers tiene IDs que no existen en players
-        const playerUids = game.players.map(p => p.uid);
-        const invalidRoundPlayers = game.roundPlayers.filter(uid => !playerUids.includes(uid));
+        const playerUids = game.players.map((p) => p.uid);
+        const invalidRoundPlayers = game.roundPlayers.filter((uid) => !playerUids.includes(uid));
         const hasNoValidRoundPlayers = game.phase === "playing" && game.roundPlayers.length === 0;
         const hasInvalidRoundPlayers = game.phase === "playing" && invalidRoundPlayers.length > 0;
         const isCorruptedGame = hasNoValidRoundPlayers || hasInvalidRoundPlayers;
@@ -123,7 +125,9 @@ class Game {
             console.log(`[Game ${gameId}] ⚠️ CORRUPTED GAME DETECTED - Setting needs_migration`);
             console.log(`[Game ${gameId}]   - roundPlayers: ${JSON.stringify(game.roundPlayers)}`);
             console.log(`[Game ${gameId}]   - playerUids: ${JSON.stringify(playerUids)}`);
-            console.log(`[Game ${gameId}]   - invalidRoundPlayers: ${JSON.stringify(invalidRoundPlayers)}`);
+            console.log(
+                `[Game ${gameId}]   - invalidRoundPlayers: ${JSON.stringify(invalidRoundPlayers)}`
+            );
             game.phase = "needs_migration";
             game.currentRound = 0;
             game.winnerId = null;
@@ -275,7 +279,8 @@ class Game {
      * Nueva partida (reset completo de puntos, nuevo impostor)
      */
     playAgain(userId) {
-        if (userId !== this.hostId) throw new Error("Solo el host puede empezar una nueva partida.");
+        if (userId !== this.hostId)
+            throw new Error("Solo el host puede empezar una nueva partida.");
 
         console.log(`[Game ${this.gameId}] playAgain called. Current phase: ${this.phase}`);
 

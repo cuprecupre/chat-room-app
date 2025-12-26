@@ -1,6 +1,6 @@
 /**
  * Tests for ScoringManager - New Scoring System
- * 
+ *
  * New system:
  * - Friends: +2 points per correct vote (individual)
  * - Impostor: +3 (R1), +2 (R2), +2 (R3) for surviving = max 7 points

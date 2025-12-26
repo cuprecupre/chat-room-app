@@ -1,6 +1,6 @@
 /**
  * Tests for VotingManager - New System
- * 
+ *
  * New system:
  * - Ties: impostor gets points
  * - Sudden death: if 2 players left, impostor wins

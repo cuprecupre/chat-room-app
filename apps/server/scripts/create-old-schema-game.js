@@ -2,9 +2,9 @@
 /**
  * Script para crear una partida de prueba con el schema antiguo (v1)
  * Esto sirve para probar la migración automática
- * 
+ *
  * Uso: node scripts/create-old-schema-game.js
- * 
+ *
  * Requiere: Variable de entorno FIREBASE_SERVICE_ACCOUNT (misma que usa el servidor)
  */
 
@@ -34,7 +34,7 @@ async function createOldSchemaGame() {
 
     // Partida con schema viejo (sin schemaVersion)
     const oldGameData = {
-        hostId: "ZVvWmAjbAJULm91kQMx5m3vgudi1",  // Leandro es el host
+        hostId: "ZVvWmAjbAJULm91kQMx5m3vgudi1", // Leandro es el host
         phase: "playing",
         players: [
             { uid: "ZVvWmAjbAJULm91kQMx5m3vgudi1", name: "Leandro", photoURL: null },
@@ -42,8 +42,8 @@ async function createOldSchemaGame() {
             { uid: "0IUWLSB3zyb6Vuzc5ktRFaaoc4F2", name: "Juan", photoURL: null },
         ],
         playerScores: {
-            "ZVvWmAjbAJULm91kQMx5m3vgudi1": 0,
-            "imeRgdwSMpZWhFOogeSElWtZGAJ2": 0,
+            ZVvWmAjbAJULm91kQMx5m3vgudi1: 0,
+            imeRgdwSMpZWhFOogeSElWtZGAJ2: 0,
             "0IUWLSB3zyb6Vuzc5ktRFaaoc4F2": 0,
         },
         // Schema v1 usaba currentTurn/maxTurns
@@ -55,7 +55,7 @@ async function createOldSchemaGame() {
         // NO tiene currentRound/maxRounds
         secretWord: "test",
         secretCategory: "Test",
-        impostorId: "imeRgdwSMpZWhFOogeSElWtZGAJ2",  // Bea es el impostor
+        impostorId: "imeRgdwSMpZWhFOogeSElWtZGAJ2", // Bea es el impostor
         votes: {},
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };

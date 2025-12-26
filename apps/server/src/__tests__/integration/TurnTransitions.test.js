@@ -180,7 +180,7 @@ describe("Round Transitions (Integration)", () => {
 
             // Scores should be reset
             const scores = sim.getState().playerScores;
-            Object.values(scores).forEach(score => {
+            Object.values(scores).forEach((score) => {
                 expect(score).toBe(0);
             });
         });

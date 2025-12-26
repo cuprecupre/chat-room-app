@@ -1,11 +1,12 @@
-const Game = require("../game/Game");
-const GameManager = require("../services/gameManager");
+const Game = require("../Game");
+const gameManager = require("../services/gameManager");
 const PlayerManager = require("../game/PlayerManager");
 
 // Mock de DB services
 const dbService = require("../services/db");
 jest.mock("../services/db", () => ({
     saveGame: jest.fn(),
+    saveGameState: jest.fn(), // ADDED THIS
     deleteGameState: jest.fn().mockResolvedValue(true),
     getActiveGames: jest.fn().mockResolvedValue([]),
 }));
@@ -24,12 +25,19 @@ jest.mock("firebase-admin", () => ({
 }));
 
 describe("Game Session & Migration Flow", () => {
-    let gameManager;
-
     beforeEach(() => {
-        gameManager = new GameManager();
+        jest.useFakeTimers();
+        // Reset state manually since it's a singleton
+        gameManager.games = {};
+        gameManager.pendingDeletions = {};
+        gameManager.io = { to: jest.fn().mockReturnThis(), emit: jest.fn() };
+
         // Reset mocks
         dbService.deleteGameState.mockClear();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
     });
 
     test("Single Session Policy: Joining Game B should remove user from Game A", async () => {
@@ -46,7 +54,7 @@ describe("Game Session & Migration Flow", () => {
         const gameB = gameManager.createGame(user, {}); // This would fail in real socket handler if cleanup wasn't called, but here createGame is dumb.
 
         // Verification: User should NOT be in Game A anymore
-        const userInGameA = gameA.players.find(p => p.uid === "user1");
+        const userInGameA = gameA.players.find((p) => p.uid === "user1");
         expect(userInGameA).toBeUndefined();
 
         // Game A should be empty (and likely scheduled for cleanup)
@@ -87,7 +95,7 @@ describe("Game Session & Migration Flow", () => {
         // (Socket join logic omitted, we care about data consistency)
 
         // Move Other Players
-        const otherPlayers = oldGame.players.filter(p => p.uid !== host.uid);
+        const otherPlayers = oldGame.players.filter((p) => p.uid !== host.uid);
         for (const player of otherPlayers) {
             await gameManager.cleanupUserPreviousGames(player.uid, "OLDGAME");
             newGame.addPlayer(player);
@@ -101,7 +109,9 @@ describe("Game Session & Migration Flow", () => {
 
         // New game should have all 3 players
         expect(newGame.players).toHaveLength(3);
-        expect(newGame.players.map(p => p.uid)).toEqual(expect.arrayContaining(["host1", "p2", "p3"]));
+        expect(newGame.players.map((p) => p.uid)).toEqual(
+            expect.arrayContaining(["host1", "p2", "p3"])
+        );
 
         // Old game should be gone from manager
         expect(gameManager.getGame("OLDGAME")).toBeUndefined();
@@ -135,12 +145,12 @@ describe("Game Session & Migration Flow", () => {
         await gameManager.cleanupUserPreviousGames(user.uid, targetGame.gameId);
 
         // User should be removed from g1, g2, g3
-        expect(g1.players.some(p => p.uid === user.uid)).toBe(false);
-        expect(g2.players.some(p => p.uid === user.uid)).toBe(false);
-        expect(g3.players.some(p => p.uid === user.uid)).toBe(false);
+        expect(g1.players.some((p) => p.uid === user.uid)).toBe(false);
+        expect(g2.players.some((p) => p.uid === user.uid)).toBe(false);
+        expect(g3.players.some((p) => p.uid === user.uid)).toBe(false);
 
         // Now add to target
         targetGame.addPlayer(user);
-        expect(targetGame.players.some(p => p.uid === user.uid)).toBe(true);
+        expect(targetGame.players.some((p) => p.uid === user.uid)).toBe(true);
     });
 });

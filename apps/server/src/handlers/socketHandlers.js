@@ -256,7 +256,7 @@ async function handleMigrateGame(io, socket, user, oldGameId) {
         return socket.emit("error-message", "Solo el anfitrión puede migrar la partida.");
     }
 
-    const playersList = oldGame.players.map(p => p.name).join(", ");
+    const playersList = oldGame.players.map((p) => p.name).join(", ");
     console.log(`[Migration] Starting migration for game ${oldGameId}`);
     console.log(`[Migration]   - Players to migrate: ${playersList}`);
 
@@ -273,7 +273,7 @@ async function handleMigrateGame(io, socket, user, oldGameId) {
     console.log(`[Migration]   - Host ${user.name} moved to new game`);
 
     // Mover a todos los demás jugadores
-    const otherPlayers = oldGame.players.filter(p => p.uid !== user.uid);
+    const otherPlayers = oldGame.players.filter((p) => p.uid !== user.uid);
     for (const player of otherPlayers) {
         // Limpiar sesiones fantasma del JUGADOR (excepto oldGameId)
         await gameManager.cleanupUserPreviousGames(player.uid, oldGameId);
@@ -290,7 +290,9 @@ async function handleMigrateGame(io, socket, user, oldGameId) {
                 playerSocket.join(newGame.gameId);
                 console.log(`[Migration]   - Player ${player.name} moved to new game`);
             } else {
-                console.log(`[Migration]   ⚠️ Player ${player.name} socket not found in io.sockets`);
+                console.log(
+                    `[Migration]   ⚠️ Player ${player.name} socket not found in io.sockets`
+                );
             }
         } else {
             console.log(`[Migration]   ⚠️ Player ${player.name} socket ID not found`);
@@ -303,13 +305,21 @@ async function handleMigrateGame(io, socket, user, oldGameId) {
 
     // IMPORTANTE: Borrar la partida vieja de Firestore para evitar que usuarios queden asociados
     const dbService = require("../services/db");
-    dbService.deleteGameState(oldGameId).then(() => {
-        console.log(`[Migration]   - Old game ${oldGameId} deleted from Firestore`);
-    }).catch(err => {
-        console.error(`[Migration]   ⚠️ Failed to delete old game from Firestore:`, err.message);
-    });
+    dbService
+        .deleteGameState(oldGameId)
+        .then(() => {
+            console.log(`[Migration]   - Old game ${oldGameId} deleted from Firestore`);
+        })
+        .catch((err) => {
+            console.error(
+                `[Migration]   ⚠️ Failed to delete old game from Firestore:`,
+                err.message
+            );
+        });
 
-    console.log(`[Migration] ✅ Migration complete: ${oldGameId} → ${newGame.gameId} (${newGame.players.length} players)`);
+    console.log(
+        `[Migration] ✅ Migration complete: ${oldGameId} → ${newGame.gameId} (${newGame.players.length} players)`
+    );
 
     // Emitir estado nuevo a todos los jugadores en la nueva room
     gameManager.emitGameState(newGame);

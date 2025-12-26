@@ -69,15 +69,15 @@ export function useSocket(user) {
 
                 const socket = window.MockSocketIO
                     ? new window.MockSocketIO(socketURL, {
-                        auth: { token, name: user.displayName, photoURL: user.photoURL },
-                        reconnection: true,
-                        reconnectionAttempts: 5,
-                    })
+                          auth: { token, name: user.displayName, photoURL: user.photoURL },
+                          reconnection: true,
+                          reconnectionAttempts: 5,
+                      })
                     : io(socketURL, {
-                        auth: { token, name: user.displayName, photoURL: user.photoURL },
-                        reconnection: true,
-                        reconnectionAttempts: 5,
-                    });
+                          auth: { token, name: user.displayName, photoURL: user.photoURL },
+                          reconnection: true,
+                          reconnectionAttempts: 5,
+                      });
                 socketRef.current = socket;
 
                 socket.on("connect", () => {
@@ -172,8 +172,14 @@ export function useSocket(user) {
                         const currentUrlId = url.searchParams.get("gameId");
 
                         // DETECCIÓN DE INVITACIÓN (Initial Load)
-                        if (initialLoadRef.current && currentUrlId && currentUrlId !== newState.gameId) {
-                            console.log(`[Socket] Invitation detected on load. Pending join to: ${currentUrlId}`);
+                        if (
+                            initialLoadRef.current &&
+                            currentUrlId &&
+                            currentUrlId !== newState.gameId
+                        ) {
+                            console.log(
+                                `[Socket] Invitation detected on load. Pending join to: ${currentUrlId}`
+                            );
                             isInvitationPendingRef.current = true;
                         }
 
@@ -186,11 +192,15 @@ export function useSocket(user) {
                         if (isInvitationPendingRef.current) {
                             // Si estamos intentando unirnos a una invitación, IGNORAR actualizaciones del servidor
                             // que nos devuelvan a la partida vieja.
-                            console.log(`[Socket] Ignoring URL update (Invitation Pending). Keep: ${currentUrlId}, Ignore: ${newState.gameId}`);
+                            console.log(
+                                `[Socket] Ignoring URL update (Invitation Pending). Keep: ${currentUrlId}, Ignore: ${newState.gameId}`
+                            );
                         } else {
                             // Comportamiento normal (Migración o Navegación dentro de partida)
                             if (currentUrlId !== newState.gameId) {
-                                console.log(`[Socket] Updating URL gameId: ${currentUrlId} → ${newState.gameId}`);
+                                console.log(
+                                    `[Socket] Updating URL gameId: ${currentUrlId} → ${newState.gameId}`
+                                );
                                 url.searchParams.set("gameId", newState.gameId);
                                 window.history.replaceState({}, "", url.toString());
                             }
@@ -204,16 +214,22 @@ export function useSocket(user) {
                         // Si entramos con un link ?gameId=XYZ y el servidor dice null,
                         // es probable que sea una invitación a partida nueva.
                         if (initialLoadRef.current && urlGameId) {
-                            console.log(`[Socket] Invitation detected (Game not found yet). Pending join to: ${urlGameId}`);
+                            console.log(
+                                `[Socket] Invitation detected (Game not found yet). Pending join to: ${urlGameId}`
+                            );
                             isInvitationPendingRef.current = true;
                         }
 
                         if (isInvitationPendingRef.current && urlGameId) {
-                            console.log(`[Socket] Preserving URL gameId (Invitation Pending): ${urlGameId}`);
+                            console.log(
+                                `[Socket] Preserving URL gameId (Invitation Pending): ${urlGameId}`
+                            );
                             // NO borrar URL
                         } else if (urlGameId) {
                             // Solo borrar si NO es una invitación pendiente
-                            console.log("[Socket] Clearing gameId from URL after receiving null state");
+                            console.log(
+                                "[Socket] Clearing gameId from URL after receiving null state"
+                            );
                             url.searchParams.delete("gameId");
                             window.history.replaceState({}, "", url.toString());
                         }

@@ -1,6 +1,6 @@
 /**
  * VotingManager - Nueva Versión
- * 
+ *
  * Cambios clave:
  * - Empates: impostor SÍ recibe puntos y pasa a siguiente ronda
  * - Muerte súbita: si quedan 2 jugadores, impostor gana
@@ -18,7 +18,7 @@ function castVote(game, voterId, targetId) {
         roundPlayers: game.roundPlayers,
         eliminatedPlayers: game.eliminatedPlayers,
         voterId,
-        targetId
+        targetId,
     });
 
     // Validaciones
@@ -159,7 +159,7 @@ function processVotingResults(game) {
     // Verificar si era el impostor
     if (eliminatedId === game.impostorId) {
         console.log(`[Game ${game.gameId}] ¡El impostor fue descubierto!`);
-        endRound(game, true);  // Amigos ganan
+        endRound(game, true); // Amigos ganan
     } else {
         // Era un amigo - eliminarlo
         game.eliminatedPlayers = game.eliminatedPlayers || [];

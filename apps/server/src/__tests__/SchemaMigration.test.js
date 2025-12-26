@@ -27,7 +27,7 @@ describe("Schema Migration", () => {
                 phase: "playing",
                 players: [{ uid: "host123", name: "Host" }],
                 playerScores: {},
-                schemaVersion: 1,  // Old version
+                schemaVersion: 1, // Old version
                 currentRound: 1,
                 roundPlayers: ["host123"],
             };
@@ -52,7 +52,7 @@ describe("Schema Migration", () => {
             const game = Game.fromState("TEST2", oldData);
 
             expect(game.phase).toBe("needs_migration");
-            expect(game.schemaVersion).toBe(1);  // Defaults to 1
+            expect(game.schemaVersion).toBe(1); // Defaults to 1
         });
 
         test("should detect old turn-based system as needs_migration", () => {
@@ -61,8 +61,8 @@ describe("Schema Migration", () => {
                 phase: "playing",
                 players: [{ uid: "host123", name: "Host" }],
                 playerScores: {},
-                currentTurn: 2,  // Old system used currentTurn
-                maxTurns: 3,     // Old system used maxTurns
+                currentTurn: 2, // Old system used currentTurn
+                maxTurns: 3, // Old system used maxTurns
                 // No currentRound
             };
 
@@ -77,7 +77,7 @@ describe("Schema Migration", () => {
                 phase: "playing",
                 players: [{ uid: "host123", name: "Host" }],
                 playerScores: {},
-                schemaVersion: 2,  // Current version
+                schemaVersion: 2, // Current version
                 currentRound: 1,
                 maxRounds: 3,
                 roundPlayers: ["host123"],
@@ -85,7 +85,7 @@ describe("Schema Migration", () => {
 
             const game = Game.fromState("TEST4", newData);
 
-            expect(game.phase).toBe("playing");  // Not migrated
+            expect(game.phase).toBe("playing"); // Not migrated
             expect(game.schemaVersion).toBe(2);
         });
 
@@ -97,7 +97,7 @@ describe("Schema Migration", () => {
                 playerScores: {},
                 schemaVersion: 2,
                 currentRound: 1,
-                roundPlayers: [],  // Empty - corrupted!
+                roundPlayers: [], // Empty - corrupted!
             };
 
             const game = Game.fromState("TEST5", corruptedData);
@@ -113,7 +113,7 @@ describe("Schema Migration", () => {
                 playerScores: {},
                 schemaVersion: 2,
                 currentRound: 1,
-                roundPlayers: ["invalid_uid_123"],  // UID not in players
+                roundPlayers: ["invalid_uid_123"], // UID not in players
             };
 
             const game = Game.fromState("TEST6", corruptedData);

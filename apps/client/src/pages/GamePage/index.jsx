@@ -45,7 +45,7 @@ export function GamePage({
             isMobile={isMobile}
             onOpenInstructions={onOpenInstructions}
             showEndGameModal={false}
-            onShowEndGameModal={() => { }}
+            onShowEndGameModal={() => {}}
         />
     );
 }
