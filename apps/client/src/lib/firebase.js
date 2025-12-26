@@ -12,6 +12,7 @@ import {
     signOut,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
+    signInAnonymously,
     updateProfile,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
@@ -74,5 +75,6 @@ export {
     signOut,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
+    signInAnonymously,
     updateProfile,
 };

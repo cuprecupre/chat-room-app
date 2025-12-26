@@ -10,6 +10,7 @@ import {
     signOut,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
+    signInAnonymously,
     updateProfile,
 } from "../lib/firebase";
 import { saveToken, clearToken } from "../lib/tokenStorage";
@@ -388,9 +389,69 @@ export function useAuth() {
         }
     }, []);
 
+    const loginAsGuest = useCallback(async (guestName) => {
+        setLoading(true);
+        setError(null);
+        try {
+            console.log("👤 Iniciando sesión anónima como:", guestName);
+            const result = await signInAnonymously(auth);
+
+            // Actualizar displayName
+            if (guestName) {
+                console.log("📝 Actualizando displayName:", guestName);
+                await updateProfile(result.user, { displayName: guestName });
+
+                // Forzar recarga del usuario para obtener el displayName actualizado
+                await result.user.reload();
+
+                // Forzar actualización del token para que incluya el displayName
+                await result.user.getIdToken(true);
+
+                // Esperar a que el currentUser tenga el displayName actualizado
+                let retries = 0;
+                while (!auth.currentUser?.displayName && retries < 10) {
+                    await new Promise((resolve) => setTimeout(resolve, 100));
+                    await auth.currentUser?.reload();
+                    retries++;
+                }
+
+                if (auth.currentUser?.displayName) {
+                    console.log("✅ DisplayName actualizado:", auth.currentUser?.displayName);
+                    setUser({ ...auth.currentUser });
+                }
+            }
+
+            console.log("✅ Sesión anónima exitosa:", {
+                uid: result.user.uid,
+                displayName: auth.currentUser?.displayName,
+                isAnonymous: result.user.isAnonymous,
+            });
+        } catch (err) {
+            console.error("❌ Error en login anónimo:", err);
+            let errorMessage = "Error al iniciar sesión como invitado.";
+            if (err.code === "auth/operation-not-allowed") {
+                errorMessage = "El modo invitado no está habilitado. Contacta al administrador.";
+            } else if (err.code === "auth/network-request-failed") {
+                errorMessage = "Error de red. Verifica tu conexión a internet.";
+            }
+            setError(errorMessage);
+            setLoading(false);
+        }
+    }, []);
+
     const clearError = useCallback(() => {
         setError(null);
     }, []);
 
-    return { user, loading, error, login, loginWithEmail, registerWithEmail, logout, clearError };
+    return {
+        user,
+        loading,
+        error,
+        login,
+        loginWithEmail,
+        registerWithEmail,
+        loginAsGuest,
+        logout,
+        clearError,
+    };
 }
