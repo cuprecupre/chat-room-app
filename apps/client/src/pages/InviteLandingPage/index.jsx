@@ -7,7 +7,7 @@ import { ROUTES } from "../../routes/routes";
 
 /**
  * InviteLandingPage - Invitation screen for NON-authenticated users
- * Shows login options (Google/Email) when accessing a game via shared link
+ * Shows login options (Google/Email/Guest) when accessing a game via shared link
  */
 export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
     const navigate = useNavigate();
@@ -25,6 +25,11 @@ export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
     const handleGoToEmailAuth = () => {
         // Navigate to auth page with gameId preserved
         navigate(`${ROUTES.AUTH}?gameId=${urlGameId}`);
+    };
+
+    // Handle guest auth - preserve gameId in URL
+    const handleGoToGuestAuth = () => {
+        navigate(`${ROUTES.GUEST_AUTH}?gameId=${urlGameId}`);
     };
 
     // Error state: Game not found
@@ -67,6 +72,17 @@ export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
             title="¡Te han invitado!"
             subtitle="¿Quieres entrar ahora?"
         >
+            {/* Guest Login Button */}
+            <Button
+                onClick={handleGoToGuestAuth}
+                disabled={isLoading}
+                variant="primary"
+                size="lg"
+                className="w-full h-14 text-base rounded-full"
+            >
+                <span className="align-middle font-semibold">Jugar como invitado</span>
+            </Button>
+
             {/* Google Login Button - Same style as LandingPage */}
             <Button
                 onClick={onLogin}
@@ -115,7 +131,7 @@ export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
                 <span className="align-middle font-semibold">Continuar con Google</span>
             </Button>
 
-            {/* Email Login Button - Same style as LandingPage */}
+            {/* Temporarily hidden - Email Login
             <Button
                 onClick={handleGoToEmailAuth}
                 disabled={isLoading}
@@ -140,6 +156,7 @@ export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
                 </span>
                 <span className="align-middle font-semibold">Continuar con Email</span>
             </Button>
+            */}
 
             {/* Cancel Button */}
             <Button

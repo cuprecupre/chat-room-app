@@ -263,20 +263,8 @@ export function RulesPage() {
                             onClick={() => (window.location.href = "/")}
                             variant="primary"
                             size="lg"
-                            className="w-full sm:w-auto px-8 bg-orange-600 hover:bg-orange-500 text-white border-none shadow-lg h-14 text-lg font-bold transform hover:scale-105 transition-all duration-300 rounded-full flex items-center justify-center gap-3 mx-auto"
+                            className="w-full sm:w-auto px-8 bg-orange-600 hover:bg-orange-500 text-white border-none shadow-lg h-14 text-lg font-bold transform hover:scale-105 transition-all duration-300 rounded-full flex items-center justify-center mx-auto"
                         >
-                            <svg
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M21.35 11.1H12V15.3H17.5C17.2 16.2 16.5 17.6 15.1 18.5C14.2 19.1 13.1 19.4 12 19.4C9.1 19.4 6.7 17.5 5.8 14.9C5.6 14.3 5.5 13.7 5.5 13C5.5 12.3 5.6 11.7 5.8 11.1C6.7 8.5 9.1 6.6 12 6.6C13.6 6.6 14.9 7.2 15.8 8l3.1-3.1C17.2 3.3 14.9 2.4 12 2.4C8 2.4 4.5 4.7 2.8 8.1C2 9.6 1.6 11.3 1.6 13C1.6 14.7 2 16.4 2.8 17.9C4.5 21.3 8 23.6 12 23.6C14.8 23.6 17.1 22.7 18.8 21.1C20.6 19.4 21.6 17 21.6 14.1C21.6 13.1 21.5 12.1 21.35 11.1Z"
-                                    fill="white"
-                                />
-                            </svg>
                             Empezar Partida Gratis
                         </Button>
                     </div>
