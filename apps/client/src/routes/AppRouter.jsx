@@ -234,12 +234,19 @@ function AppRoutes({
                         <Route
                             path={ROUTES.AUTH}
                             element={(() => {
-                                const urlGameId = new URLSearchParams(window.location.search).get("gameId");
+                                const urlGameId = new URLSearchParams(window.location.search).get(
+                                    "gameId"
+                                );
 
                                 if (user) {
                                     // Si hay gameId, redirigir a game con el gameId
                                     if (urlGameId) {
-                                        return <Navigate to={`${ROUTES.GAME}?gameId=${urlGameId}`} replace />;
+                                        return (
+                                            <Navigate
+                                                to={`${ROUTES.GAME}?gameId=${urlGameId}`}
+                                                replace
+                                            />
+                                        );
                                     }
                                     // Si no hay gameId, ir al lobby
                                     return <Navigate to={ROUTES.LOBBY} replace />;
@@ -259,12 +266,19 @@ function AppRoutes({
                         <Route
                             path={ROUTES.GUEST_AUTH}
                             element={(() => {
-                                const urlGameId = new URLSearchParams(window.location.search).get("gameId");
+                                const urlGameId = new URLSearchParams(window.location.search).get(
+                                    "gameId"
+                                );
 
                                 if (user) {
                                     // Si hay gameId, redirigir a game con el gameId
                                     if (urlGameId) {
-                                        return <Navigate to={`${ROUTES.GAME}?gameId=${urlGameId}`} replace />;
+                                        return (
+                                            <Navigate
+                                                to={`${ROUTES.GAME}?gameId=${urlGameId}`}
+                                                replace
+                                            />
+                                        );
                                     }
                                     // Si no hay gameId, ir al lobby
                                     return <Navigate to={ROUTES.LOBBY} replace />;
@@ -344,8 +358,17 @@ function AppRoutes({
 }
 
 export function AppRouter() {
-    const { user, loading, error, login, loginWithEmail, registerWithEmail, loginAsGuest, logout, clearError } =
-        useAuth();
+    const {
+        user,
+        loading,
+        error,
+        login,
+        loginWithEmail,
+        registerWithEmail,
+        loginAsGuest,
+        logout,
+        clearError,
+    } = useAuth();
     const { connected, gameState, emit, joinError, clearJoinError } = useSocket(user);
     const [showLoader, setShowLoader] = useState(false);
 

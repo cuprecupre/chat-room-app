@@ -3,12 +3,14 @@
 ## 🔜 Próximas Funcionalidades
 
 ### 1. Abstención Automática para Desconectados
+
 **Prioridad**: Alta  
 **Complejidad**: Media
 
 Si un jugador lleva >2 minutos desconectado durante la votación, su voto cuenta como abstención (no vota a nadie) y la partida puede continuar.
 
 #### Implementación
+
 - [ ] Modificar `checkIfAllVoted()` para excluir jugadores con `pendingDisconnect` > 2 min
 - [ ] Añadir campo `connected` al estado del jugador enviado al cliente
 - [ ] Mostrar indicador visual de "Desconectado" en UI
@@ -17,10 +19,12 @@ Si un jugador lleva >2 minutos desconectado durante la votación, su voto cuenta
 ---
 
 ### 2. Sistema de Estadísticas de Jugador
+
 **Prioridad**: Media  
 **Complejidad**: Media
 
 #### Métricas a trackear
+
 - `gamesPlayed` - Total de partidas jugadas
 - `gamesWon` - Partidas ganadas
 - `timesImpostor` - Veces que fue impostor
@@ -30,14 +34,16 @@ Si un jugador lleva >2 minutos desconectado durante la votación, su voto cuenta
 - `wrongVotes` - Votos a inocentes
 
 #### Reconocimientos al final de partida
-| Reconocimiento | Criterio |
-|----------------|----------|
-| 🔍 **Mejor Olfato** | Mayor ratio de votos correctos |
+
+| Reconocimiento            | Criterio                              |
+| ------------------------- | ------------------------------------- |
+| 🔍 **Mejor Olfato**       | Mayor ratio de votos correctos        |
 | 🎭 **Maestro del Engaño** | Más rondas sobrevividas como impostor |
-| 😅 **Peor Mentiroso** | Pillado más rápido como impostor |
-| 🎯 **Peor Detector** | Mayor ratio de votos incorrectos |
+| 😅 **Peor Mentiroso**     | Pillado más rápido como impostor      |
+| 🎯 **Peor Detector**      | Mayor ratio de votos incorrectos      |
 
 #### Tareas
+
 - [ ] Diseñar schema de estadísticas en Firestore
 - [ ] Implementar tracking de métricas durante partida
 - [ ] Calcular reconocimientos al finalizar partida
@@ -48,12 +54,14 @@ Si un jugador lleva >2 minutos desconectado durante la votación, su voto cuenta
 ---
 
 ### 3. Código QR para Compartir Partida
+
 **Prioridad**: Media  
 **Complejidad**: Baja
 
 Generar código QR con el enlace de invitación para facilitar compartir la partida en persona (ej: proyector, TV).
 
 #### Implementación
+
 - [ ] Añadir librería `qrcode.react` o similar
 - [ ] Botón "Mostrar QR" junto al botón "Copiar enlace"
 - [ ] Modal con QR grande y escaneable
@@ -62,6 +70,7 @@ Generar código QR con el enlace de invitación para facilitar compartir la part
 ---
 
 ### 4. Vinculación de Cuenta Anónima
+
 **Prioridad**: Baja  
 **Complejidad**: Baja
 
@@ -73,12 +82,14 @@ Generar código QR con el enlace de invitación para facilitar compartir la part
 ---
 
 ### 5. Firebase App Check (Anti-bot)
+
 **Prioridad**: Baja  
 **Complejidad**: Media
 
 Protección invisible contra bots y scripts automatizados usando reCAPTCHA v3.
 
 #### Implementación
+
 - [ ] Configurar reCAPTCHA v3 en Google Cloud Console
 - [ ] Habilitar App Check en Firebase Console
 - [ ] Inicializar App Check en cliente (`firebase.js`)

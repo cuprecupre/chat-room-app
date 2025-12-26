@@ -51,9 +51,7 @@ export function GuestAuthScreen({ onLoginAsGuest, onBack, isLoading, error, clea
                                 loading="lazy"
                             />
                         </div>
-                        <h1 className="text-3xl font-serif text-neutral-50">
-                            Jugar como invitado
-                        </h1>
+                        <h1 className="text-3xl font-serif text-neutral-50">Jugar como invitado</h1>
                         <p className="text-neutral-400">
                             Ingresa un nombre para que los demás jugadores te reconozcan
                         </p>
@@ -103,7 +101,7 @@ export function GuestAuthScreen({ onLoginAsGuest, onBack, isLoading, error, clea
                                     Entrando...
                                 </span>
                             ) : (
-                                "Entrar como invitado"
+                                "Entrar a jugar"
                             )}
                         </Button>
                     </form>
@@ -134,12 +132,8 @@ export function GuestAuthScreen({ onLoginAsGuest, onBack, isLoading, error, clea
 
                     {/* Nota informativa */}
                     <div className="text-center text-xs text-neutral-500 space-y-1">
-                        <p>
-                            Como invitado podrás jugar sin registrarte.
-                        </p>
-                        <p>
-                            Tu sesión se mantendrá hasta que cierres el navegador.
-                        </p>
+                        <p>Como invitado podrás jugar sin registrarte.</p>
+                        <p>Tu sesión se mantendrá hasta que cierres el navegador.</p>
                     </div>
                 </div>
             </div>

@@ -150,31 +150,12 @@ export function LandingPage({
                 </div>
                 <div>
                     <Button
-                        onClick={onLogin}
+                        onClick={onGoToGuestAuth}
                         variant="primary"
                         size="sm"
-                        className="w-auto !px-6 !py-1 !h-9 text-sm disabled:opacity-50 disabled:cursor-not-allowed rounded-full flex items-center gap-2"
+                        className="w-auto !px-6 !py-1 !h-9 text-sm disabled:opacity-50 disabled:cursor-not-allowed rounded-full"
                         disabled={isLoading}
                     >
-                        <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
-                            <title>Google</title>
-                            <path
-                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                                fill="#FFFFFF"
-                            />
-                            <path
-                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                                fill="#FFFFFF"
-                            />
-                            <path
-                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.26.81-.58z"
-                                fill="#FFFFFF"
-                            />
-                            <path
-                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                                fill="#FFFFFF"
-                            />
-                        </svg>
                         Jugar Ahora
                     </Button>
                 </div>
@@ -218,8 +199,19 @@ export function LandingPage({
                         </p>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10 animate-fadeIn animate-delay-600 w-full max-w-md mx-auto sm:max-w-none">
-                        <div className="w-full sm:w-auto min-w-[240px]">
+                    <div className="flex flex-col gap-4 justify-center items-center animate-fadeIn animate-delay-600 w-full max-w-md mx-auto">
+                        <div className="w-full">
+                            <Button
+                                onClick={onGoToGuestAuth}
+                                disabled={isLoading}
+                                variant="primary"
+                                size="lg"
+                                className="px-8 w-full h-14 text-base rounded-full"
+                            >
+                                <span className="align-middle font-semibold">Jugar ahora</span>
+                            </Button>
+                        </div>
+                        <div className="w-full">
                             <Button
                                 onClick={onLogin}
                                 disabled={isLoading}
@@ -269,63 +261,38 @@ export function LandingPage({
                                 </span>
                             </Button>
                         </div>
-                        <div className="w-full sm:w-auto min-w-[240px]">
-                            <Button
-                                onClick={onGoToEmailAuth}
-                                disabled={isLoading}
-                                variant="outline"
-                                size="lg"
-                                className="bg-white/5 border-white/10 text-white hover:bg-white/10 shadow-none px-8 w-full h-14 text-base backdrop-blur-sm rounded-full"
-                            >
-                                <span className="mr-3 inline-flex items-center justify-center align-middle">
-                                    <svg
-                                        className="w-5 h-5 text-neutral-300"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                        />
-                                    </svg>
-                                </span>
-                                <span className="align-middle font-semibold">
-                                    Continuar con Email
-                                </span>
-                            </Button>
-                        </div>
-                        <div className="w-full sm:w-auto min-w-[240px]">
-                            <Button
-                                onClick={onGoToGuestAuth}
-                                disabled={isLoading}
-                                variant="outline"
-                                size="lg"
-                                className="bg-white/5 border-white/10 text-white hover:bg-white/10 shadow-none px-8 w-full h-14 text-base backdrop-blur-sm rounded-full"
-                            >
-                                <span className="mr-3 inline-flex items-center justify-center align-middle">
-                                    <svg
-                                        className="w-5 h-5 text-neutral-300"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                        />
-                                    </svg>
-                                </span>
-                                <span className="align-middle font-semibold">
-                                    Jugar como invitado
-                                </span>
-                            </Button>
-                        </div>
                     </div>
+
+                    {/* Temporarily hidden - Email Login
+                    <div className="w-full">
+                        <Button
+                            onClick={onGoToEmailAuth}
+                            disabled={isLoading}
+                            variant="outline"
+                            size="lg"
+                            className="bg-white/5 border-white/10 text-white hover:bg-white/10 shadow-none px-8 w-full h-14 text-base backdrop-blur-sm rounded-full"
+                        >
+                            <span className="mr-3 inline-flex items-center justify-center align-middle">
+                                <svg
+                                    className="w-5 h-5 text-neutral-300"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                    />
+                                </svg>
+                            </span>
+                            <span className="align-middle font-semibold">
+                                Continuar con Email
+                            </span>
+                        </Button>
+                    </div>
+                    */}
 
                     <div className="pt-8 flex justify-center gap-8 text-sm text-neutral-500 animate-fadeIn animate-delay-800">
                         <span className="flex items-center gap-1.5">
@@ -566,21 +533,23 @@ export function LandingPage({
                             {reviews.map((review, index) => (
                                 <div
                                     key={index}
-                                    className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${index === currentReview
-                                        ? "animate-verbatim-in z-10 relative"
-                                        : "animate-verbatim-out z-0 pointer-events-none absolute" // Keep absolute for exiting items to prevent layout jumps if they were different sizes, or just relative if strictly stacking
-                                        }`}
-                                // Note: If we want the container to ALWAYS hold the height of the TALLEST, we should make them all relative (grid items).
-                                // BUT, if we want them to cross-fade, one might need to be absolute to not push the other?
-                                // Actually in CSS Grid, overlapping items (col-start-1 row-start-1) Sit on top of each other without pushing.
-                                // So they act like layers. The grid cell grows to fit the tallest layer.
-                                // So we can remove 'absolute' from here entirely!
+                                    className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${
+                                        index === currentReview
+                                            ? "animate-verbatim-in z-10 relative"
+                                            : "animate-verbatim-out z-0 pointer-events-none absolute" // Keep absolute for exiting items to prevent layout jumps if they were different sizes, or just relative if strictly stacking
+                                    }`}
+                                    // Note: If we want the container to ALWAYS hold the height of the TALLEST, we should make them all relative (grid items).
+                                    // BUT, if we want them to cross-fade, one might need to be absolute to not push the other?
+                                    // Actually in CSS Grid, overlapping items (col-start-1 row-start-1) Sit on top of each other without pushing.
+                                    // So they act like layers. The grid cell grows to fit the tallest layer.
+                                    // So we can remove 'absolute' from here entirely!
                                 >
                                     <div
-                                        className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${index === currentReview
-                                            ? "animate-verbatim-in z-10 opacity-100"
-                                            : "animate-verbatim-out z-0 opacity-0 pointer-events-none"
-                                            }`}
+                                        className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${
+                                            index === currentReview
+                                                ? "animate-verbatim-in z-10 opacity-100"
+                                                : "animate-verbatim-out z-0 opacity-0 pointer-events-none"
+                                        }`}
                                     >
                                         <div className="bg-neutral-950 border border-white/5 p-8 md:p-10 rounded-3xl relative overflow-hidden shadow-2xl mx-auto max-w-2xl">
                                             <div className="flex flex-col gap-6">
@@ -634,10 +603,11 @@ export function LandingPage({
                         {faqs.map((faq, index) => (
                             <div
                                 key={index}
-                                className={`group border rounded-2xl overflow-hidden transition-all duration-300 ${openFaq === index
-                                    ? "bg-neutral-900 border-orange-500/50 ring-1 ring-orange-500/20"
-                                    : "border-white/10 hover:border-orange-500/30 hover:bg-neutral-900/50"
-                                    }`}
+                                className={`group border rounded-2xl overflow-hidden transition-all duration-300 ${
+                                    openFaq === index
+                                        ? "bg-neutral-900 border-orange-500/50 ring-1 ring-orange-500/20"
+                                        : "border-white/10 hover:border-orange-500/30 hover:bg-neutral-900/50"
+                                }`}
                             >
                                 <button
                                     onClick={() => toggleFaq(index)}
@@ -667,10 +637,11 @@ export function LandingPage({
                                     </span>
                                 </button>
                                 <div
-                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${openFaq === index
-                                        ? "max-h-48 opacity-100"
-                                        : "max-h-0 opacity-0"
-                                        }`}
+                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                                        openFaq === index
+                                            ? "max-h-48 opacity-100"
+                                            : "max-h-0 opacity-0"
+                                    }`}
                                 >
                                     <div className="p-6 pt-0 text-neutral-300 leading-relaxed">
                                         {faq.answer}
@@ -702,48 +673,11 @@ export function LandingPage({
                     </p>
                     <div className="flex justify-center pt-4">
                         <Button
-                            onClick={onLogin}
+                            onClick={onGoToGuestAuth}
                             disabled={isLoading}
-                            variant="outline"
-                            className="bg-orange-600 border-orange-500 text-white hover:bg-orange-500 shadow-lg shadow-orange-900/20 px-8 h-12 text-base font-semibold transform hover:scale-105 transition-all duration-300 rounded-full w-auto"
+                            variant="primary"
+                            className="px-8 h-12 text-base font-semibold transform hover:scale-105 transition-all duration-300 rounded-full w-auto"
                         >
-                            <span className="mr-3 inline-flex items-center justify-center align-middle">
-                                {isLoading ? (
-                                    <Spinner size="sm" />
-                                ) : (
-                                    <svg
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 16 16"
-                                        aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <g clipPath="url(#clip0_643_9687_footer)">
-                                            <path
-                                                d="M8.00018 3.16667C9.18018 3.16667 10.2368 3.57333 11.0702 4.36667L13.3535 2.08333C11.9668 0.793333 10.1568 0 8.00018 0C4.87352 0 2.17018 1.79333 0.853516 4.40667L3.51352 6.47C4.14352 4.57333 5.91352 3.16667 8.00018 3.16667Z"
-                                                fill="white"
-                                            />
-                                            <path
-                                                d="M15.66 8.18335C15.66 7.66002 15.61 7.15335 15.5333 6.66669H8V9.67335H12.3133C12.12 10.66 11.56 11.5 10.72 12.0667L13.2967 14.0667C14.8 12.6734 15.66 10.6134 15.66 8.18335Z"
-                                                fill="white"
-                                            />
-                                            <path
-                                                d="M3.51 9.53001C3.35 9.04668 3.25667 8.53334 3.25667 8.00001C3.25667 7.46668 3.34667 6.95334 3.51 6.47001L0.85 4.40668C0.306667 5.48668 0 6.70668 0 8.00001C0 9.29334 0.306667 10.5133 0.853333 11.5933L3.51 9.53001Z"
-                                                fill="white"
-                                            />
-                                            <path
-                                                d="M8.0001 16C10.1601 16 11.9768 15.29 13.2968 14.0633L10.7201 12.0633C10.0034 12.5467 9.0801 12.83 8.0001 12.83C5.91343 12.83 4.14343 11.4233 3.5101 9.52667L0.850098 11.59C2.1701 14.2067 4.87343 16 8.0001 16Z"
-                                                fill="white"
-                                            />
-                                        </g>
-                                        <defs>
-                                            <clipPath id="clip0_643_9687_footer">
-                                                <rect width="16" height="16" fill="white" />
-                                            </clipPath>
-                                        </defs>
-                                    </svg>
-                                )}
-                            </span>
                             <span className="align-middle font-semibold">
                                 Empezar Partida Gratis
                             </span>

@@ -151,7 +151,7 @@ export function useAuth() {
             try {
                 console.log("🧹 Limpiando sessionStorage flag");
                 sessionStorage.removeItem("auth:redirect");
-            } catch (_) { }
+            } catch (_) {}
         };
 
         // Ejecutar inmediatamente
@@ -293,7 +293,7 @@ export function useAuth() {
             // Limpiar flag de redirect si falla
             try {
                 sessionStorage.removeItem("auth:redirect");
-            } catch (_) { }
+            } catch (_) {}
         }
     }, []);
 
@@ -443,5 +443,15 @@ export function useAuth() {
         setError(null);
     }, []);
 
-    return { user, loading, error, login, loginWithEmail, registerWithEmail, loginAsGuest, logout, clearError };
+    return {
+        user,
+        loading,
+        error,
+        login,
+        loginWithEmail,
+        registerWithEmail,
+        loginAsGuest,
+        logout,
+        clearError,
+    };
 }
