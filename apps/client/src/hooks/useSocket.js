@@ -9,6 +9,7 @@ export function useSocket(user) {
     const [gameState, setGameState] = useState(null);
     const attemptedResumeRef = useRef(false);
     const initialLoadRef = useRef(true);
+    const isInvitationPendingRef = useRef(false);
     const hasLoggedWaitingDisplayName = useRef(false);
     const [joinError, setJoinError] = useState(null); // Nuevo estado para errores de unión
 
@@ -170,33 +171,48 @@ export function useSocket(user) {
                     if (newState?.gameId) {
                         const currentUrlId = url.searchParams.get("gameId");
 
-                        // PROTECCIÓN INVITACIONES:
-                        // Si es la carga inicial y la URL tiene un ID diferente al que manda el servidor,
-                        // asumimos que el usuario quiere ir a esa URL (invitación) y NO sobrescribimos.
-                        // El useEffect de GamePage se encargará de hacer join a la URL correcta.
+                        // DETECCIÓN DE INVITACIÓN (Initial Load)
                         if (initialLoadRef.current && currentUrlId && currentUrlId !== newState.gameId) {
-                            console.log(`[Socket] Ignoring URL update on initial load (Invitation detected): URL=${currentUrlId}, State=${newState.gameId}`);
+                            console.log(`[Socket] Invitation detected on load. Pending join to: ${currentUrlId}`);
+                            isInvitationPendingRef.current = true;
+                        }
+
+                        // Si ya nos unimos a la partida deseada, apagar la bandera
+                        if (currentUrlId === newState.gameId) {
+                            isInvitationPendingRef.current = false;
+                        }
+
+                        // LÓGICA DE ACTUALIZACIÓN DE URL
+                        if (isInvitationPendingRef.current) {
+                            // Si estamos intentando unirnos a una invitación, IGNORAR actualizaciones del servidor
+                            // que nos devuelvan a la partida vieja.
+                            console.log(`[Socket] Ignoring URL update (Invitation Pending). Keep: ${currentUrlId}, Ignore: ${newState.gameId}`);
                         } else {
-                            // Comportamiento normal: Sincronizar URL con estado del servidor
-                            // Esto maneja migración (old->new) y navegación normal
+                            // Comportamiento normal (Migración o Navegación dentro de partida)
                             if (currentUrlId !== newState.gameId) {
                                 console.log(`[Socket] Updating URL gameId: ${currentUrlId} → ${newState.gameId}`);
+                                url.searchParams.set("gameId", newState.gameId);
+                                window.history.replaceState({}, "", url.toString());
                             }
-                            url.searchParams.set("gameId", newState.gameId);
-                            window.history.replaceState({}, "", url.toString());
                         }
 
                         initialLoadRef.current = false;
                     } else {
                         const urlGameId = url.searchParams.get("gameId");
 
-                        // PROTECCIÓN INVITACIONES:
-                        // Si entramos con un link ?gameId=XYZ y el servidor dice "no estás en partida",
-                        // NO borrar el ID, para permitir que el cliente intente unirse.
+                        // PROTECCIÓN INVITACIONES (Estado Null):
+                        // Si entramos con un link ?gameId=XYZ y el servidor dice null,
+                        // es probable que sea una invitación a partida nueva.
                         if (initialLoadRef.current && urlGameId) {
-                            console.log(`[Socket] Preserving URL gameId on initial load (Invitation to new game): ${urlGameId}`);
+                            console.log(`[Socket] Invitation detected (Game not found yet). Pending join to: ${urlGameId}`);
+                            isInvitationPendingRef.current = true;
+                        }
+
+                        if (isInvitationPendingRef.current && urlGameId) {
+                            console.log(`[Socket] Preserving URL gameId (Invitation Pending): ${urlGameId}`);
+                            // NO borrar URL
                         } else if (urlGameId) {
-                            // Solo borrar si NO es una invitación inicial (ej: partida borrada, kick)
+                            // Solo borrar si NO es una invitación pendiente
                             console.log("[Socket] Clearing gameId from URL after receiving null state");
                             url.searchParams.delete("gameId");
                             window.history.replaceState({}, "", url.toString());
