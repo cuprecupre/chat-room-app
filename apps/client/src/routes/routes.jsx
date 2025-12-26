@@ -2,6 +2,7 @@
 export const ROUTES = {
     HOME: "/",
     AUTH: "/auth",
+    GUEST_AUTH: "/guest",
     RULES: "/reglas",
     LOBBY: "/lobby",
     GAME: "/game",
@@ -17,6 +18,11 @@ export const routeConfig = [
     {
         path: ROUTES.AUTH,
         name: "Email Auth",
+        isProtected: false,
+    },
+    {
+        path: ROUTES.GUEST_AUTH,
+        name: "Guest Auth",
         isProtected: false,
     },
     {

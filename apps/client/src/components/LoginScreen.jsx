@@ -6,6 +6,7 @@ import heroImg from "../assets/impostor-home.jpg";
 export function LoginScreen({
     onLogin,
     onGoToEmailAuth,
+    onGoToGuestAuth,
     isLoading,
     onOpenInstructions,
     onOpenFeedback,
@@ -113,7 +114,34 @@ export function LoginScreen({
                         </Button>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 animate-fadeIn animate-delay-1000">
+                    <div className="animate-fadeIn animate-delay-1000">
+                        <Button
+                            onClick={onGoToGuestAuth}
+                            disabled={isLoading}
+                            variant="outline"
+                            size="md"
+                            className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                        >
+                            <span className="mr-3 inline-flex items-center justify-center align-middle">
+                                <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                    />
+                                </svg>
+                            </span>
+                            <span className="align-middle">Jugar como invitado</span>
+                        </Button>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 animate-fadeIn animate-delay-1100">
                         <button
                             onClick={onOpenInstructions}
                             className="inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"

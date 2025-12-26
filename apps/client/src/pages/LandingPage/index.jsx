@@ -9,10 +9,15 @@ export function LandingPage({ onLogin, isLoading, onOpenInstructions, onOpenFeed
         navigate(ROUTES.AUTH);
     };
 
+    const handleGoToGuestAuth = () => {
+        navigate(ROUTES.GUEST_AUTH);
+    };
+
     return (
         <LandingPageComponent
             onLogin={onLogin}
             onGoToEmailAuth={handleGoToEmailAuth}
+            onGoToGuestAuth={handleGoToGuestAuth}
             isLoading={isLoading}
             onOpenInstructions={onOpenInstructions}
             onOpenFeedback={onOpenFeedback}
