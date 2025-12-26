@@ -7,7 +7,7 @@ import { ROUTES } from "../../routes/routes";
 
 /**
  * InviteLandingPage - Invitation screen for NON-authenticated users
- * Shows login options (Google/Email) when accessing a game via shared link
+ * Shows login options (Google/Email/Guest) when accessing a game via shared link
  */
 export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
     const navigate = useNavigate();
@@ -25,6 +25,11 @@ export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
     const handleGoToEmailAuth = () => {
         // Navigate to auth page with gameId preserved
         navigate(`${ROUTES.AUTH}?gameId=${urlGameId}`);
+    };
+
+    // Handle guest auth - preserve gameId in URL
+    const handleGoToGuestAuth = () => {
+        navigate(`${ROUTES.GUEST_AUTH}?gameId=${urlGameId}`);
     };
 
     // Error state: Game not found
@@ -141,6 +146,32 @@ export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
                 <span className="align-middle font-semibold">Continuar con Email</span>
             </Button>
 
+            {/* Guest Login Button */}
+            <Button
+                onClick={handleGoToGuestAuth}
+                disabled={isLoading}
+                variant="outline"
+                size="lg"
+                className="bg-white/5 border-white/10 text-white hover:bg-white/10 shadow-none w-full h-14 text-base backdrop-blur-sm rounded-full"
+            >
+                <span className="mr-3 inline-flex items-center justify-center align-middle">
+                    <svg
+                        className="w-5 h-5 text-neutral-300"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                    </svg>
+                </span>
+                <span className="align-middle font-semibold">Jugar como invitado</span>
+            </Button>
+
             {/* Cancel Button */}
             <Button
                 onClick={handleCancel}
@@ -153,3 +184,4 @@ export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
         </InvitationCard>
     );
 }
+

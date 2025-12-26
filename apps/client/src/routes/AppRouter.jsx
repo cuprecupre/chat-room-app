@@ -34,6 +34,9 @@ const LandingPage = lazy(() =>
 const EmailAuthPage = lazy(() =>
     import("../pages/EmailAuthPage").then((m) => ({ default: m.EmailAuthPage }))
 );
+const GuestAuthPage = lazy(() =>
+    import("../pages/GuestAuthPage").then((m) => ({ default: m.GuestAuthPage }))
+);
 const LobbyPage = lazy(() => import("../pages/LobbyPage").then((m) => ({ default: m.LobbyPage })));
 const GamePage = lazy(() => import("../pages/GamePage").then((m) => ({ default: m.GamePage })));
 const RulesPage = lazy(() => import("../pages/RulesPage").then((m) => ({ default: m.RulesPage })));
@@ -103,6 +106,7 @@ function AppRoutes({
     login,
     loginWithEmail,
     registerWithEmail,
+    loginAsGuest,
     logout,
     clearError,
     connected,
@@ -229,10 +233,19 @@ function AppRoutes({
                         />
                         <Route
                             path={ROUTES.AUTH}
-                            element={
-                                user ? (
-                                    <Navigate to={ROUTES.LOBBY} replace />
-                                ) : (
+                            element={(() => {
+                                const urlGameId = new URLSearchParams(window.location.search).get("gameId");
+
+                                if (user) {
+                                    // Si hay gameId, redirigir a game con el gameId
+                                    if (urlGameId) {
+                                        return <Navigate to={`${ROUTES.GAME}?gameId=${urlGameId}`} replace />;
+                                    }
+                                    // Si no hay gameId, ir al lobby
+                                    return <Navigate to={ROUTES.LOBBY} replace />;
+                                }
+
+                                return (
                                     <EmailAuthPage
                                         onLoginWithEmail={loginWithEmail}
                                         onRegisterWithEmail={registerWithEmail}
@@ -240,8 +253,32 @@ function AppRoutes({
                                         error={error}
                                         clearError={clearError}
                                     />
-                                )
-                            }
+                                );
+                            })()}
+                        />
+                        <Route
+                            path={ROUTES.GUEST_AUTH}
+                            element={(() => {
+                                const urlGameId = new URLSearchParams(window.location.search).get("gameId");
+
+                                if (user) {
+                                    // Si hay gameId, redirigir a game con el gameId
+                                    if (urlGameId) {
+                                        return <Navigate to={`${ROUTES.GAME}?gameId=${urlGameId}`} replace />;
+                                    }
+                                    // Si no hay gameId, ir al lobby
+                                    return <Navigate to={ROUTES.LOBBY} replace />;
+                                }
+
+                                return (
+                                    <GuestAuthPage
+                                        onLoginAsGuest={loginAsGuest}
+                                        isLoading={loading}
+                                        error={error}
+                                        clearError={clearError}
+                                    />
+                                );
+                            })()}
                         />
                         <Route path={ROUTES.RULES} element={<RulesPage />} />
                     </Route>
@@ -307,7 +344,7 @@ function AppRoutes({
 }
 
 export function AppRouter() {
-    const { user, loading, error, login, loginWithEmail, registerWithEmail, logout, clearError } =
+    const { user, loading, error, login, loginWithEmail, registerWithEmail, loginAsGuest, logout, clearError } =
         useAuth();
     const { connected, gameState, emit, joinError, clearJoinError } = useSocket(user);
     const [showLoader, setShowLoader] = useState(false);
@@ -355,6 +392,7 @@ export function AppRouter() {
                 login={login}
                 loginWithEmail={loginWithEmail}
                 registerWithEmail={registerWithEmail}
+                loginAsGuest={loginAsGuest}
                 logout={logout}
                 clearError={clearError}
                 connected={connected}
