@@ -32,6 +32,12 @@ export function RoundStartOverlay({ state }) {
                     {displayedRound === 1 && (
                         <p className="text-2xl text-neutral-300">Comienza la partida</p>
                     )}
+                    {displayedRound === 2 && (
+                        <p className="text-2xl text-neutral-300">El Impostor lo está haciendo muy bien...</p>
+                    )}
+                    {displayedRound === 3 && (
+                        <p className="text-2xl text-neutral-300">¡Última oportunidad para descubrirlo!</p>
+                    )}
                 </div>
 
                 <div className="w-16 h-px bg-white/10 mx-auto"></div>
