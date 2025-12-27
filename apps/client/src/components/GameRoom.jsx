@@ -849,7 +849,7 @@ export function GameRoom({
                                                                         <div>
                                                                             <div className="flex flex-col items-center justify-center gap-1 text-xs tracking-wider text-orange-400">
                                                                                 <span className="uppercase">
-                                                                                    Pista:
+                                                                                    Ayuda:
                                                                                 </span>
                                                                                 <span className="normal-case">
                                                                                     La palabra
