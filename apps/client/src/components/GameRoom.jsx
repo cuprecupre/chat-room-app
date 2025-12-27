@@ -407,6 +407,7 @@ export function GameRoom({
     const [eliminatedPlayerInfo, setEliminatedPlayerInfo] = useState(null);
     const [showCardEntrance, setShowCardEntrance] = useState(false);
     const [showRestOfUI, setShowRestOfUI] = useState(true);
+    const [initialAnimationPending, setInitialAnimationPending] = useState(false);
     const [showEndGameModalInternal, setShowEndGameModalInternal] = useState(false);
 
     // Usar props si están definidas, sino usar estado interno
@@ -500,21 +501,25 @@ export function GameRoom({
             if (shouldShowAnimation) {
                 // Ocultar el resto de la UI hasta que termine la animación de la carta
                 setShowRestOfUI(false);
-                setShowCardEntrance(true);
+                setShowCardEntrance(false);
+                setInitialAnimationPending(true);
 
-                // Después de 800ms (duración de animate-cardEntrance), mostrar el resto de elementos
+                // Esperar 3000ms (duración del overlay) antes de iniciar animación
                 if (restUITimeoutRef.current) clearTimeout(restUITimeoutRef.current);
                 restUITimeoutRef.current = setTimeout(() => {
-                    setShowRestOfUI(true);
-                }, 800);
+                    setInitialAnimationPending(false);
+                    setShowCardEntrance(true);
 
-                // Quitar la animación después de que termine
-                setTimeout(() => {
-                    setShowCardEntrance(false);
-                }, 800);
+                    // Después de 800ms (duración de animate-cardEntrance), mostrar el resto de elementos
+                    setTimeout(() => {
+                        setShowRestOfUI(true);
+                        setShowCardEntrance(false);
+                    }, 800);
+                }, 3000);
             } else {
                 // Si no hay animación, mostrar todo inmediatamente
                 setShowRestOfUI(true);
+                setInitialAnimationPending(false);
             }
         }
 
@@ -790,7 +795,7 @@ export function GameRoom({
                         <div className="w-full max-w-xs mx-auto md:max-w-none pt-8 md:pt-6 pb-8 md:pb-0 border-b border-white/10 md:border-b-0">
                             <div className="space-y-3">
                                 <div
-                                    className={`${showCardEntrance ? "animate-cardEntrance" : ""}`}
+                                    className={`${initialAnimationPending ? "opacity-0" : ""} ${showCardEntrance ? "animate-cardEntrance" : ""}`}
                                 >
                                     <div
                                         className={`flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full ${cardAnimating ? "animate-card-float-complete" : ""}`}
