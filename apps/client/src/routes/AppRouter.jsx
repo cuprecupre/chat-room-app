@@ -51,6 +51,9 @@ const InviteLandingPage = lazy(() =>
 const DebugPreviews = lazy(() =>
     import("../pages/DebugPreviews").catch(() => ({ default: () => null }))
 );
+const DebugPreviewSingle = lazy(() =>
+    import("../pages/DebugPreviewSingle").catch(() => ({ default: () => null }))
+);
 
 function HomeRouteHandler({ user }) {
     const location = useLocation();
@@ -306,6 +309,7 @@ function AppRoutes({
                         />
                         <Route path={ROUTES.RULES} element={<RulesPage />} />
                         <Route path="/debug" element={<DebugPreviews />} />
+                        <Route path="/debug/preview/:viewId" element={<DebugPreviewSingle />} />
                     </Route>
 
                     {/* Protected routes */}

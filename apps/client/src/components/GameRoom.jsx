@@ -167,6 +167,7 @@ export function PlayerList({
                                         >
                                             {p.name}
                                             {p.uid === currentUserId ? " (Tú)" : ""}
+                                            {isWinner && " 🏆"}
                                         </span>
                                         {/* Indicador de eliminado en vista de puntuación */}
                                         {isRoundResult && isEliminated && (

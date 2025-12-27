@@ -18,7 +18,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
     let winnerLabel, winnerTitle, winnerSubtitle;
     if (state.winner === "Empate") {
         winnerLabel = null;
-        winnerTitle = "Impostor descubierto";
+        winnerTitle = "El impostor fue descubierto";
         winnerSubtitle = "Los amigos ganan";
     } else if (impostorWon) {
         winnerLabel = null;
@@ -26,7 +26,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
         winnerSubtitle = null;
     } else {
         winnerLabel = null;
-        winnerTitle = "Impostor descubierto";
+        winnerTitle = "El impostor fue descubierto";
         winnerSubtitle = "Los amigos ganan";
     }
 
@@ -185,12 +185,14 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                         </>
                     ) : (
                         <div className="bg-neutral-900 rounded-xl p-4 text-center">
-                            <div className="flex justify-center gap-1.5 mb-3">
-                                <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-bounce" style={{ animationDelay: '0ms', animationDuration: '0.6s' }}></span>
-                                <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-bounce" style={{ animationDelay: '150ms', animationDuration: '0.6s' }}></span>
-                                <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-bounce" style={{ animationDelay: '300ms', animationDuration: '0.6s' }}></span>
-                            </div>
-                            <p className="text-neutral-400 text-sm">Esperando al anfitrión para la siguiente partida...</p>
+                            <p className="text-neutral-400 text-sm">
+                                Esperando al anfitrión para la siguiente partida
+                                <span className="inline-flex ml-1">
+                                    <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                                    <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                                    <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                                </span>
+                            </p>
                         </div>
                     )}
                 </div>
