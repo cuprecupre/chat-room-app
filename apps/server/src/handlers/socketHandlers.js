@@ -46,6 +46,9 @@ function registerSocketHandlers(io, socket) {
     socket.on("end-game", (gameId) =>
         handleGameAction(socket, user, gameId, (g) => g.endGame(user.uid))
     );
+    socket.on("next-round", (gameId) =>
+        handleGameAction(socket, user, gameId, (g) => g.continueToNextRound(user.uid))
+    );
     socket.on("play-again", (gameId) =>
         handleGameAction(socket, user, gameId, (g) => g.playAgain(user.uid))
     );
@@ -53,6 +56,7 @@ function registerSocketHandlers(io, socket) {
     socket.on("leave-game", (gameId, callback) =>
         handleLeaveGame(io, socket, user, gameId, callback)
     );
+    socket.on("migrate-game", (gameId) => handleMigrateGame(io, socket, user, gameId));
     socket.on("get-state", () => handleGetState(socket, user));
     socket.on("heartbeat", () => sessionManager.updateHeartbeat(user.uid));
     socket.on("disconnect", () => handleDisconnect(io, socket, user));
@@ -101,20 +105,9 @@ function handleReconnection(socket, user) {
 /**
  * Handle game creation.
  */
-function handleCreateGame(socket, user, options = {}) {
-    // Leave current game if in one
-    const userGame = gameManager.findUserGame(user.uid);
-    if (userGame) {
-        console.log(`User ${user.name} leaving game ${userGame.gameId} to create new game`);
-        userGame.removePlayer(user.uid);
-        socket.leave(userGame.gameId);
-        gameManager.emitGameState(userGame);
-
-        // Schedule cleanup if game is now empty
-        if (userGame.players.length === 0) {
-            gameManager.scheduleEmptyGameCleanup(userGame.gameId);
-        }
-    }
+async function handleCreateGame(socket, user, options = {}) {
+    // Clean up ANY previous games the user might be in (ghost busting 👻)
+    await gameManager.cleanupUserPreviousGames(user.uid);
 
     const newGame = gameManager.createGame(user, options);
     socket.join(newGame.gameId);
@@ -126,7 +119,7 @@ function handleCreateGame(socket, user, options = {}) {
 /**
  * Handle joining a game.
  */
-function handleJoinGame(io, socket, user, gameId) {
+async function handleJoinGame(io, socket, user, gameId) {
     const gameToJoin = gameManager.getGame(gameId);
     if (!gameToJoin) {
         return socket.emit("error-message", "La partida no existe.");
@@ -137,19 +130,8 @@ function handleJoinGame(io, socket, user, gameId) {
         return socket.emit("error-message", "No puedes unirte a una partida en curso.");
     }
 
-    // Leave current game if switching games
-    const userGame = gameManager.findUserGame(user.uid);
-    if (userGame && userGame.gameId !== gameId) {
-        console.log(`User ${user.name} switching from game ${userGame.gameId} to ${gameId}`);
-        userGame.removePlayer(user.uid);
-        socket.leave(userGame.gameId);
-        gameManager.emitGameState(userGame);
-
-        // Schedule cleanup if game is now empty
-        if (userGame.players.length === 0) {
-            gameManager.scheduleEmptyGameCleanup(userGame.gameId);
-        }
-    }
+    // Clean up ANY previous games the user might be in (except the one they are joining)
+    await gameManager.cleanupUserPreviousGames(user.uid, gameId);
 
     gameToJoin.addPlayer(user);
     socket.join(gameId);
@@ -256,6 +238,95 @@ function handleLeaveGame(io, socket, user, gameId, callback) {
 
     console.log(`User ${user.name} successfully left game ${gameId}`);
     safeCallback();
+}
+
+/**
+ * Handle game migration (for old system games).
+ * Creates a new game and moves all players to it.
+ */
+async function handleMigrateGame(io, socket, user, oldGameId) {
+    const oldGame = gameManager.getGame(oldGameId);
+    if (!oldGame) {
+        return socket.emit("error-message", "La partida no existe.");
+    }
+
+    if (oldGame.phase !== "needs_migration") {
+        return socket.emit("error-message", "Esta partida no necesita migración.");
+    }
+
+    // Solo el host puede migrar
+    if (oldGame.hostId !== user.uid) {
+        return socket.emit("error-message", "Solo el anfitrión puede migrar la partida.");
+    }
+
+    const playersList = oldGame.players.map((p) => p.name).join(", ");
+    console.log(`[Migration] Starting migration for game ${oldGameId}`);
+    console.log(`[Migration]   - Players to migrate: ${playersList}`);
+
+    // Limpiar sesiones fantasma del HOST (excepto la partida actual de migración)
+    await gameManager.cleanupUserPreviousGames(user.uid, oldGameId);
+
+    // Crear nueva partida con el host
+    const newGame = gameManager.createGame(user, { showImpostorHint: oldGame.showImpostorHint });
+    console.log(`[Migration]   - New game created: ${newGame.gameId}`);
+
+    // Mover al host a la nueva partida
+    socket.leave(oldGameId);
+    socket.join(newGame.gameId);
+    console.log(`[Migration]   - Host ${user.name} moved to new game`);
+
+    // Mover a todos los demás jugadores
+    const otherPlayers = oldGame.players.filter((p) => p.uid !== user.uid);
+    for (const player of otherPlayers) {
+        // Limpiar sesiones fantasma del JUGADOR (excepto oldGameId)
+        await gameManager.cleanupUserPreviousGames(player.uid, oldGameId);
+
+        // Añadir a la nueva partida
+        newGame.addPlayer(player);
+
+        // Obtener el socket del jugador y moverlo
+        const playerSocketId = sessionManager.getUserSocket(player.uid);
+        if (playerSocketId) {
+            const playerSocket = io.sockets.sockets.get(playerSocketId);
+            if (playerSocket) {
+                playerSocket.leave(oldGameId);
+                playerSocket.join(newGame.gameId);
+                console.log(`[Migration]   - Player ${player.name} moved to new game`);
+            } else {
+                console.log(
+                    `[Migration]   ⚠️ Player ${player.name} socket not found in io.sockets`
+                );
+            }
+        } else {
+            console.log(`[Migration]   ⚠️ Player ${player.name} socket ID not found`);
+        }
+    }
+
+    // Limpiar la partida vieja de memoria
+    oldGame.players = [];
+    delete gameManager.games[oldGameId];
+
+    // IMPORTANTE: Borrar la partida vieja de Firestore para evitar que usuarios queden asociados
+    const dbService = require("../services/db");
+    dbService
+        .deleteGameState(oldGameId)
+        .then(() => {
+            console.log(`[Migration]   - Old game ${oldGameId} deleted from Firestore`);
+        })
+        .catch((err) => {
+            console.error(
+                `[Migration]   ⚠️ Failed to delete old game from Firestore:`,
+                err.message
+            );
+        });
+
+    console.log(
+        `[Migration] ✅ Migration complete: ${oldGameId} → ${newGame.gameId} (${newGame.players.length} players)`
+    );
+
+    // Emitir estado nuevo a todos los jugadores en la nueva room
+    gameManager.emitGameState(newGame);
+    statsManager.incrementGamesCreated();
 }
 
 /**

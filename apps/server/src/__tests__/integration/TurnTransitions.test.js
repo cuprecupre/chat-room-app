@@ -1,57 +1,111 @@
 /**
- * Integration tests for Turn Transitions
- * LOCAL ONLY - Do not commit to repository
+ * Integration tests for Round Transitions
+ * Updated for new system: 3 rounds, same impostor, no turns
  */
 
 const { GameSimulator } = require("./GameSimulator");
 
-describe("Turn Transitions (Integration)", () => {
+describe("Round Transitions (Integration)", () => {
     let sim;
 
     beforeEach(() => {
         sim = new GameSimulator();
     });
 
-    describe("Basic Turn Flow", () => {
-        test("Turn 1 → Turn 2 when non-impostor is eliminated", () => {
+    describe("Basic Round Flow", () => {
+        test("Round 1 starts with same impostor for entire match", () => {
             sim.createGame("Host").addPlayers(["Player2", "Player3", "Player4"]).startGame();
-            expect(sim.getState().currentTurn).toBe(1);
+
+            expect(sim.getState().currentRound).toBe(1);
+            expect(sim.getState().phase).toBe("playing");
+            expect(sim.getState().impostorId).toBeTruthy();
+        });
+
+        test("Eliminating non-impostor ends round (impostor survives)", () => {
+            sim.createGame("Host").addPlayers(["Player2", "Player3", "Player4"]).startGame();
+            const initialImpostor = sim.getState().impostorId;
 
             const targetIndex = sim.getNonImpostorIndex();
             sim.allVoteFor(targetIndex);
 
-            expect(sim.getState().currentTurn).toBe(2);
-            expect(sim.getState().phase).toBe("playing");
-            expect(sim.getState().lastEliminatedInTurn).toBe(sim.users[targetIndex].uid);
+            // Round ends but game continues
+            expect(sim.getState().eliminatedPlayers).toContain(sim.users[targetIndex].uid);
+            expect(sim.getState().impostorId).toBe(initialImpostor);
         });
 
-        test("Turn 1 → Turn 2 on tie (no elimination)", () => {
+        test("Tie gives impostor points and continues to next round", () => {
             sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+
             sim.createTieVote();
 
-            expect(sim.getState().currentTurn).toBe(2);
-            expect(sim.getState().phase).toBe("playing");
-            expect(sim.getState().lastEliminatedInTurn).toBeNull();
+            // Impostor gets R1 points (3)
+            const impostorId = sim.getState().impostorId;
+            expect(sim.getState().playerScores[impostorId]).toBe(3);
+            expect(sim.getState().phase).toBe("round_result");
         });
 
-        test("Round ends when impostor is caught", () => {
+        test("Game ends when impostor is caught", () => {
             sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+
             sim.allVoteFor(sim.getImpostorIndex());
 
-            expect(sim.getState().phase).toBe("round_result");
+            expect(sim.getState().phase).toBe("game_over");
+            expect(sim.getState().winnerId).not.toBe(sim.getState().impostorId);
         });
 
-        test("Round ends when impostor survives 3 turns", () => {
+        test("Impostor wins if survives 3 rounds with ties", () => {
             sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
 
-            sim.createTieVote();
-            expect(sim.getState().currentTurn).toBe(2);
-
-            sim.createTieVote();
-            expect(sim.getState().currentTurn).toBe(3);
-
+            // Round 1: tie
             sim.createTieVote();
             expect(sim.getState().phase).toBe("round_result");
+            sim.continueToNextRound();
+            expect(sim.getState().currentRound).toBe(2);
+
+            // Round 2: tie
+            sim.createTieVote();
+            sim.continueToNextRound();
+            expect(sim.getState().currentRound).toBe(3);
+
+            // Round 3: tie - game ends
+            sim.createTieVote();
+            expect(sim.getState().phase).toBe("game_over");
+            expect(sim.getState().winnerId).toBe(sim.getState().impostorId);
+        });
+    });
+
+    describe("Scoring", () => {
+        test("Impostor gets 3+2+2 = 7 points for surviving all rounds", () => {
+            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+            const impostorId = sim.getState().impostorId;
+
+            // Survive all 3 rounds with ties
+            sim.createTieVote();
+            expect(sim.getState().playerScores[impostorId]).toBe(3); // R1
+
+            sim.continueToNextRound();
+            sim.createTieVote();
+            expect(sim.getState().playerScores[impostorId]).toBe(5); // R1 + R2
+
+            sim.continueToNextRound();
+            sim.createTieVote();
+            expect(sim.getState().playerScores[impostorId]).toBe(7); // R1 + R2 + R3
+        });
+
+        test("Friends get +2 for correct vote when catching impostor", () => {
+            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+
+            sim.allVoteFor(sim.getImpostorIndex());
+
+            // All friends who voted correctly get +2
+            const scores = sim.getState().playerScores;
+            const impostorId = sim.getState().impostorId;
+
+            Object.entries(scores).forEach(([playerId, score]) => {
+                if (playerId !== impostorId && score > 0) {
+                    expect(score).toBe(2);
+                }
+            });
         });
     });
 
@@ -76,17 +130,6 @@ describe("Turn Transitions (Integration)", () => {
             expect(result3.allVoted).toBe(true);
         });
 
-        test("Player state includes lastEliminatedInTurn after elimination", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3", "Player4"]).startGame();
-
-            const targetIndex = sim.getNonImpostorIndex();
-            sim.allVoteFor(targetIndex);
-
-            const playerState = sim.getStateForPlayer(0);
-            expect(playerState.lastEliminatedInTurn).toBe(sim.users[targetIndex].uid);
-            expect(playerState.currentTurn).toBe(2);
-        });
-
         test("Impostor and friends see different info", () => {
             sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
 
@@ -101,34 +144,45 @@ describe("Turn Transitions (Integration)", () => {
         });
     });
 
-    describe("Edge Cases", () => {
-        test("2-player game: 3 ties means impostor wins", () => {
-            sim.createGame("Host").addPlayers(["Player2"]).startGame();
+    describe("Sudden Death", () => {
+        test("Impostor wins with max points when only 2 players left", () => {
+            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+            const impostorId = sim.getState().impostorId;
 
-            sim.createTieVote();
-            expect(sim.getState().currentTurn).toBe(2);
+            // Eliminate a friend (not impostor)
+            const friendIndex = sim.getNonImpostorIndex();
+            sim.allVoteFor(friendIndex);
 
-            sim.createTieVote();
-            expect(sim.getState().currentTurn).toBe(3);
-
-            sim.createTieVote();
-            expect(sim.getState().phase).toBe("round_result");
+            // Should trigger sudden death
+            expect(sim.getState().phase).toBe("game_over");
+            expect(sim.getState().winnerId).toBe(impostorId);
+            expect(sim.getState().playerScores[impostorId]).toBe(7);
         });
+    });
 
-        test("Multiple rounds work correctly", () => {
+    describe("New Match (Play Again)", () => {
+        test("playAgain resets scores and selects new impostor", () => {
             sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
 
+            // End the game somehow
             sim.createTieVote();
+            sim.continueToNextRound();
             sim.createTieVote();
+            sim.continueToNextRound();
             sim.createTieVote();
+            expect(sim.getState().phase).toBe("game_over");
 
-            expect(sim.getState().phase).toBe("round_result");
-
-            sim.game.playAgain(sim.users[0].uid);
+            // Play again
+            sim.playAgain();
 
             expect(sim.getState().phase).toBe("playing");
-            expect(sim.getState().roundCount).toBe(2);
-            expect(sim.getState().currentTurn).toBe(1);
+            expect(sim.getState().currentRound).toBe(1);
+
+            // Scores should be reset
+            const scores = sim.getState().playerScores;
+            Object.values(scores).forEach((score) => {
+                expect(score).toBe(0);
+            });
         });
     });
 });

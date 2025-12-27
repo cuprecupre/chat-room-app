@@ -47,6 +47,14 @@ const InviteLandingPage = lazy(() =>
     import("../pages/InviteLandingPage").then((m) => ({ default: m.InviteLandingPage }))
 );
 
+// Debug Page (Local Only - ignored in git)
+const DebugPreviews = lazy(() =>
+    import("../pages/DebugPreviews").catch(() => ({ default: () => null }))
+);
+const DebugPreviewSingle = lazy(() =>
+    import("../pages/DebugPreviewSingle").catch(() => ({ default: () => null }))
+);
+
 function HomeRouteHandler({ user }) {
     const location = useLocation();
     const urlGameId = new URLSearchParams(location.search).get("gameId");
@@ -133,6 +141,11 @@ function AppRoutes({
     const startGame = useCallback(() => emit("start-game", gameState?.gameId), [emit, gameState]);
     const endGame = useCallback(() => emit("end-game", gameState?.gameId), [emit, gameState]);
     const playAgain = useCallback(() => emit("play-again", gameState?.gameId), [emit, gameState]);
+    const migrateGame = useCallback(
+        () => emit("migrate-game", gameState?.gameId),
+        [emit, gameState]
+    );
+    const nextRound = useCallback(() => emit("next-round", gameState?.gameId), [emit, gameState]);
     const leaveGame = useCallback(() => {
         if (gameState?.gameId) {
             // Remove gameId from URL immediately to prevent accidental reopen
@@ -295,6 +308,15 @@ function AppRoutes({
                             })()}
                         />
                         <Route path={ROUTES.RULES} element={<RulesPage />} />
+                        {import.meta.env.DEV && (
+                            <>
+                                <Route path="/debug" element={<DebugPreviews />} />
+                                <Route
+                                    path="/debug/preview/:viewId"
+                                    element={<DebugPreviewSingle />}
+                                />
+                            </>
+                        )}
                     </Route>
 
                     {/* Protected routes */}
@@ -341,6 +363,8 @@ function AppRoutes({
                                         onStartGame={startGame}
                                         onEndGame={endGame}
                                         onPlayAgain={playAgain}
+                                        onNextRound={nextRound}
+                                        onMigrateGame={migrateGame}
                                         onLeaveGame={leaveGame}
                                         onVote={castVote}
                                     />

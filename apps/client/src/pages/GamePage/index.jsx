@@ -10,6 +10,8 @@ export function GamePage({
     onStartGame,
     onEndGame,
     onPlayAgain,
+    onNextRound,
+    onMigrateGame,
     onLeaveGame,
     onVote,
 }) {
@@ -36,6 +38,8 @@ export function GamePage({
             onStartGame={onStartGame}
             onEndGame={onEndGame}
             onPlayAgain={onPlayAgain}
+            onNextRound={onNextRound}
+            onMigrateGame={onMigrateGame}
             onLeaveGame={onLeaveGame}
             onCopyLink={handleCopyLink}
             onCopyGameCode={handleCopyGameCode}

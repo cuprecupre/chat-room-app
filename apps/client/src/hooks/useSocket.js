@@ -8,6 +8,8 @@ export function useSocket(user) {
     const [connected, setConnected] = useState(false);
     const [gameState, setGameState] = useState(null);
     const attemptedResumeRef = useRef(false);
+    const initialLoadRef = useRef(true);
+    const isInvitationPendingRef = useRef(false);
     const hasLoggedWaitingDisplayName = useRef(false);
     const [joinError, setJoinError] = useState(null); // Nuevo estado para errores de unión
 
@@ -168,27 +170,71 @@ export function useSocket(user) {
                     const url = new URL(window.location);
                     if (newState?.gameId) {
                         const currentUrlId = url.searchParams.get("gameId");
-                        // Only update URL if empty or matching (don't overwrite if user is trying to join another game via URL)
-                        // App.jsx will handle the mismatch UI
-                        if (!currentUrlId || currentUrlId === newState.gameId) {
-                            url.searchParams.set("gameId", newState.gameId);
-                            window.history.replaceState({}, "", url.toString());
+
+                        // DETECCIÓN DE INVITACIÓN (Initial Load)
+                        if (
+                            initialLoadRef.current &&
+                            currentUrlId &&
+                            currentUrlId !== newState.gameId
+                        ) {
+                            console.log(
+                                `[Socket] Invitation detected on load. Pending join to: ${currentUrlId}`
+                            );
+                            isInvitationPendingRef.current = true;
                         }
+
+                        // Si ya nos unimos a la partida deseada, apagar la bandera
+                        if (currentUrlId === newState.gameId) {
+                            isInvitationPendingRef.current = false;
+                        }
+
+                        // LÓGICA DE ACTUALIZACIÓN DE URL
+                        if (isInvitationPendingRef.current) {
+                            // Si estamos intentando unirnos a una invitación, IGNORAR actualizaciones del servidor
+                            // que nos devuelvan a la partida vieja.
+                            console.log(
+                                `[Socket] Ignoring URL update (Invitation Pending). Keep: ${currentUrlId}, Ignore: ${newState.gameId}`
+                            );
+                        } else {
+                            // Comportamiento normal (Migración o Navegación dentro de partida)
+                            if (currentUrlId !== newState.gameId) {
+                                console.log(
+                                    `[Socket] Updating URL gameId: ${currentUrlId} → ${newState.gameId}`
+                                );
+                                url.searchParams.set("gameId", newState.gameId);
+                                window.history.replaceState({}, "", url.toString());
+                            }
+                        }
+
+                        initialLoadRef.current = false;
                     } else {
-                        // IMPORTANT: When receiving null state, ALWAYS clear the URL gameId
-                        // This happens when:
-                        // 1. User explicitly leaves the game
-                        // 2. User was removed from the game
-                        // 3. Game was deleted/ended
-                        // Clearing URL prevents the user from getting stuck trying to rejoin
                         const urlGameId = url.searchParams.get("gameId");
-                        if (urlGameId) {
+
+                        // PROTECCIÓN INVITACIONES (Estado Null):
+                        // Si entramos con un link ?gameId=XYZ y el servidor dice null,
+                        // es probable que sea una invitación a partida nueva.
+                        if (initialLoadRef.current && urlGameId) {
+                            console.log(
+                                `[Socket] Invitation detected (Game not found yet). Pending join to: ${urlGameId}`
+                            );
+                            isInvitationPendingRef.current = true;
+                        }
+
+                        if (isInvitationPendingRef.current && urlGameId) {
+                            console.log(
+                                `[Socket] Preserving URL gameId (Invitation Pending): ${urlGameId}`
+                            );
+                            // NO borrar URL
+                        } else if (urlGameId) {
+                            // Solo borrar si NO es una invitación pendiente
                             console.log(
                                 "[Socket] Clearing gameId from URL after receiving null state"
                             );
                             url.searchParams.delete("gameId");
                             window.history.replaceState({}, "", url.toString());
                         }
+
+                        initialLoadRef.current = false;
                     }
                 });
 
