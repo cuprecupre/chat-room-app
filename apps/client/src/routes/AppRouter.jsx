@@ -308,8 +308,12 @@ function AppRoutes({
                             })()}
                         />
                         <Route path={ROUTES.RULES} element={<RulesPage />} />
-                        <Route path="/debug" element={<DebugPreviews />} />
-                        <Route path="/debug/preview/:viewId" element={<DebugPreviewSingle />} />
+                        {import.meta.env.DEV && (
+                            <>
+                                <Route path="/debug" element={<DebugPreviews />} />
+                                <Route path="/debug/preview/:viewId" element={<DebugPreviewSingle />} />
+                            </>
+                        )}
                     </Route>
 
                     {/* Protected routes */}
