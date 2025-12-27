@@ -13,6 +13,9 @@ function registerSocketHandlers(io, socket) {
     const user = socket.user;
     console.log(`User connected: ${user.name} (${user.uid})`);
 
+    // Emit server boot time to client for update detection
+    socket.emit("boot-time", statsManager.stats.serverStartTime);
+
     // Track stats
     statsManager.incrementConnections();
     statsManager.updatePeakUsers();

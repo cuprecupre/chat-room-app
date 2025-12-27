@@ -116,6 +116,20 @@ export function useSocket(user) {
                     socket.heartbeatInterval = heartbeatInterval;
                 });
 
+                // Version check / Auto-reload on server restart
+                socket.on("boot-time", (serverBootTime) => {
+                    const lastVersionTime = sessionStorage.getItem("app_boot_time");
+
+                    if (lastVersionTime && lastVersionTime !== String(serverBootTime)) {
+                        console.log("🚀 [Auto-Update] New server version detected, reloading...");
+                        // Use a flag to avoid infinite loops if reload happens too fast
+                        sessionStorage.setItem("app_boot_time", String(serverBootTime));
+                        window.location.reload();
+                    } else {
+                        sessionStorage.setItem("app_boot_time", String(serverBootTime));
+                    }
+                });
+
                 socket.on("disconnect", (reason) => {
                     console.log("🔌 useSocket - Socket desconectado. Razón:", reason);
                     if (isMounted) {

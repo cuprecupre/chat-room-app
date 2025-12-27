@@ -610,6 +610,37 @@ export function GameRoom({
                     )}
                 </div>
             )}
+            {state.phase === "lobby_wait" && (
+                <div className="w-full max-w-sm mx-auto text-center space-y-6 py-12">
+                    <div className="mx-auto w-32 h-32 bg-blue-500/10 rounded-full flex items-center justify-center animate-pulse">
+                        <span className="text-6xl">⏳</span>
+                    </div>
+
+                    <div className="space-y-3">
+                        <h2 className="text-3xl font-serif text-neutral-50">Partida en curso</h2>
+                        <p className="text-neutral-400 text-lg leading-relaxed">
+                            Hay un juego activo en este momento.
+                            <br />
+                            ¡Espera a que termine para unirte!
+                        </p>
+                    </div>
+
+                    <div className="pt-4">
+                        <PlayerList
+                            players={state.players}
+                            currentUserId={user.uid}
+                            isHost={isHost}
+                            onCopyLink={onCopyLink}
+                            gameState={state}
+                            onVote={onVote}
+                        />
+                    </div>
+
+                    <p className="text-sm text-neutral-500 italic mt-6">
+                        Entrarás automáticamente en la siguiente partida...
+                    </p>
+                </div>
+            )}
 
             {state.phase === "lobby" && (
                 <div className="w-full max-w-sm mx-auto text-center space-y-4 pb-24 sm:pb-0">

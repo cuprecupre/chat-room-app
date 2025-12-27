@@ -56,9 +56,6 @@ io.on("connection", (socket) => {
     registerSocketHandlers(io, socket);
 });
 
-// --- Recover Games from Database ---
-gameManager.recoverGames();
-
 // --- Sync Stats to Firestore (every 5 minutes) ---
 const STATS_SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes
 setInterval(() => {
@@ -66,6 +63,16 @@ setInterval(() => {
 }, STATS_SYNC_INTERVAL);
 
 // --- Start Server ---
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+(async () => {
+    try {
+        console.log("🔄 [Server] Initializing game recovery...");
+        await gameManager.recoverGames();
+
+        server.listen(PORT, () => {
+            console.log(`✅ [Server] Running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error("❌ [Server] Failed to start:", error);
+        process.exit(1);
+    }
+})();
