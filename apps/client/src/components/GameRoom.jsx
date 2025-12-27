@@ -111,15 +111,7 @@ export function PlayerList({
     return (
         <div className="w-full rounded-lg md:flex-1 md:flex md:flex-col">
             {/* Indicador de quién empieza la ronda */}
-            {isPlaying && startingPlayerId && (
-                <p className="text-sm text-neutral-400 mb-4 text-center md:text-left">
-                    ☀️{" "}
-                    <span className="text-white">
-                        {players.find((p) => p.uid === startingPlayerId)?.name || "Alguien"}
-                    </span>{" "}
-                    da la primera pista
-                </p>
-            )}
+
             <ul className="space-y-2">
                 {sortedPlayers.map((p, index) => {
                     const isEliminated = eliminatedPlayers.includes(p.uid);
@@ -274,18 +266,19 @@ export function PlayerList({
                 })}
             </ul>
 
-            {/* Pasos del juego */}
-            {isPlaying && (
-                <div className="mt-6 mb-4 space-y-1 text-center md:text-left">
-                    <p className="text-neutral-500 text-sm">
-                        1. Descubre tu carta
-                        <br />
-                        2. Da una pista cuando sea tu turno
-                        <br />
-                        3. Vota para descubrir al impostor
-                    </p>
-                </div>
+            {/* Indicador de quién empieza la ronda */}
+            {isPlaying && startingPlayerId && (
+                <p className="text-sm text-neutral-400 mt-4 text-center md:text-left">
+                    ☀️{" "}
+                    <span className="text-orange-400 font-medium">
+                        {players.find((p) => p.uid === startingPlayerId)?.name || "Alguien"}
+                    </span>{" "}
+                    da la primera pista
+                </p>
             )}
+
+            {/* Pasos del juego */}
+
 
             {/* Enlace de ayuda solo durante la fase playing */}
             {isPlaying && <HelpLink onOpenInstructions={onOpenInstructions} />}
@@ -307,7 +300,7 @@ function HelpLink({ onOpenInstructions }) {
         <>
             <button
                 onClick={() => setShowModal(true)}
-                className="mt-10 md:mt-auto text-sm text-orange-400 hover:text-orange-300 transition-colors underline underline-offset-2 w-full text-center md:text-left flex items-center justify-center md:justify-start gap-1.5"
+                className="mt-10 text-sm text-orange-400 hover:text-orange-300 transition-colors underline underline-offset-2 w-full text-center md:text-left flex items-center justify-center md:justify-start gap-1.5"
             >
                 <Info className="w-4 h-4" />
                 ¿Cómo jugar?
@@ -316,7 +309,7 @@ function HelpLink({ onOpenInstructions }) {
             <Modal
                 isOpen={showModal}
                 onClose={() => setShowModal(false)}
-                title="¿Qué debo hacer?"
+                title="¿Cómo jugar?"
                 size="lg"
             >
                 <div className="space-y-6">
@@ -340,7 +333,7 @@ function HelpLink({ onOpenInstructions }) {
                         <p className="flex gap-3">
                             <span className="text-orange-400 font-semibold">3.</span>
                             <span>
-                                <strong className="text-white">Si eres amigo:</strong> Da una pista
+                                <strong className="text-white">Si eres amigo:</strong> Di en voz alta una pista
                                 sutil que demuestre que conoces la palabra, pero sin revelarla.
                                 <br />
                                 <strong className="text-orange-400">Si eres impostor:</strong> Finge

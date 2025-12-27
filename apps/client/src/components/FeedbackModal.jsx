@@ -56,7 +56,7 @@ export function FeedbackModal({ isOpen, onClose, user }) {
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Enviar sugerencias" size="md">
+        <Modal isOpen={isOpen} onClose={onClose} title="Ayudanos a mejorar" size="md">
             {status === "success" ? (
                 <div className="text-center py-8">
                     <div className="text-5xl mb-4">✨</div>
