@@ -3,7 +3,6 @@ import { db } from "../lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Button } from "./ui/Button";
 import { Modal } from "./ui/Modal";
-import ReCAPTCHA from "react-google-recaptcha";
 
 export function FeedbackModal({ isOpen, onClose, user }) {
     const [message, setMessage] = useState("");
@@ -11,7 +10,6 @@ export function FeedbackModal({ isOpen, onClose, user }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [status, setStatus] = useState("idle"); // idle, success, error
     const [errorObject, setErrorObject] = useState(null);
-    const [captchaVerified, setCaptchaVerified] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -117,14 +115,6 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                         </p>
                     )}
 
-                    <div className="flex justify-center py-2">
-                        <ReCAPTCHA
-                            sitekey="6LfyhSQsAAAAAPzBaA09vL6sXcIDTqArPC301LQg"
-                            onChange={(val) => setCaptchaVerified(!!val)}
-                            theme="dark"
-                        />
-                    </div>
-
                     <div className="flex gap-3 pt-2">
                         <Button
                             type="button"
@@ -136,7 +126,7 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                         </Button>
                         <Button
                             type="submit"
-                            disabled={isSubmitting || !message.trim() || !captchaVerified}
+                            disabled={isSubmitting || !message.trim()}
                             className="flex-1"
                         >
                             {isSubmitting ? "Enviando..." : "Enviar"}
