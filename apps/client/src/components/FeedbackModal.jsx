@@ -71,7 +71,7 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                             <select
                                 value={type}
                                 onChange={(e) => setType(e.target.value)}
-                                className="w-full appearance-none bg-neutral-800 text-white border border-neutral-700 rounded-lg py-2.5 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
+                                className="w-full appearance-none bg-neutral-800 text-white border-none rounded-lg py-2.5 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all cursor-pointer"
                             >
                                 <option value="bug">🚨 Problema</option>
                                 <option value="suggestion">💡 Idea</option>
@@ -102,8 +102,8 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                         <textarea
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
-                            placeholder="Cuéntanos qué ha pasado o qué te gustaría ver..."
-                            className="w-full h-32 bg-neutral-950 border border-neutral-700 rounded-lg p-3 text-white placeholder-neutral-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none transition-all"
+                            placeholder="Cuéntanos tu problema, sugerencia o cualquier comentario que tengas para mejorar el juego..."
+                            className="w-full h-32 bg-neutral-950 border-none rounded-lg p-3 text-white placeholder-neutral-500 focus:ring-2 focus:ring-orange-500 resize-none transition-all"
                             required
                         />
                     </div>
