@@ -10,7 +10,8 @@ export function InstructionsModal({ isOpen, onClose }) {
                 className="max-w-none select-text space-y-6"
                 style={{ userSelect: "text", WebkitUserSelect: "text" }}
             >
-                <RulesContent />
+                {/* Contenido (Reutilizado de la página principal) */}
+                <RulesContent isModal={true} />
             </div>
         </Modal>
     );

@@ -1,6 +1,10 @@
 import React from "react";
 
-export function RulesContent() {
+export function RulesContent({ isModal = false }) {
+    // Si estamos en modal, usar un fondo más oscuro (950) porque el modal ya es 900.
+    // Si estamos en página, usar 900 (porque el fondo de página es negro/oscuro)
+    const boxBg = isModal ? "bg-neutral-950" : "bg-neutral-900";
+
     return (
         <div className="divide-y divide-white/10 text-neutral-300">
             {/* Introducción */}
@@ -11,7 +15,7 @@ export function RulesContent() {
                 <p className="text-lg leading-relaxed font-light">
                     <strong>El Impostor</strong> es un juego en el que en cada partida, los jugadores deberán descubrir quién entre ellos es el <strong>Impostor</strong>: un infiltrado que desconoce una palabra secreta que todos los demás conocen, y que debe pasar desapercibido mientras intenta deducirla para ganar.
                 </p>
-                <div className="mt-4 p-4 bg-neutral-900 rounded-lg">
+                <div className={`mt-4 p-4 ${boxBg} rounded-lg`}>
                     <p className="text-base">
                         <strong>Recomendación:</strong> Se requiere un mínimo de 4 jugadores. Es ideal jugarlo de manera presencial o por videollamada para facilitar la ronda de pistas y el debate.
                     </p>
@@ -27,13 +31,13 @@ export function RulesContent() {
                     El objetivo depende de tu rol. Las partidas duran un máximo de <strong className="text-orange-400">3 rondas</strong>.
                 </p>
                 <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-neutral-900 p-6 rounded-xl">
+                    <div className={`${boxBg} p-6 rounded-xl`}>
                         <h4 className="text-white font-semibold mb-3 text-lg">Como Amigo</h4>
                         <p className="text-neutral-400 text-base font-light">
                             Descubrir al Impostor votándolo en la ronda de eliminación. Cuantos más votos correctos acumules, más puntos ganas.
                         </p>
                     </div>
-                    <div className="bg-neutral-900 p-6 rounded-xl">
+                    <div className={`${boxBg} p-6 rounded-xl`}>
                         <h4 className="text-orange-400 font-semibold mb-3 text-lg">
                             Como Impostor
                         </h4>
@@ -88,7 +92,7 @@ export function RulesContent() {
                 <div className="space-y-8">
                     {/* 1 */}
                     <div className="flex gap-6">
-                        <div className="w-12 h-12 rounded-full bg-orange-600 flex items-center justify-center font-bold text-xl shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xl shrink-0">
                             1
                         </div>
                         <div className="space-y-2 pt-1">
@@ -113,7 +117,7 @@ export function RulesContent() {
 
                     {/* 2 */}
                     <div className="flex gap-6">
-                        <div className="w-12 h-12 rounded-full bg-orange-600 flex items-center justify-center font-bold text-xl shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xl shrink-0">
                             2
                         </div>
                         <div className="space-y-2 pt-1">
@@ -128,7 +132,7 @@ export function RulesContent() {
 
                     {/* 3 */}
                     <div className="flex gap-6">
-                        <div className="w-12 h-12 rounded-full bg-orange-600 flex items-center justify-center font-bold text-xl shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xl shrink-0">
                             3
                         </div>
                         <div className="space-y-2 pt-1">
@@ -144,7 +148,7 @@ export function RulesContent() {
 
                     {/* 4 */}
                     <div className="flex gap-6">
-                        <div className="w-12 h-12 rounded-full bg-orange-600 flex items-center justify-center font-bold text-xl shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xl shrink-0">
                             4
                         </div>
                         <div className="space-y-2 pt-1">
@@ -172,8 +176,8 @@ export function RulesContent() {
                 <h3 className="text-2xl font-serif text-orange-400 mb-6">
                     Sistema de Puntuación
                 </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-neutral-900 p-6 rounded-xl">
+                <div className={`grid ${isModal ? "grid-cols-1" : "md:grid-cols-2"} gap-6`}>
+                    <div className={`${boxBg} p-6 rounded-xl`}>
                         <h4 className="text-white font-semibold mb-3 text-lg">
                             Amigos
                         </h4>
@@ -186,7 +190,7 @@ export function RulesContent() {
                             Máximo posible: 6 puntos (2 por ronda)
                         </p>
                     </div>
-                    <div className="bg-neutral-900 p-6 rounded-xl">
+                    <div className={`${boxBg} p-6 rounded-xl`}>
                         <h4 className="text-orange-400 font-semibold mb-3 text-lg">
                             Impostor
                         </h4>
@@ -206,7 +210,7 @@ export function RulesContent() {
                         </p>
                     </div>
                 </div>
-                <div className="mt-6 bg-neutral-900 p-4 rounded-lg text-neutral-400 text-sm">
+                <div className={`mt-6 ${boxBg} p-4 rounded-lg text-neutral-400 text-sm`}>
                     <strong className="text-orange-400">Empates:</strong> Si hay empate
                     en la votación, nadie es eliminado y el Impostor recibe sus puntos
                     de esa ronda.
