@@ -46,6 +46,9 @@ function registerSocketHandlers(io, socket) {
     socket.on("end-game", (gameId) =>
         handleGameAction(socket, user, gameId, (g) => g.endGame(user.uid))
     );
+    socket.on("next-round", (gameId) =>
+        handleGameAction(socket, user, gameId, (g) => g.continueToNextRound(user.uid))
+    );
     socket.on("play-again", (gameId) =>
         handleGameAction(socket, user, gameId, (g) => g.playAgain(user.uid))
     );

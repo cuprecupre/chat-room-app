@@ -10,8 +10,11 @@ import keyImg from "../assets/llave.jpg";
 import dualImpostorImg from "../assets/dual-impostor.jpg";
 import cardImg from "../assets/card.jpg";
 import cardBackImg from "../assets/card-back.jpg";
+import { RoundResultOverlay } from "./RoundResultOverlay";
+import { GameOverScreen } from "./GameOverScreen";
+import { RoundStartOverlay } from "./RoundStartOverlay";
 
-function PlayerList({
+export function PlayerList({
     players,
     currentUserId,
     isHost,
@@ -44,9 +47,9 @@ function PlayerList({
     const isTie = gameState?.winner === "Empate";
     const winners = isTie
         ? (() => {
-              const maxScore = Math.max(...Object.values(playerScores));
-              return players.filter((player) => (playerScores[player.uid] || 0) === maxScore);
-          })()
+            const maxScore = Math.max(...Object.values(playerScores));
+            return players.filter((player) => (playerScores[player.uid] || 0) === maxScore);
+        })()
         : [];
 
     // Si hay 3 o más ganadores, no hay ganadores reales
@@ -125,8 +128,9 @@ function PlayerList({
                     const iVotedForThisPlayer = isMyVote(p.uid);
                     const score = playerScores[p.uid] || 0;
                     const scoreGained = lastRoundScores[p.uid] || 0;
-                    // No marcar ganadores en la lista si es game_over (ya están arriba en bloque dedicado)
-                    const isWinner = false;
+                    // Marcar como ganador a todos los que tengan el puntaje más alto
+                    const maxScore = Math.max(...Object.values(playerScores));
+                    const isWinner = isGameOver && score === maxScore;
 
                     return (
                         <li
@@ -239,13 +243,12 @@ function PlayerList({
                                             variant="outline"
                                             size="sm"
                                             disabled={iVotedForThisPlayer && !canChangeVote}
-                                            className={`!w-auto gap-2 px-4 ${
-                                                iVotedForThisPlayer
-                                                    ? canChangeVote
-                                                        ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
-                                                        : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
-                                                    : ""
-                                            }`}
+                                            className={`!w-auto gap-2 px-4 ${iVotedForThisPlayer
+                                                ? canChangeVote
+                                                    ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
+                                                    : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
+                                                : ""
+                                                }`}
                                         >
                                             <svg
                                                 className="w-4 h-4"
@@ -391,6 +394,7 @@ export function GameRoom({
     onStartGame,
     onEndGame,
     onPlayAgain,
+    onNextRound,
     onMigrateGame,
     onLeaveGame,
     onCopyLink,
@@ -768,10 +772,8 @@ export function GameRoom({
                 </div>
             )}
 
-            {/* Mostrar pantalla de playing si estamos en playing con datos completos, o esperando datos de resultado */}
-            {((state.phase === "playing" && state.role && state.currentRound && state.maxRounds) ||
-                (state.phase === "round_result" && (!state.impostorName || !state.secretWord)) ||
-                (state.phase === "game_over" && state.winner === undefined)) && (
+            {/* Mostrar pantalla de playing si estamos en playing o round_result (Overlay handling) */}
+            {(state.phase === "playing" || state.phase === "round_result") && (
                 <>
                     {/* Overlay de carga cuando estamos esperando datos (solo si estamos en playing cargando datos) */}
                     {state.phase === "playing" && (!state.role || !state.currentRound) && (
@@ -943,11 +945,17 @@ export function GameRoom({
                             </div>
                         </div>
                     </div>
+                    <RoundResultOverlay
+                        state={state}
+                        isHost={isHost}
+                        onNextRound={onNextRound}
+                        currentUserId={user.uid}
+                    />
                 </>
             )}
 
-            {/* Resultado de partida */}
-            {state.phase === "round_result" && state.impostorName && state.secretWord && (
+            {/* Resultado de partida (Desactivado - Ahora Overlay) */}
+            {false && state.phase === "round_result" && state.impostorName && state.secretWord && (
                 <div className="w-full max-w-4xl mx-auto animate-fadeIn">
                     {/* Header con partida info - alineado a la izquierda */}
                     <div className="mb-6">
@@ -1041,16 +1049,24 @@ export function GameRoom({
                                     {/* Texto y botón visible solo en desktop */}
                                     <div className="hidden sm:block text-center">
                                         <p className="text-sm text-orange-400 animate-pulse mb-3">
-                                            Lanza la siguiente partida para continuar
+                                            {state.phase === "game_over"
+                                                ? "Lanza la siguiente partida para continuar"
+                                                : "Lanza la siguiente ronda para continuar"}
                                         </p>
                                         <div className="max-w-xs mx-auto">
                                             <Button
-                                                onClick={onPlayAgain}
+                                                onClick={
+                                                    state.phase === "game_over"
+                                                        ? onPlayAgain
+                                                        : onNextRound
+                                                }
                                                 variant="primary"
                                                 size="md"
                                                 className="w-full"
                                             >
-                                                Siguiente partida
+                                                {state.phase === "game_over"
+                                                    ? "Siguiente partida"
+                                                    : "Siguiente ronda"}
                                             </Button>
                                         </div>
                                     </div>
@@ -1062,15 +1078,23 @@ export function GameRoom({
                                     <div className="bg-neutral-950 px-4 pb-6 pt-2">
                                         <div className="max-w-sm mx-auto">
                                             <Button
-                                                onClick={onPlayAgain}
+                                                onClick={
+                                                    state.phase === "game_over"
+                                                        ? onPlayAgain
+                                                        : onNextRound
+                                                }
                                                 variant="primary"
                                                 size="md"
                                                 className="w-full shadow-lg"
                                             >
-                                                Siguiente partida
+                                                {state.phase === "game_over"
+                                                    ? "Siguiente partida"
+                                                    : "Siguiente ronda"}
                                             </Button>
                                             <p className="text-center text-sm text-orange-400 animate-pulse mt-3">
-                                                Lanza la siguiente partida para continuar
+                                                {state.phase === "game_over"
+                                                    ? "Lanza la siguiente partida para continuar"
+                                                    : "Lanza la siguiente ronda para continuar"}
                                             </p>
                                         </div>
                                     </div>
@@ -1118,8 +1142,8 @@ export function GameRoom({
                 </div>
             )}
 
-            {/* Fin del juego */}
-            {state.phase === "game_over" &&
+            {/* Fin del juego (Desactivado - Ahora GameOverScreen) */}
+            {false && state.phase === "game_over" &&
                 state.winner !== undefined &&
                 (() => {
                     // Calcular ganadores - buscar entre TODOS los jugadores que tienen puntos, no solo los conectados
@@ -1247,19 +1271,19 @@ export function GameRoom({
                                 {allPlayers.filter(
                                     (p) => !winnerPlayers.some((w) => w.uid === p.uid)
                                 ).length > 0 && (
-                                    <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
-                                        <PlayerList
-                                            players={allPlayers.filter(
-                                                (p) => !winnerPlayers.some((w) => w.uid === p.uid)
-                                            )}
-                                            currentUserId={user.uid}
-                                            isHost={isHost}
-                                            onCopyLink={onCopyLink}
-                                            gameState={state}
-                                            onVote={onVote}
-                                        />
-                                    </div>
-                                )}
+                                        <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
+                                            <PlayerList
+                                                players={allPlayers.filter(
+                                                    (p) => !winnerPlayers.some((w) => w.uid === p.uid)
+                                                )}
+                                                currentUserId={user.uid}
+                                                isHost={isHost}
+                                                onCopyLink={onCopyLink}
+                                                gameState={state}
+                                                onVote={onVote}
+                                            />
+                                        </div>
+                                    )}
 
                                 <div className="animate-fadeIn animate-delay-600 flex flex-col items-center">
                                     <p className="text-xl font-medium text-white mb-4">
@@ -1342,6 +1366,15 @@ export function GameRoom({
                     </div>
                 </div>
             )}
+
+            <GameOverScreen
+                state={state}
+                isHost={isHost}
+                onPlayAgain={onPlayAgain}
+                user={user}
+                onCopyLink={onCopyLink}
+            />
+            <RoundStartOverlay state={state} />
 
             {/* Modal de confirmación para terminar juego */}
             <Modal

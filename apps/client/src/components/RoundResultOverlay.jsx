@@ -37,7 +37,7 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-black/95 backdrop-blur-md animate-fadeIn">
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-neutral-950 animate-fadeIn">
             <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md space-y-8 text-center animate-scaleIn">
 
                 <div className="space-y-8">
@@ -49,15 +49,12 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
                                     {eliminatedPlayer.name}
                                 </h2>
                                 <p className="text-2xl text-neutral-300">
-                                    se va de la partida
+                                    ha sido eliminado/a
                                 </p>
                             </div>
 
-                            <div className="text-5xl tracking-widest">
-                                {'❌'.repeat(Math.min(votersName.length, 5))}
-                            </div>
 
-                            <p className="text-sm text-neutral-400 font-normal">
+                            <p className="text-sm text-red-500 font-medium uppercase tracking-wider">
                                 Votos en contra: {votersName.length}
                             </p>
                         </div>
@@ -72,7 +69,7 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
                     <div className="w-16 h-px bg-white/10 mx-auto"></div>
 
                     <div>
-                        <p className="text-xl font-serif italic text-orange-400">El impostor sigue entre nosotros</p>
+                        <p className="text-2xl font-serif italic text-orange-400">El impostor sigue entre nosotros</p>
                     </div>
                 </div>
 
@@ -92,7 +89,7 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
             </div>
 
             {/* Loading Bar (Bottom - 30s) */}
-            <div className="w-full h-3 bg-white/10 fixed bottom-0 left-0 right-0">
+            <div className="w-full h-3 bg-neutral-900 fixed bottom-0 left-0 right-0">
                 <div
                     className="h-full bg-orange-500 origin-left animate-progress"
                     style={{ animationDuration: '10000ms' }}

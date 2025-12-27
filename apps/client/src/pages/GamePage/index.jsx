@@ -10,6 +10,7 @@ export function GamePage({
     onStartGame,
     onEndGame,
     onPlayAgain,
+    onNextRound,
     onMigrateGame,
     onLeaveGame,
     onVote,
@@ -37,6 +38,7 @@ export function GamePage({
             onStartGame={onStartGame}
             onEndGame={onEndGame}
             onPlayAgain={onPlayAgain}
+            onNextRound={onNextRound}
             onMigrateGame={onMigrateGame}
             onLeaveGame={onLeaveGame}
             onCopyLink={handleCopyLink}
@@ -45,7 +47,7 @@ export function GamePage({
             isMobile={isMobile}
             onOpenInstructions={onOpenInstructions}
             showEndGameModal={false}
-            onShowEndGameModal={() => {}}
+            onShowEndGameModal={() => { }}
         />
     );
 }

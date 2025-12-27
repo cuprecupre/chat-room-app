@@ -47,6 +47,11 @@ const InviteLandingPage = lazy(() =>
     import("../pages/InviteLandingPage").then((m) => ({ default: m.InviteLandingPage }))
 );
 
+// Debug Page (Local Only - ignored in git)
+const DebugPreviews = lazy(() =>
+    import("../pages/DebugPreviews").catch(() => ({ default: () => null }))
+);
+
 function HomeRouteHandler({ user }) {
     const location = useLocation();
     const urlGameId = new URLSearchParams(location.search).get("gameId");
@@ -137,6 +142,7 @@ function AppRoutes({
         () => emit("migrate-game", gameState?.gameId),
         [emit, gameState]
     );
+    const nextRound = useCallback(() => emit("next-round", gameState?.gameId), [emit, gameState]);
     const leaveGame = useCallback(() => {
         if (gameState?.gameId) {
             // Remove gameId from URL immediately to prevent accidental reopen
@@ -299,6 +305,7 @@ function AppRoutes({
                             })()}
                         />
                         <Route path={ROUTES.RULES} element={<RulesPage />} />
+                        <Route path="/debug" element={<DebugPreviews />} />
                     </Route>
 
                     {/* Protected routes */}
@@ -345,6 +352,7 @@ function AppRoutes({
                                         onStartGame={startGame}
                                         onEndGame={endGame}
                                         onPlayAgain={playAgain}
+                                        onNextRound={nextRound}
                                         onMigrateGame={migrateGame}
                                         onLeaveGame={leaveGame}
                                         onVote={castVote}

@@ -8,7 +8,7 @@ export function RoundStartOverlay({ state }) {
         if (state.phase === "playing") {
             setDisplayedRound(state.currentRound);
             setVisible(true);
-            const timer = setTimeout(() => setVisible(false), 5000);
+            const timer = setTimeout(() => setVisible(false), 4000);
             return () => clearTimeout(timer);
         } else {
             setVisible(false);
@@ -42,8 +42,8 @@ export function RoundStartOverlay({ state }) {
 
                 <div className="w-16 h-px bg-white/10 mx-auto"></div>
 
-                {/* Starting Player */}
-                {startingPlayer && (
+                {/* Starting Player - Solo en Ronda 1 */}
+                {startingPlayer && displayedRound === 1 && (
                     <div className="space-y-2">
                         <p className="text-xl text-neutral-400">El primer turno es para:</p>
                         <p className="text-2xl font-serif text-orange-400">
@@ -57,7 +57,7 @@ export function RoundStartOverlay({ state }) {
             <div className="w-full h-3 bg-white/10 fixed bottom-0 left-0 right-0">
                 <div
                     className="h-full bg-orange-500 origin-left animate-progress"
-                    style={{ animationDuration: '5000ms' }}
+                    style={{ animationDuration: '4000ms' }}
                 ></div>
             </div>
         </div>
