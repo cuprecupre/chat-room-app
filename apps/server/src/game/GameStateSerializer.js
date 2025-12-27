@@ -1,4 +1,10 @@
-const { checkGameOver } = require("./ScoringManager");
+/**
+ * GameStateSerializer - Nueva Versión
+ *
+ * Actualizado para el nuevo sistema de rondas simples (sin vueltas)
+ */
+
+const { findWinner } = require("./ScoringManager");
 
 function getPersistenceState(game) {
     return {
@@ -7,25 +13,27 @@ function getPersistenceState(game) {
         players: game.players,
         playerScores: game.playerScores,
 
+        // Schema version para detectar partidas antiguas
+        schemaVersion: game.schemaVersion || 2,
+
         // Game Config
         showImpostorHint: game.showImpostorHint,
         maxRounds: game.maxRounds,
-        targetScore: game.targetScore,
-        initialPlayerCount: game.initialPlayerCount,
 
         // Round State
-        roundCount: game.roundCount,
+        currentRound: game.currentRound,
         secretWord: game.secretWord,
         secretCategory: game.secretCategory,
         impostorId: game.impostorId,
         startingPlayerId: game.startingPlayerId,
-        currentTurn: game.currentTurn,
+        winnerId: game.winnerId,
+        migratedFromOldSystem: game.migratedFromOldSystem || false,
 
         // Arrays & Objects
         roundPlayers: game.roundPlayers,
-        eliminatedInRound: game.eliminatedInRound,
+        eliminatedPlayers: game.eliminatedPlayers,
         votes: game.votes,
-        turnHistory: game.turnHistory,
+        roundHistory: game.roundHistory,
         lastRoundScores: game.lastRoundScores,
         playerOrder: game.playerOrder,
         impostorHistory: game.impostorHistory,
@@ -37,15 +45,16 @@ function getStateForPlayer(game, userId) {
     const player = game.players.find((p) => p.uid === userId);
     if (!player) return null;
 
+    const eliminated = game.eliminatedPlayers || [];
+
     const baseState = {
         gameId: game.gameId,
         hostId: game.hostId,
         players: game.players,
         phase: game.phase,
         playerScores: game.playerScores,
-        roundCount: game.roundCount,
+        currentRound: game.currentRound,
         maxRounds: game.maxRounds,
-        targetScore: game.targetScore,
         playerOrder: game.playerOrder,
         startingPlayerId: game.startingPlayerId,
     };
@@ -63,17 +72,12 @@ function getStateForPlayer(game, userId) {
             }
 
             // Info de votación
-            baseState.currentTurn = game.currentTurn;
-            baseState.maxTurns = game.maxTurns;
-            baseState.eliminatedInRound = game.eliminatedInRound;
-            baseState.lastEliminatedInTurn = game.lastEliminatedInTurn;
+            baseState.eliminatedPlayers = eliminated;
             baseState.hasVoted = game.votes.hasOwnProperty(userId);
             baseState.votedPlayers = Object.keys(game.votes);
             baseState.myVote = game.votes[userId] || null;
-            baseState.activePlayers = game.roundPlayers.filter(
-                (uid) => !game.eliminatedInRound.includes(uid)
-            );
-            baseState.canVote = !game.eliminatedInRound.includes(userId);
+            baseState.activePlayers = game.roundPlayers.filter((uid) => !eliminated.includes(uid));
+            baseState.canVote = !eliminated.includes(userId);
         }
     } else if (game.phase === "round_result" || game.phase === "game_over") {
         const impostor = game.players.find((p) => p.uid === game.impostorId);
@@ -86,15 +90,18 @@ function getStateForPlayer(game, userId) {
         baseState.impostorId = game.impostorId;
         baseState.secretWord = game.secretWord;
         baseState.lastRoundScores = game.lastRoundScores;
-        baseState.eliminatedInRound = game.eliminatedInRound;
+        baseState.eliminatedPlayers = eliminated;
         baseState.formerPlayers = game.formerPlayers;
 
         if (game.phase === "game_over") {
-            const winnerId = checkGameOver(game);
+            // Usar winnerId directamente (ya calculado en endRound)
+            const winnerId = game.winnerId;
             const winner = game.players.find((p) => p.uid === winnerId);
             const formerWinner = game.formerPlayers[winnerId];
             baseState.winner = winner ? winner.name : formerWinner ? formerWinner.name : "Empate";
             baseState.winnerId = winnerId;
+            baseState.impostorWon = winnerId === game.impostorId;
+            baseState.migratedFromOldSystem = game.migratedFromOldSystem || false;
         }
     }
 
@@ -105,21 +112,8 @@ function getStateForPlayer(game, userId) {
     try {
         const jsonStr = JSON.stringify(baseState);
         if (jsonStr.length > 50000) {
-            // Log if > 50KB (adjusted for visibility)
             console.warn(
                 `[GameStateSerializer] ⚠️ LARGE STATE DETECTED: ${(jsonStr.length / 1024).toFixed(2)} KB`
-            );
-            console.warn(
-                ` - Players: ${(JSON.stringify(baseState.players).length / 1024).toFixed(2)} KB`
-            );
-            console.warn(
-                ` - FormerPlayers: ${(JSON.stringify(baseState.formerPlayers).length / 1024).toFixed(2)} KB`
-            );
-            console.warn(
-                ` - History/Voted: ${(JSON.stringify(baseState.turnHistory || []).length / 1024).toFixed(2)} KB`
-            );
-            console.warn(
-                ` - LastRoundScores: ${(JSON.stringify(baseState.lastRoundScores).length / 1024).toFixed(2)} KB`
             );
         }
     } catch (e) {

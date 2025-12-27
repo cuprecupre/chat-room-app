@@ -10,8 +10,11 @@ import keyImg from "../assets/llave.jpg";
 import dualImpostorImg from "../assets/dual-impostor.jpg";
 import cardImg from "../assets/card.jpg";
 import cardBackImg from "../assets/card-back.jpg";
+import { RoundResultOverlay } from "./RoundResultOverlay";
+import { GameOverScreen } from "./GameOverScreen";
+import { RoundStartOverlay } from "./RoundStartOverlay";
 
-function PlayerList({
+export function PlayerList({
     players,
     currentUserId,
     isHost,
@@ -28,7 +31,7 @@ function PlayerList({
     const canVote = isPlaying && gameState?.canVote;
     const hasVoted = gameState?.hasVoted;
     const votedPlayers = gameState?.votedPlayers || [];
-    const eliminatedPlayers = gameState?.eliminatedInRound || [];
+    const eliminatedPlayers = gameState?.eliminatedPlayers || [];
     const activePlayers = gameState?.activePlayers || [];
     const myVote = gameState?.myVote || null; // A quién voté yo
     const playerScores = gameState?.playerScores || {};
@@ -108,15 +111,7 @@ function PlayerList({
     return (
         <div className="w-full rounded-lg md:flex-1 md:flex md:flex-col">
             {/* Indicador de quién empieza la ronda */}
-            {isPlaying && startingPlayerId && (
-                <p className="text-sm text-neutral-400 mb-4 text-center md:text-left">
-                    ☀️{" "}
-                    <span className="text-white">
-                        {players.find((p) => p.uid === startingPlayerId)?.name || "Alguien"}
-                    </span>{" "}
-                    da la primera pista
-                </p>
-            )}
+
             <ul className="space-y-2">
                 {sortedPlayers.map((p, index) => {
                     const isEliminated = eliminatedPlayers.includes(p.uid);
@@ -125,8 +120,9 @@ function PlayerList({
                     const iVotedForThisPlayer = isMyVote(p.uid);
                     const score = playerScores[p.uid] || 0;
                     const scoreGained = lastRoundScores[p.uid] || 0;
-                    // No marcar ganadores en la lista si es game_over (ya están arriba en bloque dedicado)
-                    const isWinner = false;
+                    // Marcar como ganador a todos los que tengan el puntaje más alto
+                    const maxScore = Math.max(...Object.values(playerScores));
+                    const isWinner = isGameOver && score === maxScore;
 
                     return (
                         <li
@@ -163,6 +159,7 @@ function PlayerList({
                                         >
                                             {p.name}
                                             {p.uid === currentUserId ? " (Tú)" : ""}
+                                            {isWinner && " 🏆"}
                                         </span>
                                         {/* Indicador de eliminado en vista de puntuación */}
                                         {isRoundResult && isEliminated && (
@@ -270,18 +267,15 @@ function PlayerList({
                 })}
             </ul>
 
-            {/* Pasos del juego */}
-            {isPlaying && (
-                <div className="mt-6 mb-4 space-y-1 text-center md:text-left">
-                    <p className="text-neutral-500 text-sm">
-                        1. Descubre tu carta
-                        <br />
-                        2. Da una pista cuando sea tu turno
-                        <br />
-                        3. Vota para descubrir al impostor
-                    </p>
-                </div>
+            {/* Indicador de quién empieza la ronda */}
+            {isPlaying && startingPlayerId && (
+                <p className="text-sm text-neutral-400 font-light mt-4 text-center md:text-left">
+                    ☀️ {players.find((p) => p.uid === startingPlayerId)?.name || "Alguien"} da la
+                    primera pista
+                </p>
             )}
+
+            {/* Pasos del juego */}
 
             {/* Enlace de ayuda solo durante la fase playing */}
             {isPlaying && <HelpLink onOpenInstructions={onOpenInstructions} />}
@@ -303,7 +297,7 @@ function HelpLink({ onOpenInstructions }) {
         <>
             <button
                 onClick={() => setShowModal(true)}
-                className="mt-10 md:mt-auto text-sm text-orange-400 hover:text-orange-300 transition-colors underline underline-offset-2 w-full text-center md:text-left flex items-center justify-center md:justify-start gap-1.5"
+                className="mt-10 text-sm text-orange-400 hover:text-orange-300 transition-colors underline underline-offset-2 w-full text-center md:text-left flex items-center justify-center md:justify-start gap-1.5"
             >
                 <Info className="w-4 h-4" />
                 ¿Cómo jugar?
@@ -312,7 +306,7 @@ function HelpLink({ onOpenInstructions }) {
             <Modal
                 isOpen={showModal}
                 onClose={() => setShowModal(false)}
-                title="¿Qué debo hacer?"
+                title="¿Cómo jugar?"
                 size="lg"
             >
                 <div className="space-y-6">
@@ -336,8 +330,9 @@ function HelpLink({ onOpenInstructions }) {
                         <p className="flex gap-3">
                             <span className="text-orange-400 font-semibold">3.</span>
                             <span>
-                                <strong className="text-white">Si eres amigo:</strong> Da una pista
-                                sutil que demuestre que conoces la palabra, pero sin revelarla.
+                                <strong className="text-white">Si eres amigo:</strong> Di en voz
+                                alta una pista sutil que demuestre que conoces la palabra, pero sin
+                                revelarla.
                                 <br />
                                 <strong className="text-orange-400">Si eres impostor:</strong> Finge
                                 que la conoces usando pistas vagas o que imiten a otros.
@@ -391,6 +386,8 @@ export function GameRoom({
     onStartGame,
     onEndGame,
     onPlayAgain,
+    onNextRound,
+    onMigrateGame,
     onLeaveGame,
     onCopyLink,
     onCopyGameCode,
@@ -403,7 +400,7 @@ export function GameRoom({
     const capitalize = (s) =>
         typeof s === "string" && s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s;
     const prevPlayersRef = useRef(state.players);
-    const prevTurnRef = useRef(state.currentTurn);
+    const prevTurnRef = useRef(state.currentRound);
     const prevPhaseRef = useRef(state.phase);
     const [reveal, setReveal] = useState(false);
     const [showTurnOverlay, setShowTurnOverlay] = useState(false);
@@ -411,6 +408,7 @@ export function GameRoom({
     const [eliminatedPlayerInfo, setEliminatedPlayerInfo] = useState(null);
     const [showCardEntrance, setShowCardEntrance] = useState(false);
     const [showRestOfUI, setShowRestOfUI] = useState(true);
+    const [initialAnimationPending, setInitialAnimationPending] = useState(false);
     const [showEndGameModalInternal, setShowEndGameModalInternal] = useState(false);
 
     // Usar props si están definidas, sino usar estado interno
@@ -452,23 +450,21 @@ export function GameRoom({
 
     // Detectar cambio de ronda y mostrar overlay
     useEffect(() => {
-        const prevTurn = prevTurnRef.current;
-        const currentTurn = state.currentTurn;
+        const prevRound = prevTurnRef.current;
+        const currentRound = state.currentRound;
 
         // Si la ronda cambió y es ronda 2 o superior (nueva ronda), mostrar overlay y resetear carta
-        if (state.phase === "playing" && prevTurn && currentTurn > prevTurn && currentTurn > 1) {
+        if (
+            state.phase === "playing" &&
+            prevRound &&
+            currentRound > prevRound &&
+            currentRound > 1
+        ) {
             // Resetear carta al estado frontal
             setReveal(false);
 
-            // Buscar al jugador eliminado en la vuelta anterior
-            const lastEliminatedId = state.lastEliminatedInTurn;
-            if (lastEliminatedId) {
-                const eliminatedPlayer = state.players.find((p) => p.uid === lastEliminatedId);
-                setEliminatedPlayerInfo(eliminatedPlayer || null);
-            } else {
-                // No hubo eliminación (empate)
-                setEliminatedPlayerInfo(null);
-            }
+            // No hay jugador eliminado entre rondas (solo en round_result)
+            setEliminatedPlayerInfo(null);
 
             setShowTurnOverlay(true);
             setIsOverlayClosing(false);
@@ -487,8 +483,8 @@ export function GameRoom({
             }, 2700);
         }
 
-        prevTurnRef.current = currentTurn;
-    }, [state.currentTurn, state.phase, state.lastEliminatedInTurn, state.players]);
+        prevTurnRef.current = currentRound;
+    }, [state.currentRound, state.phase, state.players]);
 
     // Resetear carta cuando empieza una nueva partida (playing)
     useEffect(() => {
@@ -506,21 +502,25 @@ export function GameRoom({
             if (shouldShowAnimation) {
                 // Ocultar el resto de la UI hasta que termine la animación de la carta
                 setShowRestOfUI(false);
-                setShowCardEntrance(true);
+                setShowCardEntrance(false);
+                setInitialAnimationPending(true);
 
-                // Después de 800ms (duración de animate-cardEntrance), mostrar el resto de elementos
+                // Esperar 3000ms (duración del overlay) antes de iniciar animación
                 if (restUITimeoutRef.current) clearTimeout(restUITimeoutRef.current);
                 restUITimeoutRef.current = setTimeout(() => {
-                    setShowRestOfUI(true);
-                }, 800);
+                    setInitialAnimationPending(false);
+                    setShowCardEntrance(true);
 
-                // Quitar la animación después de que termine
-                setTimeout(() => {
-                    setShowCardEntrance(false);
-                }, 800);
+                    // Después de 800ms (duración de animate-cardEntrance), mostrar el resto de elementos
+                    setTimeout(() => {
+                        setShowRestOfUI(true);
+                        setShowCardEntrance(false);
+                    }, 800);
+                }, 3000);
             } else {
                 // Si no hay animación, mostrar todo inmediatamente
                 setShowRestOfUI(true);
+                setInitialAnimationPending(false);
             }
         }
 
@@ -556,6 +556,61 @@ export function GameRoom({
 
     return (
         <div className="w-full flex flex-col items-center space-y-3 md:space-y-6">
+            {/* Pantalla de migración para partidas con sistema antiguo */}
+            {state.phase === "needs_migration" && (
+                <div className="w-full max-w-sm mx-auto text-center space-y-6 py-8">
+                    <div className="mx-auto w-24 h-24 bg-orange-500/20 rounded-full flex items-center justify-center">
+                        <span className="text-5xl">🔄</span>
+                    </div>
+
+                    <div className="space-y-3">
+                        <h2 className="text-3xl font-serif text-neutral-50">
+                            ¡Nueva versión disponible!
+                        </h2>
+                        <p className="text-neutral-400 text-lg leading-relaxed">
+                            Hemos mejorado el sistema de juego.
+                            <br />
+                            Tu partida anterior necesita actualizarse.
+                        </p>
+                    </div>
+
+                    <div className="bg-white/5 rounded-xl p-5 text-left space-y-3">
+                        <p className="text-neutral-300 text-sm">
+                            <strong className="text-orange-400">¿Qué pasará?</strong>
+                        </p>
+                        <ul className="text-neutral-400 text-sm space-y-2">
+                            <li className="flex items-start gap-2">
+                                <span className="text-green-400">✓</span>
+                                <span>Se creará una nueva sala automáticamente</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-green-400">✓</span>
+                                <span>Todos los jugadores serán movidos juntos</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-green-400">✓</span>
+                                <span>Podrán empezar una nueva partida inmediatamente</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {isHost ? (
+                        <Button
+                            onClick={onMigrateGame}
+                            variant="primary"
+                            size="lg"
+                            className="w-full"
+                        >
+                            Continuar a nueva sala
+                        </Button>
+                    ) : (
+                        <div className="text-neutral-500 text-sm animate-pulse">
+                            Esperando a que el anfitrión actualice la partida...
+                        </div>
+                    )}
+                </div>
+            )}
+
             {state.phase === "lobby" && (
                 <div className="w-full max-w-sm mx-auto text-center space-y-4 pb-24 sm:pb-0">
                     {/* Header Image - 50% smaller (w-28 h-28) */}
@@ -593,7 +648,7 @@ export function GameRoom({
                                 </Button>
 
                                 <p className="text-lg text-neutral-400 font-regular">
-                                    Espera a que se unan los jugadores...
+                                    Espera a que se unan todos los jugadores...
                                 </p>
 
                                 <div className="w-full pt-2">
@@ -714,13 +769,11 @@ export function GameRoom({
                 </div>
             )}
 
-            {/* Mostrar pantalla de playing si estamos en playing con datos completos, o esperando datos de resultado */}
-            {((state.phase === "playing" && state.role && state.currentTurn && state.maxTurns) ||
-                (state.phase === "round_result" && (!state.impostorName || !state.secretWord)) ||
-                (state.phase === "game_over" && state.winner === undefined)) && (
+            {/* Mostrar pantalla de playing si estamos en playing o round_result (Overlay handling) */}
+            {(state.phase === "playing" || state.phase === "round_result") && (
                 <>
                     {/* Overlay de carga cuando estamos esperando datos (solo si estamos en playing cargando datos) */}
-                    {state.phase === "playing" && (!state.role || !state.currentTurn) && (
+                    {state.phase === "playing" && (!state.role || !state.currentRound) && (
                         <div className="fixed inset-0 z-40 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm animate-fadeIn">
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-400"></div>
                         </div>
@@ -731,8 +784,8 @@ export function GameRoom({
                         className={`w-full ${showRestOfUI ? "" : "opacity-0 pointer-events-none"}`}
                     >
                         <GameStepper
-                            roundCount={state.roundCount || 1}
-                            currentTurn={state.currentTurn}
+                            roundCount={state.currentRound || 1}
+                            currentTurn={state.currentRound}
                             showAnimation={showRestOfUI}
                         />
                     </div>
@@ -743,7 +796,7 @@ export function GameRoom({
                         <div className="w-full max-w-xs mx-auto md:max-w-none pt-8 md:pt-6 pb-8 md:pb-0 border-b border-white/10 md:border-b-0">
                             <div className="space-y-3">
                                 <div
-                                    className={`${showCardEntrance ? "animate-cardEntrance" : ""}`}
+                                    className={`${initialAnimationPending ? "opacity-0" : ""} ${showCardEntrance ? "animate-cardEntrance" : ""}`}
                                 >
                                     <div
                                         className={`flip-card relative z-10 pointer-events-auto aspect-[4/3] w-full ${cardAnimating ? "animate-card-float-complete" : ""}`}
@@ -797,7 +850,7 @@ export function GameRoom({
                                                                         <div>
                                                                             <div className="flex flex-col items-center justify-center gap-1 text-xs tracking-wider text-orange-400">
                                                                                 <span className="uppercase">
-                                                                                    Pista:
+                                                                                    Ayuda:
                                                                                 </span>
                                                                                 <span className="normal-case">
                                                                                     La palabra
@@ -889,11 +942,17 @@ export function GameRoom({
                             </div>
                         </div>
                     </div>
+                    <RoundResultOverlay
+                        state={state}
+                        isHost={isHost}
+                        onNextRound={onNextRound}
+                        currentUserId={user.uid}
+                    />
                 </>
             )}
 
-            {/* Resultado de partida */}
-            {state.phase === "round_result" && state.impostorName && state.secretWord && (
+            {/* Resultado de partida (Desactivado - Ahora Overlay) */}
+            {false && state.phase === "round_result" && state.impostorName && state.secretWord && (
                 <div className="w-full max-w-4xl mx-auto animate-fadeIn">
                     {/* Header con partida info - alineado a la izquierda */}
                     <div className="mb-6">
@@ -987,16 +1046,24 @@ export function GameRoom({
                                     {/* Texto y botón visible solo en desktop */}
                                     <div className="hidden sm:block text-center">
                                         <p className="text-sm text-orange-400 animate-pulse mb-3">
-                                            Lanza la siguiente partida para continuar
+                                            {state.phase === "game_over"
+                                                ? "Lanza la siguiente partida para continuar"
+                                                : "Lanza la siguiente ronda para continuar"}
                                         </p>
                                         <div className="max-w-xs mx-auto">
                                             <Button
-                                                onClick={onPlayAgain}
+                                                onClick={
+                                                    state.phase === "game_over"
+                                                        ? onPlayAgain
+                                                        : onNextRound
+                                                }
                                                 variant="primary"
                                                 size="md"
                                                 className="w-full"
                                             >
-                                                Siguiente partida
+                                                {state.phase === "game_over"
+                                                    ? "Siguiente partida"
+                                                    : "Siguiente ronda"}
                                             </Button>
                                         </div>
                                     </div>
@@ -1008,15 +1075,23 @@ export function GameRoom({
                                     <div className="bg-neutral-950 px-4 pb-6 pt-2">
                                         <div className="max-w-sm mx-auto">
                                             <Button
-                                                onClick={onPlayAgain}
+                                                onClick={
+                                                    state.phase === "game_over"
+                                                        ? onPlayAgain
+                                                        : onNextRound
+                                                }
                                                 variant="primary"
                                                 size="md"
                                                 className="w-full shadow-lg"
                                             >
-                                                Siguiente partida
+                                                {state.phase === "game_over"
+                                                    ? "Siguiente partida"
+                                                    : "Siguiente ronda"}
                                             </Button>
                                             <p className="text-center text-sm text-orange-400 animate-pulse mt-3">
-                                                Lanza la siguiente partida para continuar
+                                                {state.phase === "game_over"
+                                                    ? "Lanza la siguiente partida para continuar"
+                                                    : "Lanza la siguiente ronda para continuar"}
                                             </p>
                                         </div>
                                     </div>
@@ -1064,8 +1139,9 @@ export function GameRoom({
                 </div>
             )}
 
-            {/* Fin del juego */}
-            {state.phase === "game_over" &&
+            {/* Fin del juego (Desactivado - Ahora GameOverScreen) */}
+            {false &&
+                state.phase === "game_over" &&
                 state.winner !== undefined &&
                 (() => {
                     // Calcular ganadores - buscar entre TODOS los jugadores que tienen puntos, no solo los conectados
@@ -1099,9 +1175,24 @@ export function GameRoom({
                     return (
                         <div className="w-full max-w-sm mx-auto animate-fadeIn">
                             <div className="w-full px-4 py-6 space-y-6">
+                                {/* Mensaje especial para partidas migradas */}
+                                {state.migratedFromOldSystem && (
+                                    <div className="bg-orange-500/20 border border-orange-500/50 rounded-lg p-4 text-center animate-fadeIn">
+                                        <p className="text-orange-300 text-sm">
+                                            🔄 <strong>¡Hemos mejorado el juego!</strong>
+                                        </p>
+                                        <p className="text-neutral-300 text-sm mt-1">
+                                            Tu partida anterior ha terminado por una actualización.
+                                            <br />
+                                            Inicia una nueva para probar las nuevas reglas.
+                                        </p>
+                                    </div>
+                                )}
                                 <div className="text-center space-y-4 animate-scaleIn animate-delay-200">
                                     <h2 className="text-4xl font-serif text-neutral-50">
-                                        Resultado final
+                                        {state.migratedFromOldSystem
+                                            ? "Nueva versión disponible"
+                                            : "Resultado final"}
                                     </h2>
                                 </div>
 
@@ -1241,7 +1332,7 @@ export function GameRoom({
                         className={`text-center space-y-8 max-w-md transition-all duration-300 ${isOverlayClosing ? "opacity-0 scale-95" : "animate-scaleIn"}`}
                     >
                         <h2 className="text-6xl font-serif text-orange-400">
-                            Ronda {state.currentTurn}
+                            Ronda {state.currentRound}
                         </h2>
 
                         {eliminatedPlayerInfo ? (
@@ -1273,6 +1364,15 @@ export function GameRoom({
                     </div>
                 </div>
             )}
+
+            <GameOverScreen
+                state={state}
+                isHost={isHost}
+                onPlayAgain={onPlayAgain}
+                user={user}
+                onCopyLink={onCopyLink}
+            />
+            <RoundStartOverlay state={state} />
 
             {/* Modal de confirmación para terminar juego */}
             <Modal

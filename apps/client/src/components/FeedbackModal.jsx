@@ -3,7 +3,6 @@ import { db } from "../lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Button } from "./ui/Button";
 import { Modal } from "./ui/Modal";
-import ReCAPTCHA from "react-google-recaptcha";
 
 export function FeedbackModal({ isOpen, onClose, user }) {
     const [message, setMessage] = useState("");
@@ -11,7 +10,6 @@ export function FeedbackModal({ isOpen, onClose, user }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [status, setStatus] = useState("idle"); // idle, success, error
     const [errorObject, setErrorObject] = useState(null);
-    const [captchaVerified, setCaptchaVerified] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -56,7 +54,7 @@ export function FeedbackModal({ isOpen, onClose, user }) {
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Enviar sugerencias" size="md">
+        <Modal isOpen={isOpen} onClose={onClose} title="Ayudanos a mejorar" size="md">
             {status === "success" ? (
                 <div className="text-center py-8">
                     <div className="text-5xl mb-4">✨</div>
@@ -73,7 +71,7 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                             <select
                                 value={type}
                                 onChange={(e) => setType(e.target.value)}
-                                className="w-full appearance-none bg-neutral-800 text-white border border-neutral-700 rounded-lg py-2.5 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
+                                className="w-full appearance-none bg-neutral-800 text-white border-none rounded-lg py-2.5 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all cursor-pointer"
                             >
                                 <option value="bug">🚨 Problema</option>
                                 <option value="suggestion">💡 Idea</option>
@@ -104,8 +102,8 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                         <textarea
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
-                            placeholder="Cuéntanos qué ha pasado o qué te gustaría ver..."
-                            className="w-full h-32 bg-neutral-950 border border-neutral-700 rounded-lg p-3 text-white placeholder-neutral-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none transition-all"
+                            placeholder="Cuéntanos tu problema, sugerencia o cualquier comentario que tengas para mejorar el juego..."
+                            className="w-full h-32 bg-neutral-950 border-none rounded-lg p-3 text-white placeholder-neutral-500 focus:ring-2 focus:ring-orange-500 resize-none transition-all"
                             required
                         />
                     </div>
@@ -116,14 +114,6 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                                 "Hubo un error al enviar el mensaje. Inténtalo de nuevo."}
                         </p>
                     )}
-
-                    <div className="flex justify-center py-2">
-                        <ReCAPTCHA
-                            sitekey="6LfyhSQsAAAAAPzBaA09vL6sXcIDTqArPC301LQg"
-                            onChange={(val) => setCaptchaVerified(!!val)}
-                            theme="dark"
-                        />
-                    </div>
 
                     <div className="flex gap-3 pt-2">
                         <Button
@@ -136,7 +126,7 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                         </Button>
                         <Button
                             type="submit"
-                            disabled={isSubmitting || !message.trim() || !captchaVerified}
+                            disabled={isSubmitting || !message.trim()}
                             className="flex-1"
                         >
                             {isSubmitting ? "Enviando..." : "Enviar"}

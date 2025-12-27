@@ -14,7 +14,7 @@ function createMockGame() {
         formerPlayers: {},
         playerOrder: [],
         roundPlayers: [],
-        eliminatedInRound: [],
+        eliminatedPlayers: [],
         votes: {},
         phase: "lobby",
         impostorId: null,
@@ -129,14 +129,14 @@ describe("PlayerManager", () => {
             expect(game.roundPlayers).not.toContain("user1");
         });
 
-        test("should remove player from eliminatedInRound", () => {
+        test("should remove player from eliminatedPlayers", () => {
             const game = createMockGame();
             PlayerManager.addPlayer(game, createMockUser("user1", "Player 1"));
-            game.eliminatedInRound = ["user1"];
+            game.eliminatedPlayers = ["user1"];
 
             PlayerManager.removePlayer(game, "user1");
 
-            expect(game.eliminatedInRound).not.toContain("user1");
+            expect(game.eliminatedPlayers).not.toContain("user1");
         });
 
         test("should delete player votes", () => {
@@ -208,7 +208,7 @@ describe("PlayerManager", () => {
         test("should return players not eliminated", () => {
             const game = createMockGame();
             game.roundPlayers = ["user1", "user2", "user3"];
-            game.eliminatedInRound = ["user2"];
+            game.eliminatedPlayers = ["user2"];
 
             const active = PlayerManager.getActivePlayers(game);
 
@@ -218,7 +218,7 @@ describe("PlayerManager", () => {
         test("should return all players when none eliminated", () => {
             const game = createMockGame();
             game.roundPlayers = ["user1", "user2", "user3"];
-            game.eliminatedInRound = [];
+            game.eliminatedPlayers = [];
 
             const active = PlayerManager.getActivePlayers(game);
 
@@ -228,7 +228,7 @@ describe("PlayerManager", () => {
         test("should return empty array when all eliminated", () => {
             const game = createMockGame();
             game.roundPlayers = ["user1"];
-            game.eliminatedInRound = ["user1"];
+            game.eliminatedPlayers = ["user1"];
 
             const active = PlayerManager.getActivePlayers(game);
 
@@ -241,7 +241,7 @@ describe("PlayerManager", () => {
             const game = createMockGame();
             game.playerOrder = ["user1", "user2", "user3"];
             game.roundPlayers = ["user1", "user2", "user3"];
-            game.roundCount = 1;
+            game.currentRound = 1;
 
             const startingPlayer = PlayerManager.calculateStartingPlayer(game);
 
@@ -253,16 +253,16 @@ describe("PlayerManager", () => {
             game.playerOrder = ["user1", "user2", "user3"];
             game.roundPlayers = ["user1", "user2", "user3"];
 
-            game.roundCount = 1;
+            game.currentRound = 1;
             expect(PlayerManager.calculateStartingPlayer(game)).toBe("user1");
 
-            game.roundCount = 2;
+            game.currentRound = 2;
             expect(PlayerManager.calculateStartingPlayer(game)).toBe("user2");
 
-            game.roundCount = 3;
+            game.currentRound = 3;
             expect(PlayerManager.calculateStartingPlayer(game)).toBe("user3");
 
-            game.roundCount = 4;
+            game.currentRound = 4;
             expect(PlayerManager.calculateStartingPlayer(game)).toBe("user1"); // Wrap around
         });
 
@@ -270,7 +270,7 @@ describe("PlayerManager", () => {
             const game = createMockGame();
             game.playerOrder = ["user1", "user2", "user3"];
             game.roundPlayers = ["user1", "user3"]; // user2 not in round
-            game.roundCount = 2;
+            game.currentRound = 2;
 
             const startingPlayer = PlayerManager.calculateStartingPlayer(game);
 
@@ -282,7 +282,7 @@ describe("PlayerManager", () => {
             const game = createMockGame();
             game.playerOrder = ["user1", "user2"];
             game.roundPlayers = [];
-            game.roundCount = 1;
+            game.currentRound = 1;
 
             const startingPlayer = PlayerManager.calculateStartingPlayer(game);
 

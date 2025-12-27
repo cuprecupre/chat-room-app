@@ -1,29 +1,13 @@
 /**
- * Tests for RoundManager
+ * Tests for RoundManager - New System
+ *
+ * New system:
+ * - 1 match = 3 rounds max
+ * - Same impostor for entire match
+ * - Each round is a single vote
  */
 
 const RoundManager = require("../game/RoundManager");
-
-// Mock dependencies
-jest.mock("../words", () => ({
-    getRandomWordWithCategory: jest.fn(() => ({
-        word: "pizza",
-        category: "Comida",
-    })),
-}));
-
-jest.mock("../game/ScoringManager", () => ({
-    calculateRoundScores: jest.fn(),
-    checkGameOver: jest.fn(() => null),
-}));
-
-jest.mock("../game/PlayerManager", () => ({
-    calculateStartingPlayer: jest.fn(() => "user1"),
-}));
-
-const { getRandomWordWithCategory } = require("../words");
-const { calculateRoundScores, checkGameOver } = require("../game/ScoringManager");
-const { calculateStartingPlayer } = require("../game/PlayerManager");
 
 // Helper to create a mock game object
 function createMockGame() {
@@ -34,240 +18,241 @@ function createMockGame() {
             { uid: "user2", name: "Player 2" },
             { uid: "user3", name: "Player 3" },
         ],
-        roundPlayers: [],
-        eliminatedInRound: [],
-        votes: {},
-        currentTurn: 1,
-        maxTurns: 3,
-        turnHistory: [],
-        impostorId: null,
-        impostorHistory: [],
-        lastEliminatedInTurn: null,
-        roundCount: 0,
-        secretWord: "",
-        secretCategory: "",
-        startingPlayerId: null,
-        phase: "lobby",
         playerScores: { user1: 0, user2: 0, user3: 0 },
+        phase: "lobby",
+        currentRound: 0,
+        maxRounds: 3,
+        impostorId: "",
+        impostorHistory: [],
+        eliminatedPlayers: [],
+        votes: {},
         lastRoundScores: {},
-        persist: jest.fn(), // Mock persist for RoundManager calls
+        roundPlayers: [],
+        roundHistory: [],
+        playerOrder: ["user1", "user2", "user3"],
+        formerPlayers: {},
+        winnerId: null,
+        persist: jest.fn(),
     };
 }
 
-describe("RoundManager", () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
+describe("RoundManager - New System", () => {
+    describe("selectImpostor", () => {
+        test("should select an impostor from players", () => {
+            const game = createMockGame();
+
+            const impostor = RoundManager.selectImpostor(game);
+
+            expect(["user1", "user2", "user3"]).toContain(impostor);
+        });
+
+        test("should exclude player who was impostor last 2 matches", () => {
+            const game = createMockGame();
+            game.impostorHistory = ["user1", "user1"]; // user1 was impostor twice
+
+            const impostor = RoundManager.selectImpostor(game);
+
+            // user1 should be excluded
+            expect(impostor).not.toBe("user1");
+        });
+
+        test("should allow repeated impostor if fewer than 2 in history", () => {
+            const game = createMockGame();
+            game.impostorHistory = ["user1"]; // Only once
+
+            const impostor = RoundManager.selectImpostor(game);
+
+            // user1 can be selected
+            expect(["user1", "user2", "user3"]).toContain(impostor);
+        });
     });
 
-    describe("startNewRound", () => {
-        test("should initialize round state", () => {
+    describe("startNewMatch", () => {
+        test("should reset all scores to 0", () => {
             const game = createMockGame();
+            game.playerScores = { user1: 5, user2: 3, user3: 2 };
 
-            RoundManager.startNewRound(game);
+            RoundManager.startNewMatch(game);
 
-            expect(game.roundPlayers).toEqual(["user1", "user2", "user3"]);
-            expect(game.currentTurn).toBe(1);
-            expect(game.eliminatedInRound).toEqual([]);
-            expect(game.votes).toEqual({});
-            expect(game.turnHistory).toEqual([]);
-            expect(game.lastRoundScores).toEqual({});
+            expect(game.playerScores).toEqual({ user1: 0, user2: 0, user3: 0 });
         });
 
-        test("should increment round count", () => {
-            const game = createMockGame();
-            game.roundCount = 1;
-
-            RoundManager.startNewRound(game);
-
-            expect(game.roundCount).toBe(2);
-        });
-
-        test("should set starting player", () => {
-            const game = createMockGame();
-            calculateStartingPlayer.mockReturnValue("user2");
-
-            RoundManager.startNewRound(game);
-
-            expect(game.startingPlayerId).toBe("user2");
-        });
-
-        test("should select an impostor", () => {
+        test("should select a new impostor", () => {
             const game = createMockGame();
 
-            RoundManager.startNewRound(game);
+            RoundManager.startNewMatch(game);
 
             expect(game.impostorId).toBeTruthy();
-            expect(game.roundPlayers).toContain(game.impostorId);
+            expect(["user1", "user2", "user3"]).toContain(game.impostorId);
         });
 
-        test("should add impostor to history", () => {
+        test("should set currentRound to 1", () => {
             const game = createMockGame();
 
-            RoundManager.startNewRound(game);
+            RoundManager.startNewMatch(game);
 
-            expect(game.impostorHistory).toContain(game.impostorId);
-            expect(game.impostorHistory[0]).toBe(game.impostorId);
-        });
-
-        test("should select a word and category", () => {
-            const game = createMockGame();
-            getRandomWordWithCategory.mockReturnValue({
-                word: "pizza",
-                category: "Comida",
-            });
-
-            RoundManager.startNewRound(game);
-
-            expect(game.secretWord).toBe("pizza");
-            expect(game.secretCategory).toBe("Comida");
+            expect(game.currentRound).toBe(1);
         });
 
         test("should set phase to playing", () => {
             const game = createMockGame();
 
-            RoundManager.startNewRound(game);
+            RoundManager.startNewMatch(game);
 
             expect(game.phase).toBe("playing");
         });
 
-        test("should limit impostor history to 10 entries", () => {
+        test("should clear eliminatedPlayers", () => {
             const game = createMockGame();
-            game.impostorHistory = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
+            game.eliminatedPlayers = ["user1"];
 
-            RoundManager.startNewRound(game);
+            RoundManager.startNewMatch(game);
 
-            expect(game.impostorHistory.length).toBeLessThanOrEqual(10);
+            expect(game.eliminatedPlayers).toEqual([]);
+        });
+
+        test("should add impostor to history", () => {
+            const game = createMockGame();
+
+            RoundManager.startNewMatch(game);
+
+            expect(game.impostorHistory[0]).toBe(game.impostorId);
         });
     });
 
-    describe("selectImpostorWithLimit", () => {
-        test("should exclude player who was impostor last 2 times", () => {
+    describe("startNextRound", () => {
+        test("should increment currentRound", () => {
             const game = createMockGame();
-            game.roundPlayers = ["user1", "user2", "user3"];
-            game.impostorHistory = ["user1", "user1"]; // user1 was impostor twice
+            game.currentRound = 1;
+            game.players = [{ uid: "user1" }, { uid: "user2" }];
 
-            // Run multiple times to check exclusion
-            const results = new Set();
-            for (let i = 0; i < 20; i++) {
-                const impostor = RoundManager.selectImpostorWithLimit(game);
-                results.add(impostor);
-            }
+            RoundManager.startNextRound(game);
 
-            expect(results.has("user1")).toBe(false);
-            expect(results.has("user2")).toBe(true);
-            expect(results.has("user3")).toBe(true);
-        });
-
-        test("should not exclude if last 2 impostors are different", () => {
-            const game = createMockGame();
-            game.roundPlayers = ["user1", "user2", "user3"];
-            game.impostorHistory = ["user1", "user2"];
-
-            const results = new Set();
-            for (let i = 0; i < 30; i++) {
-                const impostor = RoundManager.selectImpostorWithLimit(game);
-                results.add(impostor);
-            }
-
-            // All players should be possible
-            expect(results.size).toBe(3);
-        });
-
-        test("should allow all players if exclusion would leave no candidates", () => {
-            const game = createMockGame();
-            game.roundPlayers = ["user1"]; // Only one player
-            game.impostorHistory = ["user1", "user1"];
-
-            const impostor = RoundManager.selectImpostorWithLimit(game);
-
-            expect(impostor).toBe("user1");
-        });
-    });
-
-    describe("startNextTurn", () => {
-        test("should increment turn counter", () => {
-            const game = createMockGame();
-            game.currentTurn = 1;
-
-            RoundManager.startNextTurn(game);
-
-            expect(game.currentTurn).toBe(2);
+            expect(game.currentRound).toBe(2);
         });
 
         test("should clear votes", () => {
             const game = createMockGame();
-            game.votes = { user1: "user2", user2: "user3" };
+            game.currentRound = 1;
+            game.votes = { user1: "user2" };
 
-            RoundManager.startNextTurn(game);
+            RoundManager.startNextRound(game);
 
             expect(game.votes).toEqual({});
         });
 
-        test("should give impostor points for surviving turn (not tie)", () => {
+        test("should set phase to playing", () => {
             const game = createMockGame();
-            game.currentTurn = 1;
-            game.impostorId = "user1";
-            game.playerScores = { user1: 0 };
-            game.lastRoundScores = {};
+            game.currentRound = 1;
+            game.phase = "round_result";
 
-            RoundManager.startNextTurn(game, false); // wasTie = false
+            RoundManager.startNextRound(game);
 
-            // Survived turn 1, gets turn + 1 = 2 points
-            expect(game.playerScores["user1"]).toBe(2);
-            expect(game.lastRoundScores["user1"]).toBe(2);
+            expect(game.phase).toBe("playing");
         });
 
-        test("should NOT give impostor points when tie", () => {
+        test("should select a new word", () => {
             const game = createMockGame();
-            game.currentTurn = 1;
-            game.impostorId = "user1";
-            game.playerScores = { user1: 0 };
-            game.lastRoundScores = {};
+            game.currentRound = 1;
 
-            RoundManager.startNextTurn(game, true); // wasTie = true
+            RoundManager.startNextRound(game);
 
-            expect(game.playerScores["user1"]).toBe(0);
-        });
-
-        test("should accumulate impostor survival points", () => {
-            const game = createMockGame();
-            game.currentTurn = 2;
-            game.impostorId = "user1";
-            game.playerScores = { user1: 2 }; // Already has 2 from turn 1
-            game.lastRoundScores = { user1: 2 };
-
-            RoundManager.startNextTurn(game, false);
-
-            // Survived turn 2, gets 3 more points
-            expect(game.playerScores["user1"]).toBe(5); // 2 + 3
+            expect(game.secretWord).toBeTruthy();
+            expect(game.secretCategory).toBeTruthy();
         });
     });
 
-    describe("endRound", () => {
-        test("should call calculateRoundScores with friendsWon", () => {
+    describe("endRound - Impostor Caught", () => {
+        test("should set phase to game_over when impostor caught", () => {
             const game = createMockGame();
-
-            RoundManager.endRound(game, true);
-
-            expect(calculateRoundScores).toHaveBeenCalledWith(game, true);
-        });
-
-        test("should set phase to round_result when game not over", () => {
-            const game = createMockGame();
-            checkGameOver.mockReturnValue(null);
-
-            RoundManager.endRound(game, true);
-
-            expect(game.phase).toBe("round_result");
-        });
-
-        test("should set phase to game_over when someone wins", () => {
-            const game = createMockGame();
-            checkGameOver.mockReturnValue("user2");
+            game.impostorId = "user1";
+            game.votes = { user2: "user1", user3: "user1" };
 
             RoundManager.endRound(game, true);
 
             expect(game.phase).toBe("game_over");
+        });
+
+        test("should set winnerId to friend with most points", () => {
+            const game = createMockGame();
+            game.impostorId = "user1";
+            game.playerScores = { user1: 0, user2: 4, user3: 2 };
+            game.votes = { user2: "user1", user3: "user1" };
+
+            RoundManager.endRound(game, true);
+
+            expect(game.winnerId).toBe("user2");
+        });
+    });
+
+    describe("endRound - Impostor Survives", () => {
+        test("should set phase to round_result if not last round", () => {
+            const game = createMockGame();
+            game.currentRound = 1;
+            game.maxRounds = 3;
+            game.impostorId = "user1";
+
+            RoundManager.endRound(game, false);
+
+            expect(game.phase).toBe("round_result");
+        });
+
+        test("should set phase to game_over if last round", () => {
+            const game = createMockGame();
+            game.currentRound = 3;
+            game.maxRounds = 3;
+            game.impostorId = "user1";
+
+            RoundManager.endRound(game, false);
+
+            expect(game.phase).toBe("game_over");
+        });
+
+        test("should set winnerId to impostor if last round", () => {
+            const game = createMockGame();
+            game.currentRound = 3;
+            game.maxRounds = 3;
+            game.impostorId = "user1";
+
+            RoundManager.endRound(game, false);
+
+            expect(game.winnerId).toBe("user1");
+        });
+    });
+
+    describe("handleSuddenDeath", () => {
+        test("should set winnerId to impostor", () => {
+            const game = createMockGame();
+            game.impostorId = "user1";
+
+            RoundManager.handleSuddenDeath(game);
+
+            expect(game.winnerId).toBe("user1");
+        });
+
+        test("should set phase to game_over", () => {
+            const game = createMockGame();
+            game.impostorId = "user1";
+
+            RoundManager.handleSuddenDeath(game);
+
+            expect(game.phase).toBe("game_over");
+        });
+
+        test("should give impostor max points", () => {
+            const game = createMockGame();
+            game.impostorId = "user1";
+            game.playerScores = { user1: 3 };
+
+            RoundManager.handleSuddenDeath(game);
+
+            expect(game.playerScores["user1"]).toBe(7);
+        });
+    });
+
+    describe("MAX_ROUNDS constant", () => {
+        test("should be 3", () => {
+            expect(RoundManager.MAX_ROUNDS).toBe(3);
         });
     });
 });

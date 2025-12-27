@@ -1,23 +1,44 @@
+/**
+ * RoundManager - Nueva Versión
+ *
+ * Estructura simplificada:
+ * - 1 partida = máximo 3 rondas
+ * - Mismo impostor durante toda la partida
+ * - Cada ronda es una sola votación
+ * - El impostor se selecciona solo al inicio de la partida
+ */
+
 const { getRandomWordWithCategory } = require("../words");
-const { calculateRoundScores, checkGameOver } = require("./ScoringManager");
+const {
+    giveImpostorSurvivalPoints,
+    giveImpostorMaxPoints,
+    calculateRoundScores,
+    findWinner,
+} = require("./ScoringManager");
 const { calculateStartingPlayer } = require("./PlayerManager");
 
-function selectImpostorWithLimit(game) {
+const MAX_ROUNDS = 3;
+
+/**
+ * Seleccionar impostor (solo al inicio de la partida)
+ * Mantiene historial para evitar que el mismo sea impostor en partidas consecutivas
+ */
+function selectImpostor(game) {
     const lastTwoImpostors = game.impostorHistory.slice(0, 2);
 
     let excludedPlayer = null;
     if (lastTwoImpostors.length === 2 && lastTwoImpostors[0] === lastTwoImpostors[1]) {
         excludedPlayer = lastTwoImpostors[0];
         console.log(
-            `[Game ${game.gameId}] Jugador ${game.players.find((p) => p.uid === excludedPlayer)?.name} fue impostor las últimas 2 veces, será excluido`
+            `[Game ${game.gameId}] Jugador ${game.players.find((p) => p.uid === excludedPlayer)?.name} fue impostor las últimas 2 partidas, será excluido`
         );
     }
 
-    let candidates = game.roundPlayers.filter((uid) => uid !== excludedPlayer);
+    let candidates = game.players.map((p) => p.uid).filter((uid) => uid !== excludedPlayer);
 
     if (candidates.length === 0) {
         console.log(`[Game ${game.gameId}] No hay candidatos elegibles, permitiendo a todos`);
-        candidates = [...game.roundPlayers];
+        candidates = game.players.map((p) => p.uid);
     }
 
     // Fisher-Yates shuffle
@@ -33,105 +54,125 @@ function selectImpostorWithLimit(game) {
     return shuffledCandidates[0];
 }
 
-function startNewRound(game) {
-    // Reiniciar estado de ronda
-    game.roundPlayers = game.players.map((p) => p.uid);
-    game.currentTurn = 1;
-    game.eliminatedInRound = [];
-    game.lastEliminatedInTurn = null;
+/**
+ * Iniciar nueva partida (nueva palabra, nuevo impostor)
+ * Se llama al inicio del juego o cuando el host da a "Nueva partida"
+ */
+function startNewMatch(game) {
+    // Reset completo de puntos
+    game.playerScores = {};
+    game.players.forEach((p) => {
+        game.playerScores[p.uid] = 0;
+    });
+
+    // Inicializar estado de partida
+    game.currentRound = 0; // Se incrementará a 1 en startNextRound
+    game.maxRounds = MAX_ROUNDS;
+    game.eliminatedPlayers = [];
     game.votes = {};
-    game.turnHistory = [];
     game.lastRoundScores = {};
-    game.roundCount++;
 
-    // Calcular jugador inicial
-    game.startingPlayerId = calculateStartingPlayer(game);
+    // Seleccionar impostor para toda la partida
+    game.impostorId = selectImpostor(game);
 
-    // Seleccionar impostor
-    game.impostorId = selectImpostorWithLimit(game);
-
-    // Agregar al historial
+    // Agregar al historial de impostores
     game.impostorHistory.unshift(game.impostorId);
     if (game.impostorHistory.length > 10) {
         game.impostorHistory = game.impostorHistory.slice(0, 10);
     }
 
-    // Seleccionar palabra
+    const impostorName = game.players.find((p) => p.uid === game.impostorId)?.name || "desconocido";
+    console.log(
+        `[Game ${game.gameId}] Nueva partida iniciada. Impostor: '${impostorName}' (${game.impostorId})`
+    );
+
+    // Iniciar la primera ronda
+    startNextRound(game);
+}
+
+/**
+ * Iniciar siguiente ronda (nueva palabra, mismo impostor)
+ */
+function startNextRound(game) {
+    game.currentRound++;
+    game.votes = {};
+    game.lastRoundScores = {};
+
+    // Jugadores activos para esta ronda (excluyendo eliminados)
+    game.roundPlayers = game.players
+        .map((p) => p.uid)
+        .filter((uid) => !game.eliminatedPlayers.includes(uid));
+
+    // Calcular jugador inicial
+    game.startingPlayerId = calculateStartingPlayer(game);
+
+    // Seleccionar nueva palabra
     const { word, category } = getRandomWordWithCategory();
     game.secretWord = word;
     game.secretCategory = category;
 
-    const impostorName = game.players.find((p) => p.uid === game.impostorId)?.name || "desconocido";
     console.log(
-        `[Game ${game.gameId}] Ronda ${game.roundCount}: palabra='${game.secretWord}', categoría='${game.secretCategory}', impostor='${impostorName}' (${game.impostorId})`
-    );
-    console.log(
-        `[Game ${game.gameId}] Historial de impostores:`,
-        game.impostorHistory
-            .slice(0, 3)
-            .map((uid) => game.players.find((p) => p.uid === uid)?.name || uid)
+        `[Game ${game.gameId}] Ronda ${game.currentRound}/${game.maxRounds}: palabra='${game.secretWord}', categoría='${game.secretCategory}'`
     );
 
     game.phase = "playing";
-}
-
-function startNextTurn(game, wasTie = false) {
-    console.log(
-        `[Game ${game.gameId}] 🔄 startNextTurn llamado. Vuelta actual: ${game.currentTurn} → ${game.currentTurn + 1}`
-    );
-    console.log(
-        `[Game ${game.gameId}] lastEliminatedInTurn antes de cambiar vuelta:`,
-        game.lastEliminatedInTurn
-    );
-    console.log(`[Game ${game.gameId}] Fue empate:`, wasTie);
-
-    game.currentTurn++;
-    game.votes = {};
-
-    if (game.currentTurn > 1 && !wasTie) {
-        const previousTurn = game.currentTurn - 1;
-        const points = previousTurn + 1;
-        game.playerScores[game.impostorId] = (game.playerScores[game.impostorId] || 0) + points;
-        game.lastRoundScores[game.impostorId] =
-            (game.lastRoundScores[game.impostorId] || 0) + points;
-        console.log(
-            `[Game ${game.gameId}] Impostor sobrevivió vuelta ${previousTurn}: +${points} puntos`
-        );
-    } else if (wasTie) {
-        console.log(`[Game ${game.gameId}] Empate: no se otorgan puntos al impostor`);
-    }
-
-    console.log(
-        `[Game ${game.gameId}] ✅ Vuelta ${game.currentTurn} iniciada. lastEliminatedInTurn:`,
-        game.lastEliminatedInTurn
-    );
-
-    // Persist after turn change (important for recovery)
     game.persist();
 }
 
-function endRound(game, friendsWon) {
-    // Calcular puntos
-    calculateRoundScores(game, friendsWon);
+/**
+ * Finalizar ronda
+ * @param {Object} game - Estado del juego
+ * @param {boolean} impostorCaught - Si el impostor fue descubierto
+ */
+function endRound(game, impostorCaught) {
+    if (impostorCaught) {
+        // Amigos ganan - calcular puntos y terminar partida
+        calculateRoundScores(game, true);
 
-    // Verificar si alguien ganó
-    const gameOver = checkGameOver(game);
-
-    if (gameOver) {
+        // Encontrar al amigo ganador (el que tiene más puntos)
+        const winner = findWinner(game);
+        game.winnerId = winner;
         game.phase = "game_over";
-        console.log(`[Game ${game.gameId}] ¡Partida terminada! Ganador: ${gameOver}`);
+
+        console.log(`[Game ${game.gameId}] ¡Impostor descubierto! Ganador: ${winner}`);
     } else {
-        game.phase = "round_result";
-        console.log(`[Game ${game.gameId}] Ronda ${game.roundCount} terminada.`);
+        // Impostor sobrevivió esta ronda
+        giveImpostorSurvivalPoints(game);
+
+        if (game.currentRound >= game.maxRounds) {
+            // Impostor sobrevivió 3 rondas - gana
+            game.winnerId = game.impostorId;
+            game.phase = "game_over";
+            console.log(`[Game ${game.gameId}] ¡Impostor sobrevivió 3 rondas! Gana.`);
+        } else {
+            // Continuar a la siguiente ronda
+            game.phase = "round_result";
+            console.log(
+                `[Game ${game.gameId}] Ronda ${game.currentRound} terminada. Impostor sobrevive.`
+            );
+        }
     }
 
-    // Persist after phase change (critical for recovery)
+    game.persist();
+}
+
+/**
+ * Manejar muerte súbita (solo quedan 2 jugadores)
+ */
+function handleSuddenDeath(game) {
+    giveImpostorMaxPoints(game);
+    game.winnerId = game.impostorId;
+    game.phase = "game_over";
+
+    console.log(`[Game ${game.gameId}] ¡Muerte súbita! Solo quedan 2 jugadores. Impostor gana.`);
     game.persist();
 }
 
 module.exports = {
-    selectImpostorWithLimit,
-    startNewRound,
-    startNextTurn,
+    selectImpostor,
+    startNewMatch,
+    startNextRound,
     endRound,
+    handleSuddenDeath,
+    MAX_ROUNDS,
 };
