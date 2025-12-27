@@ -117,7 +117,7 @@ class GameSimulator {
 
     continueToNextRound() {
         if (this.game.phase === "round_result") {
-            this.game.continueToNextRound();
+            this.game.continueToNextRound(this.users[0].uid);
             this._captureState("Continued to next round");
         }
         return this;

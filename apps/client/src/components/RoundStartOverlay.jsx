@@ -17,17 +17,14 @@ export function RoundStartOverlay({ state }) {
 
     if (!visible) return null;
 
-    const startingPlayer = state.players.find(p => p.uid === state.startingPlayerId);
+    const startingPlayer = state.players.find((p) => p.uid === state.startingPlayerId);
 
     return (
         <div className="fixed inset-0 z-[60] flex flex-col items-center justify-center p-4 bg-black/95 backdrop-blur-md animate-fadeIn pointer-events-none">
             <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md space-y-8 text-center animate-scaleIn">
-
                 <div className="space-y-6">
                     {/* Round Number */}
-                    <h1 className="text-7xl font-serif text-orange-400">
-                        Ronda {displayedRound}
-                    </h1>
+                    <h1 className="text-7xl font-serif text-orange-400">Ronda {displayedRound}</h1>
 
                     {displayedRound === 1 && (
                         <p className="text-2xl text-neutral-300">Comienza la partida</p>
@@ -36,7 +33,9 @@ export function RoundStartOverlay({ state }) {
                         <p className="text-2xl text-neutral-300">Nueva ronda de pistas</p>
                     )}
                     {displayedRound === 3 && (
-                        <p className="text-2xl text-neutral-300">Última oportunidad para descubrir al impostor</p>
+                        <p className="text-2xl text-neutral-300">
+                            Última oportunidad para descubrir al impostor
+                        </p>
                     )}
                 </div>
 
@@ -57,7 +56,7 @@ export function RoundStartOverlay({ state }) {
             <div className="w-full h-3 bg-white/10 fixed bottom-0 left-0 right-0">
                 <div
                     className="h-full bg-orange-500 origin-left animate-progress"
-                    style={{ animationDuration: '3000ms' }}
+                    style={{ animationDuration: "3000ms" }}
                 ></div>
             </div>
         </div>

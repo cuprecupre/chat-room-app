@@ -311,7 +311,10 @@ function AppRoutes({
                         {import.meta.env.DEV && (
                             <>
                                 <Route path="/debug" element={<DebugPreviews />} />
-                                <Route path="/debug/preview/:viewId" element={<DebugPreviewSingle />} />
+                                <Route
+                                    path="/debug/preview/:viewId"
+                                    element={<DebugPreviewSingle />}
+                                />
                             </>
                         )}
                     </Route>

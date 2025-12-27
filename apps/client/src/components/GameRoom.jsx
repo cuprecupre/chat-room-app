@@ -47,9 +47,9 @@ export function PlayerList({
     const isTie = gameState?.winner === "Empate";
     const winners = isTie
         ? (() => {
-            const maxScore = Math.max(...Object.values(playerScores));
-            return players.filter((player) => (playerScores[player.uid] || 0) === maxScore);
-        })()
+              const maxScore = Math.max(...Object.values(playerScores));
+              return players.filter((player) => (playerScores[player.uid] || 0) === maxScore);
+          })()
         : [];
 
     // Si hay 3 o más ganadores, no hay ganadores reales
@@ -236,12 +236,13 @@ export function PlayerList({
                                             variant="outline"
                                             size="sm"
                                             disabled={iVotedForThisPlayer && !canChangeVote}
-                                            className={`!w-auto gap-2 px-4 ${iVotedForThisPlayer
-                                                ? canChangeVote
-                                                    ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
-                                                    : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
-                                                : ""
-                                                }`}
+                                            className={`!w-auto gap-2 px-4 ${
+                                                iVotedForThisPlayer
+                                                    ? canChangeVote
+                                                        ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
+                                                        : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
+                                                    : ""
+                                            }`}
                                         >
                                             <svg
                                                 className="w-4 h-4"
@@ -269,13 +270,12 @@ export function PlayerList({
             {/* Indicador de quién empieza la ronda */}
             {isPlaying && startingPlayerId && (
                 <p className="text-sm text-neutral-400 font-light mt-4 text-center md:text-left">
-                    ☀️ {players.find((p) => p.uid === startingPlayerId)?.name || "Alguien"}{" "}
-                    da la primera pista
+                    ☀️ {players.find((p) => p.uid === startingPlayerId)?.name || "Alguien"} da la
+                    primera pista
                 </p>
             )}
 
             {/* Pasos del juego */}
-
 
             {/* Enlace de ayuda solo durante la fase playing */}
             {isPlaying && <HelpLink onOpenInstructions={onOpenInstructions} />}
@@ -330,8 +330,9 @@ function HelpLink({ onOpenInstructions }) {
                         <p className="flex gap-3">
                             <span className="text-orange-400 font-semibold">3.</span>
                             <span>
-                                <strong className="text-white">Si eres amigo:</strong> Di en voz alta una pista
-                                sutil que demuestre que conoces la palabra, pero sin revelarla.
+                                <strong className="text-white">Si eres amigo:</strong> Di en voz
+                                alta una pista sutil que demuestre que conoces la palabra, pero sin
+                                revelarla.
                                 <br />
                                 <strong className="text-orange-400">Si eres impostor:</strong> Finge
                                 que la conoces usando pistas vagas o que imiten a otros.
@@ -1139,7 +1140,8 @@ export function GameRoom({
             )}
 
             {/* Fin del juego (Desactivado - Ahora GameOverScreen) */}
-            {false && state.phase === "game_over" &&
+            {false &&
+                state.phase === "game_over" &&
                 state.winner !== undefined &&
                 (() => {
                     // Calcular ganadores - buscar entre TODOS los jugadores que tienen puntos, no solo los conectados
@@ -1267,19 +1269,19 @@ export function GameRoom({
                                 {allPlayers.filter(
                                     (p) => !winnerPlayers.some((w) => w.uid === p.uid)
                                 ).length > 0 && (
-                                        <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
-                                            <PlayerList
-                                                players={allPlayers.filter(
-                                                    (p) => !winnerPlayers.some((w) => w.uid === p.uid)
-                                                )}
-                                                currentUserId={user.uid}
-                                                isHost={isHost}
-                                                onCopyLink={onCopyLink}
-                                                gameState={state}
-                                                onVote={onVote}
-                                            />
-                                        </div>
-                                    )}
+                                    <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
+                                        <PlayerList
+                                            players={allPlayers.filter(
+                                                (p) => !winnerPlayers.some((w) => w.uid === p.uid)
+                                            )}
+                                            currentUserId={user.uid}
+                                            isHost={isHost}
+                                            onCopyLink={onCopyLink}
+                                            gameState={state}
+                                            onVote={onVote}
+                                        />
+                                    </div>
+                                )}
 
                                 <div className="animate-fadeIn animate-delay-600 flex flex-col items-center">
                                     <p className="text-xl font-medium text-white mb-4">

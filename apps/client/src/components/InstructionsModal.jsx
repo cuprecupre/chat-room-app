@@ -2,7 +2,6 @@ import React from "react";
 import { Modal } from "./ui/Modal";
 import { RulesContent } from "./RulesContent";
 
-
 export function InstructionsModal({ isOpen, onClose }) {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Instrucciones">

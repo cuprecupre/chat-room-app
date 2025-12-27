@@ -95,7 +95,6 @@ button {
 }
 
 @keyframes cardFloatComplete {
-
     /* 0-71% (5 segundos): oscilación normal a velocidad constante */
     0% {
         transform: rotateZ(-1deg);
@@ -383,7 +382,6 @@ button {
 
 /* Animación pulse personalizada para texto */
 @keyframes textPulse {
-
     0%,
     100% {
         opacity: 1;
@@ -403,7 +401,6 @@ button {
 }
 
 @keyframes pulse {
-
     0%,
     100% {
         opacity: 1;

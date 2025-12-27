@@ -263,7 +263,8 @@ class Game {
      * Continuar a la siguiente ronda (mismo impostor)
      */
     continueToNextRound(userId) {
-        if (userId !== this.hostId) throw new Error("Solo el host puede iniciar la siguiente ronda.");
+        if (userId !== this.hostId)
+            throw new Error("Solo el host puede iniciar la siguiente ronda.");
         if (this.phase !== "round_result") {
             throw new Error("Solo se puede continuar desde el resultado de ronda.");
         }

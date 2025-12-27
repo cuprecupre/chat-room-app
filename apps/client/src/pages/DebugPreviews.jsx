@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import React, { useState } from "react";
+import { ChevronRight, ChevronDown } from "lucide-react";
 
 export default function DebugPreviews() {
     const [view, setView] = useState(null);
@@ -12,54 +12,54 @@ export default function DebugPreviews() {
 
     // Toggle category expansion
     const toggleCategory = (category) => {
-        setExpandedCategories(prev => ({
+        setExpandedCategories((prev) => ({
             ...prev,
-            [category]: !prev[category]
+            [category]: !prev[category],
         }));
     };
 
     // Navigation Tree Structure
     const navTree = [
         {
-            id: 'overlays',
-            label: 'Overlays de Ronda',
+            id: "overlays",
+            label: "Overlays de Ronda",
             items: [
-                { id: 'r1', label: 'Ronda 1' },
-                { id: 'r2', label: 'Ronda 2' },
-                { id: 'r3', label: 'Ronda 3' },
-            ]
+                { id: "r1", label: "Ronda 1" },
+                { id: "r2", label: "Ronda 2" },
+                { id: "r3", label: "Ronda 3" },
+            ],
         },
         {
-            id: 'results',
-            label: 'Resultados de Ronda',
+            id: "results",
+            label: "Resultados de Ronda",
             items: [
-                { id: 'result_elim_host', label: 'Eliminado (Host)' },
-                { id: 'result_elim_guest', label: 'Eliminado (Guest)' },
-                { id: 'result_tie_host', label: 'Empate (Host)' },
-                { id: 'result_tie_guest', label: 'Empate (Guest)' },
-            ]
+                { id: "result_elim_host", label: "Eliminado (Host)" },
+                { id: "result_elim_guest", label: "Eliminado (Guest)" },
+                { id: "result_tie_host", label: "Empate (Host)" },
+                { id: "result_tie_guest", label: "Empate (Guest)" },
+            ],
         },
         {
-            id: 'gameOver',
-            label: 'Game Over',
+            id: "gameOver",
+            label: "Game Over",
             items: [
-                { id: 'gameover_friend_host', label: 'Amigo Gana (Host)' },
-                { id: 'gameover_friend_guest', label: 'Amigo Gana (Guest)' },
-                { id: 'gameover_impostor_host', label: 'Impostor Gana (Host)' },
-                { id: 'gameover_impostor_guest', label: 'Impostor Gana (Guest)' },
-                { id: 'gameover_tie', label: 'Empate Final' },
-            ]
+                { id: "gameover_friend_host", label: "Amigo Gana (Host)" },
+                { id: "gameover_friend_guest", label: "Amigo Gana (Guest)" },
+                { id: "gameover_impostor_host", label: "Impostor Gana (Host)" },
+                { id: "gameover_impostor_guest", label: "Impostor Gana (Guest)" },
+                { id: "gameover_tie", label: "Empate Final" },
+            ],
         },
         {
-            id: 'modals',
-            label: 'Modales',
+            id: "modals",
+            label: "Modales",
             items: [
-                { id: 'modal_instructions', label: 'Instrucciones' },
-                { id: 'modal_feedback', label: 'Feedback' },
-                { id: 'modal_scoring', label: 'Puntuación' },
-                { id: 'modal_endgame', label: 'Terminar Partida' },
-                { id: 'modal_leave', label: 'Abandonar Partida' },
-            ]
+                { id: "modal_instructions", label: "Instrucciones" },
+                { id: "modal_feedback", label: "Feedback" },
+                { id: "modal_scoring", label: "Puntuación" },
+                { id: "modal_endgame", label: "Terminar Partida" },
+                { id: "modal_leave", label: "Abandonar Partida" },
+            ],
         },
     ];
 
@@ -98,10 +98,11 @@ export default function DebugPreviews() {
                                         <button
                                             key={item.id}
                                             onClick={() => setView(item.id)}
-                                            className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${view === item.id
-                                                ? 'bg-orange-500/20 text-orange-400 border-l-2 border-orange-400'
-                                                : 'text-neutral-400 hover:text-white hover:bg-white/5'
-                                                }`}
+                                            className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+                                                view === item.id
+                                                    ? "bg-orange-500/20 text-orange-400 border-l-2 border-orange-400"
+                                                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                                            }`}
                                         >
                                             {item.label}
                                         </button>
@@ -129,8 +130,12 @@ export default function DebugPreviews() {
                 {!view && (
                     <div className="flex items-center justify-center h-full">
                         <div className="text-center">
-                            <p className="text-2xl text-neutral-500 mb-2">Selecciona una pantalla</p>
-                            <p className="text-sm text-neutral-600">Usa el menú de la izquierda para navegar</p>
+                            <p className="text-2xl text-neutral-500 mb-2">
+                                Selecciona una pantalla
+                            </p>
+                            <p className="text-sm text-neutral-600">
+                                Usa el menú de la izquierda para navegar
+                            </p>
                         </div>
                     </div>
                 )}

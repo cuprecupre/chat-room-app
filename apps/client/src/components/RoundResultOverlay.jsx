@@ -21,7 +21,9 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
     const eliminatedId = lastRoundHistory?.eliminated;
 
     // Identificar al eliminado
-    const eliminatedPlayer = eliminatedId ? state.players.find(p => p.uid === eliminatedId) : null;
+    const eliminatedPlayer = eliminatedId
+        ? state.players.find((p) => p.uid === eliminatedId)
+        : null;
 
     // Obtener votantes (Transparencia)
     const votes = lastRoundHistory?.votes || {};
@@ -30,7 +32,7 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
     if (eliminatedId) {
         Object.entries(votes).forEach(([voterId, targetId]) => {
             if (targetId === eliminatedId) {
-                const voter = state.players.find(p => p.uid === voterId);
+                const voter = state.players.find((p) => p.uid === voterId);
                 if (voter) votersName.push(voter.name);
             }
         });
@@ -39,7 +41,6 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
     return (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-neutral-950 animate-fadeIn">
             <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md space-y-8 text-center animate-scaleIn">
-
                 <div className="space-y-8">
                     {/* Caso 1: Alguien eliminado */}
                     {eliminatedPlayer ? (
@@ -48,11 +49,8 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
                                 <h2 className="text-6xl font-serif text-red-500">
                                     {eliminatedPlayer.name}
                                 </h2>
-                                <p className="text-2xl text-neutral-300">
-                                    ha sido eliminado/a
-                                </p>
+                                <p className="text-2xl text-neutral-300">ha sido eliminado/a</p>
                             </div>
-
 
                             <p className="text-sm text-red-500 font-medium uppercase tracking-wider">
                                 Votos en contra: {votersName.length}
@@ -69,7 +67,9 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
                     <div className="w-16 h-px bg-white/10 mx-auto"></div>
 
                     <div>
-                        <p className="text-2xl font-serif italic text-orange-400">El impostor sigue entre nosotros</p>
+                        <p className="text-2xl font-serif italic text-orange-400">
+                            El impostor sigue entre nosotros
+                        </p>
                     </div>
                 </div>
 
@@ -92,7 +92,7 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
             <div className="w-full h-3 bg-neutral-900 fixed bottom-0 left-0 right-0">
                 <div
                     className="h-full bg-orange-500 origin-left animate-progress"
-                    style={{ animationDuration: '4000ms' }}
+                    style={{ animationDuration: "4000ms" }}
                 ></div>
             </div>
         </div>

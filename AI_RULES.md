@@ -8,18 +8,18 @@
 
 1.  **PREGUNTAR**: Indica claramente qué vas a hacer.
 2.  **EXPLICAR**: Detalla:
-    *   **Por qué** es necesario.
-    *   **Pros**: Qué ganamos.
-    *   **Contras**: Qué riesgos hay o qué efectos secundarios tiene.
+    - **Por qué** es necesario.
+    - **Pros**: Qué ganamos.
+    - **Contras**: Qué riesgos hay o qué efectos secundarios tiene.
 3.  **ESPERAR CONFIRMACIÓN**: No ejecutes NADA hasta que el usuario diga "Sí", "Ok", "Adelante" explícitamente.
 
 ## 2. MODIFICACIONES DE CÓDIGO
 
-*   Nunca asumas que un "bugfix" es deseado sin explicarlo primero.
-*   Si encuentras código que parece "basura" o "debug", PREGUNTA antes de borrarlo.
-*   Respeta el estilo de código existente.
+- Nunca asumas que un "bugfix" es deseado sin explicarlo primero.
+- Si encuentras código que parece "basura" o "debug", PREGUNTA antes de borrarlo.
+- Respeta el estilo de código existente.
 
 ## 3. COMANDOS
 
-*   Los comandos de lectura (`ls`, `cat`, `grep`, `git status`, `git log`) están permitidos sin permiso explícito si son necesarios para responder o investigar.
-*   Los comandos de **escritura/ejecución** (`npm install`, `git commit`, `rm`, `touch`) requieren el proceso de autorización del punto 1.
+- Los comandos de lectura (`ls`, `cat`, `grep`, `git status`, `git log`) están permitidos sin permiso explícito si son necesarios para responder o investigar.
+- Los comandos de **escritura/ejecución** (`npm install`, `git commit`, `rm`, `touch`) requieren el proceso de autorización del punto 1.

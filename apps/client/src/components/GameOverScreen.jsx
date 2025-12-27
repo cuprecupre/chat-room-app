@@ -32,15 +32,14 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
 
     return (
         <div className="w-full max-w-4xl mx-auto animate-fadeIn pb-32 pt-10 px-4">
-
             {/* Ganador */}
             <div className="text-center mb-12">
                 {winnerLabel && (
-                    <p className="text-sm text-neutral-400 uppercase tracking-widest mb-2">{winnerLabel}</p>
+                    <p className="text-sm text-neutral-400 uppercase tracking-widest mb-2">
+                        {winnerLabel}
+                    </p>
                 )}
-                <h1 className="text-5xl md:text-6xl font-serif text-orange-400">
-                    {winnerTitle}
-                </h1>
+                <h1 className="text-5xl md:text-6xl font-serif text-orange-400">{winnerTitle}</h1>
                 {winnerSubtitle && (
                     <p className="text-3xl text-neutral-300 mt-2">{winnerSubtitle}</p>
                 )}
@@ -50,7 +49,9 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                 {/* Impostor Reveal */}
                 <div className="w-full">
                     <div className="bg-neutral-900 rounded-2xl p-8 text-center relative overflow-hidden">
-                        <p className="text-xs uppercase tracking-wider text-neutral-400 mb-6">El impostor era</p>
+                        <p className="text-xs uppercase tracking-wider text-neutral-400 mb-6">
+                            El impostor era
+                        </p>
 
                         {impostor ? (
                             <>
@@ -61,11 +62,16 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                                         size="md"
                                         className="ring-2 ring-orange-500"
                                     />
-                                    <span className="text-3xl font-serif text-white">{impostor.name}</span>
+                                    <span className="text-3xl font-serif text-white">
+                                        {impostor.name}
+                                    </span>
                                 </div>
                                 {state.secretWord && (
                                     <p className="text-base text-neutral-300 mt-4">
-                                        Palabra secreta: <span className="text-white font-medium capitalize">{state.secretWord}</span>
+                                        Palabra secreta:{" "}
+                                        <span className="text-white font-medium capitalize">
+                                            {state.secretWord}
+                                        </span>
                                     </p>
                                 )}
                             </>
@@ -111,16 +117,28 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                         <h3 className="text-xl font-serif text-orange-400">Si eres Amigo</h3>
                         <ul className="space-y-3">
                             <li className="flex justify-between items-center">
-                                <span className="text-neutral-300">Votas al impostor en Ronda 1</span>
-                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">+2</span>
+                                <span className="text-neutral-300">
+                                    Votas al impostor en Ronda 1
+                                </span>
+                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
+                                    +2
+                                </span>
                             </li>
                             <li className="flex justify-between items-center">
-                                <span className="text-neutral-300">Votas al impostor en Ronda 2</span>
-                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">+2</span>
+                                <span className="text-neutral-300">
+                                    Votas al impostor en Ronda 2
+                                </span>
+                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
+                                    +2
+                                </span>
                             </li>
                             <li className="flex justify-between items-center">
-                                <span className="text-neutral-300">Votas al impostor en Ronda 3</span>
-                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">+2</span>
+                                <span className="text-neutral-300">
+                                    Votas al impostor en Ronda 3
+                                </span>
+                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
+                                    +2
+                                </span>
                             </li>
                         </ul>
                         <div className="flex justify-between items-center pt-2 border-t border-white/10">
@@ -135,15 +153,21 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                         <ul className="space-y-3">
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">Sobrevives la Ronda 1</span>
-                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">+3</span>
+                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
+                                    +3
+                                </span>
                             </li>
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">Sobrevives la Ronda 2</span>
-                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">+2</span>
+                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
+                                    +2
+                                </span>
                             </li>
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">Sobrevives la Ronda 3</span>
-                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">+2</span>
+                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
+                                    +2
+                                </span>
                             </li>
                         </ul>
                         <div className="flex justify-between items-center pt-2 border-t border-white/10">
@@ -154,7 +178,8 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
 
                     {/* Nota */}
                     <p className="text-sm text-neutral-500 text-center">
-                        El amigo con más puntos gana si descubren al impostor.<br />
+                        El amigo con más puntos gana si descubren al impostor.
+                        <br />
                         Si el impostor sobrevive 3 rondas, gana la partida.
                     </p>
 
@@ -188,9 +213,24 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                             <p className="text-neutral-400 text-sm">
                                 Esperando al anfitrión para la siguiente partida
                                 <span className="inline-flex ml-1">
-                                    <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
-                                    <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
-                                    <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                                    <span
+                                        className="animate-bounce"
+                                        style={{ animationDelay: "0ms" }}
+                                    >
+                                        .
+                                    </span>
+                                    <span
+                                        className="animate-bounce"
+                                        style={{ animationDelay: "150ms" }}
+                                    >
+                                        .
+                                    </span>
+                                    <span
+                                        className="animate-bounce"
+                                        style={{ animationDelay: "300ms" }}
+                                    >
+                                        .
+                                    </span>
                                 </span>
                             </p>
                         </div>
