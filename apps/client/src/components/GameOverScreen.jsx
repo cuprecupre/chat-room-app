@@ -65,7 +65,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                                 </div>
                                 {state.secretWord && (
                                     <p className="text-base text-neutral-300 mt-4">
-                                        Palabra secreta: <span className="text-orange-400 font-medium capitalize">{state.secretWord}</span>
+                                        Palabra secreta: <span className="text-white font-medium capitalize">{state.secretWord}</span>
                                     </p>
                                 )}
                             </>

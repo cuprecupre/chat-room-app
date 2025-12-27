@@ -8,7 +8,7 @@ export function RoundStartOverlay({ state }) {
         if (state.phase === "playing") {
             setDisplayedRound(state.currentRound);
             setVisible(true);
-            const timer = setTimeout(() => setVisible(false), 4000);
+            const timer = setTimeout(() => setVisible(false), 3000);
             return () => clearTimeout(timer);
         } else {
             setVisible(false);
@@ -57,7 +57,7 @@ export function RoundStartOverlay({ state }) {
             <div className="w-full h-3 bg-white/10 fixed bottom-0 left-0 right-0">
                 <div
                     className="h-full bg-orange-500 origin-left animate-progress"
-                    style={{ animationDuration: '4000ms' }}
+                    style={{ animationDuration: '3000ms' }}
                 ></div>
             </div>
         </div>

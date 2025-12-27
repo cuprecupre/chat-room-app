@@ -10,7 +10,7 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
         if (isHost) {
             const timer = setTimeout(() => {
                 onNextRound();
-            }, 10000);
+            }, 4000);
             return () => clearTimeout(timer);
         }
     }, [isHost, onNextRound]);
@@ -92,7 +92,7 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
             <div className="w-full h-3 bg-neutral-900 fixed bottom-0 left-0 right-0">
                 <div
                     className="h-full bg-orange-500 origin-left animate-progress"
-                    style={{ animationDuration: '10000ms' }}
+                    style={{ animationDuration: '4000ms' }}
                 ></div>
             </div>
         </div>

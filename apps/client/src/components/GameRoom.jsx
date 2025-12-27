@@ -268,11 +268,8 @@ export function PlayerList({
 
             {/* Indicador de quién empieza la ronda */}
             {isPlaying && startingPlayerId && (
-                <p className="text-sm text-neutral-400 mt-4 text-center md:text-left">
-                    ☀️{" "}
-                    <span className="text-orange-400 font-medium">
-                        {players.find((p) => p.uid === startingPlayerId)?.name || "Alguien"}
-                    </span>{" "}
+                <p className="text-sm text-neutral-400 font-light mt-4 text-center md:text-left">
+                    ☀️ {players.find((p) => p.uid === startingPlayerId)?.name || "Alguien"}{" "}
                     da la primera pista
                 </p>
             )}
@@ -645,7 +642,7 @@ export function GameRoom({
                                 </Button>
 
                                 <p className="text-lg text-neutral-400 font-regular">
-                                    Espera a que se unan los jugadores...
+                                    Espera a que se unan todos los jugadores...
                                 </p>
 
                                 <div className="w-full pt-2">
