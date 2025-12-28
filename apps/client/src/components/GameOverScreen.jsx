@@ -232,9 +232,9 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                         </>
                     ) : (
                         <div className="bg-neutral-900 rounded-xl p-4 text-center w-fit">
-                            <p className="text-neutral-400 text-sm leading-relaxed">
+                            <p className="text-neutral-400 text-base leading-relaxed">
                                 <svg
-                                    className="animate-spin h-4 w-4 text-orange-400 inline-block align-text-bottom mr-2"
+                                    className="animate-spin h-5 w-5 text-orange-400 inline-block align-text-bottom mr-2"
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
                                     viewBox="0 0 24 24"
