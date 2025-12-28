@@ -36,12 +36,12 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
     // Combinar jugadores conectados y desconectados que tienen puntos
     const playerScores = state.playerScores || {};
     const allPlayerUids = new Set([
-        ...state.players.map(p => p.uid),
-        ...Object.keys(playerScores)
+        ...state.players.map((p) => p.uid),
+        ...Object.keys(playerScores),
     ]);
 
-    const allPlayers = Array.from(allPlayerUids).map(uid => {
-        const connectedPlayer = state.players.find(p => p.uid === uid);
+    const allPlayers = Array.from(allPlayerUids).map((uid) => {
+        const connectedPlayer = state.players.find((p) => p.uid === uid);
         if (connectedPlayer) return connectedPlayer;
 
         // Si no está conectado, buscar en formerPlayers
@@ -49,7 +49,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
         return {
             uid,
             name: formerPlayer?.name || "Jugador desconectado",
-            photoURL: formerPlayer?.photoURL || null
+            photoURL: formerPlayer?.photoURL || null,
         };
     });
 
