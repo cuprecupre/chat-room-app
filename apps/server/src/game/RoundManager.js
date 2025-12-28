@@ -83,9 +83,14 @@ function startNewMatch(game) {
         game.impostorHistory = game.impostorHistory.slice(0, 10);
     }
 
+    // Seleccionar palabra para toda la partida (NO cambia entre rondas)
+    const { word, category } = getRandomWordWithCategory();
+    game.secretWord = word;
+    game.secretCategory = category;
+
     const impostorName = game.players.find((p) => p.uid === game.impostorId)?.name || "desconocido";
     console.log(
-        `[Game ${game.gameId}] Nueva partida iniciada. Impostor: '${impostorName}' (${game.impostorId})`
+        `[Game ${game.gameId}] Nueva partida iniciada. Impostor: '${impostorName}' (${game.impostorId}), Palabra: '${word}'`
     );
 
     // Iniciar la primera ronda
@@ -118,11 +123,7 @@ function startNextRound(game) {
     // Calcular jugador inicial
     game.startingPlayerId = calculateStartingPlayer(game);
 
-    // Seleccionar nueva palabra
-    const { word, category } = getRandomWordWithCategory();
-    game.secretWord = word;
-    game.secretCategory = category;
-
+    // La palabra ya fue seleccionada en startNewMatch, no cambia entre rondas
     console.log(
         `[Game ${game.gameId}] Ronda ${game.currentRound}/${game.maxRounds}: palabra='${game.secretWord}', categoría='${game.secretCategory}'`
     );
