@@ -18,6 +18,7 @@ function createMockGame() {
         votes: {},
         phase: "lobby",
         impostorId: null,
+        persist: jest.fn(), // Mock persist method for RoundManager.endRound
     };
 }
 
@@ -186,7 +187,8 @@ describe("PlayerManager", () => {
             const { playerIsImpostor } = PlayerManager.removePlayer(game, "user1");
 
             expect(playerIsImpostor).toBe(true);
-            expect(game.phase).toBe("round_result");
+            // When impostor leaves, friends win immediately (game_over)
+            expect(game.phase).toBe("game_over");
         });
 
         test("should not end round when non-impostor leaves during play", () => {

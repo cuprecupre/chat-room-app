@@ -151,14 +151,17 @@ describe("RoundManager - New System", () => {
             expect(game.phase).toBe("playing");
         });
 
-        test("should select a new word", () => {
+        test("should NOT change the word (word selected in startNewMatch)", () => {
             const game = createMockGame();
             game.currentRound = 1;
+            game.secretWord = "existing-word";
+            game.secretCategory = "existing-category";
 
             RoundManager.startNextRound(game);
 
-            expect(game.secretWord).toBeTruthy();
-            expect(game.secretCategory).toBeTruthy();
+            // Word should remain the same across rounds
+            expect(game.secretWord).toBe("existing-word");
+            expect(game.secretCategory).toBe("existing-category");
         });
     });
 
@@ -253,6 +256,62 @@ describe("RoundManager - New System", () => {
     describe("MAX_ROUNDS constant", () => {
         test("should be 3", () => {
             expect(RoundManager.MAX_ROUNDS).toBe(3);
+        });
+    });
+
+    // Integration Tests
+    describe("Integration - Word Persistence", () => {
+        test("word should remain the same across all 3 rounds", () => {
+            const game = createMockGame();
+
+            // Start new match - word is selected
+            RoundManager.startNewMatch(game);
+            const initialWord = game.secretWord;
+            const initialCategory = game.secretCategory;
+
+            expect(initialWord).toBeTruthy();
+            expect(initialCategory).toBeTruthy();
+
+            // Advance to round 2
+            game.phase = "round_result";
+            RoundManager.startNextRound(game);
+
+            expect(game.currentRound).toBe(2);
+            expect(game.secretWord).toBe(initialWord);
+            expect(game.secretCategory).toBe(initialCategory);
+
+            // Advance to round 3
+            game.phase = "round_result";
+            RoundManager.startNextRound(game);
+
+            expect(game.currentRound).toBe(3);
+            expect(game.secretWord).toBe(initialWord);
+            expect(game.secretCategory).toBe(initialCategory);
+        });
+    });
+
+    describe("Integration - Impostor Disconnection", () => {
+        test("game should end immediately when impostor disconnects during play", () => {
+            const PlayerManager = require("../game/PlayerManager");
+            const game = createMockGame();
+
+            // Setup: Add players and start match
+            PlayerManager.addPlayer(game, { uid: "user1", name: "Player 1", photoURL: null });
+            PlayerManager.addPlayer(game, { uid: "user2", name: "Player 2", photoURL: null });
+            PlayerManager.addPlayer(game, { uid: "user3", name: "Player 3", photoURL: null });
+
+            RoundManager.startNewMatch(game);
+            const impostorId = game.impostorId;
+
+            expect(game.phase).toBe("playing");
+            expect(game.currentRound).toBe(1);
+
+            // Action: Impostor disconnects
+            PlayerManager.removePlayer(game, impostorId);
+
+            // Assertion: Game should end (friends win by default when impostor leaves)
+            expect(game.phase).toBe("game_over");
+            // Note: winnerId can be null if no friends have points yet
         });
     });
 });
