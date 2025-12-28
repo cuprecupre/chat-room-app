@@ -162,7 +162,7 @@ export function LandingPage({
             </nav>
 
             {/* Hero Section */}
-            <header className="relative pt-32 pb-20 px-6 md:pt-48 md:pb-32 overflow-hidden flex flex-col items-center text-center">
+            <header className="relative pt-24 pb-20 px-6 md:pt-32 md:pb-32 overflow-hidden flex flex-col items-center text-center">
                 {/* Dynamic Background Elements */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
                     <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-amber-600/[0.08] md:bg-amber-600/15 rounded-full blur-[80px] md:blur-[100px]" />
@@ -181,7 +181,7 @@ export function LandingPage({
                     </div>
 
                     <h1 className="flex flex-col items-center gap-2 md:gap-3 animate-fadeIn animate-delay-400 drop-shadow-2xl">
-                        <span className="text-xl md:text-2xl font-serif font-normal text-neutral-400">
+                        <span className="text-xl md:text-2xl font-sans font-normal text-neutral-400">
                             Juega ahora a
                         </span>
                         <span className="text-4xl md:text-6xl/tight lg:text-7xl/tight font-serif font-normal text-white">
@@ -191,13 +191,6 @@ export function LandingPage({
                             Descubre quién miente.
                         </span>
                     </h1>
-
-                    <div className="space-y-2 mt-2">
-                        <p className="text-base md:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed animate-fadeIn animate-delay-500 font-light">
-                            Inicia una partida, invita a tus amigos y sumérgete en el mejor juego de
-                            deducción&nbsp;social.
-                        </p>
-                    </div>
 
                     <div className="flex flex-col gap-4 justify-center items-center animate-fadeIn animate-delay-600 w-full max-w-md mx-auto">
                         <div className="w-full">
@@ -261,6 +254,14 @@ export function LandingPage({
                                 </span>
                             </Button>
                         </div>
+
+                    </div>
+
+                    <div className="space-y-2 mt-8">
+                        <p className="text-base md:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed animate-fadeIn animate-delay-500 font-light">
+                            Inicia una partida, invita a tus amigos y sumérgete en el mejor juego de
+                            deducción&nbsp;social.
+                        </p>
                     </div>
 
                     {/* Temporarily hidden - Email Login
@@ -534,8 +535,8 @@ export function LandingPage({
                                 <div
                                     key={index}
                                     className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${index === currentReview
-                                            ? "animate-verbatim-in z-10 relative"
-                                            : "animate-verbatim-out z-0 pointer-events-none absolute" // Keep absolute for exiting items to prevent layout jumps if they were different sizes, or just relative if strictly stacking
+                                        ? "animate-verbatim-in z-10 relative"
+                                        : "animate-verbatim-out z-0 pointer-events-none absolute" // Keep absolute for exiting items to prevent layout jumps if they were different sizes, or just relative if strictly stacking
                                         }`}
                                 // Note: If we want the container to ALWAYS hold the height of the TALLEST, we should make them all relative (grid items).
                                 // BUT, if we want them to cross-fade, one might need to be absolute to not push the other?
@@ -545,8 +546,8 @@ export function LandingPage({
                                 >
                                     <div
                                         className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${index === currentReview
-                                                ? "animate-verbatim-in z-10 opacity-100"
-                                                : "animate-verbatim-out z-0 opacity-0 pointer-events-none"
+                                            ? "animate-verbatim-in z-10 opacity-100"
+                                            : "animate-verbatim-out z-0 opacity-0 pointer-events-none"
                                             }`}
                                     >
                                         <div className="bg-neutral-950 border border-white/5 p-8 md:p-10 rounded-3xl relative overflow-hidden shadow-2xl mx-auto max-w-2xl">
@@ -602,8 +603,8 @@ export function LandingPage({
                             <div
                                 key={index}
                                 className={`group border rounded-2xl overflow-hidden transition-all duration-300 ${openFaq === index
-                                        ? "bg-neutral-900 border-orange-500/50 ring-1 ring-orange-500/20"
-                                        : "border-white/10 hover:border-orange-500/30 hover:bg-neutral-900/50"
+                                    ? "bg-neutral-900 border-orange-500/50 ring-1 ring-orange-500/20"
+                                    : "border-white/10 hover:border-orange-500/30 hover:bg-neutral-900/50"
                                     }`}
                             >
                                 <button
@@ -635,8 +636,8 @@ export function LandingPage({
                                 </button>
                                 <div
                                     className={`overflow-hidden transition-all duration-300 ease-in-out ${openFaq === index
-                                            ? "max-h-48 opacity-100"
-                                            : "max-h-0 opacity-0"
+                                        ? "max-h-48 opacity-100"
+                                        : "max-h-0 opacity-0"
                                         }`}
                                 >
                                     <div className="p-6 pt-0 text-neutral-300 leading-relaxed">

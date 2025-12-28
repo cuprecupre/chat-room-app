@@ -11,7 +11,7 @@ export function Lobby({ onCreateGame }) {
     };
 
     return (
-        <div className="w-full space-y-8">
+        <div className="w-full space-y-8 pt-8">
             <div className="text-center space-y-6">
                 <img
                     src={homeImg}

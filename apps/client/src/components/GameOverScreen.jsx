@@ -83,7 +83,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                         {winnerLabel}
                     </p>
                 )}
-                <h1 className="text-4xl md:text-5xl font-serif text-orange-400">{winnerTitle}</h1>
+                <h1 className="text-5xl md:text-7xl font-serif text-orange-400">{winnerTitle}</h1>
                 {winnerSubtitle && (
                     <p className="text-3xl text-neutral-300 mt-2">{winnerSubtitle}</p>
                 )}
