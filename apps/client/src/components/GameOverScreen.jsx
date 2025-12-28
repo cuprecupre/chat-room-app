@@ -218,23 +218,23 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
 
             {/* Botón Play Again (Fixed Bottom) */}
             <div className="fixed bottom-0 left-0 right-0 pt-16 pb-6 px-6 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent z-40">
-                <div className="max-w-sm mx-auto space-y-4">
+                <div className="w-full max-w-2xl mx-auto space-y-4 flex flex-col items-center">
                     {isHost ? (
                         <>
                             <Button
                                 onClick={onPlayAgain}
                                 variant="primary"
                                 size="lg"
-                                className="w-full text-lg py-6"
+                                className="w-full max-w-sm text-lg py-6"
                             >
                                 Jugar otra partida
                             </Button>
                         </>
                     ) : (
-                        <div className="bg-neutral-900 rounded-xl p-4 text-center">
-                            <p className="text-neutral-400 text-sm flex items-center justify-center gap-2">
+                        <div className="bg-neutral-900 rounded-xl p-4 text-center w-fit">
+                            <p className="text-neutral-400 text-sm leading-relaxed">
                                 <svg
-                                    className="animate-spin h-4 w-4 text-orange-400"
+                                    className="animate-spin h-4 w-4 text-orange-400 inline-block align-text-bottom mr-2"
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
                                     viewBox="0 0 24 24"

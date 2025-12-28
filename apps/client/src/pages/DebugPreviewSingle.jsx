@@ -122,7 +122,42 @@ export default function DebugPreviewSingle() {
         playerScores: { user1: 400, user2: 400, user3: 400, user4: 300 },
     };
 
-    const noop = () => {};
+    const mockStateGameOverBonus = {
+        ...mockStateCommon,
+        phase: "game_over",
+        winner: "Developer",
+        winnerId: "user1",
+        impostorId: "user4",
+        playerScores: { user1: 10, user2: 10, user3: 10, user4: 2 },
+        playerBonus: { user1: 8, user2: 8, user3: 8 },
+    };
+
+    const mockStateResultBonus = {
+        ...mockStateCommon,
+        phase: "round_result",
+        roundHistory: [
+            {
+                tie: false,
+                eliminated: "user4",
+                votes: { user1: "user4", user2: "user3", user4: "user1" },
+            },
+        ],
+        playerScores: { user1: 10, user2: 2, user3: 0, user4: 0 },
+        lastRoundScores: { user1: 2, user2: 0, user3: 0, user4: 0 },
+        playerBonus: { user1: 8 },
+    };
+
+    const mockStateGameOverSingleBonus = {
+        ...mockStateCommon,
+        phase: "game_over",
+        winner: "Developer",
+        winnerId: "user1",
+        impostorId: "user4",
+        playerScores: { user1: 10, user2: 4, user3: 2, user4: 2 },
+        playerBonus: { user1: 4 },
+    };
+
+    const noop = () => { };
 
     return (
         <div className="min-h-screen bg-neutral-950 text-white font-sans">
@@ -216,6 +251,30 @@ export default function DebugPreviewSingle() {
                     isHost={true}
                     onPlayAgain={noop}
                     user={currentUser}
+                />
+            )}
+            {viewId === "gameover_bonus" && (
+                <GameOverScreen
+                    state={mockStateGameOverBonus}
+                    isHost={true}
+                    onPlayAgain={noop}
+                    user={currentUser}
+                />
+            )}
+            {viewId === "gameover_single_bonus" && (
+                <GameOverScreen
+                    state={mockStateGameOverSingleBonus}
+                    isHost={true}
+                    onPlayAgain={noop}
+                    user={currentUser}
+                />
+            )}
+            {viewId === "result_bonus" && (
+                <RoundResultOverlay
+                    state={mockStateResultBonus}
+                    isHost={true}
+                    onNextRound={noop}
+                    currentUserId={currentUser.uid}
                 />
             )}
 

@@ -37,6 +37,7 @@ export default function DebugPreviews() {
                 { id: "result_elim_guest", label: "Eliminado (Guest)" },
                 { id: "result_tie_host", label: "Empate (Host)" },
                 { id: "result_tie_guest", label: "Empate (Guest)" },
+                { id: "result_bonus", label: "Bonus (Multi-ganador)" },
             ],
         },
         {
@@ -48,6 +49,8 @@ export default function DebugPreviews() {
                 { id: "gameover_impostor_host", label: "Impostor Gana (Host)" },
                 { id: "gameover_impostor_guest", label: "Impostor Gana (Guest)" },
                 { id: "gameover_tie", label: "Empate Final" },
+                { id: "gameover_bonus", label: "Bonus (Varios Ganadores)" },
+                { id: "gameover_single_bonus", label: "Bonus (Un solo ganador)" },
             ],
         },
         {
@@ -98,11 +101,10 @@ export default function DebugPreviews() {
                                         <button
                                             key={item.id}
                                             onClick={() => setView(item.id)}
-                                            className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                                                view === item.id
-                                                    ? "bg-orange-500/20 text-orange-400 border-l-2 border-orange-400"
-                                                    : "text-neutral-400 hover:text-white hover:bg-white/5"
-                                            }`}
+                                            className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${view === item.id
+                                                ? "bg-orange-500/20 text-orange-400 border-l-2 border-orange-400"
+                                                : "text-neutral-400 hover:text-white hover:bg-white/5"
+                                                }`}
                                         >
                                             {item.label}
                                         </button>
