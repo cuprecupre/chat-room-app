@@ -38,9 +38,9 @@ describe("Round Transitions (Integration)", () => {
 
             sim.createTieVote();
 
-            // Impostor gets R1 points (3)
+            // Impostor gets R1 points (2)
             const impostorId = sim.getState().impostorId;
-            expect(sim.getState().playerScores[impostorId]).toBe(3);
+            expect(sim.getState().playerScores[impostorId]).toBe(2);
             expect(sim.getState().phase).toBe("round_result");
         });
 
@@ -75,21 +75,21 @@ describe("Round Transitions (Integration)", () => {
     });
 
     describe("Scoring", () => {
-        test("Impostor gets 3+2+2 = 7 points for surviving all rounds", () => {
+        test("Impostor gets 2+2+6(bonus) = 10 points for surviving all rounds", () => {
             sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
             const impostorId = sim.getState().impostorId;
 
             // Survive all 3 rounds with ties
             sim.createTieVote();
-            expect(sim.getState().playerScores[impostorId]).toBe(3); // R1
+            expect(sim.getState().playerScores[impostorId]).toBe(2); // R1
 
             sim.continueToNextRound();
             sim.createTieVote();
-            expect(sim.getState().playerScores[impostorId]).toBe(5); // R1 + R2
+            expect(sim.getState().playerScores[impostorId]).toBe(4); // R1 + R2
 
             sim.continueToNextRound();
             sim.createTieVote();
-            expect(sim.getState().playerScores[impostorId]).toBe(7); // R1 + R2 + R3
+            expect(sim.getState().playerScores[impostorId]).toBe(10); // Final score with bonus
         });
 
         test("Friends get +2 for correct vote when catching impostor", () => {
@@ -97,15 +97,17 @@ describe("Round Transitions (Integration)", () => {
 
             sim.allVoteFor(sim.getImpostorIndex());
 
-            // All friends who voted correctly get +2
+            // Friends who voted correctly get +2
+            // One of them will be the "Perfect Friend" and get bonus to 10
             const scores = sim.getState().playerScores;
             const impostorId = sim.getState().impostorId;
 
-            Object.entries(scores).forEach(([playerId, score]) => {
-                if (playerId !== impostorId && score > 0) {
-                    expect(score).toBe(2);
-                }
-            });
+            const friendScores = Object.entries(scores)
+                .filter(([id]) => id !== impostorId)
+                .map(([, score]) => score);
+
+            expect(friendScores).toContain(10); // Winner
+            expect(friendScores).toContain(2); // Other friend who voted right
         });
     });
 
@@ -156,7 +158,7 @@ describe("Round Transitions (Integration)", () => {
             // Should trigger sudden death
             expect(sim.getState().phase).toBe("game_over");
             expect(sim.getState().winnerId).toBe(impostorId);
-            expect(sim.getState().playerScores[impostorId]).toBe(7);
+            expect(sim.getState().playerScores[impostorId]).toBe(10);
         });
     });
 

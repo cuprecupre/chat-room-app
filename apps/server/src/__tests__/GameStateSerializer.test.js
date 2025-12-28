@@ -26,9 +26,7 @@ describe("GameStateSerializer - Eliminated Players", () => {
             showImpostorHint: true,
             votes: {},
             formerPlayers: {},
-            roundHistory: [
-                { round: 1, eliminated: "user2", tie: false }
-            ],
+            roundHistory: [{ round: 1, eliminated: "user2", tie: false }],
         };
     });
 

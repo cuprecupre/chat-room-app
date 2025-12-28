@@ -19,7 +19,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
             angle: 60,
             spread: 70,
             origin: { x: 0, y: 0.6 },
-            colors: ['#f97316', '#fb923c', '#fdba74', '#ffffff']
+            colors: ["#f97316", "#fb923c", "#fdba74", "#ffffff"],
         });
         // Burst from right
         confetti({
@@ -27,7 +27,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
             angle: 120,
             spread: 70,
             origin: { x: 1, y: 0.6 },
-            colors: ['#f97316', '#fb923c', '#fdba74', '#ffffff']
+            colors: ["#f97316", "#fb923c", "#fdba74", "#ffffff"],
         });
     }, [state.phase]);
 
@@ -83,9 +83,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                                 size="md"
                                 className="ring-2 ring-orange-500"
                             />
-                            <span className="text-2xl text-white font-medium">
-                                {impostor.name}
-                            </span>
+                            <span className="text-2xl text-white font-medium">{impostor.name}</span>
                         </div>
                     ) : (
                         <span className="text-neutral-500">Desconocido</span>
@@ -149,7 +147,8 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                             </li>
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">
-                                    <span className="text-yellow-400">★</span> Bonus (votas bien todas las rondas y el impostor pierde)
+                                    <span className="text-yellow-400">★</span> Bonus (votas bien
+                                    todas las rondas y el impostor pierde)
                                 </span>
                                 <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium whitespace-nowrap">
                                     10 pts
@@ -165,14 +164,17 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                         <h3 className="text-xl font-serif text-orange-400">Si eres Impostor</h3>
                         <ul className="space-y-3">
                             <li className="flex justify-between items-center">
-                                <span className="text-neutral-300">Por cada ronda que sobrevives</span>
+                                <span className="text-neutral-300">
+                                    Por cada ronda que sobrevives
+                                </span>
                                 <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
                                     +2 pts
                                 </span>
                             </li>
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">
-                                    <span className="text-yellow-400">★</span> Bonus (sobrevives las 3 rondas)
+                                    <span className="text-yellow-400">★</span> Bonus (sobrevives las
+                                    3 rondas)
                                 </span>
                                 <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium whitespace-nowrap">
                                     10 pts
@@ -209,9 +211,25 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                     ) : (
                         <div className="bg-neutral-900 rounded-xl p-4 text-center">
                             <p className="text-neutral-400 text-sm flex items-center justify-center gap-2">
-                                <svg className="animate-spin h-4 w-4 text-orange-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                <svg
+                                    className="animate-spin h-4 w-4 text-orange-400"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    ></path>
                                 </svg>
                                 Esperando al anfitrión para la siguiente partida
                             </p>

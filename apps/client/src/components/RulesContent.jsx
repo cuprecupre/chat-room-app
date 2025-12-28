@@ -191,10 +191,13 @@ export function RulesContent({ isModal = false }) {
                         <h4 className="text-white font-semibold mb-3 text-lg">Amigos</h4>
                         <ul className="text-neutral-300 space-y-2 font-light">
                             <li>
-                                • Por cada ronda que votas al impostor: <strong className="text-orange-400">+2 pts</strong>
+                                • Por cada ronda que votas al impostor:{" "}
+                                <strong className="text-orange-400">+2 pts</strong>
                             </li>
                             <li>
-                                • <span className="text-yellow-400">★</span> Bonus (votas bien todas las rondas y el impostor pierde): <strong className="text-orange-400">10 pts</strong>
+                                • <span className="text-yellow-400">★</span> Bonus (votas bien todas
+                                las rondas y el impostor pierde):{" "}
+                                <strong className="text-orange-400">10 pts</strong>
                             </li>
                         </ul>
                     </div>
@@ -202,10 +205,12 @@ export function RulesContent({ isModal = false }) {
                         <h4 className="text-orange-400 font-semibold mb-3 text-lg">Impostor</h4>
                         <ul className="text-neutral-300 space-y-2">
                             <li>
-                                • Por cada ronda que sobrevives: <strong className="text-orange-400">+2 pts</strong>
+                                • Por cada ronda que sobrevives:{" "}
+                                <strong className="text-orange-400">+2 pts</strong>
                             </li>
                             <li>
-                                • <span className="text-yellow-400">★</span> Bonus (sobrevives las 3 rondas): <strong className="text-orange-400">10 pts</strong>
+                                • <span className="text-yellow-400">★</span> Bonus (sobrevives las 3
+                                rondas): <strong className="text-orange-400">10 pts</strong>
                             </li>
                         </ul>
                     </div>

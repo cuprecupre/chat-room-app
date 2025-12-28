@@ -48,9 +48,9 @@ export function PlayerList({
     const isTie = gameState?.winner === "Empate";
     const winners = isTie
         ? (() => {
-            const maxScore = Math.max(...Object.values(playerScores));
-            return players.filter((player) => (playerScores[player.uid] || 0) === maxScore);
-        })()
+              const maxScore = Math.max(...Object.values(playerScores));
+              return players.filter((player) => (playerScores[player.uid] || 0) === maxScore);
+          })()
         : [];
 
     // Si hay 3 o más ganadores, no hay ganadores reales
@@ -252,12 +252,13 @@ export function PlayerList({
                                             variant="outline"
                                             size="sm"
                                             disabled={iVotedForThisPlayer && !canChangeVote}
-                                            className={`!w-auto gap-2 px-4 ${iVotedForThisPlayer
-                                                ? canChangeVote
-                                                    ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
-                                                    : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
-                                                : ""
-                                                }`}
+                                            className={`!w-auto gap-2 px-4 ${
+                                                iVotedForThisPlayer
+                                                    ? canChangeVote
+                                                        ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
+                                                        : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
+                                                    : ""
+                                            }`}
                                         >
                                             <svg
                                                 className="w-4 h-4"
@@ -721,9 +722,25 @@ export function GameRoom({
 
                             <div className="space-y-6 mt-8">
                                 <p className="text-lg text-neutral-400 text-center">
-                                    <svg className="animate-spin inline-block h-4 w-4 text-orange-400 mr-2 align-middle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    <svg
+                                        className="animate-spin inline-block h-4 w-4 text-orange-400 mr-2 align-middle"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
                                     </svg>
                                     Espera hasta que{" "}
                                     <span className="text-orange-400 font-regular">
@@ -888,7 +905,9 @@ export function GameRoom({
                                                                 ) : (
                                                                     <div>
                                                                         <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-orange-400">
-                                                                            <span>Palabra secreta</span>
+                                                                            <span>
+                                                                                Palabra secreta
+                                                                            </span>
                                                                         </div>
                                                                         <p className="font-serif text-xl mt-1 text-white">
                                                                             {capitalize(
@@ -1124,9 +1143,25 @@ export function GameRoom({
                                     </p>
 
                                     <p className="text-sm text-neutral-400 flex items-center justify-center gap-2">
-                                        <svg className="animate-spin h-4 w-4 text-orange-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        <svg
+                                            className="animate-spin h-4 w-4 text-orange-400"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                            ></circle>
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                            ></path>
                                         </svg>
                                         <span>
                                             Espera a que{" "}
@@ -1274,19 +1309,19 @@ export function GameRoom({
                                 {allPlayers.filter(
                                     (p) => !winnerPlayers.some((w) => w.uid === p.uid)
                                 ).length > 0 && (
-                                        <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
-                                            <PlayerList
-                                                players={allPlayers.filter(
-                                                    (p) => !winnerPlayers.some((w) => w.uid === p.uid)
-                                                )}
-                                                currentUserId={user.uid}
-                                                isHost={isHost}
-                                                onCopyLink={onCopyLink}
-                                                gameState={state}
-                                                onVote={onVote}
-                                            />
-                                        </div>
-                                    )}
+                                    <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
+                                        <PlayerList
+                                            players={allPlayers.filter(
+                                                (p) => !winnerPlayers.some((w) => w.uid === p.uid)
+                                            )}
+                                            currentUserId={user.uid}
+                                            isHost={isHost}
+                                            onCopyLink={onCopyLink}
+                                            gameState={state}
+                                            onVote={onVote}
+                                        />
+                                    </div>
+                                )}
 
                                 <div className="animate-fadeIn animate-delay-600 flex flex-col items-center">
                                     <p className="text-xl font-medium text-white mb-4">

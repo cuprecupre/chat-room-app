@@ -17,7 +17,8 @@ const TARGET_SCORE = 10;
  * Dar puntos al impostor por sobrevivir la ronda actual
  */
 function giveImpostorSurvivalPoints(game) {
-    game.playerScores[game.impostorId] = (game.playerScores[game.impostorId] || 0) + IMPOSTOR_POINTS_PER_ROUND;
+    game.playerScores[game.impostorId] =
+        (game.playerScores[game.impostorId] || 0) + IMPOSTOR_POINTS_PER_ROUND;
     game.lastRoundScores[game.impostorId] =
         (game.lastRoundScores[game.impostorId] || 0) + IMPOSTOR_POINTS_PER_ROUND;
 
@@ -37,8 +38,7 @@ function giveWinnerBonus(game, winnerId) {
 
     if (bonusPoints > 0) {
         game.playerScores[winnerId] = TARGET_SCORE;
-        game.lastRoundScores[winnerId] =
-            (game.lastRoundScores[winnerId] || 0) + bonusPoints;
+        game.lastRoundScores[winnerId] = (game.lastRoundScores[winnerId] || 0) + bonusPoints;
 
         // Track bonus for UI display
         game.playerBonus = game.playerBonus || {};
@@ -55,9 +55,10 @@ function giveWinnerBonus(game, winnerId) {
  */
 function giveImpostorMaxPoints(game) {
     giveWinnerBonus(game, game.impostorId);
-    console.log(`[Game ${game.gameId}] Impostor gana. Bonus aplicado hasta ${TARGET_SCORE} puntos.`);
+    console.log(
+        `[Game ${game.gameId}] Impostor gana. Bonus aplicado hasta ${TARGET_SCORE} puntos.`
+    );
 }
-
 
 /**
  * Dar puntos a los amigos que votaron correctamente al impostor
@@ -86,7 +87,9 @@ function giveCorrectVotersPoints(game) {
         .map(([voter]) => voter);
 
     if (correctVoters.length > 0) {
-        console.log(`[Game ${game.gameId}] Amigos que votaron bien: ${correctVoters.length} (+${FRIEND_POINTS_PER_CORRECT_VOTE} pts cada uno)`);
+        console.log(
+            `[Game ${game.gameId}] Amigos que votaron bien: ${correctVoters.length} (+${FRIEND_POINTS_PER_CORRECT_VOTE} pts cada uno)`
+        );
     }
 }
 
@@ -108,19 +111,21 @@ function calculateFriendsWinScores(game) {
     if (perfectFriends.length > 0) {
         // Give bonus to the perfect friend with highest score (first one if tied)
         const bestPerfectFriend = perfectFriends.reduce((best, current) => {
-            return (game.playerScores[current] || 0) >= (game.playerScores[best] || 0) ? current : best;
+            return (game.playerScores[current] || 0) >= (game.playerScores[best] || 0)
+                ? current
+                : best;
         });
 
         giveWinnerBonus(game, bestPerfectFriend);
-        console.log(`[Game ${game.gameId}] Amigo perfecto encontrado: ${bestPerfectFriend} (votó bien ${totalRounds}/${totalRounds} rondas)`);
+        console.log(
+            `[Game ${game.gameId}] Amigo perfecto encontrado: ${bestPerfectFriend} (votó bien ${totalRounds}/${totalRounds} rondas)`
+        );
     } else {
         console.log(`[Game ${game.gameId}] No hay amigo perfecto. Gana el amigo con más puntos.`);
     }
 
     console.log(`[Game ${game.gameId}] Amigos ganan. Puntos finales:`, game.playerScores);
 }
-
-
 
 /**
  * Calcular puntos de la ronda

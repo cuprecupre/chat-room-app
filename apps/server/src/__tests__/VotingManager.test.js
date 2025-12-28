@@ -136,8 +136,8 @@ describe("VotingManager - New System", () => {
 
             VotingManager.processVotingResults(game);
 
-            // Impostor should have gotten R1 points (3)
-            expect(game.playerScores["user1"]).toBe(3);
+            // Impostor should have gotten R1 points (2)
+            expect(game.playerScores["user1"]).toBe(2);
         });
 
         test("should continue to next round on tie (not last round)", () => {
@@ -194,7 +194,7 @@ describe("VotingManager - New System", () => {
             // user2 eliminated, only user1 (impostor) and user3 left
             expect(game.phase).toBe("game_over");
             expect(game.winnerId).toBe("user1");
-            expect(game.playerScores["user1"]).toBe(7); // Max points
+            expect(game.playerScores["user1"]).toBe(10); // Max points (bonus applied)
         });
     });
 

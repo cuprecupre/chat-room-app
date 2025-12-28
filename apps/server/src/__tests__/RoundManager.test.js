@@ -246,7 +246,7 @@ describe("RoundManager - New System", () => {
 
             RoundManager.handleSuddenDeath(game);
 
-            expect(game.playerScores["user1"]).toBe(7);
+            expect(game.playerScores["user1"]).toBe(10);
         });
     });
 

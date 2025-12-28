@@ -90,8 +90,8 @@ function getStateForPlayer(game, userId) {
         baseState.impostorName = impostor
             ? impostor.name
             : formerImpostor
-                ? formerImpostor.name
-                : "Jugador desconectado";
+              ? formerImpostor.name
+              : "Jugador desconectado";
         baseState.impostorId = game.impostorId;
         baseState.secretWord = game.secretWord;
         baseState.lastRoundScores = game.lastRoundScores;
@@ -99,7 +99,6 @@ function getStateForPlayer(game, userId) {
         baseState.formerPlayers = game.formerPlayers;
         baseState.playerBonus = game.playerBonus || {};
         baseState.roundHistory = game.roundHistory;
-
 
         if (game.phase === "game_over") {
             // Usar winnerId directamente (ya calculado en endRound)

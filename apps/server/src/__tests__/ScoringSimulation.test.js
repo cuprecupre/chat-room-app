@@ -1,9 +1,9 @@
 /**
  * SIMULACIÓN MATEMÁTICA DEL SISTEMA DE PUNTUACIÓN
- * 
+ *
  * Este test cubre TODOS los escenarios posibles del juego y verifica
  * que el bonus se aplica correctamente en cada caso.
- * 
+ *
  * Reglas:
  * - Amigo vota bien: +2 pts por ronda
  * - Impostor sobrevive: +2 pts por ronda
@@ -15,9 +15,9 @@ const ScoringManager = require("../game/ScoringManager");
 function createGame(players = ["p1", "p2", "p3", "p4"]) {
     return {
         gameId: "TEST",
-        players: players.map(uid => ({ uid, name: uid })),
+        players: players.map((uid) => ({ uid, name: uid })),
         impostorId: players[0], // p1 es siempre impostor
-        playerScores: Object.fromEntries(players.map(p => [p, 0])),
+        playerScores: Object.fromEntries(players.map((p) => [p, 0])),
         lastRoundScores: {},
         currentRound: 0,
         maxRounds: 3,
@@ -28,9 +28,7 @@ function createGame(players = ["p1", "p2", "p3", "p4"]) {
 }
 
 describe("Simulación Matemática - Sistema de Puntuación Completo", () => {
-
     describe("Escenarios donde IMPOSTOR gana", () => {
-
         test("Impostor sobrevive 3 rondas (R1+R2+R3) = 10 pts con bonus", () => {
             const game = createGame();
 
@@ -99,7 +97,6 @@ describe("Simulación Matemática - Sistema de Puntuación Completo", () => {
     });
 
     describe("Escenarios donde AMIGOS ganan", () => {
-
         test("Descubren impostor R1, amigo perfecto con 2 pts → 10 pts", () => {
             const game = createGame();
             game.currentRound = 1;
@@ -207,7 +204,6 @@ describe("Simulación Matemática - Sistema de Puntuación Completo", () => {
     });
 
     describe("Verificación de límites", () => {
-
         test("Impostor nunca puede tener más de 10 pts", () => {
             const game = createGame();
             game.playerScores["p1"] = 10;
@@ -240,7 +236,6 @@ describe("Simulación Matemática - Sistema de Puntuación Completo", () => {
     });
 
     describe("Resumen matemático", () => {
-
         test("TABLA DE TODOS LOS ESCENARIOS", () => {
             const scenarios = [
                 { desc: "Impostor R1 (muerte súbita)", basePts: 0, bonus: 10, total: 10 },
@@ -255,22 +250,23 @@ describe("Simulación Matemática - Sistema de Puntuación Completo", () => {
             console.log("\n=== TABLA DE ESCENARIOS ===");
             console.log("| Escenario               | Base | Bonus | Total |");
             console.log("|-------------------------|------|-------|-------|");
-            scenarios.forEach(s => {
-                console.log(`| ${s.desc.padEnd(23)} | ${s.basePts.toString().padStart(4)} | ${s.bonus.toString().padStart(5)} | ${s.total.toString().padStart(5)} |`);
+            scenarios.forEach((s) => {
+                console.log(
+                    `| ${s.desc.padEnd(23)} | ${s.basePts.toString().padStart(4)} | ${s.bonus.toString().padStart(5)} | ${s.total.toString().padStart(5)} |`
+                );
                 expect(s.basePts + s.bonus).toBe(s.total);
             });
             console.log("");
 
             // Verificar que el ganador SIEMPRE tiene 10 pts
-            const winnerScenarios = scenarios.filter(s => s.bonus > 0);
-            winnerScenarios.forEach(s => {
+            const winnerScenarios = scenarios.filter((s) => s.bonus > 0);
+            winnerScenarios.forEach((s) => {
                 expect(s.total).toBe(10);
             });
         });
     });
 
     describe("Con más jugadores (5-8)", () => {
-
         test("5 jugadores: impostor gana R3 = 10 pts", () => {
             const game = createGame(["imp", "a1", "a2", "a3", "a4"]);
 
@@ -305,8 +301,12 @@ describe("Simulación Matemática - Sistema de Puntuación Completo", () => {
             // Todos votan bien en R1
             game.currentRound = 1;
             game.votes = {
-                a1: "imp", a2: "imp", a3: "imp",
-                a4: "imp", a5: "imp", a6: "imp"
+                a1: "imp",
+                a2: "imp",
+                a3: "imp",
+                a4: "imp",
+                a5: "imp",
+                a6: "imp",
             };
             ScoringManager.giveCorrectVotersPoints(game);
             ScoringManager.calculateRoundScores(game, true);
@@ -323,16 +323,26 @@ describe("Simulación Matemática - Sistema de Puntuación Completo", () => {
             // R1: a1, a2, a3 votan bien
             game.currentRound = 1;
             game.votes = {
-                a1: "imp", a2: "imp", a3: "imp",
-                a4: "a1", a5: "a2", a6: "a3", a7: "a4"
+                a1: "imp",
+                a2: "imp",
+                a3: "imp",
+                a4: "a1",
+                a5: "a2",
+                a6: "a3",
+                a7: "a4",
             };
             ScoringManager.giveCorrectVotersPoints(game);
 
             // R2: a4, a5, a6 votan bien (diferentes)
             game.currentRound = 2;
             game.votes = {
-                a1: "a2", a2: "a3", a3: "a4",
-                a4: "imp", a5: "imp", a6: "imp", a7: "a1"
+                a1: "a2",
+                a2: "a3",
+                a3: "a4",
+                a4: "imp",
+                a5: "imp",
+                a6: "imp",
+                a7: "a1",
             };
             game.lastRoundScores = {};
             ScoringManager.giveCorrectVotersPoints(game);
@@ -340,8 +350,13 @@ describe("Simulación Matemática - Sistema de Puntuación Completo", () => {
             // R3: a7 vota bien (otro diferente)
             game.currentRound = 3;
             game.votes = {
-                a1: "a2", a2: "a3", a3: "a4",
-                a4: "a5", a5: "a6", a6: "a7", a7: "imp"
+                a1: "a2",
+                a2: "a3",
+                a3: "a4",
+                a4: "a5",
+                a5: "a6",
+                a6: "a7",
+                a7: "imp",
             };
             game.lastRoundScores = {};
             ScoringManager.giveCorrectVotersPoints(game);
@@ -351,7 +366,7 @@ describe("Simulación Matemática - Sistema de Puntuación Completo", () => {
 
             expect(Object.keys(game.playerBonus).length).toBe(0);
             // Verificar que nadie tiene 10 pts
-            Object.values(game.playerScores).forEach(score => {
+            Object.values(game.playerScores).forEach((score) => {
                 expect(score).toBeLessThan(10);
             });
         });

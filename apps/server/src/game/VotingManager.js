@@ -8,7 +8,11 @@
  */
 
 const { endRound, startNextRound, handleSuddenDeath } = require("./RoundManager");
-const { giveImpostorSurvivalPoints, giveCorrectVotersPoints, giveImpostorMaxPoints } = require("./ScoringManager");
+const {
+    giveImpostorSurvivalPoints,
+    giveCorrectVotersPoints,
+    giveImpostorMaxPoints,
+} = require("./ScoringManager");
 const { getActivePlayers } = require("./PlayerManager");
 
 function castVote(game, voterId, targetId) {
