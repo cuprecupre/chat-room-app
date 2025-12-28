@@ -169,7 +169,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
             </Modal>
 
             {/* Botón Play Again (Fixed Bottom) */}
-            <div className="fixed bottom-0 left-0 right-0 p-6 bg-neutral-950 z-40">
+            <div className="fixed bottom-0 left-0 right-0 pt-16 pb-6 px-6 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent z-40">
                 <div className="max-w-sm mx-auto space-y-4">
                     {isHost ? (
                         <>
