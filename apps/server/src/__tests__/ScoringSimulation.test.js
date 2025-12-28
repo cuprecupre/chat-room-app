@@ -185,7 +185,7 @@ describe("Simulación Matemática - Sistema de Puntuación Completo", () => {
             expect(game.playerScores["p3"]).toBe(4);
         });
 
-        test("Empate entre amigos perfectos → bonus al primero", () => {
+        test("Empate entre amigos perfectos → bonus compartido", () => {
             const game = createGame();
             game.currentRound = 1;
 
@@ -196,10 +196,11 @@ describe("Simulación Matemática - Sistema de Puntuación Completo", () => {
             // Ambos son perfectos (1/1), ambos tienen 2 pts
             ScoringManager.calculateRoundScores(game, true);
 
-            // Solo uno recibe bonus
+            // TODOS los perfectos reciben bonus
             const winners = Object.keys(game.playerBonus);
-            expect(winners.length).toBe(1);
-            expect(game.playerScores[winners[0]]).toBe(10);
+            expect(winners.length).toBe(2); // p2 y p3
+            expect(game.playerScores["p2"]).toBe(10);
+            expect(game.playerScores["p3"]).toBe(10);
         });
     });
 
@@ -295,7 +296,7 @@ describe("Simulación Matemática - Sistema de Puntuación Completo", () => {
             expect(game.playerScores["a3"]).toBe(0);
         });
 
-        test("7 jugadores: múltiples amigos perfectos → uno recibe bonus", () => {
+        test("7 jugadores: múltiples amigos perfectos → todos reciben bonus", () => {
             const game = createGame(["imp", "a1", "a2", "a3", "a4", "a5", "a6"]);
 
             // Todos votan bien en R1
@@ -311,10 +312,12 @@ describe("Simulación Matemática - Sistema de Puntuación Completo", () => {
             ScoringManager.giveCorrectVotersPoints(game);
             ScoringManager.calculateRoundScores(game, true);
 
-            // Todos tienen 2 pts base, uno tiene bonus
+            // TODOS reciben bonus (6 am igos perfectos)
             const withBonus = Object.keys(game.playerBonus);
-            expect(withBonus.length).toBe(1);
-            expect(game.playerScores[withBonus[0]]).toBe(10);
+            expect(withBonus.length).toBe(6); // Todos los amigos
+            withBonus.forEach(uid => {
+                expect(game.playerScores[uid]).toBe(10);
+            });
         });
 
         test("8 jugadores: R3, nadie perfecto = sin bonus", () => {

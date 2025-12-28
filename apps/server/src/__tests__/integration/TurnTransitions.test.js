@@ -98,7 +98,7 @@ describe("Round Transitions (Integration)", () => {
             sim.allVoteFor(sim.getImpostorIndex());
 
             // Friends who voted correctly get +2
-            // One of them will be the "Perfect Friend" and get bonus to 10
+            // ALL perfect friends (voted correctly in all rounds) get bonus to 10
             const scores = sim.getState().playerScores;
             const impostorId = sim.getState().impostorId;
 
@@ -106,8 +106,8 @@ describe("Round Transitions (Integration)", () => {
                 .filter(([id]) => id !== impostorId)
                 .map(([, score]) => score);
 
-            expect(friendScores).toContain(10); // Winner
-            expect(friendScores).toContain(2); // Other friend who voted right
+            // All friends voted correctly in Round 1 (only round), so ALL get bonus
+            expect(friendScores.every(score => score === 10)).toBe(true);
         });
     });
 
