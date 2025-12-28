@@ -717,33 +717,18 @@ export function GameRoom({
                             </h2>
 
                             <div className="space-y-6 mt-8">
-                                <p className="text-lg text-neutral-400 animate-pulse">
-                                    Espera hasta que{" "}
-                                    <span className="text-orange-400 font-regular">
-                                        {state.players.find((p) => p.uid === state.hostId)?.name ||
-                                            "el anfitrión"}
-                                    </span>
-                                    <br />
-                                    inicie la partida
-                                    <span className="inline-flex ml-1">
-                                        <span
-                                            className="animate-bounce"
-                                            style={{ animationDelay: "0ms" }}
-                                        >
-                                            .
-                                        </span>
-                                        <span
-                                            className="animate-bounce"
-                                            style={{ animationDelay: "150ms" }}
-                                        >
-                                            .
-                                        </span>
-                                        <span
-                                            className="animate-bounce"
-                                            style={{ animationDelay: "300ms" }}
-                                        >
-                                            .
-                                        </span>
+                                <p className="text-lg text-neutral-400 flex items-center justify-center gap-2">
+                                    <svg className="animate-spin h-5 w-5 text-orange-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span>
+                                        Espera hasta que{" "}
+                                        <span className="text-orange-400 font-regular">
+                                            {state.players.find((p) => p.uid === state.hostId)?.name ||
+                                                "el anfitrión"}
+                                        </span>{" "}
+                                        inicie la partida
                                     </span>
                                 </p>
 
@@ -1119,32 +1104,18 @@ export function GameRoom({
                                         La siguiente partida empieza en breve
                                     </p>
 
-                                    <p className="text-sm text-neutral-400">
-                                        Espera a que el anfitrión{" "}
-                                        <span className="font-semibold text-neutral-300">
-                                            {state.players.find((p) => p.uid === state.hostId)
-                                                ?.name || "desconocido"}
-                                        </span>{" "}
-                                        inicie la siguiente partida
-                                        <span className="inline-flex ml-1">
-                                            <span
-                                                className="animate-bounce"
-                                                style={{ animationDelay: "0ms" }}
-                                            >
-                                                .
-                                            </span>
-                                            <span
-                                                className="animate-bounce"
-                                                style={{ animationDelay: "150ms" }}
-                                            >
-                                                .
-                                            </span>
-                                            <span
-                                                className="animate-bounce"
-                                                style={{ animationDelay: "300ms" }}
-                                            >
-                                                .
-                                            </span>
+                                    <p className="text-sm text-neutral-400 flex items-center justify-center gap-2">
+                                        <svg className="animate-spin h-4 w-4 text-orange-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span>
+                                            Espera a que{" "}
+                                            <span className="font-semibold text-neutral-300">
+                                                {state.players.find((p) => p.uid === state.hostId)
+                                                    ?.name || "el anfitrión"}
+                                            </span>{" "}
+                                            inicie la siguiente partida
                                         </span>
                                     </p>
                                 </div>
