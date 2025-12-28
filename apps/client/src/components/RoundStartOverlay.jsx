@@ -48,8 +48,8 @@ export function RoundStartOverlay({ state }) {
                 {startingPlayer && displayedRound === 1 && (
                     <div className="space-y-2">
                         <p className="text-xl text-neutral-400">El primer turno es para:</p>
-                        <p className="text-2xl font-serif text-orange-400">
-                            ☀️ {startingPlayer.name}
+                        <p className="text-2xl font-serif text-white">
+                            {startingPlayer.name}
                         </p>
                     </div>
                 )}
