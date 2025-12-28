@@ -42,16 +42,16 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
     let winnerLabel, winnerTitle, winnerSubtitle;
     if (state.winner === "Empate") {
         winnerLabel = null;
-        winnerTitle = "El impostor fue descubierto";
-        winnerSubtitle = "Los amigos ganan";
+        winnerTitle = "Los amigos ganan la partida";
+        winnerSubtitle = "El impostor fue descubierto";
     } else if (impostorWon) {
         winnerLabel = null;
-        winnerTitle = "El impostor ganó la partida";
+        winnerTitle = "El impostor gana la partida";
         winnerSubtitle = null;
     } else {
         winnerLabel = null;
-        winnerTitle = "El impostor fue descubierto";
-        winnerSubtitle = "Los amigos ganan";
+        winnerTitle = "Los amigos ganan la partida";
+        winnerSubtitle = "El impostor fue descubierto";
     }
 
     return (
@@ -71,36 +71,36 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
 
             <div className="grid grid-cols-1 gap-12 items-start max-w-md mx-auto pb-32">
                 {/* Impostor Reveal */}
-                <div className="w-full">
-                    <p className="text-xs uppercase tracking-wider text-neutral-400 mb-4 text-center">
+                <div className="w-full bg-neutral-900 rounded-2xl p-8 text-center">
+                    <p className="text-xs uppercase tracking-wider text-neutral-400 mb-4">
                         El impostor era
                     </p>
-                    <div className="bg-neutral-900 rounded-2xl p-8 text-center relative overflow-hidden">
-                        {impostor ? (
-                            <div className="flex items-center justify-center gap-4">
-                                <Avatar
-                                    photoURL={impostor.photoURL}
-                                    displayName={impostor.name}
-                                    size="md"
-                                    className="ring-2 ring-orange-500"
-                                />
-                                <span className="text-2xl text-white font-medium">
-                                    {impostor.name}
-                                </span>
-                            </div>
-                        ) : (
-                            <span className="text-neutral-500">Desconocido</span>
-                        )}
-                    </div>
+                    {impostor ? (
+                        <div className="flex items-center justify-center gap-4">
+                            <Avatar
+                                photoURL={impostor.photoURL}
+                                displayName={impostor.name}
+                                size="md"
+                                className="ring-2 ring-orange-500"
+                            />
+                            <span className="text-2xl text-white font-medium">
+                                {impostor.name}
+                            </span>
+                        </div>
+                    ) : (
+                        <span className="text-neutral-500">Desconocido</span>
+                    )}
+
                     {state.secretWord && (
-                        <div className="bg-neutral-900 rounded-2xl p-6 mt-4 text-center">
-                            <p className="text-xs uppercase tracking-wider text-neutral-400">
+                        <>
+                            <hr className="border-neutral-800 my-6" />
+                            <p className="text-xs uppercase tracking-wider text-neutral-400 mb-2">
                                 Palabra secreta
                             </p>
-                            <p className="text-2xl text-white font-medium capitalize mt-2">
+                            <p className="text-2xl text-white font-medium capitalize">
                                 {state.secretWord}
                             </p>
-                        </div>
+                        </>
                     )}
                 </div>
 
