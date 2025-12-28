@@ -135,13 +135,15 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                             gameState={state}
                         />
                     </div>
-                    <button
+                    <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => setShowScoringModal(true)}
-                        className="mt-4 w-full flex items-center justify-center gap-1.5 text-sm text-neutral-500 hover:text-orange-400 transition-colors"
+                        className="mt-6 w-full py-3 border-white/10 text-neutral-400 hover:text-orange-400 hover:border-orange-500/50 gap-2"
                     >
                         <Info className="w-4 h-4" />
                         ¿Cómo se calculan los puntos?
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -225,7 +227,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                                 size="lg"
                                 className="w-full text-lg py-6"
                             >
-                                Siguiente Partida
+                                Jugar otra partida
                             </Button>
                         </>
                     ) : (
@@ -251,7 +253,10 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                     ></path>
                                 </svg>
-                                Esperando al anfitrión para la siguiente partida
+                                Esperando a que <span className="text-orange-400 font-medium">
+                                    {state.players.find((p) => p.uid === state.hostId)?.name ||
+                                        "el anfitrión"}
+                                </span> inicie una nueva partida
                             </p>
                         </div>
                     )}

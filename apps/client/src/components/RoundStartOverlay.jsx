@@ -23,12 +23,15 @@ export function RoundStartOverlay({ state }) {
         <div className="fixed inset-0 z-[60] flex flex-col items-center justify-center p-4 bg-black/95 backdrop-blur-md animate-fadeIn pointer-events-none">
             <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md space-y-8 text-center animate-scaleIn">
                 <div className="space-y-6">
+                    {displayedRound === 1 && (
+                        <p className="text-xl uppercase tracking-[0.2em] text-orange-400 font-medium mb-1">
+                            Nueva partida
+                        </p>
+                    )}
+
                     {/* Round Number */}
                     <h1 className="text-7xl font-serif text-orange-400">Ronda {displayedRound}</h1>
 
-                    {displayedRound === 1 && (
-                        <p className="text-2xl text-neutral-300">Comienza la partida</p>
-                    )}
                     {displayedRound === 2 && (
                         <p className="text-2xl text-neutral-300">Nueva ronda de pistas</p>
                     )}

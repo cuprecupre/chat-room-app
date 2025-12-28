@@ -112,12 +112,21 @@ function calculateStartingPlayer(game) {
         return null;
     }
 
-    const roundIndex = ((game.currentRound || 1) - 1) % eligiblePlayers.length;
-    const startingPlayerId = eligiblePlayers[roundIndex];
+    // REQUISITO: Siempre empieza el Anfitrión (Host)
+    let startingPlayerId = game.hostId;
+
+    // Fallback: Si el host no es elegible (ej. espectador o se acaba de ir), usar rotación
+    if (!eligiblePlayers.includes(startingPlayerId)) {
+        const roundIndex = ((game.currentRound || 1) - 1) % eligiblePlayers.length;
+        startingPlayerId = eligiblePlayers[roundIndex];
+        console.log(
+            `[Game ${game.gameId}] Host no elegible. Fallback a rotación: ${startingPlayerId}`
+        );
+    }
 
     const startingPlayer = game.players.find((p) => p.uid === startingPlayerId);
     console.log(
-        `[Game ${game.gameId}] Ronda ${game.currentRound}: Jugador inicial = ${startingPlayer?.name} (índice ${roundIndex} de ${eligiblePlayers.length} elegibles)`
+        `[Game ${game.gameId}] Ronda ${game.currentRound}: Jugador inicial = ${startingPlayer?.name}`
     );
 
     return startingPlayerId;

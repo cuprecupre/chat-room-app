@@ -39,7 +39,7 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-neutral-950 animate-fadeIn">
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-neutral-950/90 backdrop-blur-sm animate-fadeIn">
             <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md space-y-8 text-center animate-scaleIn">
                 <div className="space-y-8">
                     {/* Caso 1: Alguien eliminado */}

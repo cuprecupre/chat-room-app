@@ -201,9 +201,9 @@ describe("ScoringManager - New System", () => {
             ScoringManager.giveCorrectVotersPoints(game);
             ScoringManager.calculateRoundScores(game, true);
 
-            // Friends should have gotten points, user4 has perfect score (1/1) so gets bonus
-            expect(game.playerScores["user2"]).toBe(2);
-            expect(game.playerScores["user3"]).toBe(2);
+            // Friends should have gotten points, ALL have perfect score (1/1) so ALL get bonus
+            expect(game.playerScores["user2"]).toBe(10); // +2 vote + 8 bonus = 10
+            expect(game.playerScores["user3"]).toBe(10); // +2 vote + 8 bonus = 10
             expect(game.playerScores["user4"]).toBe(10); // +2 vote + 8 bonus = 10
         });
 

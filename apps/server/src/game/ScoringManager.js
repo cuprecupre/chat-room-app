@@ -109,17 +109,13 @@ function calculateFriendsWinScores(game) {
     });
 
     if (perfectFriends.length > 0) {
-        // Give bonus to the perfect friend with highest score (first one if tied)
-        const bestPerfectFriend = perfectFriends.reduce((best, current) => {
-            return (game.playerScores[current] || 0) >= (game.playerScores[best] || 0)
-                ? current
-                : best;
+        // Give bonus to ALL perfect friends
+        perfectFriends.forEach((playerId) => {
+            giveWinnerBonus(game, playerId);
+            console.log(
+                `[Game ${game.gameId}] Amigo perfecto encontrado: ${playerId} (votó bien ${totalRounds}/${totalRounds} rondas)`
+            );
         });
-
-        giveWinnerBonus(game, bestPerfectFriend);
-        console.log(
-            `[Game ${game.gameId}] Amigo perfecto encontrado: ${bestPerfectFriend} (votó bien ${totalRounds}/${totalRounds} rondas)`
-        );
     } else {
         console.log(`[Game ${game.gameId}] No hay amigo perfecto. Gana el amigo con más puntos.`);
     }
