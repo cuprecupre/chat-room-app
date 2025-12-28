@@ -61,9 +61,13 @@ function getStateForPlayer(game, userId) {
 
     if (game.phase === "playing") {
         const isInRound = game.roundPlayers.includes(userId);
-        if (!isInRound) {
+        const isEliminated = eliminated.includes(userId);
+
+        if (!isInRound && !isEliminated) {
+            // Player never was part of this round (late joiner)
             baseState.phase = "lobby_wait";
         } else {
+            // Player is active or eliminated - keep in playing phase
             baseState.role = game.impostorId === userId ? "impostor" : "amigo";
             const isImpostor = game.impostorId === userId;
             baseState.secretWord = isImpostor ? "Descubre la palabra secreta" : game.secretWord;
@@ -77,7 +81,8 @@ function getStateForPlayer(game, userId) {
             baseState.votedPlayers = Object.keys(game.votes);
             baseState.myVote = game.votes[userId] || null;
             baseState.activePlayers = game.roundPlayers.filter((uid) => !eliminated.includes(uid));
-            baseState.canVote = !eliminated.includes(userId);
+            baseState.canVote = !isEliminated;
+            baseState.roundHistory = game.roundHistory;
         }
     } else if (game.phase === "round_result" || game.phase === "game_over") {
         const impostor = game.players.find((p) => p.uid === game.impostorId);
@@ -93,6 +98,7 @@ function getStateForPlayer(game, userId) {
         baseState.eliminatedPlayers = eliminated;
         baseState.formerPlayers = game.formerPlayers;
         baseState.playerBonus = game.playerBonus || {};
+        baseState.roundHistory = game.roundHistory;
 
 
         if (game.phase === "game_over") {
