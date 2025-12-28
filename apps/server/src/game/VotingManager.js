@@ -8,7 +8,7 @@
  */
 
 const { endRound, startNextRound, handleSuddenDeath } = require("./RoundManager");
-const { giveImpostorSurvivalPoints } = require("./ScoringManager");
+const { giveImpostorSurvivalPoints, giveCorrectVotersPoints } = require("./ScoringManager");
 const { getActivePlayers } = require("./PlayerManager");
 
 function castVote(game, voterId, targetId) {
@@ -128,6 +128,11 @@ function processVotingResults(game) {
         eliminated: mostVoted.length === 1 ? mostVoted[0] : null,
         tie: mostVoted.length !== 1,
     });
+
+    // IMPORTANTE: Dar puntos a amigos que votaron correctamente ANTES de procesar resultado
+    // Esto asegura que reciban puntos sin importar si el impostor es eliminado o no
+    game.lastRoundScores = {};
+    giveCorrectVotersPoints(game);
 
     // Manejar empate o sin votos válidos
     if (mostVoted.length !== 1) {

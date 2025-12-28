@@ -49,13 +49,12 @@ function giveImpostorMaxPoints(game) {
 }
 
 /**
- * Calcular puntos cuando los amigos ganan (impostor descubierto)
+ * Dar puntos a los amigos que votaron correctamente al impostor
+ * Se llama al final de CADA ronda, independientemente del resultado
  */
-function calculateFriendsWinScores(game) {
-    game.lastRoundScores = {};
-
-    // Amigos: +2 puntos por cada voto correcto al impostor
+function giveCorrectVotersPoints(game) {
     Object.entries(game.votes).forEach(([voter, target]) => {
+        // Solo amigos (no el impostor) que votaron al impostor
         if (target === game.impostorId && voter !== game.impostorId) {
             game.playerScores[voter] =
                 (game.playerScores[voter] || 0) + FRIEND_POINTS_PER_CORRECT_VOTE;
@@ -64,8 +63,25 @@ function calculateFriendsWinScores(game) {
         }
     });
 
+    const correctVoters = Object.entries(game.votes)
+        .filter(([voter, target]) => target === game.impostorId && voter !== game.impostorId)
+        .map(([voter]) => voter);
+
+    if (correctVoters.length > 0) {
+        console.log(`[Game ${game.gameId}] Amigos que votaron bien: ${correctVoters.length} (+${FRIEND_POINTS_PER_CORRECT_VOTE} pts cada uno)`);
+    }
+}
+
+/**
+ * Calcular puntos cuando los amigos ganan (impostor descubierto)
+ * NOTA: Los puntos por votar correctamente ya se dieron en giveCorrectVotersPoints
+ */
+function calculateFriendsWinScores(game) {
+    // Los puntos ya fueron dados por giveCorrectVotersPoints
+    // Esta función ahora solo registra el evento
     console.log(`[Game ${game.gameId}] Amigos ganan. Puntos de esta ronda:`, game.lastRoundScores);
 }
+
 
 /**
  * Calcular puntos de la ronda
@@ -127,6 +143,7 @@ function checkGameOver(game) {
 module.exports = {
     giveImpostorSurvivalPoints,
     giveImpostorMaxPoints,
+    giveCorrectVotersPoints,
     calculateRoundScores,
     calculateFriendsWinScores,
     findWinner,

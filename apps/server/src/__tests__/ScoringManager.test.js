@@ -123,7 +123,7 @@ describe("ScoringManager - New System", () => {
         });
     });
 
-    describe("calculateFriendsWinScores", () => {
+    describe("giveCorrectVotersPoints", () => {
         test("should give +2 to each player who voted for impostor", () => {
             const game = createMockGame();
             game.votes = {
@@ -133,7 +133,7 @@ describe("ScoringManager - New System", () => {
                 user4: "user2", // Voted wrong
             };
 
-            ScoringManager.calculateFriendsWinScores(game);
+            ScoringManager.giveCorrectVotersPoints(game);
 
             expect(game.playerScores["user2"]).toBe(2);
             expect(game.playerScores["user3"]).toBe(2);
@@ -149,7 +149,7 @@ describe("ScoringManager - New System", () => {
                 user4: "user1",
             };
 
-            ScoringManager.calculateFriendsWinScores(game);
+            ScoringManager.giveCorrectVotersPoints(game);
 
             expect(game.playerScores["user1"]).toBe(0); // Impostor gets nothing
             expect(game.playerScores["user2"]).toBe(2);
@@ -188,7 +188,7 @@ describe("ScoringManager - New System", () => {
     });
 
     describe("calculateRoundScores", () => {
-        test("should call calculateFriendsWinScores when friends win", () => {
+        test("should log when friends win (points given by giveCorrectVotersPoints)", () => {
             const game = createMockGame();
             game.votes = {
                 user2: "user1",
@@ -196,6 +196,8 @@ describe("ScoringManager - New System", () => {
                 user4: "user1",
             };
 
+            // Points are now given by giveCorrectVotersPoints, not calculateRoundScores
+            ScoringManager.giveCorrectVotersPoints(game);
             ScoringManager.calculateRoundScores(game, true);
 
             // Friends should have gotten points
