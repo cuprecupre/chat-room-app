@@ -198,8 +198,8 @@ export function PlayerList({
                                             <div className="flex flex-col items-end gap-0.5">
                                                 <div className="flex items-center gap-1.5">
                                                     {bonusPoints > 0 && (
-                                                        <span className="text-[10px] font-bold text-green-400 bg-green-500/20 px-1.5 py-0.5 rounded-full">
-                                                            ★ +{bonusPoints}
+                                                        <span className="text-[10px] font-bold text-yellow-400 bg-yellow-500/20 px-1.5 py-0.5 rounded-full">
+                                                            ★ BONUS
                                                         </span>
                                                     )}
                                                     <div
@@ -219,8 +219,8 @@ export function PlayerList({
                                             // Mostrar total con bonus en game over
                                             <div className="flex flex-col items-end gap-0.5">
                                                 {bonusPoints > 0 && (
-                                                    <span className="text-[10px] font-bold text-green-400 bg-green-500/20 px-1.5 py-0.5 rounded-full">
-                                                        ★ +{bonusPoints} BONUS
+                                                    <span className="text-[10px] font-bold text-yellow-400 bg-yellow-500/20 px-1.5 py-0.5 rounded-full">
+                                                        ★ BONUS
                                                     </span>
                                                 )}
                                                 <span

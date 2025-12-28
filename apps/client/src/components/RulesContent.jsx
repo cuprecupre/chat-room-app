@@ -191,28 +191,23 @@ export function RulesContent({ isModal = false }) {
                         <h4 className="text-white font-semibold mb-3 text-lg">Amigos</h4>
                         <ul className="text-neutral-300 space-y-2 font-light">
                             <li>
-                                • <strong>+2 puntos</strong> para cada jugador que vote
-                                correctamente al Impostor.
+                                • Por cada ronda que votas al impostor: <strong className="text-orange-400">+2 pts</strong>
+                            </li>
+                            <li>
+                                • <span className="text-yellow-400">★</span> Bonus (votas bien todas las rondas y el impostor pierde): <strong className="text-orange-400">10 pts</strong>
                             </li>
                         </ul>
-                        <p className="text-neutral-500 text-sm mt-4">
-                            Máximo posible: 6 puntos (2 por ronda)
-                        </p>
                     </div>
                     <div className={`${boxBg} p-6 rounded-xl`}>
                         <h4 className="text-orange-400 font-semibold mb-3 text-lg">Impostor</h4>
                         <ul className="text-neutral-300 space-y-2">
                             <li>
-                                • <strong>+3 puntos</strong> por sobrevivir ronda 1.
+                                • Por cada ronda que sobrevives: <strong className="text-orange-400">+2 pts</strong>
                             </li>
                             <li>
-                                • <strong>+2 puntos</strong> por sobrevivir ronda 2.
-                            </li>
-                            <li>
-                                • <strong>+2 puntos</strong> por ganar ronda 3.
+                                • <span className="text-yellow-400">★</span> Bonus (sobrevives las 3 rondas): <strong className="text-orange-400">10 pts</strong>
                             </li>
                         </ul>
-                        <p className="text-neutral-500 text-sm mt-4">Máximo posible: 7 puntos</p>
                     </div>
                 </div>
                 <div className={`mt-6 ${boxBg} p-4 rounded-lg text-neutral-400 text-sm`}>

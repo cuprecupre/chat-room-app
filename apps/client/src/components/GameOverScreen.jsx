@@ -118,58 +118,45 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                         <ul className="space-y-3">
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">
-                                    Votas al impostor en cada ronda
+                                    Por cada ronda que votas al impostor
                                 </span>
                                 <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
-                                    +2 por ronda
+                                    +2 pts
                                 </span>
                             </li>
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">
-                                    <span className="text-green-400">★</span> Bonus por ganar (votas bien todas las rondas)
+                                    <span className="text-yellow-400">★</span> Bonus (votas bien todas las rondas y el impostor pierde)
                                 </span>
-                                <span className="bg-green-500/20 px-3 py-1 rounded text-green-400 font-medium">
-                                    hasta 10 pts
+                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium whitespace-nowrap">
+                                    10 pts
                                 </span>
                             </li>
                         </ul>
-                        <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                            <span className="text-white font-medium">Máximo posible</span>
-                            <span className="text-lg text-orange-400 font-bold">10 pts</span>
-                        </div>
                     </div>
+
+                    <hr className="border-white/10" />
 
                     {/* Impostor */}
                     <div className="space-y-4">
                         <h3 className="text-xl font-serif text-orange-400">Si eres Impostor</h3>
                         <ul className="space-y-3">
                             <li className="flex justify-between items-center">
-                                <span className="text-neutral-300">Sobrevives cada ronda</span>
+                                <span className="text-neutral-300">Por cada ronda que sobrevives</span>
                                 <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
-                                    +2 por ronda
+                                    +2 pts
                                 </span>
                             </li>
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">
-                                    <span className="text-green-400">★</span> Bonus por ganar (sobrevives las 3 rondas)
+                                    <span className="text-yellow-400">★</span> Bonus (sobrevives las 3 rondas)
                                 </span>
-                                <span className="bg-green-500/20 px-3 py-1 rounded text-green-400 font-medium">
-                                    hasta 10 pts
+                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium whitespace-nowrap">
+                                    10 pts
                                 </span>
                             </li>
                         </ul>
-                        <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                            <span className="text-white font-medium">Máximo posible</span>
-                            <span className="text-lg text-orange-400 font-bold">10 pts</span>
-                        </div>
                     </div>
-
-                    {/* Nota */}
-                    <p className="text-sm text-neutral-500 text-center">
-                        El ganador siempre llega a 10 puntos.
-                        <br />
-                        El impostor gana si sobrevive 3 rondas. Los amigos ganan si lo descubren.
-                    </p>
 
                     <Button
                         onClick={() => setShowScoringModal(false)}

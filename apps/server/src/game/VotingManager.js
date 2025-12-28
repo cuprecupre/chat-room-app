@@ -8,7 +8,7 @@
  */
 
 const { endRound, startNextRound, handleSuddenDeath } = require("./RoundManager");
-const { giveImpostorSurvivalPoints, giveCorrectVotersPoints } = require("./ScoringManager");
+const { giveImpostorSurvivalPoints, giveCorrectVotersPoints, giveImpostorMaxPoints } = require("./ScoringManager");
 const { getActivePlayers } = require("./PlayerManager");
 
 function castVote(game, voterId, targetId) {
@@ -144,7 +144,8 @@ function processVotingResults(game) {
         giveImpostorSurvivalPoints(game);
 
         if (game.currentRound >= game.maxRounds) {
-            // Ronda 3 con empate: impostor gana (puntos ya dados arriba)
+            // Ronda 3 con empate: impostor gana
+            giveImpostorMaxPoints(game);
             console.log(`[Game ${game.gameId}] Ronda 3 con empate. ¡El impostor gana!`);
             game.winnerId = game.impostorId;
             game.phase = "game_over";

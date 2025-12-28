@@ -71,6 +71,8 @@ function startNewMatch(game) {
     game.eliminatedPlayers = [];
     game.votes = {};
     game.lastRoundScores = {};
+    game.playerBonus = {};
+    game.correctVotesPerPlayer = {};
 
     // Seleccionar impostor para toda la partida
     game.impostorId = selectImpostor(game);
@@ -141,6 +143,7 @@ function endRound(game, impostorCaught) {
 
         if (game.currentRound >= game.maxRounds) {
             // Impostor sobrevivió 3 rondas - gana
+            giveImpostorMaxPoints(game);
             game.winnerId = game.impostorId;
             game.phase = "game_over";
             console.log(`[Game ${game.gameId}] ¡Impostor sobrevivió 3 rondas! Gana.`);
