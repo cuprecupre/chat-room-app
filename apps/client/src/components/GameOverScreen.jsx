@@ -1,12 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "./ui/Button";
 import { Avatar } from "./ui/Avatar";
 import { PlayerList } from "./GameRoom";
 import { Modal } from "./ui/Modal";
 import { Info } from "lucide-react";
+import confetti from "canvas-confetti";
 
 export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
     const [showScoringModal, setShowScoringModal] = useState(false);
+
+    // Confetti effect when game ends
+    useEffect(() => {
+        if (state.phase !== "game_over") return;
+
+        // Burst from left
+        confetti({
+            particleCount: 100,
+            angle: 60,
+            spread: 70,
+            origin: { x: 0, y: 0.6 },
+            colors: ['#f97316', '#fb923c', '#fdba74', '#ffffff']
+        });
+        // Burst from right
+        confetti({
+            particleCount: 100,
+            angle: 120,
+            spread: 70,
+            origin: { x: 1, y: 0.6 },
+            colors: ['#f97316', '#fb923c', '#fdba74', '#ffffff']
+        });
+    }, [state.phase]);
+
     if (state.phase !== "game_over") return null;
 
     const impostor = state.players.find((p) => p.uid === state.impostorId);
