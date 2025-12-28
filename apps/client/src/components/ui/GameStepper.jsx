@@ -3,7 +3,7 @@ import React from "react";
 export function GameStepper({ roundCount = 1, currentTurn = 1, showAnimation = true }) {
     return (
         <div
-            className={`w-full max-w-4xl mx-auto -mt-3 md:mt-0 ${showAnimation ? "animate-fadeIn animate-delay-200" : ""}`}
+            className={`w-full max-w-4xl mx-auto pt-5 md:pt-0 ${showAnimation ? "animate-fadeIn animate-delay-200" : ""}`}
         >
             <div className="flex items-center gap-4 justify-center">
                 {/* Stepper de rondas */}
@@ -16,10 +16,10 @@ export function GameStepper({ roundCount = 1, currentTurn = 1, showAnimation = t
                             {/* Círculo con número */}
                             <div
                                 className={`w-4 h-4 rounded-full flex items-center justify-center text-xs font-medium transition-all ${currentTurn > turn
-                                        ? "bg-green-500/20 text-green-400"
-                                        : currentTurn === turn
-                                            ? "bg-white text-neutral-900"
-                                            : "bg-neutral-800 text-neutral-500"
+                                    ? "bg-green-500/20 text-green-400"
+                                    : currentTurn === turn
+                                        ? "bg-white text-neutral-900"
+                                        : "bg-neutral-800 text-neutral-500"
                                     }`}
                             >
                                 {currentTurn > turn ? (
@@ -37,8 +37,8 @@ export function GameStepper({ roundCount = 1, currentTurn = 1, showAnimation = t
                                 ) : (
                                     <div
                                         className={`w-1 h-1 rounded-full ${currentTurn === turn
-                                                ? "bg-neutral-900"
-                                                : "bg-neutral-500"
+                                            ? "bg-neutral-900"
+                                            : "bg-neutral-500"
                                             }`}
                                     />
                                 )}
@@ -46,10 +46,10 @@ export function GameStepper({ roundCount = 1, currentTurn = 1, showAnimation = t
                             {/* Etiqueta de la ronda - solo en desktop */}
                             <span
                                 className={`text-xs ${currentTurn === turn
-                                        ? "text-neutral-200"
-                                        : currentTurn > turn
-                                            ? "text-green-400/70"
-                                            : "text-neutral-600"
+                                    ? "text-neutral-200"
+                                    : currentTurn > turn
+                                        ? "text-green-400/70"
+                                        : "text-neutral-600"
                                     }`}
                             >
                                 Ronda{"\u200C"} {turn}
@@ -59,7 +59,7 @@ export function GameStepper({ roundCount = 1, currentTurn = 1, showAnimation = t
                 </div>
             </div>
             {/* Divider */}
-            <div className="h-px w-full bg-white/10 mt-3 md:mt-6"></div>
+            <div className="h-px w-full bg-white/10 mt-5 md:mt-6"></div>
         </div>
     );
 }
