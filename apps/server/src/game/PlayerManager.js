@@ -35,6 +35,9 @@ function removePlayer(game, userId) {
     const playerIsImpostor = game.impostorId === userId;
     const wasHost = game.hostId === userId;
 
+    // CRITICAL: Guardar la fase ANTES de cualquier modificación
+    const phaseBeforeRemoval = game.phase;
+
     // Guardar datos del jugador antes de eliminarlo
     const leavingPlayer = game.players.find((p) => p.uid === userId);
     if (leavingPlayer) {
@@ -71,9 +74,22 @@ function removePlayer(game, userId) {
         }
     }
 
-    // If the impostor leaves during the game, end the round
-    if (game.phase === "playing" && playerIsImpostor) {
+    // Si el impostor se va durante el juego, terminar la ronda (amigos ganan)
+    if (phaseBeforeRemoval === "playing" && playerIsImpostor) {
+        console.log(`[Game ${game.gameId}] Impostor eliminado. Amigos ganan.`);
         game.phase = "round_result";
+        // NO verificar votos - el impostor se fue, se acabó
+        return { newHostInfo, playerIsImpostor };
+    }
+
+    // CRITICAL FIX: Si estábamos en votación y el jugador NO era impostor,
+    // verificar si los jugadores restantes ya completaron la votación
+    if (phaseBeforeRemoval === "playing" && !playerIsImpostor) {
+        const VotingManager = require("./VotingManager");
+        console.log(
+            `[Game ${game.gameId}] Jugador eliminado durante votación. Verificando si todos votaron...`
+        );
+        VotingManager.checkIfAllVoted(game);
     }
 
     return { newHostInfo, playerIsImpostor };

@@ -105,6 +105,16 @@ function startNextRound(game) {
         .map((p) => p.uid)
         .filter((uid) => !game.eliminatedPlayers.includes(uid));
 
+    // CRITICAL: Verificar muerte súbita ANTES de iniciar ronda
+    // Si solo quedan 2 jugadores (impostor + 1 amigo), el impostor gana automát icamente
+    if (game.roundPlayers.length <= 2) {
+        console.log(
+            `[Game ${game.gameId}] ¡Muerte súbita detectada! Solo ${game.roundPlayers.length} jugadores. Impostor gana.`
+        );
+        handleSuddenDeath(game);
+        return; // NO iniciar la ronda
+    }
+
     // Calcular jugador inicial
     game.startingPlayerId = calculateStartingPlayer(game);
 
