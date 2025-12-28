@@ -2,8 +2,8 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { Spinner } from "../components/ui/Spinner";
 import { Button } from "../components/ui/Button";
-import { RefreshCw } from "lucide-react";
 import heroImg from "../assets/impostor-home.jpg";
+import bellImg from "../assets/bell.jpg";
 import { ROUTES } from "./routes";
 import { showToast } from "../lib/toast";
 
@@ -82,9 +82,11 @@ export function ProtectedRoute({ user, connected, emit, gameState }) {
             <div className="w-full h-[100dvh] flex items-center justify-center bg-neutral-950 text-white">
                 <div className="w-full max-w-sm mx-auto text-center space-y-6">
                     <div className="flex justify-center">
-                        <div className="w-20 h-20 rounded-full bg-orange-500/10 flex items-center justify-center shadow-lg">
-                            <RefreshCw className="w-10 h-10 text-orange-400 animate-spin-slow" />
-                        </div>
+                        <img
+                            src={bellImg}
+                            alt="Advertencia"
+                            className="w-20 h-20 rounded-full object-cover ring-2 ring-orange-400/30 shadow-lg"
+                        />
                     </div>
                     <div>
                         <h2 className="text-2xl font-serif text-neutral-50 mb-2">

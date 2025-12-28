@@ -533,23 +533,21 @@ export function LandingPage({
                             {reviews.map((review, index) => (
                                 <div
                                     key={index}
-                                    className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${
-                                        index === currentReview
+                                    className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${index === currentReview
                                             ? "animate-verbatim-in z-10 relative"
                                             : "animate-verbatim-out z-0 pointer-events-none absolute" // Keep absolute for exiting items to prevent layout jumps if they were different sizes, or just relative if strictly stacking
-                                    }`}
-                                    // Note: If we want the container to ALWAYS hold the height of the TALLEST, we should make them all relative (grid items).
-                                    // BUT, if we want them to cross-fade, one might need to be absolute to not push the other?
-                                    // Actually in CSS Grid, overlapping items (col-start-1 row-start-1) Sit on top of each other without pushing.
-                                    // So they act like layers. The grid cell grows to fit the tallest layer.
-                                    // So we can remove 'absolute' from here entirely!
+                                        }`}
+                                // Note: If we want the container to ALWAYS hold the height of the TALLEST, we should make them all relative (grid items).
+                                // BUT, if we want them to cross-fade, one might need to be absolute to not push the other?
+                                // Actually in CSS Grid, overlapping items (col-start-1 row-start-1) Sit on top of each other without pushing.
+                                // So they act like layers. The grid cell grows to fit the tallest layer.
+                                // So we can remove 'absolute' from here entirely!
                                 >
                                     <div
-                                        className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${
-                                            index === currentReview
+                                        className={`col-start-1 row-start-1 w-full transition-all duration-700 ease-in-out ${index === currentReview
                                                 ? "animate-verbatim-in z-10 opacity-100"
                                                 : "animate-verbatim-out z-0 opacity-0 pointer-events-none"
-                                        }`}
+                                            }`}
                                     >
                                         <div className="bg-neutral-950 border border-white/5 p-8 md:p-10 rounded-3xl relative overflow-hidden shadow-2xl mx-auto max-w-2xl">
                                             <div className="flex flex-col gap-6">
@@ -603,11 +601,10 @@ export function LandingPage({
                         {faqs.map((faq, index) => (
                             <div
                                 key={index}
-                                className={`group border rounded-2xl overflow-hidden transition-all duration-300 ${
-                                    openFaq === index
+                                className={`group border rounded-2xl overflow-hidden transition-all duration-300 ${openFaq === index
                                         ? "bg-neutral-900 border-orange-500/50 ring-1 ring-orange-500/20"
                                         : "border-white/10 hover:border-orange-500/30 hover:bg-neutral-900/50"
-                                }`}
+                                    }`}
                             >
                                 <button
                                     onClick={() => toggleFaq(index)}
@@ -637,11 +634,10 @@ export function LandingPage({
                                     </span>
                                 </button>
                                 <div
-                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                                        openFaq === index
+                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${openFaq === index
                                             ? "max-h-48 opacity-100"
                                             : "max-h-0 opacity-0"
-                                    }`}
+                                        }`}
                                 >
                                     <div className="p-6 pt-0 text-neutral-300 leading-relaxed">
                                         {faq.answer}

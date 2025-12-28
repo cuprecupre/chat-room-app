@@ -104,8 +104,8 @@ export function MainLayout({
 
     return (
         <div className="bg-neutral-950 text-white min-h-[100dvh] font-sans flex flex-col">
-            <div className="w-full max-w-4xl mx-auto px-6 py-4 sm:p-6 lg:p-8">
-                <header className="flex justify-between items-center mb-0 pb-4 sm:mb-6 sm:pb-6 border-b border-white/10">
+            <div className="w-full max-w-4xl mx-auto p-6 sm:p-6 lg:p-8">
+                <header className="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
                     <button
                         onClick={handleTitleClick}
                         className="text-xl sm:text-2xl font-serif text-neutral-50 hover:text-orange-400 transition-colors active:scale-95 cursor-pointer"
