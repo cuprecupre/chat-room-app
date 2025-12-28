@@ -15,7 +15,7 @@ export function LobbyScreen({
     onOpenInstructions,
 }) {
     return (
-        <div className="w-full max-w-sm mx-auto text-center space-y-4 pb-24 sm:pb-0">
+        <div className="w-full max-w-sm mx-auto text-center space-y-4 pb-24 sm:pb-0 pt-8">
             {/* Header Image - 50% smaller (w-28 h-28) */}
             <img
                 src={dualImpostorImg}
