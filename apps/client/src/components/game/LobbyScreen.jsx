@@ -38,7 +38,7 @@ export function LobbyScreen({
                             onClick={onCopyLink}
                             variant="outline"
                             size="md"
-                            className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20 gap-2"
+                            className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20 gap-2 !w-auto"
                         >
                             {isMobile ? (
                                 <Share className="w-4 h-4" />
@@ -153,7 +153,7 @@ export function LobbyScreen({
                                 onClick={onCopyLink}
                                 variant="outline"
                                 size="md"
-                                className="w-full border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20 gap-2"
+                                className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20 gap-2 !w-auto"
                             >
                                 {isMobile ? (
                                     <Share className="w-4 h-4" />

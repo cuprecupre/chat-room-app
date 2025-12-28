@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Video } from "lucide-react";
 import { Button } from "./ui/Button";
 import homeImg from "../assets/impostor-home.jpg";
 
@@ -22,16 +23,13 @@ export function Lobby({ onCreateGame }) {
                     ¿Listos para jugar?
                 </h2>
                 <div className="space-y-4">
-                    <p className="text-lg text-neutral-50 leading-relaxed max-w-md mx-auto">
-                        Crea una partida rápida e invita a tus amigos para descubrir al impostor.
-                    </p>
-                    <p className="text-sm text-neutral-500 max-w-xs mx-auto leading-snug">
-                        Si juegan a distancia, una videollamada hará el juego mucho más interesante.
+                    <p className="text-xl font-light text-neutral-400 leading-relaxed max-w-md mx-auto">
+                        Crea la partida, comparte el enlace <br /> y que empiece el juego.
                     </p>
                 </div>
             </div>
-            <div className="max-w-sm mx-auto space-y-4">
-                <Button onClick={handleCreateGame} variant="primary" size="md" className="w-full">
+            <div className="max-w-sm mx-auto space-y-8">
+                <Button onClick={handleCreateGame} variant="primary" size="lg" className="w-full h-14 text-xl rounded-full shadow-lg">
                     Crear nueva partida
                 </Button>
 
@@ -39,26 +37,34 @@ export function Lobby({ onCreateGame }) {
                 <div className="bg-white/5 rounded-lg p-4">
                     <label className="flex items-center justify-between cursor-pointer gap-4">
                         <div className="flex-1">
-                            <span className="text-sm text-neutral-300">Jugar en modo fácil</span>
+                            <span className="text-sm font-semibold text-neutral-300">
+                                Jugar en modo fácil
+                            </span>
                             <p className="text-xs text-neutral-500 mt-1">
-                                El Impostor recibirá una pista sobre la palabra secreta para que le
-                                sea más fácil mentir.
+                                El Impostor recibirá una pequeña ayuda sobre la palabra secreta para
+                                que le sea más fácil mentir.
                             </p>
                         </div>
                         <button
                             type="button"
                             onClick={() => setShowImpostorHint(!showImpostorHint)}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 focus:ring-offset-neutral-950 ${
-                                showImpostorHint ? "bg-orange-500" : "bg-neutral-700"
-                            }`}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-neutral-950 ${showImpostorHint ? "bg-green-500" : "bg-neutral-700"
+                                }`}
                         >
                             <span
-                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
-                                    showImpostorHint ? "translate-x-6" : "translate-x-1"
-                                }`}
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${showImpostorHint ? "translate-x-6" : "translate-x-1"
+                                    }`}
                             />
                         </button>
                     </label>
+                </div>
+
+                <div className="bg-neutral-500/10 rounded-lg p-4 flex gap-3 items-start">
+                    <Video className="w-5 h-5 text-neutral-400 shrink-0 mt-0.5" />
+                    <p className="text-sm text-neutral-400 leading-snug">
+                        Si juegas a distancia con tus amigos, una videollamada por WhatsApp o Zoom
+                        hará el juego mucho más interesante.
+                    </p>
                 </div>
             </div>
         </div>
