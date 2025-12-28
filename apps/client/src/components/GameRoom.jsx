@@ -36,6 +36,7 @@ export function PlayerList({
     const myVote = gameState?.myVote || null; // A quién voté yo
     const playerScores = gameState?.playerScores || {};
     const lastRoundScores = gameState?.lastRoundScores || {};
+    const playerBonus = gameState?.playerBonus || {};
     const playerOrder = gameState?.playerOrder || [];
     const startingPlayerId = gameState?.startingPlayerId;
 
@@ -47,9 +48,9 @@ export function PlayerList({
     const isTie = gameState?.winner === "Empate";
     const winners = isTie
         ? (() => {
-              const maxScore = Math.max(...Object.values(playerScores));
-              return players.filter((player) => (playerScores[player.uid] || 0) === maxScore);
-          })()
+            const maxScore = Math.max(...Object.values(playerScores));
+            return players.filter((player) => (playerScores[player.uid] || 0) === maxScore);
+        })()
         : [];
 
     // Si hay 3 o más ganadores, no hay ganadores reales
@@ -120,6 +121,7 @@ export function PlayerList({
                     const iVotedForThisPlayer = isMyVote(p.uid);
                     const score = playerScores[p.uid] || 0;
                     const scoreGained = lastRoundScores[p.uid] || 0;
+                    const bonusPoints = playerBonus[p.uid] || 0;
                     // Marcar como ganador a todos los que tengan el puntaje más alto
                     const maxScore = Math.max(...Object.values(playerScores));
                     const isWinner = isGameOver && score === maxScore;
@@ -194,11 +196,18 @@ export function PlayerList({
                                         {isRoundResult ? (
                                             // Mostrar puntos ganados y total en resultado de ronda (para todos)
                                             <div className="flex flex-col items-end gap-0.5">
-                                                <div
-                                                    className={`text-xs font-medium ${scoreGained > 0 ? "text-green-400" : "text-neutral-500"}`}
-                                                >
-                                                    {scoreGained > 0 ? "+" : ""}
-                                                    {scoreGained} pts
+                                                <div className="flex items-center gap-1.5">
+                                                    {bonusPoints > 0 && (
+                                                        <span className="text-[10px] font-bold text-green-400 bg-green-500/20 px-1.5 py-0.5 rounded-full">
+                                                            ★ +{bonusPoints}
+                                                        </span>
+                                                    )}
+                                                    <div
+                                                        className={`text-xs font-medium ${scoreGained > 0 ? "text-green-400" : "text-neutral-500"}`}
+                                                    >
+                                                        {scoreGained > 0 ? "+" : ""}
+                                                        {scoreGained} pts
+                                                    </div>
                                                 </div>
                                                 <div
                                                     className={`text-sm ${isWinner ? "text-orange-400" : "text-neutral-400"}`}
@@ -207,12 +216,19 @@ export function PlayerList({
                                                 </div>
                                             </div>
                                         ) : (
-                                            // Solo mostrar total en game over
-                                            <span
-                                                className={`font-medium ${isWinner ? "text-orange-400" : "text-neutral-300"}`}
-                                            >
-                                                {score} pts
-                                            </span>
+                                            // Mostrar total con bonus en game over
+                                            <div className="flex flex-col items-end gap-0.5">
+                                                {bonusPoints > 0 && (
+                                                    <span className="text-[10px] font-bold text-green-400 bg-green-500/20 px-1.5 py-0.5 rounded-full">
+                                                        ★ +{bonusPoints} BONUS
+                                                    </span>
+                                                )}
+                                                <span
+                                                    className={`font-medium ${isWinner ? "text-orange-400" : "text-neutral-300"}`}
+                                                >
+                                                    {score} pts
+                                                </span>
+                                            </div>
                                         )}
                                     </div>
                                 ) : (
@@ -236,13 +252,12 @@ export function PlayerList({
                                             variant="outline"
                                             size="sm"
                                             disabled={iVotedForThisPlayer && !canChangeVote}
-                                            className={`!w-auto gap-2 px-4 ${
-                                                iVotedForThisPlayer
-                                                    ? canChangeVote
-                                                        ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
-                                                        : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
-                                                    : ""
-                                            }`}
+                                            className={`!w-auto gap-2 px-4 ${iVotedForThisPlayer
+                                                ? canChangeVote
+                                                    ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
+                                                    : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
+                                                : ""
+                                                }`}
                                         >
                                             <svg
                                                 className="w-4 h-4"
@@ -1269,19 +1284,19 @@ export function GameRoom({
                                 {allPlayers.filter(
                                     (p) => !winnerPlayers.some((w) => w.uid === p.uid)
                                 ).length > 0 && (
-                                    <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
-                                        <PlayerList
-                                            players={allPlayers.filter(
-                                                (p) => !winnerPlayers.some((w) => w.uid === p.uid)
-                                            )}
-                                            currentUserId={user.uid}
-                                            isHost={isHost}
-                                            onCopyLink={onCopyLink}
-                                            gameState={state}
-                                            onVote={onVote}
-                                        />
-                                    </div>
-                                )}
+                                        <div className="bg-white/5 rounded-xl p-4 animate-fadeIn animate-delay-400">
+                                            <PlayerList
+                                                players={allPlayers.filter(
+                                                    (p) => !winnerPlayers.some((w) => w.uid === p.uid)
+                                                )}
+                                                currentUserId={user.uid}
+                                                isHost={isHost}
+                                                onCopyLink={onCopyLink}
+                                                gameState={state}
+                                                onVote={onVote}
+                                            />
+                                        </div>
+                                    )}
 
                                 <div className="animate-fadeIn animate-delay-600 flex flex-col items-center">
                                     <p className="text-xl font-medium text-white mb-4">

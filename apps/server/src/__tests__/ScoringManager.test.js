@@ -38,57 +38,57 @@ function createMockGame() {
 
 describe("ScoringManager - New System", () => {
     describe("giveImpostorSurvivalPoints", () => {
-        test("should give +3 points on round 1", () => {
+        test("should give +2 points on round 1", () => {
             const game = createMockGame();
             game.currentRound = 1;
 
             ScoringManager.giveImpostorSurvivalPoints(game);
 
-            expect(game.playerScores["user1"]).toBe(3);
-            expect(game.lastRoundScores["user1"]).toBe(3);
+            expect(game.playerScores["user1"]).toBe(2);
+            expect(game.lastRoundScores["user1"]).toBe(2);
         });
 
         test("should give +2 points on round 2", () => {
             const game = createMockGame();
             game.currentRound = 2;
-            game.playerScores["user1"] = 3; // Already got R1 points
+            game.playerScores["user1"] = 2; // Already got R1 points
 
             ScoringManager.giveImpostorSurvivalPoints(game);
 
-            expect(game.playerScores["user1"]).toBe(5); // 3 + 2
+            expect(game.playerScores["user1"]).toBe(4); // 2 + 2
             expect(game.lastRoundScores["user1"]).toBe(2);
         });
 
         test("should give +2 points on round 3", () => {
             const game = createMockGame();
             game.currentRound = 3;
-            game.playerScores["user1"] = 5; // R1 + R2 points
+            game.playerScores["user1"] = 4; // R1 + R2 points
 
             ScoringManager.giveImpostorSurvivalPoints(game);
 
-            expect(game.playerScores["user1"]).toBe(7); // 5 + 2 = max
+            expect(game.playerScores["user1"]).toBe(6); // 4 + 2
             expect(game.lastRoundScores["user1"]).toBe(2);
         });
 
-        test("should accumulate correctly: 3+2+2 = 7 max", () => {
+        test("should accumulate correctly: 2+2+2 = 6 base", () => {
             const game = createMockGame();
 
             // Round 1
             game.currentRound = 1;
             ScoringManager.giveImpostorSurvivalPoints(game);
-            expect(game.playerScores["user1"]).toBe(3);
+            expect(game.playerScores["user1"]).toBe(2);
 
             // Round 2
             game.currentRound = 2;
             game.lastRoundScores = {};
             ScoringManager.giveImpostorSurvivalPoints(game);
-            expect(game.playerScores["user1"]).toBe(5);
+            expect(game.playerScores["user1"]).toBe(4);
 
             // Round 3
             game.currentRound = 3;
             game.lastRoundScores = {};
             ScoringManager.giveImpostorSurvivalPoints(game);
-            expect(game.playerScores["user1"]).toBe(7);
+            expect(game.playerScores["user1"]).toBe(6);
         });
     });
 
@@ -99,27 +99,27 @@ describe("ScoringManager - New System", () => {
 
             ScoringManager.giveImpostorMaxPoints(game);
 
-            expect(game.playerScores["user1"]).toBe(7);
-            expect(game.lastRoundScores["user1"]).toBe(4);
+            expect(game.playerScores["user1"]).toBe(10);
+            expect(game.lastRoundScores["user1"]).toBe(7); // 10 - 3 already earned
         });
 
         test("should not give extra points if already at max", () => {
             const game = createMockGame();
-            game.playerScores["user1"] = 7;
+            game.playerScores["user1"] = 10;
 
             ScoringManager.giveImpostorMaxPoints(game);
 
-            expect(game.playerScores["user1"]).toBe(7);
+            expect(game.playerScores["user1"]).toBe(10);
         });
 
-        test("should give all 7 points if impostor has 0", () => {
+        test("should give all 10 points if impostor has 0", () => {
             const game = createMockGame();
             game.playerScores["user1"] = 0;
 
             ScoringManager.giveImpostorMaxPoints(game);
 
-            expect(game.playerScores["user1"]).toBe(7);
-            expect(game.lastRoundScores["user1"]).toBe(7);
+            expect(game.playerScores["user1"]).toBe(10);
+            expect(game.lastRoundScores["user1"]).toBe(10);
         });
     });
 
@@ -197,13 +197,14 @@ describe("ScoringManager - New System", () => {
             };
 
             // Points are now given by giveCorrectVotersPoints, not calculateRoundScores
+            // Then calculateFriendsWinScores gives bonus to perfect friend
             ScoringManager.giveCorrectVotersPoints(game);
             ScoringManager.calculateRoundScores(game, true);
 
-            // Friends should have gotten points
+            // Friends should have gotten points, user4 has perfect score (1/1) so gets bonus
             expect(game.playerScores["user2"]).toBe(2);
             expect(game.playerScores["user3"]).toBe(2);
-            expect(game.playerScores["user4"]).toBe(2);
+            expect(game.playerScores["user4"]).toBe(10); // +2 vote + 8 bonus = 10
         });
 
         test("should not change scores when impostor wins (points given separately)", () => {
@@ -220,10 +221,8 @@ describe("ScoringManager - New System", () => {
     describe("Constants", () => {
         test("should have correct point values", () => {
             expect(ScoringManager.FRIEND_POINTS_PER_CORRECT_VOTE).toBe(2);
-            expect(ScoringManager.IMPOSTOR_POINTS_BY_ROUND[1]).toBe(3);
-            expect(ScoringManager.IMPOSTOR_POINTS_BY_ROUND[2]).toBe(2);
-            expect(ScoringManager.IMPOSTOR_POINTS_BY_ROUND[3]).toBe(2);
-            expect(ScoringManager.IMPOSTOR_MAX_POINTS).toBe(7);
+            expect(ScoringManager.IMPOSTOR_POINTS_PER_ROUND).toBe(2);
+            expect(ScoringManager.TARGET_SCORE).toBe(10);
         });
     });
 });

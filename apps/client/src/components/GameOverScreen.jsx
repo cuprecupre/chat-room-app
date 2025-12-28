@@ -118,32 +118,24 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                         <ul className="space-y-3">
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">
-                                    Votas al impostor en Ronda 1
+                                    Votas al impostor en cada ronda
                                 </span>
                                 <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
-                                    +2
+                                    +2 por ronda
                                 </span>
                             </li>
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">
-                                    Votas al impostor en Ronda 2
+                                    <span className="text-green-400">★</span> Bonus por ganar (votas bien todas las rondas)
                                 </span>
-                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
-                                    +2
-                                </span>
-                            </li>
-                            <li className="flex justify-between items-center">
-                                <span className="text-neutral-300">
-                                    Votas al impostor en Ronda 3
-                                </span>
-                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
-                                    +2
+                                <span className="bg-green-500/20 px-3 py-1 rounded text-green-400 font-medium">
+                                    hasta 10 pts
                                 </span>
                             </li>
                         </ul>
                         <div className="flex justify-between items-center pt-2 border-t border-white/10">
                             <span className="text-white font-medium">Máximo posible</span>
-                            <span className="text-lg text-orange-400 font-bold">6 pts</span>
+                            <span className="text-lg text-orange-400 font-bold">10 pts</span>
                         </div>
                     </div>
 
@@ -152,35 +144,31 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                         <h3 className="text-xl font-serif text-orange-400">Si eres Impostor</h3>
                         <ul className="space-y-3">
                             <li className="flex justify-between items-center">
-                                <span className="text-neutral-300">Sobrevives la Ronda 1</span>
+                                <span className="text-neutral-300">Sobrevives cada ronda</span>
                                 <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
-                                    +3
+                                    +2 por ronda
                                 </span>
                             </li>
                             <li className="flex justify-between items-center">
-                                <span className="text-neutral-300">Sobrevives la Ronda 2</span>
-                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
-                                    +2
+                                <span className="text-neutral-300">
+                                    <span className="text-green-400">★</span> Bonus por ganar (sobrevives las 3 rondas)
                                 </span>
-                            </li>
-                            <li className="flex justify-between items-center">
-                                <span className="text-neutral-300">Sobrevives la Ronda 3</span>
-                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
-                                    +2
+                                <span className="bg-green-500/20 px-3 py-1 rounded text-green-400 font-medium">
+                                    hasta 10 pts
                                 </span>
                             </li>
                         </ul>
                         <div className="flex justify-between items-center pt-2 border-t border-white/10">
                             <span className="text-white font-medium">Máximo posible</span>
-                            <span className="text-lg text-orange-400 font-bold">7 pts</span>
+                            <span className="text-lg text-orange-400 font-bold">10 pts</span>
                         </div>
                     </div>
 
                     {/* Nota */}
                     <p className="text-sm text-neutral-500 text-center">
-                        El amigo con más puntos gana si descubren al impostor.
+                        El ganador siempre llega a 10 puntos.
                         <br />
-                        Si el impostor sobrevive 3 rondas, gana la partida.
+                        El impostor gana si sobrevive 3 rondas. Los amigos ganan si lo descubren.
                     </p>
 
                     <Button

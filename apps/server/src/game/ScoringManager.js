@@ -1,58 +1,73 @@
 /**
- * Sistema de Puntuación - Nueva Versión
+ * Sistema de Puntuación - Versión con Bonus
  *
  * AMIGOS: +2 puntos por votar correctamente al impostor (individual)
- * IMPOSTOR: +3 (R1), +2 (R2), +2 (R3) por sobrevivir = máx 7 puntos
+ * IMPOSTOR: +2 por ronda por sobrevivir = máx 6 puntos base
  *
- * Victoria:
- * - Impostor gana si sobrevive 3 rondas o muerte súbita
- * - Amigo con más puntos gana si descubren al impostor
+ * BONUS: El ganador siempre llega a 10 puntos
+ * - Impostor gana: 10 - puntos acumulados = bonus
+ * - Amigo perfecto gana (votó bien TODAS las rondas): 10 - puntos acumulados = bonus
  */
 
 const FRIEND_POINTS_PER_CORRECT_VOTE = 2;
-const IMPOSTOR_POINTS_BY_ROUND = {
-    1: 3, // Bonus por dificultad inicial
-    2: 2,
-    3: 2,
-};
-const IMPOSTOR_MAX_POINTS = 7;
+const IMPOSTOR_POINTS_PER_ROUND = 2;
+const TARGET_SCORE = 10;
 
 /**
  * Dar puntos al impostor por sobrevivir la ronda actual
  */
 function giveImpostorSurvivalPoints(game) {
-    const roundPoints = IMPOSTOR_POINTS_BY_ROUND[game.currentRound] || 2;
-    game.playerScores[game.impostorId] = (game.playerScores[game.impostorId] || 0) + roundPoints;
+    game.playerScores[game.impostorId] = (game.playerScores[game.impostorId] || 0) + IMPOSTOR_POINTS_PER_ROUND;
     game.lastRoundScores[game.impostorId] =
-        (game.lastRoundScores[game.impostorId] || 0) + roundPoints;
+        (game.lastRoundScores[game.impostorId] || 0) + IMPOSTOR_POINTS_PER_ROUND;
 
     console.log(
-        `[Game ${game.gameId}] Impostor sobrevivió ronda ${game.currentRound}: +${roundPoints} puntos`
+        `[Game ${game.gameId}] Impostor sobrevivió ronda ${game.currentRound}: +${IMPOSTOR_POINTS_PER_ROUND} puntos`
     );
 }
 
 /**
- * Dar puntos máximos al impostor (muerte súbita)
+ * Dar bonus al ganador para llegar a TARGET_SCORE (10 puntos)
+ * @param {Object} game - Estado del juego
+ * @param {string} winnerId - ID del ganador
  */
-function giveImpostorMaxPoints(game) {
-    const currentPoints = game.playerScores[game.impostorId] || 0;
-    const pointsToAdd = IMPOSTOR_MAX_POINTS - currentPoints;
+function giveWinnerBonus(game, winnerId) {
+    const currentPoints = game.playerScores[winnerId] || 0;
+    const bonusPoints = TARGET_SCORE - currentPoints;
 
-    if (pointsToAdd > 0) {
-        game.playerScores[game.impostorId] = IMPOSTOR_MAX_POINTS;
-        game.lastRoundScores[game.impostorId] =
-            (game.lastRoundScores[game.impostorId] || 0) + pointsToAdd;
+    if (bonusPoints > 0) {
+        game.playerScores[winnerId] = TARGET_SCORE;
+        game.lastRoundScores[winnerId] =
+            (game.lastRoundScores[winnerId] || 0) + bonusPoints;
+
+        // Track bonus for UI display
+        game.playerBonus = game.playerBonus || {};
+        game.playerBonus[winnerId] = bonusPoints;
+
         console.log(
-            `[Game ${game.gameId}] Muerte súbita: Impostor recibe +${pointsToAdd} puntos (máximo ${IMPOSTOR_MAX_POINTS})`
+            `[Game ${game.gameId}] Bonus para ganador ${winnerId}: +${bonusPoints} puntos (total: ${TARGET_SCORE})`
         );
     }
 }
 
 /**
+ * Dar puntos máximos al impostor (muerte súbita o sobrevivir 3 rondas)
+ */
+function giveImpostorMaxPoints(game) {
+    giveWinnerBonus(game, game.impostorId);
+    console.log(`[Game ${game.gameId}] Impostor gana. Bonus aplicado hasta ${TARGET_SCORE} puntos.`);
+}
+
+
+/**
  * Dar puntos a los amigos que votaron correctamente al impostor
  * Se llama al final de CADA ronda, independientemente del resultado
+ * También trackea quién votó bien para determinar el "amigo perfecto"
  */
 function giveCorrectVotersPoints(game) {
+    // Initialize tracking if not exists
+    game.correctVotesPerPlayer = game.correctVotesPerPlayer || {};
+
     Object.entries(game.votes).forEach(([voter, target]) => {
         // Solo amigos (no el impostor) que votaron al impostor
         if (target === game.impostorId && voter !== game.impostorId) {
@@ -60,6 +75,9 @@ function giveCorrectVotersPoints(game) {
                 (game.playerScores[voter] || 0) + FRIEND_POINTS_PER_CORRECT_VOTE;
             game.lastRoundScores[voter] =
                 (game.lastRoundScores[voter] || 0) + FRIEND_POINTS_PER_CORRECT_VOTE;
+
+            // Track correct votes for this player
+            game.correctVotesPerPlayer[voter] = (game.correctVotesPerPlayer[voter] || 0) + 1;
         }
     });
 
@@ -74,13 +92,34 @@ function giveCorrectVotersPoints(game) {
 
 /**
  * Calcular puntos cuando los amigos ganan (impostor descubierto)
- * NOTA: Los puntos por votar correctamente ya se dieron en giveCorrectVotersPoints
+ * Da bonus al "amigo perfecto" (votó bien TODAS las rondas)
  */
 function calculateFriendsWinScores(game) {
-    // Los puntos ya fueron dados por giveCorrectVotersPoints
-    // Esta función ahora solo registra el evento
-    console.log(`[Game ${game.gameId}] Amigos ganan. Puntos de esta ronda:`, game.lastRoundScores);
+    // Find the "perfect friend" - someone who voted correctly in ALL rounds
+    const totalRounds = game.currentRound;
+    const perfectFriends = [];
+
+    Object.entries(game.correctVotesPerPlayer || {}).forEach(([playerId, correctVotes]) => {
+        if (correctVotes === totalRounds) {
+            perfectFriends.push(playerId);
+        }
+    });
+
+    if (perfectFriends.length > 0) {
+        // Give bonus to the perfect friend with highest score (first one if tied)
+        const bestPerfectFriend = perfectFriends.reduce((best, current) => {
+            return (game.playerScores[current] || 0) >= (game.playerScores[best] || 0) ? current : best;
+        });
+
+        giveWinnerBonus(game, bestPerfectFriend);
+        console.log(`[Game ${game.gameId}] Amigo perfecto encontrado: ${bestPerfectFriend} (votó bien ${totalRounds}/${totalRounds} rondas)`);
+    } else {
+        console.log(`[Game ${game.gameId}] No hay amigo perfecto. Gana el amigo con más puntos.`);
+    }
+
+    console.log(`[Game ${game.gameId}] Amigos ganan. Puntos finales:`, game.playerScores);
 }
+
 
 
 /**
@@ -144,11 +183,12 @@ module.exports = {
     giveImpostorSurvivalPoints,
     giveImpostorMaxPoints,
     giveCorrectVotersPoints,
+    giveWinnerBonus,
     calculateRoundScores,
     calculateFriendsWinScores,
     findWinner,
     checkGameOver,
     FRIEND_POINTS_PER_CORRECT_VOTE,
-    IMPOSTOR_POINTS_BY_ROUND,
-    IMPOSTOR_MAX_POINTS,
+    IMPOSTOR_POINTS_PER_ROUND,
+    TARGET_SCORE,
 };
