@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "./ui/Button";
 import { Avatar } from "./ui/Avatar";
-import { PlayerList } from "./GameRoom";
+import { PlayerList } from "./game/PlayerList";
 import { Modal } from "./ui/Modal";
 import { Info } from "lucide-react";
 import confetti from "canvas-confetti";
