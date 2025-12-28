@@ -74,10 +74,11 @@ function removePlayer(game, userId) {
         }
     }
 
-    // Si el impostor se va durante el juego, terminar la ronda (amigos ganan)
+    // Si el impostor se va durante el juego, terminar la partida (amigos ganan)
     if (phaseBeforeRemoval === "playing" && playerIsImpostor) {
+        const RoundManager = require("./RoundManager");
         console.log(`[Game ${game.gameId}] Impostor eliminado. Amigos ganan.`);
-        game.phase = "round_result";
+        RoundManager.endRound(game, true); // Amigos ganan - termina partida
         // NO verificar votos - el impostor se fue, se acabó
         return { newHostInfo, playerIsImpostor };
     }
