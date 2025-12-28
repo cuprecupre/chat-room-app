@@ -21,8 +21,11 @@ function addPlayer(game, user) {
             name: user.name,
             photoURL: safePhotoURL,
         };
-        // Inicializar puntuación del jugador
-        game.playerScores[user.uid] = 0;
+        // Solo inicializar puntuación si el jugador NO tiene puntos previos
+        // Esto preserva puntos cuando un jugador se reconecta
+        if (!game.playerScores.hasOwnProperty(user.uid)) {
+            game.playerScores[user.uid] = 0;
+        }
         // Actualizar orden base (OB)
         updatePlayerOrder(game);
     }

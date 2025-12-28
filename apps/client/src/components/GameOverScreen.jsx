@@ -33,7 +33,27 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
 
     if (state.phase !== "game_over") return null;
 
-    const impostor = state.players.find((p) => p.uid === state.impostorId);
+    // Combinar jugadores conectados y desconectados que tienen puntos
+    const playerScores = state.playerScores || {};
+    const allPlayerUids = new Set([
+        ...state.players.map(p => p.uid),
+        ...Object.keys(playerScores)
+    ]);
+
+    const allPlayers = Array.from(allPlayerUids).map(uid => {
+        const connectedPlayer = state.players.find(p => p.uid === uid);
+        if (connectedPlayer) return connectedPlayer;
+
+        // Si no está conectado, buscar en formerPlayers
+        const formerPlayer = state.formerPlayers?.[uid];
+        return {
+            uid,
+            name: formerPlayer?.name || "Jugador desconectado",
+            photoURL: formerPlayer?.photoURL || null
+        };
+    });
+
+    const impostor = allPlayers.find((p) => p.uid === state.impostorId);
 
     // Determinar si ganó el impostor
     const impostorWon = state.winnerId === state.impostorId;
@@ -109,7 +129,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                     </h2>
                     <div className="rounded-2xl p-1">
                         <PlayerList
-                            players={state.players}
+                            players={allPlayers}
                             currentUserId={user.uid}
                             isHost={isHost}
                             gameState={state}
