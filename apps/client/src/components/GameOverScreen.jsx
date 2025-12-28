@@ -135,15 +135,15 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                             gameState={state}
                         />
                     </div>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowScoringModal(true)}
-                        className="mt-6 w-full py-3 border-white/10 text-neutral-400 hover:text-orange-400 hover:border-orange-500/50 gap-2"
-                    >
-                        <Info className="w-4 h-4" />
-                        ¿Cómo se calculan los puntos?
-                    </Button>
+                    <div className="flex justify-center">
+                        <button
+                            onClick={() => setShowScoringModal(true)}
+                            className="mt-6 inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"
+                        >
+                            <Info className="w-5 h-5" />
+                            ¿Cómo se calculan los puntos?
+                        </button>
+                    </div>
                 </div>
             </div>
 

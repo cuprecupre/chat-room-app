@@ -206,17 +206,17 @@ export function PlayerList({
                                             // Mostrar puntos ganados y total en resultado de ronda (para todos)
                                             <div className="flex flex-col items-end gap-0.5">
                                                 <div className="flex items-center gap-1.5">
-                                                    {bonusPoints > 0 && (
-                                                        <span className="text-[10px] font-bold text-yellow-400 bg-yellow-500/20 px-1.5 py-0.5 rounded-full">
-                                                            ★ BONUS
-                                                        </span>
-                                                    )}
                                                     <div
                                                         className={`text-xs font-medium ${scoreGained > 0 ? "text-green-400" : "text-neutral-500"}`}
                                                     >
                                                         {scoreGained > 0 ? "+" : ""}
                                                         {scoreGained} pts
                                                     </div>
+                                                    {bonusPoints > 0 && (
+                                                        <span className="text-[10px] font-bold text-yellow-400 bg-yellow-500/20 px-1.5 py-0.5 rounded-full">
+                                                            ★ BONUS
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 <div
                                                     className={`text-sm ${isWinner ? "text-orange-400" : "text-neutral-400"}`}
@@ -225,18 +225,19 @@ export function PlayerList({
                                                 </div>
                                             </div>
                                         ) : (
-                                            // Mostrar total con bonus en game over
                                             <div className="flex flex-col items-end gap-0.5">
-                                                {bonusPoints > 0 && (
-                                                    <span className="text-[10px] font-bold text-yellow-400 bg-yellow-500/20 px-1.5 py-0.5 rounded-full">
-                                                        ★ BONUS
+                                                <div className="flex items-center gap-1.5">
+                                                    {bonusPoints > 0 && (
+                                                        <span className="text-[10px] font-bold text-yellow-400 bg-yellow-500/20 px-1.5 py-0.5 rounded-full">
+                                                            ★ BONUS
+                                                        </span>
+                                                    )}
+                                                    <span
+                                                        className={`font-medium ${isWinner ? "text-orange-400" : "text-neutral-300"}`}
+                                                    >
+                                                        {score} pts
                                                     </span>
-                                                )}
-                                                <span
-                                                    className={`font-medium ${isWinner ? "text-orange-400" : "text-neutral-300"}`}
-                                                >
-                                                    {score} pts
-                                                </span>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -262,10 +263,10 @@ export function PlayerList({
                                             size="sm"
                                             disabled={iVotedForThisPlayer && !canChangeVote}
                                             className={`!w-auto gap-2 px-4 ${iVotedForThisPlayer
-                                                    ? canChangeVote
-                                                        ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
-                                                        : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
-                                                    : ""
+                                                ? canChangeVote
+                                                    ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
+                                                    : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
+                                                : ""
                                                 }`}
                                         >
                                             <svg
