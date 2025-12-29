@@ -225,19 +225,17 @@ export function PlayerList({
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="flex flex-col items-end gap-0.5">
-                                                <div className="flex items-center gap-1.5">
-                                                    {bonusPoints > 0 && (
-                                                        <span className="text-[10px] font-bold text-yellow-400 bg-yellow-500/20 px-1.5 py-0.5 rounded-full">
-                                                            ★ BONUS
-                                                        </span>
-                                                    )}
-                                                    <span
-                                                        className={`font-medium ${isWinner ? "text-orange-400" : "text-neutral-300"}`}
-                                                    >
-                                                        {score} pts
+                                            <div className="flex flex-col items-end gap-1">
+                                                {bonusPoints > 0 && (
+                                                    <span className="text-[10px] font-bold text-yellow-400 bg-yellow-500/20 px-1.5 py-0.5 rounded-full">
+                                                        ★ BONUS
                                                     </span>
-                                                </div>
+                                                )}
+                                                <span
+                                                    className={`font-medium ${isWinner ? "text-orange-400" : "text-neutral-300"}`}
+                                                >
+                                                    {score} pts
+                                                </span>
                                             </div>
                                         )}
                                     </div>
