@@ -64,6 +64,14 @@ export function Footer({ onOpenInstructions, onOpenFeedback, gameId, isMobile, o
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"
+                        onClick={() => {
+                            window.dataLayer = window.dataLayer || [];
+                            window.dataLayer.push({
+                                event: 'support_click',
+                                location: 'footer',
+                                link_url: 'https://buymeacoffee.com/elimpostor'
+                            });
+                        }}
                     >
                         <Coffee className="w-5 h-5" />
                         <span>Apoya al desarrollador</span>

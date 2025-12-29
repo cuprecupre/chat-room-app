@@ -117,11 +117,20 @@ export function MainLayout({
                         href="https://buymeacoffee.com/elimpostor"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3 py-1.5 sm:px-4 sm:py-2 bg-transparent hover:bg-yellow-400/10 text-yellow-400 hover:text-yellow-300 font-semibold text-xs sm:text-sm rounded-full transition-all active:scale-95 justify-self-center flex items-center gap-1.5 sm:gap-2 whitespace-nowrap"
+                        className="px-3 py-1.5 sm:px-4 sm:py-2 bg-transparent hover:bg-yellow-400/10 text-yellow-400 hover:text-yellow-300 font-semibold text-sm rounded-full transition-all active:scale-95 justify-self-center flex items-center gap-1.5 sm:gap-2 whitespace-nowrap"
                         aria-label="Apoya al desarrollador en Buy Me a Coffee"
+                        onClick={() => {
+                            window.dataLayer = window.dataLayer || [];
+                            window.dataLayer.push({
+                                event: 'support_click',
+                                location: 'header',
+                                link_url: 'https://buymeacoffee.com/elimpostor'
+                            });
+                        }}
                     >
                         <Coffee className="w-4 h-4 sm:w-5 sm:h-5" />
-                        <span>Apoya al desarrollador</span>
+                        <span className="sm:hidden">Apoyanos</span>
+                        <span className="hidden sm:inline">Apoya al desarrollador</span>
                     </a>
                     <div className="flex items-center gap-3 sm:gap-4 justify-self-end">
                         <span className="text-sm sm:text-base font-medium hidden sm:flex items-center">
