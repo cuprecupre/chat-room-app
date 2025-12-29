@@ -117,7 +117,7 @@ export function MainLayout({
                         href="https://buymeacoffee.com/elimpostor"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3 py-1.5 sm:px-4 sm:py-2 bg-yellow-400 hover:bg-yellow-500 text-neutral-900 font-semibold text-xs sm:text-sm rounded-full transition-colors active:scale-95 justify-self-center flex items-center gap-1.5 sm:gap-2 whitespace-nowrap"
+                        className="px-3 py-1.5 sm:px-4 sm:py-2 bg-transparent hover:bg-yellow-400/10 text-yellow-400 hover:text-yellow-300 font-semibold text-xs sm:text-sm rounded-full transition-all active:scale-95 justify-self-center flex items-center gap-1.5 sm:gap-2 whitespace-nowrap"
                         aria-label="Apoya al desarrollador en Buy Me a Coffee"
                     >
                         <Coffee className="w-4 h-4 sm:w-5 sm:h-5" />
