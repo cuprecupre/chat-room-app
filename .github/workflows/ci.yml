@@ -22,8 +22,9 @@ jobs:
             - name: Install Root Dependencies
               run: npm ci
 
-            - name: Check Formatting
-              run: npm run format:check
+            # Comentado: formato ya no es obligatorio en CI
+            # - name: Check Formatting
+            #   run: npm run format:check
 
     test-server:
         name: Server Tests

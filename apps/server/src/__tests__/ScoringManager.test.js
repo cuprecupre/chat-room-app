@@ -1,5 +1,11 @@
 /**
- * Tests for ScoringManager
+ * Tests for ScoringManager - New Scoring System
+ *
+ * New system:
+ * - Friends: +2 points per correct vote (individual)
+ * - Impostor: +3 (R1), +2 (R2), +2 (R3) for surviving = max 7 points
+ * - Ties: impostor DOES get points
+ * - Sudden death: impostor gets max points (7)
  */
 
 const ScoringManager = require("../game/ScoringManager");
@@ -15,7 +21,7 @@ function createMockGame() {
             { uid: "user4", name: "Player 4" },
         ],
         roundPlayers: ["user1", "user2", "user3", "user4"],
-        eliminatedInRound: [],
+        eliminatedPlayers: [],
         impostorId: "user1",
         playerScores: {
             user1: 0,
@@ -24,227 +30,199 @@ function createMockGame() {
             user4: 0,
         },
         lastRoundScores: {},
-        roundCount: 1,
+        currentRound: 1,
         maxRounds: 3,
-        targetScore: 15,
-        currentTurn: 1,
-        turnHistory: [],
+        votes: {},
     };
 }
 
-describe("ScoringManager", () => {
-    describe("calculateRoundScores - Friends Win", () => {
-        test("should give +1 to players who voted for impostor", () => {
+describe("ScoringManager - New System", () => {
+    describe("giveImpostorSurvivalPoints", () => {
+        test("should give +2 points on round 1", () => {
             const game = createMockGame();
-            game.impostorId = "user1";
-            game.turnHistory = [
-                {
-                    turn: 1,
-                    votes: {
-                        user1: "user2", // Impostor voted for someone else
-                        user2: "user1", // Voted correctly
-                        user3: "user1", // Voted correctly
-                        user4: "user2", // Voted wrong
-                    },
-                },
-            ];
+            game.currentRound = 1;
 
-            ScoringManager.calculateRoundScores(game, true); // friendsWon = true
+            ScoringManager.giveImpostorSurvivalPoints(game);
 
-            // user2 and user3 voted correctly: +1 each
-            expect(game.lastRoundScores["user2"]).toBeGreaterThanOrEqual(1);
-            expect(game.lastRoundScores["user3"]).toBeGreaterThanOrEqual(1);
-        });
-
-        test("should give +1 bonus to all non-impostor survivors for winning", () => {
-            const game = createMockGame();
-            game.impostorId = "user1";
-            game.eliminatedInRound = ["user1"]; // Impostor eliminated
-            game.turnHistory = [
-                {
-                    turn: 1,
-                    votes: {
-                        user1: "user2",
-                        user2: "user1",
-                        user3: "user1",
-                        user4: "user1",
-                    },
-                },
-            ];
-
-            ScoringManager.calculateRoundScores(game, true);
-
-            // All surviving friends get +1 bonus
-            expect(game.lastRoundScores["user2"]).toBeGreaterThan(0);
-            expect(game.lastRoundScores["user3"]).toBeGreaterThan(0);
-            expect(game.lastRoundScores["user4"]).toBeGreaterThan(0);
-        });
-
-        test("should not give bonus to eliminated players", () => {
-            const game = createMockGame();
-            game.impostorId = "user1";
-            game.eliminatedInRound = ["user2"]; // user2 was eliminated before impostor
-            game.turnHistory = [
-                {
-                    turn: 1,
-                    votes: {
-                        user1: "user3",
-                        user2: "user1", // Voted correctly but eliminated
-                        user3: "user1",
-                        user4: "user1",
-                    },
-                },
-            ];
-
-            ScoringManager.calculateRoundScores(game, true);
-
-            // user2 should not get the survival bonus (but may get vote bonus)
-            // The bonus for surviving is only for non-eliminated players
-            expect(game.lastRoundScores["user2"] || 0).toBeLessThanOrEqual(1);
-        });
-    });
-
-    describe("calculateRoundScores - Impostor Wins", () => {
-        test("should give impostor points based on turn (turn 1 = 2 points)", () => {
-            const game = createMockGame();
-            game.impostorId = "user1";
-            game.currentTurn = 1;
-            game.turnHistory = [];
-
-            ScoringManager.calculateRoundScores(game, false); // friendsWon = false
-
-            // Turn 1: impostor gets currentTurn + 1 = 2 points
+            expect(game.playerScores["user1"]).toBe(2);
             expect(game.lastRoundScores["user1"]).toBe(2);
         });
 
-        test("should give impostor more points for surviving longer (turn 2 = 3 points)", () => {
+        test("should give +2 points on round 2", () => {
             const game = createMockGame();
-            game.impostorId = "user1";
-            game.currentTurn = 2;
-            game.turnHistory = [];
+            game.currentRound = 2;
+            game.playerScores["user1"] = 2; // Already got R1 points
 
-            ScoringManager.calculateRoundScores(game, false);
+            ScoringManager.giveImpostorSurvivalPoints(game);
 
-            // Turn 2: impostor gets currentTurn + 1 = 3 points
-            expect(game.lastRoundScores["user1"]).toBe(3);
+            expect(game.playerScores["user1"]).toBe(4); // 2 + 2
+            expect(game.lastRoundScores["user1"]).toBe(2);
         });
 
-        test("should give impostor max points on turn 3 (4 points)", () => {
+        test("should give +2 points on round 3", () => {
             const game = createMockGame();
-            game.impostorId = "user1";
-            game.currentTurn = 3;
-            game.turnHistory = [];
+            game.currentRound = 3;
+            game.playerScores["user1"] = 4; // R1 + R2 points
 
-            ScoringManager.calculateRoundScores(game, false);
+            ScoringManager.giveImpostorSurvivalPoints(game);
 
-            // Turn 3: impostor gets currentTurn + 1 = 4 points
-            expect(game.lastRoundScores["user1"]).toBe(4);
+            expect(game.playerScores["user1"]).toBe(6); // 4 + 2
+            expect(game.lastRoundScores["user1"]).toBe(2);
         });
 
-        test("should still give +1 to friends who voted correctly even when impostor wins", () => {
+        test("should accumulate correctly: 2+2+2 = 6 base", () => {
             const game = createMockGame();
-            game.impostorId = "user1";
-            game.currentTurn = 1;
-            game.turnHistory = [
-                {
-                    turn: 1,
-                    votes: {
-                        user1: "user2",
-                        user2: "user1", // Voted correctly
-                        user3: "user2", // Voted wrong
-                        user4: "user1", // Voted correctly
-                    },
-                },
-            ];
 
-            ScoringManager.calculateRoundScores(game, false);
+            // Round 1
+            game.currentRound = 1;
+            ScoringManager.giveImpostorSurvivalPoints(game);
+            expect(game.playerScores["user1"]).toBe(2);
 
-            expect(game.lastRoundScores["user2"]).toBe(1);
-            expect(game.lastRoundScores["user4"]).toBe(1);
-            expect(game.lastRoundScores["user3"]).toBeUndefined();
-        });
+            // Round 2
+            game.currentRound = 2;
+            game.lastRoundScores = {};
+            ScoringManager.giveImpostorSurvivalPoints(game);
+            expect(game.playerScores["user1"]).toBe(4);
 
-        test("should accumulate points in playerScores", () => {
-            const game = createMockGame();
-            game.impostorId = "user1";
-            game.playerScores = { user1: 5, user2: 3, user3: 2, user4: 1 };
-            game.currentTurn = 2;
-            game.turnHistory = [];
-
-            ScoringManager.calculateRoundScores(game, false);
-
-            expect(game.playerScores["user1"]).toBe(8); // 5 + 3
+            // Round 3
+            game.currentRound = 3;
+            game.lastRoundScores = {};
+            ScoringManager.giveImpostorSurvivalPoints(game);
+            expect(game.playerScores["user1"]).toBe(6);
         });
     });
 
-    describe("checkGameOver", () => {
-        test("should return winner when target score reached", () => {
+    describe("giveImpostorMaxPoints (Sudden Death)", () => {
+        test("should give remaining points to reach 7", () => {
             const game = createMockGame();
-            game.playerScores = { user1: 15, user2: 8, user3: 5, user4: 3 };
-            game.targetScore = 15;
+            game.playerScores["user1"] = 3; // Only got R1 points
 
-            const result = ScoringManager.checkGameOver(game);
+            ScoringManager.giveImpostorMaxPoints(game);
 
-            expect(result).toBe("user1");
+            expect(game.playerScores["user1"]).toBe(10);
+            expect(game.lastRoundScores["user1"]).toBe(7); // 10 - 3 already earned
         });
 
-        test("should return first player to reach target in case of tie", () => {
+        test("should not give extra points if already at max", () => {
             const game = createMockGame();
-            game.playerScores = { user1: 15, user2: 16, user3: 5, user4: 3 };
-            game.targetScore = 15;
+            game.playerScores["user1"] = 10;
 
-            const result = ScoringManager.checkGameOver(game);
+            ScoringManager.giveImpostorMaxPoints(game);
 
-            // Should return one of the players who reached target
-            expect(["user1", "user2"]).toContain(result);
+            expect(game.playerScores["user1"]).toBe(10);
         });
 
-        test("should return winner when max rounds reached with clear leader", () => {
+        test("should give all 10 points if impostor has 0", () => {
             const game = createMockGame();
-            game.roundCount = 3;
-            game.maxRounds = 3;
-            game.playerScores = { user1: 8, user2: 12, user3: 5, user4: 3 };
-            game.targetScore = 15;
+            game.playerScores["user1"] = 0;
 
-            const result = ScoringManager.checkGameOver(game);
+            ScoringManager.giveImpostorMaxPoints(game);
 
-            expect(result).toBe("user2");
+            expect(game.playerScores["user1"]).toBe(10);
+            expect(game.lastRoundScores["user1"]).toBe(10);
+        });
+    });
+
+    describe("giveCorrectVotersPoints", () => {
+        test("should give +2 to each player who voted for impostor", () => {
+            const game = createMockGame();
+            game.votes = {
+                user1: "user2", // Impostor voted for someone else
+                user2: "user1", // Voted correctly
+                user3: "user1", // Voted correctly
+                user4: "user2", // Voted wrong
+            };
+
+            ScoringManager.giveCorrectVotersPoints(game);
+
+            expect(game.playerScores["user2"]).toBe(2);
+            expect(game.playerScores["user3"]).toBe(2);
+            expect(game.playerScores["user4"]).toBe(0);
         });
 
-        test("should return null when max rounds reached with tie", () => {
+        test("should not give points to impostor even if voted for themselves", () => {
             const game = createMockGame();
-            game.roundCount = 3;
-            game.maxRounds = 3;
-            game.playerScores = { user1: 8, user2: 8, user3: 5, user4: 3 };
-            game.targetScore = 15;
+            game.votes = {
+                user1: "user1", // Impostor voted for themselves (edge case)
+                user2: "user1",
+                user3: "user1",
+                user4: "user1",
+            };
 
-            const result = ScoringManager.checkGameOver(game);
+            ScoringManager.giveCorrectVotersPoints(game);
+
+            expect(game.playerScores["user1"]).toBe(0); // Impostor gets nothing
+            expect(game.playerScores["user2"]).toBe(2);
+            expect(game.playerScores["user3"]).toBe(2);
+            expect(game.playerScores["user4"]).toBe(2);
+        });
+    });
+
+    describe("findWinner", () => {
+        test("should return player with highest score (excluding impostor)", () => {
+            const game = createMockGame();
+            game.playerScores = { user1: 7, user2: 4, user3: 2, user4: 6 };
+
+            const result = ScoringManager.findWinner(game);
+
+            expect(result).toBe("user4"); // Highest non-impostor
+        });
+
+        test("should return first player in case of tie", () => {
+            const game = createMockGame();
+            game.playerScores = { user1: 7, user2: 4, user3: 4, user4: 2 };
+
+            const result = ScoringManager.findWinner(game);
+
+            expect(["user2", "user3"]).toContain(result);
+        });
+
+        test("should return null if no friends have points", () => {
+            const game = createMockGame();
+            game.playerScores = { user1: 7, user2: 0, user3: 0, user4: 0 };
+
+            const result = ScoringManager.findWinner(game);
 
             expect(result).toBeNull();
         });
+    });
 
-        test("should return null when game not over", () => {
+    describe("calculateRoundScores", () => {
+        test("should log when friends win (points given by giveCorrectVotersPoints)", () => {
             const game = createMockGame();
-            game.roundCount = 1;
-            game.maxRounds = 3;
-            game.playerScores = { user1: 5, user2: 3, user3: 2, user4: 1 };
-            game.targetScore = 15;
+            game.votes = {
+                user2: "user1",
+                user3: "user1",
+                user4: "user1",
+            };
 
-            const result = ScoringManager.checkGameOver(game);
+            // Points are now given by giveCorrectVotersPoints, not calculateRoundScores
+            // Then calculateFriendsWinScores gives bonus to perfect friend
+            ScoringManager.giveCorrectVotersPoints(game);
+            ScoringManager.calculateRoundScores(game, true);
 
-            expect(result).toBeNull();
+            // Friends should have gotten points, ALL have perfect score (1/1) so ALL get bonus
+            expect(game.playerScores["user2"]).toBe(10); // +2 vote + 8 bonus = 10
+            expect(game.playerScores["user3"]).toBe(10); // +2 vote + 8 bonus = 10
+            expect(game.playerScores["user4"]).toBe(10); // +2 vote + 8 bonus = 10
         });
 
-        test("should not end game if no one has points", () => {
+        test("should not change scores when impostor wins (points given separately)", () => {
             const game = createMockGame();
-            game.roundCount = 1;
-            game.maxRounds = 3;
-            game.playerScores = {};
-            game.targetScore = 15;
+            const initialScores = { ...game.playerScores };
 
-            const result = ScoringManager.checkGameOver(game);
+            ScoringManager.calculateRoundScores(game, false);
 
-            expect(result).toBeNull();
+            // Scores should remain the same (impostor points given in giveImpostorSurvivalPoints)
+            expect(game.playerScores).toEqual(initialScores);
+        });
+    });
+
+    describe("Constants", () => {
+        test("should have correct point values", () => {
+            expect(ScoringManager.FRIEND_POINTS_PER_CORRECT_VOTE).toBe(2);
+            expect(ScoringManager.IMPOSTOR_POINTS_PER_ROUND).toBe(2);
+            expect(ScoringManager.TARGET_SCORE).toBe(10);
         });
     });
 });

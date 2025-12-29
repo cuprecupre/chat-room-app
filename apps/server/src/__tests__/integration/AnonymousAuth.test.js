@@ -133,17 +133,18 @@ describe("Anonymous User Integration", () => {
             expect(impostorState.secretWord).toBe("Descubre la palabra secreta");
         });
 
-        test("Anonymous impostor can win by surviving 3 turns", () => {
+        test("Anonymous impostor can win by surviving 3 rounds", () => {
             sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
 
-            // 3 ties means impostor survives
+            // 3 ties means impostor survives all rounds
             sim.createTieVote();
+            sim.continueToNextRound();
             sim.createTieVote();
+            sim.continueToNextRound();
             sim.createTieVote();
 
-            expect(sim.getState().phase).toBe("round_result");
-            // Round ended - impostor survived (check lastRoundScores exists)
-            expect(sim.game.lastRoundScores).toBeDefined();
+            expect(sim.getState().phase).toBe("game_over");
+            expect(sim.getState().winnerId).toBe(sim.getState().impostorId);
         });
     });
 
@@ -173,7 +174,7 @@ describe("Anonymous User Integration", () => {
             const targetIndex = sim.getNonImpostorIndex();
             sim.allVoteFor(targetIndex);
 
-            expect(sim.getState().eliminatedInRound).toContain(sim.users[targetIndex].uid);
+            expect(sim.getState().eliminatedPlayers).toContain(sim.users[targetIndex].uid);
         });
     });
 
@@ -253,23 +254,28 @@ describe("Anonymous User Integration", () => {
         test("Anonymous winner has scores in lastRoundScores", () => {
             sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
 
-            // Make impostor win
+            // Make impostor win by surviving 3 rounds
             sim.createTieVote();
+            sim.continueToNextRound();
             sim.createTieVote();
+            sim.continueToNextRound();
             sim.createTieVote();
 
             expect(sim.game.lastRoundScores).toBeDefined();
             expect(Object.keys(sim.game.lastRoundScores).length).toBeGreaterThan(0);
         });
 
-        test("Impostor ID is tracked after round ends", () => {
+        test("Impostor ID is tracked after game ends", () => {
             sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
             sim.createTieVote();
+            sim.continueToNextRound();
             sim.createTieVote();
+            sim.continueToNextRound();
             sim.createTieVote();
 
             // impostorId should still be tracked
             expect(sim.game.impostorId).toBeDefined();
+            expect(sim.getState().winnerId).toBe(sim.game.impostorId);
         });
     });
 });

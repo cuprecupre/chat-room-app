@@ -21,8 +21,11 @@ function addPlayer(game, user) {
             name: user.name,
             photoURL: safePhotoURL,
         };
-        // Inicializar puntuación del jugador
-        game.playerScores[user.uid] = 0;
+        // Solo inicializar puntuación si el jugador NO tiene puntos previos
+        // Esto preserva puntos cuando un jugador se reconecta
+        if (!game.playerScores.hasOwnProperty(user.uid)) {
+            game.playerScores[user.uid] = 0;
+        }
         // Actualizar orden base (OB)
         updatePlayerOrder(game);
     }
@@ -31,6 +34,9 @@ function addPlayer(game, user) {
 function removePlayer(game, userId) {
     const playerIsImpostor = game.impostorId === userId;
     const wasHost = game.hostId === userId;
+
+    // CRITICAL: Guardar la fase ANTES de cualquier modificación
+    const phaseBeforeRemoval = game.phase;
 
     // Guardar datos del jugador antes de eliminarlo
     const leavingPlayer = game.players.find((p) => p.uid === userId);
@@ -43,7 +49,9 @@ function removePlayer(game, userId) {
 
     game.players = game.players.filter((p) => p.uid !== userId);
     game.roundPlayers = game.roundPlayers.filter((uid) => uid !== userId);
-    game.eliminatedInRound = game.eliminatedInRound.filter((uid) => uid !== userId);
+    if (game.eliminatedPlayers) {
+        game.eliminatedPlayers = game.eliminatedPlayers.filter((uid) => uid !== userId);
+    }
     delete game.votes[userId];
 
     // Actualizar orden base cuando un jugador se va
@@ -66,9 +74,23 @@ function removePlayer(game, userId) {
         }
     }
 
-    // If the impostor leaves during the game, end the round
-    if (game.phase === "playing" && playerIsImpostor) {
-        game.phase = "round_result";
+    // Si el impostor se va durante el juego, terminar la partida (amigos ganan)
+    if (phaseBeforeRemoval === "playing" && playerIsImpostor) {
+        const RoundManager = require("./RoundManager");
+        console.log(`[Game ${game.gameId}] Impostor eliminado. Amigos ganan.`);
+        RoundManager.endRound(game, true); // Amigos ganan - termina partida
+        // NO verificar votos - el impostor se fue, se acabó
+        return { newHostInfo, playerIsImpostor };
+    }
+
+    // CRITICAL FIX: Si estábamos en votación y el jugador NO era impostor,
+    // verificar si los jugadores restantes ya completaron la votación
+    if (phaseBeforeRemoval === "playing" && !playerIsImpostor) {
+        const VotingManager = require("./VotingManager");
+        console.log(
+            `[Game ${game.gameId}] Jugador eliminado durante votación. Verificando si todos votaron...`
+        );
+        VotingManager.checkIfAllVoted(game);
     }
 
     return { newHostInfo, playerIsImpostor };
@@ -90,19 +112,30 @@ function calculateStartingPlayer(game) {
         return null;
     }
 
-    const roundIndex = (game.roundCount - 1) % eligiblePlayers.length;
-    const startingPlayerId = eligiblePlayers[roundIndex];
+    // REQUISITO: Siempre empieza el Anfitrión (Host)
+    let startingPlayerId = game.hostId;
+
+    // Fallback: Si el host no es elegible (ej. espectador o se acaba de ir), usar rotación
+    if (!eligiblePlayers.includes(startingPlayerId)) {
+        const roundIndex = ((game.currentRound || 1) - 1) % eligiblePlayers.length;
+        startingPlayerId = eligiblePlayers[roundIndex];
+        console.log(
+            `[Game ${game.gameId}] Host no elegible. Fallback a rotación: ${startingPlayerId}`
+        );
+    }
 
     const startingPlayer = game.players.find((p) => p.uid === startingPlayerId);
     console.log(
-        `[Game ${game.gameId}] Ronda ${game.roundCount}: Jugador inicial = ${startingPlayer?.name} (índice ${roundIndex} de ${eligiblePlayers.length} elegibles)`
+        `[Game ${game.gameId}] Ronda ${game.currentRound}: Jugador inicial = ${startingPlayer?.name}`
     );
 
     return startingPlayerId;
 }
 
 function getActivePlayers(game) {
-    return game.roundPlayers.filter((uid) => !game.eliminatedInRound.includes(uid));
+    const eliminated = game.eliminatedPlayers || [];
+    const roundPlayers = game.roundPlayers || [];
+    return roundPlayers.filter((uid) => !eliminated.includes(uid));
 }
 
 module.exports = {
