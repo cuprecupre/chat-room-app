@@ -3,6 +3,17 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 
+// Limpiar cualquier Service Worker registrado anteriormente
+// Esto fuerza a los usuarios a obtener contenido fresco
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => {
+            registration.unregister();
+            console.log("🧹 Service Worker eliminado:", registration.scope);
+        });
+    });
+}
+
 console.log(import.meta.env.DEV);
 // Inicializar Eruda para debug móvil (solo si VITE_ENABLE_ERUDA=true)
 if (import.meta.env.DEV === "true") {
