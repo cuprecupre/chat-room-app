@@ -89,37 +89,43 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                 )}
             </div>
 
-            <div className="grid grid-cols-1 gap-12 items-start max-w-md mx-auto pb-32">
+            <div className="grid grid-cols-1 gap-12 items-start max-w-lg mx-auto pb-32">
                 {/* Impostor Reveal */}
-                <div className="w-full bg-neutral-900 rounded-2xl p-8 text-center">
-                    <p className="text-xs uppercase tracking-wider text-neutral-400 mb-4">
-                        El impostor era
-                    </p>
-                    {impostor ? (
-                        <div className="flex items-center justify-center gap-4">
-                            <Avatar
-                                photoURL={impostor.photoURL}
-                                displayName={impostor.name}
-                                size="md"
-                                className="ring-2 ring-orange-500"
-                            />
-                            <span className="text-2xl text-white font-medium">{impostor.name}</span>
+                <div className="w-full bg-neutral-900 rounded-2xl p-6 md:p-8 text-center">
+                    <div className="grid grid-cols-2 gap-x-8 items-start relative">
+                        {/* Impostor Column */}
+                        <div className="flex flex-col items-center justify-center px-4">
+                            <p className="text-xs uppercase tracking-wider text-neutral-400 mb-3">
+                                El impostor era
+                            </p>
+                            {impostor ? (
+                                <div className="flex items-center justify-center w-full">
+                                    <span className="text-2xl text-white font-medium text-center break-words leading-tight max-w-full">
+                                        {impostor.name}
+                                    </span>
+                                </div>
+                            ) : (
+                                <span className="text-neutral-500">Desconocido</span>
+                            )}
                         </div>
-                    ) : (
-                        <span className="text-neutral-500">Desconocido</span>
-                    )}
 
-                    {state.secretWord && (
-                        <>
-                            <hr className="border-neutral-800 my-6" />
-                            <p className="text-xs uppercase tracking-wider text-neutral-400 mb-2">
-                                Palabra secreta
-                            </p>
-                            <p className="text-2xl text-white font-medium capitalize">
-                                {state.secretWord}
-                            </p>
-                        </>
-                    )}
+                        {/* Secret Word Column - Conditional */}
+                        {state.secretWord && (
+                            <>
+                                {/* Vertical Divider */}
+                                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/10 -translate-x-1/2"></div>
+
+                                <div className="flex flex-col items-center justify-center px-4">
+                                    <p className="text-xs uppercase tracking-wider text-neutral-400 mb-3">
+                                        Palabra secreta
+                                    </p>
+                                    <p className="text-2xl text-white font-medium capitalize">
+                                        {state.secretWord}
+                                    </p>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
 
                 {/* Leaderboard */}
