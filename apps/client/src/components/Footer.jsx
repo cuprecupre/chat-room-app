@@ -1,5 +1,5 @@
 import React from "react";
-import { LogOut } from "lucide-react";
+import { LogOut, Coffee } from "lucide-react";
 
 export function Footer({ onOpenInstructions, onOpenFeedback, gameId, isMobile, onLeaveGame }) {
     return (
@@ -9,6 +9,16 @@ export function Footer({ onOpenInstructions, onOpenFeedback, gameId, isMobile, o
             <div className="flex flex-col gap-4">
                 {/* Botones globales (Reglas / Feedback / Abandonar) */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+                    {gameId && onLeaveGame && (
+                        <button
+                            onClick={onLeaveGame}
+                            className="inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"
+                        >
+                            <LogOut className="w-5 h-5" />
+                            <span>Abandonar partida</span>
+                        </button>
+                    )}
+
                     <button
                         onClick={onOpenInstructions}
                         className="inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"
@@ -49,15 +59,15 @@ export function Footer({ onOpenInstructions, onOpenFeedback, gameId, isMobile, o
                         <span>Ayudanos a mejorar</span>
                     </button>
 
-                    {gameId && onLeaveGame && (
-                        <button
-                            onClick={onLeaveGame}
-                            className="inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"
-                        >
-                            <LogOut className="w-5 h-5" />
-                            <span>Abandonar partida</span>
-                        </button>
-                    )}
+                    <a
+                        href="https://buymeacoffee.com/elimpostor"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"
+                    >
+                        <Coffee className="w-5 h-5" />
+                        <span>Apoya al desarrollador</span>
+                    </a>
                 </div>
             </div>
         </footer>

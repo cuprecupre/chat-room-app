@@ -1,5 +1,6 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { Coffee } from "lucide-react";
 import { Avatar } from "../components/ui/Avatar";
 import { Button } from "../components/ui/Button";
 import { Modal } from "../components/ui/Modal";
@@ -105,14 +106,24 @@ export function MainLayout({
     return (
         <div className="bg-neutral-950 text-white min-h-[100dvh] font-sans flex flex-col">
             <div className="w-full max-w-4xl mx-auto px-6 py-4 sm:p-6 lg:p-8">
-                <header className="flex justify-between items-center mb-0 pb-4 sm:mb-6 sm:pb-6 border-b border-white/10">
+                <header className="grid grid-cols-3 items-center mb-0 pb-4 sm:mb-6 sm:pb-6 border-b border-white/10">
                     <button
                         onClick={handleTitleClick}
-                        className="text-xl sm:text-2xl font-serif text-neutral-50 hover:text-orange-400 transition-colors active:scale-95 cursor-pointer"
+                        className="text-xl sm:text-2xl font-serif text-neutral-50 hover:text-orange-400 transition-colors active:scale-95 cursor-pointer justify-self-start"
                     >
                         El Impostor
                     </button>
-                    <div className="flex items-center gap-3 sm:gap-4">
+                    <a
+                        href="https://buymeacoffee.com/elimpostor"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 sm:px-4 sm:py-2 bg-yellow-400 hover:bg-yellow-500 text-neutral-900 font-semibold text-xs sm:text-sm rounded-full transition-colors active:scale-95 justify-self-center flex items-center gap-1.5 sm:gap-2 whitespace-nowrap"
+                        aria-label="Apoya al desarrollador en Buy Me a Coffee"
+                    >
+                        <Coffee className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <span>Apoya al desarrollador</span>
+                    </a>
+                    <div className="flex items-center gap-3 sm:gap-4 justify-self-end">
                         <span className="text-sm sm:text-base font-medium hidden sm:flex items-center">
                             {user.displayName}
                         </span>
