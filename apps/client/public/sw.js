@@ -13,6 +13,9 @@ const ASSETS_TO_CACHE = [
 
 // Instalar Service Worker
 self.addEventListener("install", (event) => {
+    // Forzar activación inmediata sin esperar a que se cierren otras pestañas
+    self.skipWaiting();
+
     event.waitUntil(
         caches
             .open(CACHE_NAME)
@@ -38,6 +41,9 @@ self.addEventListener("activate", (event) => {
                     }
                 })
             );
+        }).then(() => {
+            // Tomar control de todas las pestañas inmediatamente
+            return self.clients.claim();
         })
     );
 });
