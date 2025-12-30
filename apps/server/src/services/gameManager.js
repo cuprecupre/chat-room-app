@@ -1,5 +1,4 @@
 const Game = require("../Game");
-const dbService = require("./db");
 const sessionManager = require("./sessionManager");
 
 /**
@@ -150,32 +149,6 @@ class GameManager {
     }
 
     /**
-     * Recover active games from database on server startup.
-     */
-    async recoverGames() {
-        console.log("🔄 [GameManager] Starting game recovery process...");
-        try {
-            const activeGames = await dbService.getActiveGames();
-            activeGames.forEach((data) => {
-                try {
-                    const game = Game.fromState(data.gameId, data);
-                    this.games[data.gameId] = game;
-                } catch (e) {
-                    console.error(
-                        `❌ [GameManager] Failed to restore game ${data.gameId}:`,
-                        e.message
-                    );
-                }
-            });
-            console.log(
-                `✅ [GameManager] Recovery complete. ${Object.keys(this.games).length} games loaded into memory.`
-            );
-        } catch (e) {
-            console.error("❌ [GameManager] Recovery procedure failed:", e);
-        }
-    }
-
-    /**
      * Get all games (for debugging/admin purposes).
      */
     getAllGames() {
@@ -235,13 +208,11 @@ class GameManager {
                 return;
             }
 
-            // Delete from memory only (keep in Firestore for recovery)
+            // Delete from memory
             delete this.games[gameId];
             delete this.pendingDeletions[gameId];
 
-            console.log(
-                `🗑️  [Cleanup] Removed empty game ${gameId} from memory (kept in Firestore)`
-            );
+            console.log(`🗑️  [Cleanup] Removed empty game ${gameId} from memory`);
         }, delayMs);
 
         this.pendingDeletions[gameId] = timeoutId;
