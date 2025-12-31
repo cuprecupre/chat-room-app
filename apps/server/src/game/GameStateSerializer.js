@@ -1,45 +1,10 @@
 /**
- * GameStateSerializer - Nueva Versión
+ * GameStateSerializer
  *
- * Actualizado para el nuevo sistema de rondas simples (sin vueltas)
+ * Provides serialization functions for game state:
+ * - getStateForPlayer: Personalized state for each player (for real-time updates)
+ * - getAnalyticsState: Minimal data for end-of-game analytics
  */
-
-const { findWinner } = require("./ScoringManager");
-
-function getPersistenceState(game) {
-    return {
-        hostId: game.hostId,
-        phase: game.phase,
-        players: game.players,
-        playerScores: game.playerScores,
-
-        // Schema version para detectar partidas antiguas
-        schemaVersion: game.schemaVersion || 2,
-
-        // Game Config
-        showImpostorHint: game.showImpostorHint,
-        maxRounds: game.maxRounds,
-
-        // Round State
-        currentRound: game.currentRound,
-        secretWord: game.secretWord,
-        secretCategory: game.secretCategory,
-        impostorId: game.impostorId,
-        startingPlayerId: game.startingPlayerId,
-        winnerId: game.winnerId,
-        migratedFromOldSystem: game.migratedFromOldSystem || false,
-
-        // Arrays & Objects
-        roundPlayers: game.roundPlayers,
-        eliminatedPlayers: game.eliminatedPlayers,
-        votes: game.votes,
-        roundHistory: game.roundHistory,
-        lastRoundScores: game.lastRoundScores,
-        playerOrder: game.playerOrder,
-        impostorHistory: game.impostorHistory,
-        formerPlayers: game.formerPlayers,
-    };
-}
 
 function getStateForPlayer(game, userId) {
     const player = game.players.find((p) => p.uid === userId);
@@ -130,7 +95,25 @@ function getStateForPlayer(game, userId) {
     return baseState;
 }
 
+/**
+ * Returns minimal analytics data for completed games.
+ * Used for end-of-game persistence to game_analytics collection.
+ */
+function getAnalyticsState(game) {
+    return {
+        gameId: game.gameId,
+        hostId: game.hostId,
+        winnerId: game.winnerId || null,
+        players: game.players.map((p) => ({ uid: p.uid, name: p.name })),
+        playerScores: game.playerScores,
+        currentRound: game.currentRound,
+        maxRounds: game.maxRounds,
+        completedAt: new Date().toISOString(),
+        endReason: "completed",
+    };
+}
+
 module.exports = {
-    getPersistenceState,
     getStateForPlayer,
+    getAnalyticsState,
 };

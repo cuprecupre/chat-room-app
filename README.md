@@ -76,3 +76,70 @@ Para más detalles técnicos, consulta la carpeta `docs/`.
 El proyecto se despliega automáticamente en Render.com con 3 entornos:
 - `develop` (Staging/Dev)
 - `main` (Producción)
+
+## 🔐 Admin API
+
+Endpoints protegidos para administración del servidor. Requieren la variable de entorno `ADMIN_SECRET`.
+
+### Generar secreto
+
+```bash
+openssl rand -base64 32
+```
+
+### Endpoints
+
+#### Iniciar shutdown programado
+
+Inicia un countdown visible para los usuarios. Durante el countdown:
+- No se pueden crear nuevas partidas
+- Las partidas activas pueden finalizar naturalmente
+- Al terminar, los usuarios son redirigidos al lobby
+
+```bash
+curl -X POST "https://tu-servidor.com/api/admin/shutdown?minutes=5" \
+     -H "Authorization: Bearer TU_ADMIN_SECRET"
+```
+
+**Parámetros:**
+- `minutes` (query): Duración del countdown (1-60 minutos, default: 5)
+
+**Respuesta:**
+```json
+{
+  "success": true,
+  "message": "Shutdown scheduled in 5 minutes",
+  "shutdownAt": "2025-01-15T10:30:00.000Z"
+}
+```
+
+#### Cancelar shutdown
+
+```bash
+curl -X DELETE "https://tu-servidor.com/api/admin/shutdown" \
+     -H "Authorization: Bearer TU_ADMIN_SECRET"
+```
+
+**Respuesta:**
+```json
+{
+  "success": true,
+  "message": "Shutdown cancelled"
+}
+```
+
+#### Consultar estado
+
+```bash
+curl "https://tu-servidor.com/api/admin/shutdown" \
+     -H "Authorization: Bearer TU_ADMIN_SECRET"
+```
+
+**Respuesta:**
+```json
+{
+  "isShuttingDown": true,
+  "remainingSeconds": 245,
+  "shutdownAt": "2025-01-15T10:30:00.000Z"
+}
+```

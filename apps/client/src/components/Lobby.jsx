@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Video } from "lucide-react";
 import { Button } from "./ui/Button";
-import homeImg from "../assets/impostor-home.jpg";
+
+// Firebase Storage CDN URL
+const homeImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
 
 export function Lobby({ onCreateGame }) {
     const [showImpostorHint, setShowImpostorHint] = useState(true);

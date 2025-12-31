@@ -56,9 +56,6 @@ io.on("connection", (socket) => {
     registerSocketHandlers(io, socket);
 });
 
-// --- Recover Games from Database ---
-gameManager.recoverGames();
-
 // --- Sync Stats to Firestore (every 5 minutes) ---
 const STATS_SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes
 setInterval(() => {
@@ -69,3 +66,7 @@ setInterval(() => {
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+// --- Initialize Graceful Shutdown ---
+const shutdownManager = require("./services/shutdownManager");
+shutdownManager.initialize(io, server);

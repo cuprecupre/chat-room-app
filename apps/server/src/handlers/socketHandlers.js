@@ -1,6 +1,7 @@
 const gameManager = require("../services/gameManager");
 const sessionManager = require("../services/sessionManager");
 const statsManager = require("../services/statsManager");
+const shutdownManager = require("../services/shutdownManager");
 
 // Grace period constants
 const MOBILE_GRACE_PERIOD = 300000; // 5 minutes for mobile users
@@ -106,6 +107,14 @@ function handleReconnection(socket, user) {
  * Handle game creation.
  */
 async function handleCreateGame(socket, user, options = {}) {
+    // Block new game creation during shutdown
+    if (shutdownManager.isShuttingDown) {
+        return socket.emit(
+            "error-message",
+            "El servidor está en mantenimiento. No se pueden crear nuevas partidas."
+        );
+    }
+
     // Clean up ANY previous games the user might be in (ghost busting 👻)
     await gameManager.cleanupUserPreviousGames(user.uid);
 

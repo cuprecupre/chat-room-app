@@ -2,7 +2,8 @@ import React from "react";
 import { Button } from "./ui/Button";
 import { RulesContent } from "./RulesContent";
 
-import heroImg from "../assets/impostor-home.jpg";
+// Firebase Storage CDN URL
+const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
 
 export function RulesPage() {
     return (

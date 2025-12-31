@@ -40,25 +40,7 @@ class DBService {
     }
 
     /**
-     * Upserts the game state to Firestore.
-     */
-    async saveGameState(gameId, state) {
-        if (!this.db) return;
-
-        try {
-            const docRef = this.db.collection(this.collectionName).doc(gameId);
-            const payload = {
-                ...state,
-                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-            };
-            await docRef.set(payload, { merge: true });
-        } catch (error) {
-            console.error(`⚠️ [DB Service] Save failed for ${gameId}: ${error.message}`);
-        }
-    }
-
-    /**
-     * Retrieves game state for recovery.
+     * Retrieves game state (for admin purposes).
      */
     async getGameState(gameId) {
         if (!this.db) return null;
@@ -87,55 +69,21 @@ class DBService {
     }
 
     /**
-     * Retrieves all active games for server restart recovery.
+     * Saves game analytics to the game_analytics collection.
+     * Called only when a game ends (for analytics purposes).
      */
-    async getActiveGames() {
-        if (!this.db) return [];
+    async saveGameAnalytics(gameId, analyticsData) {
+        if (!this.db) return;
 
         try {
-            // Only recover games updated in the last 3 hours (configurable via env)
-            const recoveryWindowHours = parseInt(process.env.GAME_RECOVERY_HOURS || "3");
-            const cutoffTime = new Date(Date.now() - recoveryWindowHours * 60 * 60 * 1000);
-
-            const snapshot = await this.db
-                .collection(this.collectionName)
-                .where("phase", "in", ["lobby", "playing", "round_result"])
-                .where("updatedAt", ">", cutoffTime)
-                .orderBy("updatedAt", "desc")
-                .limit(1000) // Safety limit to prevent loading too many games
-                .get();
-
-            if (snapshot.empty) {
-                console.log("✅ [DB Service] No active games to recover.");
-                return [];
-            }
-
-            const games = [];
-            let skippedEmpty = 0;
-
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                const playerCount = data.players ? data.players.length : 0;
-
-                // Only recover games with at least 1 player
-                if (playerCount > 0) {
-                    games.push({ gameId: doc.id, ...data });
-                } else {
-                    skippedEmpty++;
-                }
+            const docRef = this.db.collection("game_analytics").doc(gameId);
+            await docRef.set({
+                ...analyticsData,
+                savedAt: admin.firestore.FieldValue.serverTimestamp(),
             });
-
-            if (skippedEmpty > 0) {
-                console.log(`⏭️  [DB Service] Skipped ${skippedEmpty} empty games (0 players).`);
-            }
-
-            console.log(
-                `✅ [DB Service] Recovered ${games.length} active games (updated within last ${recoveryWindowHours}h).`
-            );
-            return games;
+            console.log(`✅ [DB Service] Analytics saved for game ${gameId}`);
         } catch (error) {
-            console.error(`❌ [DB Service] Failed to recover games: ${error.message}`);
-            return [];
+            console.error(`⚠️ [DB Service] Analytics save failed for ${gameId}: ${error.message}`);
         }
     }
 }

@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "../ui/Button";
-import cardImg from "../../assets/card.jpg";
-import cardBackImg from "../../assets/card-back.jpg";
 import { capitalize } from "./utils";
+
+// Firebase Storage CDN URLs
+const CDN_BASE = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2F";
+const CDN_SUFFIX = "?alt=media";
+const cardImg = `${CDN_BASE}card.jpg${CDN_SUFFIX}`;
+const cardBackImg = `${CDN_BASE}card-back.jpg${CDN_SUFFIX}`;
 
 export function GameCard({ state, initialAnimationPending, showCardEntrance, showRestOfUI }) {
     const [reveal, setReveal] = useState(false);

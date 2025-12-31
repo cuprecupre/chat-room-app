@@ -2,57 +2,58 @@ const express = require("express");
 const gameManager = require("../services/gameManager");
 const dbService = require("../services/db");
 const statsManager = require("../services/statsManager");
+const shutdownManager = require("../services/shutdownManager");
 
 const router = express.Router();
+
+// Admin secret for protected endpoints
+const ADMIN_SECRET = process.env.ADMIN_SECRET;
+
+/**
+ * Middleware to verify admin authorization.
+ */
+function requireAdmin(req, res, next) {
+    if (!ADMIN_SECRET) {
+        return res.status(503).json({
+            error: "Admin endpoints not configured. Set ADMIN_SECRET env variable.",
+        });
+    }
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ error: "Missing authorization header" });
+    }
+
+    const token = authHeader.substring(7);
+    if (token !== ADMIN_SECRET) {
+        return res.status(403).json({ error: "Invalid admin secret" });
+    }
+
+    next();
+}
 
 /**
  * GET /api/game/:gameId
  * Get game preview info (for join links, social sharing, etc.)
+ * Note: Only checks in-memory games (no Firestore fallback since games are not persisted during play)
  */
-router.get("/game/:gameId", async (req, res) => {
+router.get("/game/:gameId", (req, res) => {
     const { gameId } = req.params;
     const safeGameId = (gameId || "").toUpperCase();
 
-    let game = gameManager.getGame(safeGameId);
-    let hostName = "Anfitrión desconocido";
-    let playerCount = 0;
-    let status = "unknown";
-    let found = false;
+    const game = gameManager.getGame(safeGameId);
 
-    if (game) {
-        // Memory hit
-        const host = game.players.find((p) => p.uid === game.hostId);
-        hostName = host ? host.name : "Anfitrión desconocido";
-        playerCount = game.players.length;
-        status = game.phase;
-        found = true;
-    } else {
-        // Memory miss -> Try lazy DB lookup
-        try {
-            const state = await dbService.getGameState(safeGameId);
-            if (state) {
-                const host = state.players
-                    ? state.players.find((p) => p.uid === state.hostId)
-                    : null;
-                hostName = host ? host.name : "Partida recuperada";
-                playerCount = state.players ? state.players.length : 0;
-                status = state.phase;
-                found = true;
-            }
-        } catch (e) {
-            console.error(`Error lazy loading game ${safeGameId}:`, e);
-        }
-    }
-
-    if (!found) {
+    if (!game) {
         return res.status(404).json({ error: "Game not found" });
     }
 
+    const host = game.players.find((p) => p.uid === game.hostId);
+
     res.json({
         gameId: safeGameId,
-        hostName: hostName,
-        playerCount: playerCount,
-        status: status,
+        hostName: host ? host.name : "Anfitrión desconocido",
+        playerCount: game.players.length,
+        status: game.phase,
     });
 });
 
@@ -98,6 +99,63 @@ router.get("/health", async (req, res) => {
 
     const statusCode = firestoreHealth.healthy ? 200 : 503;
     res.status(statusCode).json(health);
+});
+
+// ============================================
+// Admin Endpoints (protected by ADMIN_SECRET)
+// ============================================
+
+/**
+ * POST /api/admin/shutdown
+ * Start a graceful shutdown with countdown.
+ *
+ * Query params:
+ *   - minutes: Countdown duration (1-60, default: 5)
+ *
+ * Usage:
+ *   curl -X POST "http://localhost:3000/api/admin/shutdown?minutes=5" \
+ *        -H "Authorization: Bearer YOUR_ADMIN_SECRET"
+ */
+router.post("/admin/shutdown", requireAdmin, (req, res) => {
+    const minutes = parseInt(req.query.minutes) || 5;
+
+    const result = shutdownManager.startShutdown(minutes);
+
+    if (result.success) {
+        res.json(result);
+    } else {
+        res.status(400).json(result);
+    }
+});
+
+/**
+ * DELETE /api/admin/shutdown
+ * Cancel a pending shutdown.
+ *
+ * Usage:
+ *   curl -X DELETE "http://localhost:3000/api/admin/shutdown" \
+ *        -H "Authorization: Bearer YOUR_ADMIN_SECRET"
+ */
+router.delete("/admin/shutdown", requireAdmin, (req, res) => {
+    const result = shutdownManager.cancelShutdown();
+
+    if (result.success) {
+        res.json(result);
+    } else {
+        res.status(400).json(result);
+    }
+});
+
+/**
+ * GET /api/admin/shutdown
+ * Get current shutdown status.
+ *
+ * Usage:
+ *   curl "http://localhost:3000/api/admin/shutdown" \
+ *        -H "Authorization: Bearer YOUR_ADMIN_SECRET"
+ */
+router.get("/admin/shutdown", requireAdmin, (req, res) => {
+    res.json(shutdownManager.getStatus());
 });
 
 module.exports = router;

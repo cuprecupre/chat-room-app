@@ -129,7 +129,6 @@ function startNextRound(game) {
     );
 
     game.phase = "playing";
-    game.persist();
 }
 
 /**
@@ -146,6 +145,7 @@ function endRound(game, impostorCaught) {
         const winner = findWinner(game);
         game.winnerId = winner;
         game.phase = "game_over";
+        game.persistAnalytics("impostor_caught");
 
         console.log(`[Game ${game.gameId}] ¡Impostor descubierto! Ganador: ${winner}`);
     } else {
@@ -157,6 +157,7 @@ function endRound(game, impostorCaught) {
             giveImpostorMaxPoints(game);
             game.winnerId = game.impostorId;
             game.phase = "game_over";
+            game.persistAnalytics("impostor_survived");
             console.log(`[Game ${game.gameId}] ¡Impostor sobrevivió 3 rondas! Gana.`);
         } else {
             // Continuar a la siguiente ronda
@@ -166,8 +167,6 @@ function endRound(game, impostorCaught) {
             );
         }
     }
-
-    game.persist();
 }
 
 /**
@@ -178,8 +177,8 @@ function handleSuddenDeath(game) {
     game.winnerId = game.impostorId;
     game.phase = "game_over";
 
+    game.persistAnalytics("sudden_death");
     console.log(`[Game ${game.gameId}] ¡Muerte súbita! Solo quedan 2 jugadores. Impostor gana.`);
-    game.persist();
 }
 
 module.exports = {

@@ -153,12 +153,11 @@ function processVotingResults(game) {
             console.log(`[Game ${game.gameId}] Ronda 3 con empate. ¡El impostor gana!`);
             game.winnerId = game.impostorId;
             game.phase = "game_over";
-            game.persist();
+            game.persistAnalytics("tie_round3");
         } else {
             // Siguiente ronda
             console.log(`[Game ${game.gameId}] Empate: impostor recibe puntos. Siguiente ronda.`);
             game.phase = "round_result";
-            game.persist();
         }
         return;
     }
