@@ -129,7 +129,7 @@ export function MainLayout({
                         }}
                     >
                         <Coffee className="w-4 h-4 sm:w-5 sm:h-5" />
-                        <span className="sm:hidden">Apoyanos</span>
+                        <span className="sm:hidden">Apóyanos</span>
                         <span className="hidden sm:inline">Apoya al desarrollador</span>
                     </a>
                     <div className="flex items-center gap-3 sm:gap-4 justify-self-end">
