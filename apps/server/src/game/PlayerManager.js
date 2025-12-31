@@ -112,15 +112,55 @@ function calculateStartingPlayer(game) {
         return null;
     }
 
-    // REQUISITO: Siempre empieza el Anfitrión (Host)
-    let startingPlayerId = game.hostId;
+    let startingPlayerId;
 
-    // Fallback: Si el host no es elegible (ej. espectador o se acaba de ir), usar rotación
+    // Si es la primera partida (no hay historial), empieza el host
+    if (!game.lastStartingPlayerId) {
+        startingPlayerId = game.hostId;
+        console.log(`[Game ${game.gameId}] Primera partida: empieza el host`);
+    } else {
+        // Buscar el índice del último jugador que empezó
+        const lastIndex = eligiblePlayers.indexOf(game.lastStartingPlayerId);
+
+        if (lastIndex !== -1) {
+            // Rotar al siguiente jugador (con wrap-around)
+            const nextIndex = (lastIndex + 1) % eligiblePlayers.length;
+            startingPlayerId = eligiblePlayers[nextIndex];
+            console.log(
+                `[Game ${game.gameId}] Rotación: de ${game.lastStartingPlayerId} a ${startingPlayerId}`
+            );
+        } else {
+            // El jugador anterior no está disponible, buscar el siguiente válido
+            // Encontrar su posición original en playerOrder
+            const originalIndex = game.playerOrder.indexOf(game.lastStartingPlayerId);
+            if (originalIndex !== -1) {
+                // Buscar hacia adelante el primer jugador elegible
+                for (let i = 1; i <= game.playerOrder.length; i++) {
+                    const candidateIndex = (originalIndex + i) % game.playerOrder.length;
+                    const candidateUid = game.playerOrder[candidateIndex];
+                    if (eligiblePlayers.includes(candidateUid)) {
+                        startingPlayerId = candidateUid;
+                        console.log(
+                            `[Game ${game.gameId}] Jugador anterior no disponible. Siguiente elegible: ${startingPlayerId}`
+                        );
+                        break;
+                    }
+                }
+            }
+
+            // Fallback final: el host
+            if (!startingPlayerId) {
+                startingPlayerId = game.hostId;
+                console.log(`[Game ${game.gameId}] Fallback a host: ${startingPlayerId}`);
+            }
+        }
+    }
+
+    // Fallback: Si el jugador calculado no es elegible, usar el primero disponible
     if (!eligiblePlayers.includes(startingPlayerId)) {
-        const roundIndex = ((game.currentRound || 1) - 1) % eligiblePlayers.length;
-        startingPlayerId = eligiblePlayers[roundIndex];
+        startingPlayerId = eligiblePlayers[0];
         console.log(
-            `[Game ${game.gameId}] Host no elegible. Fallback a rotación: ${startingPlayerId}`
+            `[Game ${game.gameId}] Jugador calculado no elegible. Usando primero: ${startingPlayerId}`
         );
     }
 

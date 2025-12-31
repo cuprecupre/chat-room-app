@@ -24,8 +24,14 @@ export function RoundStartOverlay({ state }) {
             <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md space-y-8 text-center animate-scaleIn">
                 <div className="space-y-6">
                     {displayedRound === 1 && (
-                        <p className="text-xl uppercase tracking-[0.2em] text-orange-400 font-medium mb-1">
+                        <p className="text-xl uppercase tracking-[0.2em] text-white font-medium mb-1">
                             Nueva partida
+                        </p>
+                    )}
+
+                    {displayedRound === 3 && (
+                        <p className="text-xl uppercase tracking-[0.2em] text-white font-medium mb-1">
+                            Última ronda
                         </p>
                     )}
 
