@@ -13,7 +13,9 @@ import { UnauthenticatedLayout } from "../layouts/UnauthenticatedLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { ROUTES } from "./routes";
 import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
-import heroImg from "../assets/impostor-home.jpg";
+
+// Firebase Storage CDN URL
+const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
 
 // Handle ChunkLoadError during deploys - auto reload when old chunks are gone
 if (typeof window !== "undefined") {

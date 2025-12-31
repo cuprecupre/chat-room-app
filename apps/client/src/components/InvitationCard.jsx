@@ -1,4 +1,5 @@
-import heroImg from "../assets/impostor-home.jpg";
+// Firebase Storage CDN URL
+const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
 
 /**
  * InvitationCard - Shared UI component for invitation screens
