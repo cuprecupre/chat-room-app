@@ -239,44 +239,56 @@ describe("PlayerManager", () => {
     });
 
     describe("calculateStartingPlayer", () => {
-        test("should return first player for round 1", () => {
+        test("should return host for first match (no lastStartingPlayerId)", () => {
             const game = createMockGame();
+            game.hostId = "user1";
             game.playerOrder = ["user1", "user2", "user3"];
             game.roundPlayers = ["user1", "user2", "user3"];
             game.currentRound = 1;
+            game.lastStartingPlayerId = null; // Primera partida
 
             const startingPlayer = PlayerManager.calculateStartingPlayer(game);
 
-            expect(startingPlayer).toBe("user1");
+            expect(startingPlayer).toBe("user1"); // Host empieza
         });
 
-        test("should rotate starting player each round", () => {
+        test("should rotate to next player on new match", () => {
             const game = createMockGame();
+            game.hostId = "user1";
             game.playerOrder = ["user1", "user2", "user3"];
             game.roundPlayers = ["user1", "user2", "user3"];
-
             game.currentRound = 1;
-            expect(PlayerManager.calculateStartingPlayer(game)).toBe("user1");
-
-            game.currentRound = 2;
-            expect(PlayerManager.calculateStartingPlayer(game)).toBe("user2");
-
-            game.currentRound = 3;
-            expect(PlayerManager.calculateStartingPlayer(game)).toBe("user3");
-
-            game.currentRound = 4;
-            expect(PlayerManager.calculateStartingPlayer(game)).toBe("user1"); // Wrap around
-        });
-
-        test("should skip players not in roundPlayers", () => {
-            const game = createMockGame();
-            game.playerOrder = ["user1", "user2", "user3"];
-            game.roundPlayers = ["user1", "user3"]; // user2 not in round
-            game.currentRound = 2;
+            game.lastStartingPlayerId = "user1"; // User1 empezó la partida anterior
 
             const startingPlayer = PlayerManager.calculateStartingPlayer(game);
 
-            // Round 2 would be index 1, which maps to user3 in eligible players
+            expect(startingPlayer).toBe("user2"); // Rota al siguiente
+        });
+
+        test("should wrap around to first player after last", () => {
+            const game = createMockGame();
+            game.hostId = "user1";
+            game.playerOrder = ["user1", "user2", "user3"];
+            game.roundPlayers = ["user1", "user2", "user3"];
+            game.currentRound = 1;
+            game.lastStartingPlayerId = "user3"; // User3 empezó la partida anterior
+
+            const startingPlayer = PlayerManager.calculateStartingPlayer(game);
+
+            expect(startingPlayer).toBe("user1"); // Wrap-around
+        });
+
+        test("should skip disconnected player and advance to next eligible", () => {
+            const game = createMockGame();
+            game.hostId = "user1";
+            game.playerOrder = ["user1", "user2", "user3"];
+            game.roundPlayers = ["user1", "user3"]; // user2 se desconectó
+            game.currentRound = 1;
+            game.lastStartingPlayerId = "user1"; // User1 empezó antes
+
+            const startingPlayer = PlayerManager.calculateStartingPlayer(game);
+
+            // user2 debería ser el siguiente pero no está, así que salta a user3
             expect(startingPlayer).toBe("user3");
         });
 
@@ -289,6 +301,49 @@ describe("PlayerManager", () => {
             const startingPlayer = PlayerManager.calculateStartingPlayer(game);
 
             expect(startingPlayer).toBeNull();
+        });
+
+        test("should handle host disconnection gracefully", () => {
+            const game = createMockGame();
+            game.hostId = "user2"; // Host cambió a user2
+            game.playerOrder = ["user2", "user3"]; // user1 (host original) se fue
+            game.roundPlayers = ["user2", "user3"];
+            game.currentRound = 1;
+            game.lastStartingPlayerId = "user1"; // user1 empezó antes pero ya no está
+
+            const startingPlayer = PlayerManager.calculateStartingPlayer(game);
+
+            // Debería encontrar al siguiente elegible (user2 o user3)
+            expect(["user2", "user3"]).toContain(startingPlayer);
+        });
+
+        test("should fallback to first eligible when lastStartingPlayerId not in playerOrder", () => {
+            const game = createMockGame();
+            game.hostId = "user2";
+            game.playerOrder = ["user2", "user3"]; // Nuevo orden sin user1
+            game.roundPlayers = ["user2", "user3"];
+            game.currentRound = 1;
+            game.lastStartingPlayerId = "deletedUser"; // Jugador que ya no existe en ninguna lista
+
+            const startingPlayer = PlayerManager.calculateStartingPlayer(game);
+
+            // Fallback: debería usar el host (user2) o el primero elegible
+            expect(startingPlayer).toBe("user2");
+        });
+
+        test("should always return a valid player when eligiblePlayers is not empty", () => {
+            const game = createMockGame();
+            game.hostId = "hostGone"; // Host que ya no existe
+            game.playerOrder = ["user3", "user4"];
+            game.roundPlayers = ["user3", "user4"];
+            game.currentRound = 1;
+            game.lastStartingPlayerId = "someoneGone"; // Alguien que ya no existe
+
+            const startingPlayer = PlayerManager.calculateStartingPlayer(game);
+
+            // Debe devolver ALGÚN jugador válido (nunca undefined ni null si hay elegibles)
+            expect(startingPlayer).not.toBeNull();
+            expect(["user3", "user4"]).toContain(startingPlayer);
         });
     });
 });

@@ -123,6 +123,9 @@ function startNextRound(game) {
     // Calcular jugador inicial
     game.startingPlayerId = calculateStartingPlayer(game);
 
+    // Guardar para rotación en la siguiente partida
+    game.lastStartingPlayerId = game.startingPlayerId;
+
     // La palabra ya fue seleccionada en startNewMatch, no cambia entre rondas
     console.log(
         `[Game ${game.gameId}] Ronda ${game.currentRound}/${game.maxRounds}: palabra='${game.secretWord}', categoría='${game.secretCategory}'`
