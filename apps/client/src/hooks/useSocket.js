@@ -12,6 +12,7 @@ export function useSocket(user) {
     const isInvitationPendingRef = useRef(false);
     const hasLoggedWaitingDisplayName = useRef(false);
     const [joinError, setJoinError] = useState(null); // Nuevo estado para errores de unión
+    const [shutdownCountdown, setShutdownCountdown] = useState(null); // Shutdown countdown state
 
     useEffect(() => {
         // No conectar socket si el usuario no tiene displayName
@@ -334,6 +335,41 @@ export function useSocket(user) {
                     console.log("[Socket] Toast from server:", message);
                     showToast(message);
                 });
+
+                // ============================================
+                // Server Shutdown Events
+                // ============================================
+
+                socket.on("shutdown-countdown", (data) => {
+                    console.log("[Socket] Shutdown countdown:", data);
+                    if (isMounted) {
+                        setShutdownCountdown({
+                            remainingSeconds: data.remainingSeconds,
+                            message: data.message,
+                        });
+                    }
+                });
+
+                socket.on("shutdown-complete", (data) => {
+                    console.log("[Socket] Shutdown complete:", data);
+                    if (isMounted) {
+                        setShutdownCountdown(null);
+                        setGameState(null);
+                        // Clear URL and show message
+                        const url = new URL(window.location);
+                        url.searchParams.delete("gameId");
+                        window.history.replaceState({}, "", url.toString());
+                        showToast(data.message || "El servidor se está reiniciando...");
+                    }
+                });
+
+                socket.on("shutdown-cancelled", (data) => {
+                    console.log("[Socket] Shutdown cancelled:", data);
+                    if (isMounted) {
+                        setShutdownCountdown(null);
+                        showToast(data.message || "El mantenimiento ha sido cancelado");
+                    }
+                });
             } catch (error) {
                 console.error("❌ useSocket - Error al obtener token de Firebase para socket:", {
                     message: error.message,
@@ -363,5 +399,12 @@ export function useSocket(user) {
         socketRef.current?.emit(event, payload, callback);
     }, []);
 
-    return { connected, gameState, emit, joinError, clearJoinError: () => setJoinError(null) };
+    return {
+        connected,
+        gameState,
+        emit,
+        joinError,
+        clearJoinError: () => setJoinError(null),
+        shutdownCountdown,
+    };
 }

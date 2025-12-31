@@ -7,6 +7,7 @@ import { Spinner } from "../components/ui/Spinner";
 import { PageLoader } from "../components/ui/PageLoader";
 import { InstructionsModal } from "../components/InstructionsModal";
 import { FeedbackModal } from "../components/FeedbackModal";
+import { ShutdownToast } from "../components/ShutdownToast";
 import { MainLayout } from "../layouts/MainLayout";
 import { UnauthenticatedLayout } from "../layouts/UnauthenticatedLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -122,6 +123,7 @@ function AppRoutes({
     emit,
     joinError,
     clearJoinError,
+    shutdownCountdown,
 }) {
     const navigate = useNavigate();
     const location = useLocation();
@@ -200,6 +202,7 @@ function AppRoutes({
     return (
         <>
             <Toaster />
+            <ShutdownToast shutdownCountdown={shutdownCountdown} />
             <InstructionsModal
                 isOpen={instructionsOpen}
                 onClose={() => setInstructionsOpen(false)}
@@ -393,7 +396,8 @@ export function AppRouter() {
         logout,
         clearError,
     } = useAuth();
-    const { connected, gameState, emit, joinError, clearJoinError } = useSocket(user);
+    const { connected, gameState, emit, joinError, clearJoinError, shutdownCountdown } =
+        useSocket(user);
     const [showLoader, setShowLoader] = useState(false);
 
     // Show loader only if loading takes more than 500ms (avoid flicker on quick reloads)
@@ -447,6 +451,7 @@ export function AppRouter() {
                 emit={emit}
                 joinError={joinError}
                 clearJoinError={clearJoinError}
+                shutdownCountdown={shutdownCountdown}
             />
         </BrowserRouter>
     );
