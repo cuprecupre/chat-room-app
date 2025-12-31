@@ -3,9 +3,11 @@ import { useState, useEffect, useRef } from "react";
 import { Spinner } from "../components/ui/Spinner";
 import { Button } from "../components/ui/Button";
 import { RefreshCw } from "lucide-react";
-import heroImg from "../assets/impostor-home.jpg";
 import { ROUTES } from "./routes";
 import { showToast } from "../lib/toast";
+
+// Firebase Storage CDN URL
+const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
 
 export function ProtectedRoute({ user, connected, emit, gameState }) {
     const [isStuck, setIsStuck] = useState(false);

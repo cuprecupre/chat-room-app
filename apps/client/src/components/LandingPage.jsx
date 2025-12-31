@@ -1,17 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "./ui/Button";
 import { Spinner } from "./ui/Spinner";
-import heroImg from "../assets/impostor-home.jpg";
-import cardBackImg from "../assets/card-back.jpg";
-import cardImg from "../assets/card.jpg";
-import maskImg from "../assets/mascara.jpg";
-import clockImg from "../assets/reloj.jpg";
-import dualImpostorImg from "../assets/dual-impostor.jpg";
-import avatarAlex from "../assets/avatar-alex.jpg";
-import avatarSofia from "../assets/avatar-sofia.jpg";
-import avatarJavi from "../assets/avatar-javi.jpg";
-import avatarLucia from "../assets/avatar-lucia.jpg";
-import avatarMarco from "../assets/avatar-marco.jpg";
+
+// Firebase Storage CDN URLs
+const CDN_BASE = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2F";
+const CDN_SUFFIX = "?alt=media";
+const heroImg = `${CDN_BASE}impostor-home.jpg${CDN_SUFFIX}`;
+const cardBackImg = `${CDN_BASE}card-back.jpg${CDN_SUFFIX}`;
+const cardImg = `${CDN_BASE}card.jpg${CDN_SUFFIX}`;
+const maskImg = `${CDN_BASE}mascara.jpg${CDN_SUFFIX}`;
+const clockImg = `${CDN_BASE}reloj.jpg${CDN_SUFFIX}`;
+const dualImpostorImg = `${CDN_BASE}dual-impostor.jpg${CDN_SUFFIX}`;
+const avatarAlex = `${CDN_BASE}avatar-alex.jpg${CDN_SUFFIX}`;
+const avatarSofia = `${CDN_BASE}avatar-sofia.jpg${CDN_SUFFIX}`;
+const avatarJavi = `${CDN_BASE}avatar-javi.jpg${CDN_SUFFIX}`;
+const avatarLucia = `${CDN_BASE}avatar-lucia.jpg${CDN_SUFFIX}`;
+const avatarMarco = `${CDN_BASE}avatar-marco.jpg${CDN_SUFFIX}`;
 
 export function LandingPage({
     onLogin,

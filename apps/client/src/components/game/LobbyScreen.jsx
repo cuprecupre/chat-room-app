@@ -2,7 +2,9 @@ import React from "react";
 import { Link, Share } from "lucide-react";
 import { Button } from "../ui/Button";
 import { PlayerList } from "./PlayerList";
-import dualImpostorImg from "../../assets/dual-impostor.jpg";
+
+// Firebase Storage CDN URL
+const dualImpostorImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fdual-impostor.jpg?alt=media";
 
 export function LobbyScreen({
     state,
