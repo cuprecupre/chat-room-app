@@ -249,6 +249,12 @@ export function PlayerList({
                                     showVoteButton && (
                                         <Button
                                             onClick={() => {
+                                                // GTM event para medir votos
+                                                window.dataLayer = window.dataLayer || [];
+                                                window.dataLayer.push({
+                                                    event: 'vote_click',
+                                                    vote_action: iVotedForThisPlayer && canChangeVote ? 'remove' : 'cast',
+                                                });
                                                 // Si ya voté por este jugador y puedo cambiar voto, quitar el voto
                                                 if (iVotedForThisPlayer && canChangeVote) {
                                                     onVote(null);

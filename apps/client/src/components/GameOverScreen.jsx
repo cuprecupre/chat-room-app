@@ -228,7 +228,14 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                     {isHost ? (
                         <>
                             <Button
-                                onClick={onPlayAgain}
+                                onClick={() => {
+                                    window.dataLayer = window.dataLayer || [];
+                                    window.dataLayer.push({
+                                        event: 'play_again_click',
+                                        location: 'game_over_screen',
+                                    });
+                                    onPlayAgain();
+                                }}
                                 variant="primary"
                                 size="lg"
                                 className="w-full max-w-sm text-lg py-6"

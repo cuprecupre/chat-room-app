@@ -36,6 +36,7 @@ class Game {
         // Sistema de orden y jugador inicial
         this.playerOrder = [];
         this.startingPlayerId = null;
+        this.lastStartingPlayerId = null; // Para rotación entre partidas
 
         // Historial de impostores (para evitar repeticiones entre partidas)
         this.impostorHistory = [];

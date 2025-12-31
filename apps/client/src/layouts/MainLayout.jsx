@@ -180,7 +180,7 @@ export function MainLayout({
                                                 }}
                                                 className="block w-full text-left px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md"
                                             >
-                                                Finalizar juego
+                                                Finalizar partida
                                             </button>
                                             <div className="my-1 h-px bg-white/10" />
                                         </>
@@ -256,7 +256,7 @@ export function MainLayout({
             <Modal
                 isOpen={showEndGameModal}
                 onClose={() => setShowEndGameModal(false)}
-                title="¿Finalizar el juego?"
+                title="¿Finalizar la partida?"
                 size="sm"
             >
                 <div className="text-center space-y-4">

@@ -52,7 +52,7 @@ export function LobbyScreen({
                                 : "Copiar enlace de la partida"}
                         </Button>
 
-                        <p className="text-lg text-neutral-400 font-regular">
+                        <p className="text-lg text-neutral-400 font-regular animate-pulse">
                             Espera a que se unan todos los jugadores...
                         </p>
 
