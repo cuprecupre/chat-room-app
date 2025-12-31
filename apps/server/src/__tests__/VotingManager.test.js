@@ -31,7 +31,7 @@ function createMockGame() {
         phase: "playing",
         roundHistory: [],
         winnerId: null,
-        persist: jest.fn(),
+        persistAnalytics: jest.fn(),
     };
 }
 

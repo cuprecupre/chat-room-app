@@ -5,8 +5,7 @@ const PlayerManager = require("../game/PlayerManager");
 // Mock de DB services
 const dbService = require("../services/db");
 jest.mock("../services/db", () => ({
-    saveGame: jest.fn(),
-    saveGameState: jest.fn(), // ADDED THIS
+    saveGameAnalytics: jest.fn(),
     deleteGameState: jest.fn().mockResolvedValue(true),
     getActiveGames: jest.fn().mockResolvedValue([]),
 }));

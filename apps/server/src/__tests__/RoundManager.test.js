@@ -32,7 +32,7 @@ function createMockGame() {
         playerOrder: ["user1", "user2", "user3"],
         formerPlayers: {},
         winnerId: null,
-        persist: jest.fn(),
+        persistAnalytics: jest.fn(),
     };
 }
 

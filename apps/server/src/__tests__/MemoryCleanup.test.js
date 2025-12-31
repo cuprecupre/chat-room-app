@@ -3,7 +3,7 @@ const PlayerManager = require("../game/PlayerManager");
 
 // Mock de DBService para evitar llamadas reales a Firestore
 jest.mock("../services/db", () => ({
-    saveGameState: jest.fn(),
+    saveGameAnalytics: jest.fn(),
     initialize: jest.fn(),
 }));
 
@@ -29,7 +29,7 @@ describe("Memory Cleanup & Limits", () => {
             const user = { uid: "u2", name: "BigPhoto", photoURL: massiveURL };
 
             // Spy on console.warn to verify warning
-            const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+            const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => { });
 
             PlayerManager.addPlayer(game, user);
 

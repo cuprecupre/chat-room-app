@@ -17,8 +17,8 @@ function createMockGame() {
         eliminatedPlayers: [],
         votes: {},
         phase: "lobby",
-        impostorId: null,
-        persist: jest.fn(), // Mock persist method for RoundManager.endRound
+        winnerId: null,
+        persistAnalytics: jest.fn(), // Mock persist method for RoundManager.endRound
     };
 }
 
