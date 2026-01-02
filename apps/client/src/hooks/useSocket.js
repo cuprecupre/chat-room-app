@@ -71,13 +71,19 @@ export function useSocket(user) {
                 const socket = window.MockSocketIO
                     ? new window.MockSocketIO(socketURL, {
                           auth: { token, name: user.displayName, photoURL: user.photoURL },
+                          transports: ["websocket", "polling"],
                           reconnection: true,
-                          reconnectionAttempts: 5,
+                          reconnectionAttempts: 10,
+                          reconnectionDelay: 1000,
+                          reconnectionDelayMax: 5000,
                       })
                     : io(socketURL, {
                           auth: { token, name: user.displayName, photoURL: user.photoURL },
+                          transports: ["websocket", "polling"], // Prioritize WebSocket, fallback to polling
                           reconnection: true,
-                          reconnectionAttempts: 5,
+                          reconnectionAttempts: 10, // More attempts for flaky mobile
+                          reconnectionDelay: 1000,
+                          reconnectionDelayMax: 5000,
                       });
                 socketRef.current = socket;
 

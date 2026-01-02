@@ -88,9 +88,23 @@ function startNewMatch(game) {
     game.secretWord = word;
     game.secretCategory = category;
 
+    // Calcular jugador inicial UNA VEZ para toda la partida
+    // (roundPlayers debe estar configurado antes de calcular)
+    game.roundPlayers = game.players.map((p) => p.uid);
+
+    // Guardar el lastStartingPlayerId ANTES de actualizarlo (para restaurar en caso de muerte súbita)
+    game.previousLastStartingPlayerId = game.lastStartingPlayerId;
+
+    game.startingPlayerId = calculateStartingPlayer(game);
+    game.lastStartingPlayerId = game.startingPlayerId;
+
+    // Guardar el jugador inicial ORIGINAL (para detectar si fue reemplazado)
+    game.originalStartingPlayerId = game.startingPlayerId;
+
     const impostorName = game.players.find((p) => p.uid === game.impostorId)?.name || "desconocido";
+    const startingName = game.players.find((p) => p.uid === game.startingPlayerId)?.name || "desconocido";
     console.log(
-        `[Game ${game.gameId}] Nueva partida iniciada. Impostor: '${impostorName}' (${game.impostorId}), Palabra: '${word}'`
+        `[Game ${game.gameId}] Nueva partida iniciada. Impostor: '${impostorName}', Inicia: '${startingName}', Palabra: '${word}'`
     );
 
     // Iniciar la primera ronda
@@ -111,7 +125,7 @@ function startNextRound(game) {
         .filter((uid) => !game.eliminatedPlayers.includes(uid));
 
     // CRITICAL: Verificar muerte súbita ANTES de iniciar ronda
-    // Si solo quedan 2 jugadores (impostor + 1 amigo), el impostor gana automát icamente
+    // Si solo quedan 2 jugadores (impostor + 1 amigo), el impostor gana automáticamente
     if (game.roundPlayers.length <= 2) {
         console.log(
             `[Game ${game.gameId}] ¡Muerte súbita detectada! Solo ${game.roundPlayers.length} jugadores. Impostor gana.`
@@ -120,15 +134,25 @@ function startNextRound(game) {
         return; // NO iniciar la ronda
     }
 
-    // Calcular jugador inicial
-    game.startingPlayerId = calculateStartingPlayer(game);
-
-    // Guardar para rotación en la siguiente partida
-    game.lastStartingPlayerId = game.startingPlayerId;
+    // Solo recalcular jugador inicial si el actual fue eliminado
+    // El mismo jugador debe iniciar TODAS las rondas de una partida
+    if (!game.roundPlayers.includes(game.startingPlayerId)) {
+        const oldStartingPlayer = game.startingPlayerId;
+        game.startingPlayerId = calculateStartingPlayer(game);
+        // Actualizar lastStartingPlayerId para que la siguiente partida rote desde el reemplazo
+        // Ej: Si A fue eliminado y B lo reemplaza, la siguiente partida empezará con C
+        game.lastStartingPlayerId = game.startingPlayerId;
+        const oldName = game.formerPlayers[oldStartingPlayer]?.name || oldStartingPlayer;
+        const newName = game.players.find((p) => p.uid === game.startingPlayerId)?.name || "desconocido";
+        console.log(
+            `[Game ${game.gameId}] Jugador inicial '${oldName}' fue eliminado. Nuevo: '${newName}' (rotación actualizada)`
+        );
+    }
 
     // La palabra ya fue seleccionada en startNewMatch, no cambia entre rondas
+    const startingName = game.players.find((p) => p.uid === game.startingPlayerId)?.name || "desconocido";
     console.log(
-        `[Game ${game.gameId}] Ronda ${game.currentRound}/${game.maxRounds}: palabra='${game.secretWord}', categoría='${game.secretCategory}'`
+        `[Game ${game.gameId}] Ronda ${game.currentRound}/${game.maxRounds}: palabra='${game.secretWord}', inicia='${startingName}'`
     );
 
     game.phase = "playing";
@@ -179,6 +203,10 @@ function handleSuddenDeath(game) {
     giveImpostorMaxPoints(game);
     game.winnerId = game.impostorId;
     game.phase = "game_over";
+
+    console.log(
+        `[Game ${game.gameId}] Muerte súbita: rotación normal`
+    );
 
     game.persistAnalytics("sudden_death");
     console.log(`[Game ${game.gameId}] ¡Muerte súbita! Solo quedan 2 jugadores. Impostor gana.`);
