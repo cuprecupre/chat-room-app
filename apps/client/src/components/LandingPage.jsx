@@ -191,7 +191,7 @@ export function LandingPage({
                         <span className="text-4xl md:text-6xl/tight lg:text-6xl/tight font-serif font-normal text-white">
                             El Impostor Online Gratis<br />con tus amigos.
                         </span>
-                        <span className="text-2xl md:text-4xl lg:text-5xl font-serif font-normal tracking-tight mt-1 bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600">
+                        <span className="text-xl md:text-3xl lg:text-4xl font-serif font-normal tracking-tight mt-1 bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600">
                             Descubre quién miente.
                         </span>
                     </h1>

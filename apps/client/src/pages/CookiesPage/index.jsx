@@ -57,10 +57,10 @@ export function CookiesPage() {
                                         <td className="py-3 px-4">Mantener tu sesión de juego</td>
                                     </tr>
                                     <tr className="border-b border-neutral-800">
-                                        <td className="py-3 px-4">_ga, _gid</td>
+                                        <td className="py-3 px-4">_ga, _gid, SL_*</td>
                                         <td className="py-3 px-4">Analítica</td>
                                         <td className="py-3 px-4">2 años</td>
-                                        <td className="py-3 px-4">Google Analytics - Estadísticas de uso</td>
+                                        <td className="py-3 px-4">Google Analytics, Smartlook - Estadísticas de uso</td>
                                     </tr>
                                     <tr className="border-b border-neutral-800">
                                         <td className="py-3 px-4">_gcl_au</td>

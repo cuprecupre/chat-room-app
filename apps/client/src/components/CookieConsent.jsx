@@ -152,7 +152,7 @@ function CookieDetails({ onSave, onClose }) {
                 <div className="flex items-center justify-between p-3 bg-white border border-neutral-200 rounded-lg md:flex-1">
                     <div>
                         <p className="text-sm font-medium text-neutral-800">Analítica</p>
-                        <p className="text-xs text-neutral-500">Google Analytics</p>
+                        <p className="text-xs text-neutral-500">Google Analytics, Smartlook - Estadísticas de uso</p>
                     </div>
                     <button
                         onClick={() => setAnalytics(!analytics)}
