@@ -53,24 +53,8 @@
   <!-- End Google Tag Manager -->
 
   <!-- Google AdSense (always loads in production, components handle consent) -->
-  <script>
-    // Load AdSense in Production (components handle personalized vs non-personalized)
-    (function () {
-      var isProduction = window.location.hostname === 'impostor.me' || window.location.hostname === 'www.impostor.me';
-      if (!isProduction) {
-        console.log('📢 AdSense Skipped: Non-production environment');
-        return;
-      }
-
-      // Always load AdSense script - components will handle consent via data-npa attribute
-      var script = document.createElement('script');
-      script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6211741187285412';
-      script.async = true;
-      script.crossOrigin = 'anonymous';
-      document.head.appendChild(script);
-      console.log('📢 AdSense Loaded');
-    })();
-  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6211741187285412"
+    crossorigin="anonymous"></script>
   <!-- End Google AdSense -->
   <!-- Favicons -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
