@@ -82,7 +82,7 @@ export function LandingPage({
         },
         {
             question: "¿Es gratis?",
-            answer: "Sí, 100% gratuito. Sin compras ocultas ni anuncios molestos. Solo diversión pura.",
+            answer: "Sí, 100% gratuito. Sin compras ocultas. Mantenemos el juego con publicidad no intrusiva.",
         },
         {
             question: "¿Cuántos jugadores pueden jugar?",
@@ -179,7 +179,7 @@ export function LandingPage({
                             <img
                                 src={heroImg}
                                 alt="Icono del juego El Impostor"
-                                className="relative w-36 h-36 md:w-44 md:h-44 rounded-full object-cover animate-tilt-oscillate shadow-2xl ring-1 ring-white/10"
+                                className="relative w-36 h-36 md:w-44 md:h-44 rounded-full object-cover shadow-2xl ring-1 ring-white/10"
                             />
                         </div>
                     </div>
@@ -188,10 +188,10 @@ export function LandingPage({
                         <span className="text-xl md:text-2xl font-sans font-normal text-neutral-400">
                             Juega ahora a
                         </span>
-                        <span className="text-4xl md:text-6xl/tight lg:text-7xl/tight font-serif font-normal text-white">
-                            El Impostor Online Gratis con tus amigos.
+                        <span className="text-4xl md:text-6xl/tight lg:text-6xl/tight font-serif font-normal text-white">
+                            El Impostor Online Gratis<br />con tus amigos.
                         </span>
-                        <span className="text-3xl md:text-5xl font-serif font-normal tracking-tight mt-1 bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600">
+                        <span className="text-2xl md:text-4xl lg:text-5xl font-serif font-normal tracking-tight mt-1 bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600">
                             Descubre quién miente.
                         </span>
                     </h1>
@@ -520,7 +520,7 @@ export function LandingPage({
                                 </li>
                                 <li className="flex items-center gap-3 text-neutral-300">
                                     <span className="text-green-500">✓</span> Totalmente gratis y
-                                    sin anuncios molestos
+                                    con publicidad mínima
                                 </li>
                             </ul>
                         </div>
