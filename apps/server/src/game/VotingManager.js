@@ -15,23 +15,23 @@ const {
 } = require("./ScoringManager");
 const { getActivePlayers } = require("./PlayerManager");
 
-function castVote(game, voterId, targetId) {
+function castVote(match, voterId, targetId) {
     // Debug log
-    console.log(`[Vote Debug] Game ${game.gameId}:`, {
-        phase: game.phase,
-        roundPlayers: game.roundPlayers,
-        eliminatedPlayers: game.eliminatedPlayers,
+    console.log(`[Vote Debug] Match ${match.matchId}:`, {
+        phase: match.phase,
+        roundPlayers: match.roundPlayers,
+        eliminatedPlayers: match.eliminatedPlayers,
         voterId,
         targetId,
     });
 
     // Validaciones
-    if (game.phase !== "playing") {
+    if (match.phase !== "playing") {
         throw new Error("Solo puedes votar durante una ronda activa.");
     }
 
-    const eliminated = game.eliminatedPlayers || [];
-    const roundPlayers = game.roundPlayers || [];
+    const eliminated = match.eliminatedPlayers || [];
+    const roundPlayers = match.roundPlayers || [];
 
     if (eliminated.includes(voterId)) {
         throw new Error("Los jugadores eliminados no pueden votar.");
@@ -43,9 +43,9 @@ function castVote(game, voterId, targetId) {
 
     // Si targetId es null, desmarcar voto
     if (targetId === null || targetId === undefined) {
-        if (game.votes[voterId]) {
-            delete game.votes[voterId];
-            console.log(`[Game ${game.gameId}] ${voterId} desmarcó su voto`);
+        if (match.votes[voterId]) {
+            delete match.votes[voterId];
+            console.log(`[Match ${match.matchId}] ${voterId} desmarcó su voto`);
         }
         return { phaseChanged: false, allVoted: false };
     }
@@ -63,50 +63,50 @@ function castVote(game, voterId, targetId) {
     }
 
     // Registrar o cambiar voto
-    const isChangingVote = game.votes[voterId] !== undefined;
-    game.votes[voterId] = targetId;
+    const isChangingVote = match.votes[voterId] !== undefined;
+    match.votes[voterId] = targetId;
     console.log(
-        `[Game ${game.gameId}] ${voterId} ${isChangingVote ? "cambió su voto a" : "votó a"} ${targetId}`
+        `[Match ${match.matchId}] ${voterId} ${isChangingVote ? "cambió su voto a" : "votó a"} ${targetId}`
     );
 
     // Capturar fase antes de verificar votación
-    const phaseBefore = game.phase;
+    const phaseBefore = match.phase;
 
     // Verificar si todos han votado
-    const allVoted = checkIfAllVoted(game);
+    const allVoted = checkIfAllVoted(match);
 
     // Determinar si la fase cambió (votación terminó)
-    const phaseChanged = game.phase !== phaseBefore;
+    const phaseChanged = match.phase !== phaseBefore;
 
     return { phaseChanged, allVoted };
 }
 
-function checkIfAllVoted(game) {
-    const activePlayers = getActivePlayers(game);
-    const votedPlayers = Object.keys(game.votes).filter((uid) => activePlayers.includes(uid));
+function checkIfAllVoted(match) {
+    const activePlayers = getActivePlayers(match);
+    const votedPlayers = Object.keys(match.votes).filter((uid) => activePlayers.includes(uid));
 
     if (votedPlayers.length === activePlayers.length) {
-        console.log(`[Game ${game.gameId}] Todos han votado. Procesando resultados...`);
-        processVotingResults(game);
+        console.log(`[Match ${match.matchId}] Todos han votado. Procesando resultados...`);
+        processVotingResults(match);
         return true;
     }
     return false;
 }
 
-function processVotingResults(game) {
+function processVotingResults(match) {
     const voteCount = {};
-    const activePlayers = getActivePlayers(game);
+    const activePlayers = getActivePlayers(match);
 
-    console.log(`[Game ${game.gameId}] Procesando resultados. Jugadores activos:`, activePlayers);
-    console.log(`[Game ${game.gameId}] Votos registrados:`, game.votes);
+    console.log(`[Match ${match.matchId}] Procesando resultados. Jugadores activos:`, activePlayers);
+    console.log(`[Match ${match.matchId}] Votos registrados:`, match.votes);
 
-    Object.entries(game.votes).forEach(([voter, target]) => {
+    Object.entries(match.votes).forEach(([voter, target]) => {
         if (activePlayers.includes(voter)) {
             voteCount[target] = (voteCount[target] || 0) + 1;
         }
     });
 
-    console.log(`[Game ${game.gameId}] Conteo de votos:`, voteCount);
+    console.log(`[Match ${match.matchId}] Conteo de votos:`, voteCount);
 
     // Encontrar el más votado
     let maxVotes = 0;
@@ -121,13 +121,13 @@ function processVotingResults(game) {
         }
     });
 
-    console.log(`[Game ${game.gameId}] Más votados:`, mostVoted, `con ${maxVotes} votos`);
+    console.log(`[Match ${match.matchId}] Más votados:`, mostVoted, `con ${maxVotes} votos`);
 
     // Guardar historial de la ronda
-    game.roundHistory = game.roundHistory || [];
-    game.roundHistory.push({
-        round: game.currentRound,
-        votes: { ...game.votes },
+    match.roundHistory = match.roundHistory || [];
+    match.roundHistory.push({
+        round: match.currentRound,
+        votes: { ...match.votes },
         voteCount: { ...voteCount },
         eliminated: mostVoted.length === 1 ? mostVoted[0] : null,
         tie: mostVoted.length !== 1,
@@ -135,29 +135,29 @@ function processVotingResults(game) {
 
     // IMPORTANTE: Dar puntos a amigos que votaron correctamente ANTES de procesar resultado
     // Esto asegura que reciban puntos sin importar si el impostor es eliminado o no
-    game.lastRoundScores = {};
-    giveCorrectVotersPoints(game);
+    match.lastRoundScores = {};
+    giveCorrectVotersPoints(match);
 
     // Manejar empate o sin votos válidos
     if (mostVoted.length !== 1) {
         const reason =
             mostVoted.length === 0 ? "sin votos" : `empate entre: ${mostVoted.join(", ")}`;
-        console.log(`[Game ${game.gameId}] No hay eliminación (${reason}).`);
+        console.log(`[Match ${match.matchId}] No hay eliminación (${reason}).`);
 
         // NUEVO: En empate, el impostor SÍ recibe puntos
-        giveImpostorSurvivalPoints(game);
+        giveImpostorSurvivalPoints(match);
 
-        if (game.currentRound >= game.maxRounds) {
+        if (match.currentRound >= match.maxRounds) {
             // Ronda 3 con empate: impostor gana
-            giveImpostorMaxPoints(game);
-            console.log(`[Game ${game.gameId}] Ronda 3 con empate. ¡El impostor gana!`);
-            game.winnerId = game.impostorId;
-            game.phase = "game_over";
-            game.persistAnalytics("tie_round3");
+            giveImpostorMaxPoints(match);
+            console.log(`[Match ${match.matchId}] Ronda 3 con empate. ¡El impostor gana!`);
+            match.winnerId = match.impostorId;
+            match.phase = "game_over";
+            match.persistAnalytics("tie_round3");
         } else {
             // Siguiente ronda
-            console.log(`[Game ${game.gameId}] Empate: impostor recibe puntos. Siguiente ronda.`);
-            game.phase = "round_result";
+            console.log(`[Match ${match.matchId}] Empate: impostor recibe puntos. Siguiente ronda.`);
+            match.phase = "round_result";
         }
         return;
     }
@@ -166,35 +166,35 @@ function processVotingResults(game) {
     const eliminatedId = mostVoted[0];
 
     // Verificar si era el impostor
-    if (eliminatedId === game.impostorId) {
-        console.log(`[Game ${game.gameId}] ¡El impostor fue descubierto!`);
-        endRound(game, true); // Amigos ganan
+    if (eliminatedId === match.impostorId) {
+        console.log(`[Match ${match.matchId}] ¡El impostor fue descubierto!`);
+        endRound(match, true); // Amigos ganan
     } else {
         // Era un amigo - eliminarlo
-        game.eliminatedPlayers = game.eliminatedPlayers || [];
-        game.eliminatedPlayers.push(eliminatedId);
-        console.log(`[Game ${game.gameId}] ${eliminatedId} ha sido eliminado (era amigo).`);
+        match.eliminatedPlayers = match.eliminatedPlayers || [];
+        match.eliminatedPlayers.push(eliminatedId);
+        console.log(`[Match ${match.matchId}] ${eliminatedId} ha sido eliminado (era amigo).`);
 
         // Recalcular jugadores activos
-        const remainingPlayers = getActivePlayers(game);
+        const remainingPlayers = getActivePlayers(match);
 
         // Verificar muerte súbita (solo quedan 2 jugadores = impostor + 1 amigo)
         if (remainingPlayers.length <= 2) {
-            console.log(`[Game ${game.gameId}] ¡Muerte súbita! Solo quedan 2 jugadores.`);
-            handleSuddenDeath(game);
-        } else if (game.currentRound >= game.maxRounds) {
+            console.log(`[Match ${match.matchId}] ¡Muerte súbita! Solo quedan 2 jugadores.`);
+            handleSuddenDeath(match);
+        } else if (match.currentRound >= match.maxRounds) {
             // Ronda 3 completada, impostor sobrevive
-            console.log(`[Game ${game.gameId}] Ronda 3 completada. ¡El impostor gana!`);
-            endRound(game, false);
+            console.log(`[Match ${match.matchId}] Ronda 3 completada. ¡El impostor gana!`);
+            endRound(match, false);
         } else {
             // Impostor sobrevive, siguiente ronda
-            endRound(game, false);
+            endRound(match, false);
         }
     }
 }
 
-function hasVoted(game, playerId) {
-    return game.votes.hasOwnProperty(playerId);
+function hasVoted(match, playerId) {
+    return match.votes.hasOwnProperty(playerId);
 }
 
 module.exports = {

@@ -16,36 +16,36 @@ const TARGET_SCORE = 10;
 /**
  * Dar puntos al impostor por sobrevivir la ronda actual
  */
-function giveImpostorSurvivalPoints(game) {
-    game.playerScores[game.impostorId] =
-        (game.playerScores[game.impostorId] || 0) + IMPOSTOR_POINTS_PER_ROUND;
-    game.lastRoundScores[game.impostorId] =
-        (game.lastRoundScores[game.impostorId] || 0) + IMPOSTOR_POINTS_PER_ROUND;
+function giveImpostorSurvivalPoints(match) {
+    match.playerScores[match.impostorId] =
+        (match.playerScores[match.impostorId] || 0) + IMPOSTOR_POINTS_PER_ROUND;
+    match.lastRoundScores[match.impostorId] =
+        (match.lastRoundScores[match.impostorId] || 0) + IMPOSTOR_POINTS_PER_ROUND;
 
     console.log(
-        `[Game ${game.gameId}] Impostor sobrevivió ronda ${game.currentRound}: +${IMPOSTOR_POINTS_PER_ROUND} puntos`
+        `[Match ${match.matchId}] Impostor sobrevivió ronda ${match.currentRound}: +${IMPOSTOR_POINTS_PER_ROUND} puntos`
     );
 }
 
 /**
  * Dar bonus al ganador para llegar a TARGET_SCORE (10 puntos)
- * @param {Object} game - Estado del juego
+ * @param {Object} match - Estado del match
  * @param {string} winnerId - ID del ganador
  */
-function giveWinnerBonus(game, winnerId) {
-    const currentPoints = game.playerScores[winnerId] || 0;
+function giveWinnerBonus(match, winnerId) {
+    const currentPoints = match.playerScores[winnerId] || 0;
     const bonusPoints = TARGET_SCORE - currentPoints;
 
     if (bonusPoints > 0) {
-        game.playerScores[winnerId] = TARGET_SCORE;
-        game.lastRoundScores[winnerId] = (game.lastRoundScores[winnerId] || 0) + bonusPoints;
+        match.playerScores[winnerId] = TARGET_SCORE;
+        match.lastRoundScores[winnerId] = (match.lastRoundScores[winnerId] || 0) + bonusPoints;
 
         // Track bonus for UI display
-        game.playerBonus = game.playerBonus || {};
-        game.playerBonus[winnerId] = bonusPoints;
+        match.playerBonus = match.playerBonus || {};
+        match.playerBonus[winnerId] = bonusPoints;
 
         console.log(
-            `[Game ${game.gameId}] Bonus para ganador ${winnerId}: +${bonusPoints} puntos (total: ${TARGET_SCORE})`
+            `[Match ${match.matchId}] Bonus para ganador ${winnerId}: +${bonusPoints} puntos (total: ${TARGET_SCORE})`
         );
     }
 }
@@ -53,10 +53,10 @@ function giveWinnerBonus(game, winnerId) {
 /**
  * Dar puntos máximos al impostor (muerte súbita o sobrevivir 3 rondas)
  */
-function giveImpostorMaxPoints(game) {
-    giveWinnerBonus(game, game.impostorId);
+function giveImpostorMaxPoints(match) {
+    giveWinnerBonus(match, match.impostorId);
     console.log(
-        `[Game ${game.gameId}] Impostor gana. Bonus aplicado hasta ${TARGET_SCORE} puntos.`
+        `[Match ${match.matchId}] Impostor gana. Bonus aplicado hasta ${TARGET_SCORE} puntos.`
     );
 }
 
@@ -65,30 +65,30 @@ function giveImpostorMaxPoints(game) {
  * Se llama al final de CADA ronda, independientemente del resultado
  * También trackea quién votó bien para determinar el "amigo perfecto"
  */
-function giveCorrectVotersPoints(game) {
+function giveCorrectVotersPoints(match) {
     // Initialize tracking if not exists
-    game.correctVotesPerPlayer = game.correctVotesPerPlayer || {};
+    match.correctVotesPerPlayer = match.correctVotesPerPlayer || {};
 
-    Object.entries(game.votes).forEach(([voter, target]) => {
+    Object.entries(match.votes).forEach(([voter, target]) => {
         // Solo amigos (no el impostor) que votaron al impostor
-        if (target === game.impostorId && voter !== game.impostorId) {
-            game.playerScores[voter] =
-                (game.playerScores[voter] || 0) + FRIEND_POINTS_PER_CORRECT_VOTE;
-            game.lastRoundScores[voter] =
-                (game.lastRoundScores[voter] || 0) + FRIEND_POINTS_PER_CORRECT_VOTE;
+        if (target === match.impostorId && voter !== match.impostorId) {
+            match.playerScores[voter] =
+                (match.playerScores[voter] || 0) + FRIEND_POINTS_PER_CORRECT_VOTE;
+            match.lastRoundScores[voter] =
+                (match.lastRoundScores[voter] || 0) + FRIEND_POINTS_PER_CORRECT_VOTE;
 
             // Track correct votes for this player
-            game.correctVotesPerPlayer[voter] = (game.correctVotesPerPlayer[voter] || 0) + 1;
+            match.correctVotesPerPlayer[voter] = (match.correctVotesPerPlayer[voter] || 0) + 1;
         }
     });
 
-    const correctVoters = Object.entries(game.votes)
-        .filter(([voter, target]) => target === game.impostorId && voter !== game.impostorId)
+    const correctVoters = Object.entries(match.votes)
+        .filter(([voter, target]) => target === match.impostorId && voter !== match.impostorId)
         .map(([voter]) => voter);
 
     if (correctVoters.length > 0) {
         console.log(
-            `[Game ${game.gameId}] Amigos que votaron bien: ${correctVoters.length} (+${FRIEND_POINTS_PER_CORRECT_VOTE} pts cada uno)`
+            `[Match ${match.matchId}] Amigos que votaron bien: ${correctVoters.length} (+${FRIEND_POINTS_PER_CORRECT_VOTE} pts cada uno)`
         );
     }
 }
@@ -97,12 +97,12 @@ function giveCorrectVotersPoints(game) {
  * Calcular puntos cuando los amigos ganan (impostor descubierto)
  * Da bonus al "amigo perfecto" (votó bien TODAS las rondas)
  */
-function calculateFriendsWinScores(game) {
+function calculateFriendsWinScores(match) {
     // Find the "perfect friend" - someone who voted correctly in ALL rounds
-    const totalRounds = game.currentRound;
+    const totalRounds = match.currentRound;
     const perfectFriends = [];
 
-    Object.entries(game.correctVotesPerPlayer || {}).forEach(([playerId, correctVotes]) => {
+    Object.entries(match.correctVotesPerPlayer || {}).forEach(([playerId, correctVotes]) => {
         if (correctVotes === totalRounds) {
             perfectFriends.push(playerId);
         }
@@ -111,30 +111,30 @@ function calculateFriendsWinScores(game) {
     if (perfectFriends.length > 0) {
         // Give bonus to ALL perfect friends
         perfectFriends.forEach((playerId) => {
-            giveWinnerBonus(game, playerId);
+            giveWinnerBonus(match, playerId);
             console.log(
-                `[Game ${game.gameId}] Amigo perfecto encontrado: ${playerId} (votó bien ${totalRounds}/${totalRounds} rondas)`
+                `[Match ${match.matchId}] Amigo perfecto encontrado: ${playerId} (votó bien ${totalRounds}/${totalRounds} rondas)`
             );
         });
     } else {
-        console.log(`[Game ${game.gameId}] No hay amigo perfecto. Gana el amigo con más puntos.`);
+        console.log(`[Match ${match.matchId}] No hay amigo perfecto. Gana el amigo con más puntos.`);
     }
 
-    console.log(`[Game ${game.gameId}] Amigos ganan. Puntos finales:`, game.playerScores);
+    console.log(`[Match ${match.matchId}] Amigos ganan. Puntos finales:`, match.playerScores);
 }
 
 /**
  * Calcular puntos de la ronda
- * @param {Object} game - Estado del juego
+ * @param {Object} match - Estado del match
  * @param {boolean} friendsWon - Si los amigos ganaron (descubrieron al impostor)
  */
-function calculateRoundScores(game, friendsWon) {
+function calculateRoundScores(match, friendsWon) {
     if (friendsWon) {
-        calculateFriendsWinScores(game);
+        calculateFriendsWinScores(match);
     } else {
         // Impostor ya recibió sus puntos en giveImpostorSurvivalPoints o giveImpostorMaxPoints
         // Solo loguear el estado final
-        console.log(`[Game ${game.gameId}] Impostor gana. Puntos finales:`, game.playerScores);
+        console.log(`[Match ${match.matchId}] Impostor gana. Puntos finales:`, match.playerScores);
     }
 }
 
@@ -142,13 +142,13 @@ function calculateRoundScores(game, friendsWon) {
  * Encontrar al ganador (amigo con más puntos)
  * @returns {string|null} - ID del jugador ganador o null si empate
  */
-function findWinner(game) {
+function findWinner(match) {
     let maxScore = 0;
     const playersWithMaxScore = [];
 
-    Object.entries(game.playerScores).forEach(([playerId, score]) => {
+    Object.entries(match.playerScores).forEach(([playerId, score]) => {
         // Excluir al impostor de la búsqueda del ganador amigo
-        if (playerId === game.impostorId) return;
+        if (playerId === match.impostorId) return;
 
         if (score > maxScore) {
             maxScore = score;
@@ -161,7 +161,7 @@ function findWinner(game) {
 
     // Si hay empate o nadie tiene puntos
     if (playersWithMaxScore.length !== 1) {
-        console.log(`[Game ${game.gameId}] Empate entre amigos o sin puntos:`, playersWithMaxScore);
+        console.log(`[Match ${match.matchId}] Empate entre amigos o sin puntos:`, playersWithMaxScore);
         // En caso de empate, devolver el primero (o podría devolver todos)
         return playersWithMaxScore[0] || null;
     }
@@ -170,13 +170,9 @@ function findWinner(game) {
 }
 
 /**
- * Verificar si el juego terminó
- * @returns {Object} - { isOver: boolean, winner: string|null, reason: string }
+ * Verificar si el match terminó (ya no confundir con game)
  */
-function checkGameOver(game) {
-    // Ya no hay objetivo de 15 puntos
-    // El juego termina cuando se descubre al impostor o tras 3 rondas
-    // Esta función ahora solo se usa para verificar condiciones especiales
+function checkMatchOver(match) {
     return { isOver: false, winner: null, reason: null };
 }
 
@@ -188,7 +184,7 @@ module.exports = {
     calculateRoundScores,
     calculateFriendsWinScores,
     findWinner,
-    checkGameOver,
+    checkMatchOver,
     FRIEND_POINTS_PER_CORRECT_VOTE,
     IMPOSTOR_POINTS_PER_ROUND,
     TARGET_SCORE,

@@ -4,8 +4,7 @@ class DBService {
     constructor() {
         this.db = null;
         this.roomsCollection = "rooms";
-        this.gamesCollection = "games";
-        this.analyticsCollection = "game_analytics";
+        this.matchesCollection = "matches";
         this.playerStatsCollection = "player_stats";
     }
 
@@ -60,69 +59,23 @@ class DBService {
     }
 
     /**
-     * Saves game results to Firestore.
+     * Saves match results to Firestore.
      */
-    async saveGame(gameId, gameData) {
+    async saveMatch(matchId, matchData) {
         if (!this.db) return;
         try {
-            const docRef = this.db.collection(this.gamesCollection).doc(gameId);
+            const docRef = this.db.collection(this.matchesCollection).doc(matchId);
             await docRef.set({
-                ...gameData,
+                ...matchData,
                 savedAt: admin.firestore.FieldValue.serverTimestamp(),
             });
-            console.log(`✅ [DB Service] Game ${gameId} persisted`);
+            console.log(`✅ [DB Service] Match ${matchId} persisted`);
         } catch (error) {
-            console.error(`⚠️ [DB Service] Game save failed for ${gameId}: ${error.message}`);
+            console.error(`⚠️ [DB Service] Match save failed for ${matchId}: ${error.message}`);
         }
     }
 
-    /**
-     * Retrieves game state (legacy/admin).
-     */
-    async getGameState(gameId) {
-        if (!this.db) return null;
 
-        try {
-            const doc = await this.db.collection(this.gamesCollection).doc(gameId).get();
-            return doc.exists ? doc.data() : null;
-        } catch (error) {
-            console.error(`⚠️ [DB Service] Load failed for ${gameId}: ${error.message}`);
-            return null;
-        }
-    }
-
-    /**
-     * Deletes a game state (legacy/admin).
-     */
-    async deleteGameState(gameId) {
-        if (!this.db) return;
-
-        try {
-            await this.db.collection(this.gamesCollection).doc(gameId).delete();
-        } catch (error) {
-            console.error(`⚠️ [DB Service] Delete failed for ${gameId}: ${error.message}`);
-            throw error;
-        }
-    }
-
-    /**
-     * Saves legacy analytics.
-     * @deprecated Use saveGame instead.
-     */
-    async saveGameAnalytics(gameId, analyticsData) {
-        if (!this.db) return;
-
-        try {
-            const docRef = this.db.collection(this.analyticsCollection).doc(gameId);
-            await docRef.set({
-                ...analyticsData,
-                savedAt: admin.firestore.FieldValue.serverTimestamp(),
-            });
-            console.log(`✅ [DB Service] Legacy analytics saved for game ${gameId}`);
-        } catch (error) {
-            console.error(`⚠️ [DB Service] Legacy analytics save failed for ${gameId}: ${error.message}`);
-        }
-    }
 
     /**
      * Updates player statistics incrementally.

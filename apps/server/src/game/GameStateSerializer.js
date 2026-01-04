@@ -3,29 +3,31 @@
  *
  * Provides serialization functions for game state:
  * - getStateForPlayer: Personalized state for each player (for real-time updates)
- * - getAnalyticsState: Minimal data for end-of-game analytics
+ * - getEnrichedGameData: Full match data for persistence
  */
 
-function getStateForPlayer(game, userId) {
-    const player = game.players.find((p) => p.uid === userId);
+function getStateForPlayer(match, userId) {
+    const player = match.players.find((p) => p.uid === userId);
     if (!player) return null;
 
-    const eliminated = game.eliminatedPlayers || [];
+    const eliminated = match.eliminatedPlayers || [];
 
     const baseState = {
-        gameId: game.gameId,
-        hostId: game.hostId,
-        players: game.players,
-        phase: game.phase,
-        playerScores: game.playerScores,
-        currentRound: game.currentRound,
-        maxRounds: game.maxRounds,
-        playerOrder: game.playerOrder,
-        startingPlayerId: game.startingPlayerId,
+        matchId: match.matchId,
+        gameId: match.matchId, // For legacy client compatibility
+        roomId: match.roomId,
+        hostId: match.hostId,
+        players: match.players,
+        phase: match.phase,
+        playerScores: match.playerScores,
+        currentRound: match.currentRound,
+        maxRounds: match.maxRounds,
+        playerOrder: match.playerOrder,
+        startingPlayerId: match.startingPlayerId,
     };
 
-    if (game.phase === "playing") {
-        const isInRound = game.roundPlayers.includes(userId);
+    if (match.phase === "playing") {
+        const isInRound = match.roundPlayers.includes(userId);
         const isEliminated = eliminated.includes(userId);
 
         if (!isInRound && !isEliminated) {
@@ -33,52 +35,51 @@ function getStateForPlayer(game, userId) {
             baseState.phase = "lobby_wait";
         } else {
             // Player is active or eliminated - keep in playing phase
-            baseState.role = game.impostorId === userId ? "impostor" : "friend";
-            const isImpostor = game.impostorId === userId;
-            baseState.secretWord = isImpostor ? "Descubre la palabra secreta" : game.secretWord;
-            if (isImpostor && game.showImpostorHint) {
-                baseState.secretCategory = game.secretCategory;
+            baseState.role = match.impostorId === userId ? "impostor" : "friend";
+            const isImpostor = match.impostorId === userId;
+            baseState.secretWord = isImpostor ? "Descubre la palabra secreta" : match.secretWord;
+            if (isImpostor && match.showImpostorHint) {
+                baseState.secretCategory = match.secretCategory;
             }
 
             // Info de votación
             baseState.eliminatedPlayers = eliminated;
-            baseState.hasVoted = game.votes.hasOwnProperty(userId);
-            baseState.votedPlayers = Object.keys(game.votes);
-            baseState.myVote = game.votes[userId] || null;
-            baseState.activePlayers = game.roundPlayers.filter((uid) => !eliminated.includes(uid));
+            baseState.hasVoted = match.votes.hasOwnProperty(userId);
+            baseState.votedPlayers = Object.keys(match.votes);
+            baseState.myVote = match.votes[userId] || null;
+            baseState.activePlayers = match.roundPlayers.filter((uid) => !eliminated.includes(uid));
             baseState.canVote = !isEliminated;
-            baseState.roundHistory = game.roundHistory;
+            baseState.roundHistory = match.roundHistory;
         }
-    } else if (game.phase === "round_result" || game.phase === "game_over") {
-        const impostor = game.players.find((p) => p.uid === game.impostorId);
-        const formerImpostor = game.formerPlayers[game.impostorId];
+    } else if (match.phase === "round_result" || match.phase === "game_over") {
+        const impostor = match.players.find((p) => p.uid === match.impostorId);
+        const formerImpostor = match.formerPlayers[match.impostorId];
         baseState.impostorName = impostor
             ? impostor.name
             : formerImpostor
                 ? formerImpostor.name
                 : "Jugador desconectado";
-        baseState.impostorId = game.impostorId;
-        baseState.secretWord = game.secretWord;
-        baseState.lastRoundScores = game.lastRoundScores;
+        baseState.impostorId = match.impostorId;
+        baseState.secretWord = match.secretWord;
+        baseState.lastRoundScores = match.lastRoundScores;
         baseState.eliminatedPlayers = eliminated;
-        baseState.formerPlayers = game.formerPlayers;
-        baseState.playerBonus = game.playerBonus || {};
-        baseState.roundHistory = game.roundHistory;
+        baseState.formerPlayers = match.formerPlayers;
+        baseState.playerBonus = match.playerBonus || {};
+        baseState.roundHistory = match.roundHistory;
 
-        if (game.phase === "game_over") {
+        if (match.phase === "game_over") {
             // Usar winnerId directamente (ya calculado en endRound)
-            const winnerId = game.winnerId;
-            const winner = game.players.find((p) => p.uid === winnerId);
-            const formerWinner = game.formerPlayers[winnerId];
+            const winnerId = match.winnerId;
+            const winner = match.players.find((p) => p.uid === winnerId);
+            const formerWinner = match.formerPlayers[winnerId];
             baseState.winner = winner ? winner.name : formerWinner ? formerWinner.name : "Empate";
             baseState.winnerId = winnerId;
-            baseState.impostorWon = winnerId === game.impostorId;
-            baseState.migratedFromOldSystem = game.migratedFromOldSystem || false;
+            baseState.impostorWon = winnerId === match.impostorId;
         }
     }
 
     // Always include formerPlayers for showing scores
-    baseState.formerPlayers = game.formerPlayers;
+    baseState.formerPlayers = match.formerPlayers;
 
     // DIAGNOSTIC: Detect bloated state
     try {
@@ -96,60 +97,45 @@ function getStateForPlayer(game, userId) {
 }
 
 /**
- * Returns minimal analytics data for completed games.
- * Used for end-of-game persistence to game_analytics collection.
+ * Returns enriched match data for full persistence in /matches collection.
  */
-function getAnalyticsState(game) {
-    return {
-        gameId: game.gameId,
-        hostId: game.hostId,
-        winnerId: game.winnerId || null,
-        players: game.players.map((p) => ({ uid: p.uid, name: p.name })),
-        playerScores: game.playerScores,
-        currentRound: game.currentRound,
-        maxRounds: game.maxRounds,
-        completedAt: new Date().toISOString(),
-        endReason: "completed",
-    };
-}
-
-/**
- * Returns enriched game data for full persistence in /games collection.
- */
-function getEnrichedGameData(game) {
-    const playersInfo = game.players.map((p) => {
-        const isImpostor = game.impostorId === p.uid;
-        const eliminated = game.eliminatedPlayers || [];
+function getEnrichedGameData(match) {
+    const playersInfo = match.players.map((p) => {
+        const isImpostor = match.impostorId === p.uid;
+        const eliminated = match.eliminatedPlayers || [];
         return {
             uid: p.uid,
             name: p.name,
             role: isImpostor ? "impostor" : "friend",
-            score: game.playerScores[p.uid] || 0,
+            score: match.playerScores[p.uid] || 0,
             wasEliminated: eliminated.includes(p.uid),
         };
     });
 
     // Determine winning team
-    const impostorWon = game.winnerId === game.impostorId;
-    const winningTeam = game.winnerId === "tie" ? "tie" : impostorWon ? "impostor" : "friends";
+    const impostorWon = match.winnerId === match.impostorId;
+    const winningTeam = match.winnerId === null
+        ? "cancelled"  // Match ended manually without a winner
+        : match.winnerId === "tie"
+            ? "tie"
+            : impostorWon ? "impostor" : "friends";
 
     return {
-        gameId: game.gameId,
-        roomId: game.roomId,
-        impostorId: game.impostorId,
-        winnerId: game.winnerId || null,
+        matchId: match.matchId,
+        roomId: match.roomId,
+        impostorId: match.impostorId,
+        winnerId: match.winnerId || null,
         winningTeam,
-        roundCount: game.currentRound,
+        roundCount: match.currentRound,
         players: playersInfo,
-        rounds: game.roundHistory || [],
-        startedAt: game.startedAt || null,
+        rounds: match.roundHistory || [],
+        startedAt: match.startedAt || null,
         endedAt: Date.now(),
-        options: game.options || {},
+        options: match.options || {},
     };
 }
 
 module.exports = {
     getStateForPlayer,
-    getAnalyticsState,
     getEnrichedGameData,
 };

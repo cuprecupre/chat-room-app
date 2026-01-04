@@ -6,8 +6,8 @@ class StatsManager {
     constructor() {
         this.stats = {
             totalConnections: 0, // Total connections since server start
-            gamesCreated: 0, // Total games created since server start
-            gamesCompleted: 0, // Total games completed since server start
+            matchesCreated: 0, // Total matches created since server start
+            matchesCompleted: 0, // Total matches completed since server start
             peakConcurrentUsers: 0, // Peak concurrent users
             serverStartTime: Date.now(),
         };
@@ -32,17 +32,17 @@ class StatsManager {
     }
 
     /**
-     * Increment games created counter.
+     * Increment matches created counter.
      */
     incrementGamesCreated() {
-        this.stats.gamesCreated++;
+        this.stats.matchesCreated++;
     }
 
     /**
-     * Increment games completed counter.
+     * Increment matches completed counter.
      */
     incrementGamesCompleted() {
-        this.stats.gamesCompleted++;
+        this.stats.matchesCompleted++;
     }
 
     /**
@@ -64,13 +64,13 @@ class StatsManager {
         const connectedUsers = this.sessionManager
             ? Object.keys(this.sessionManager.userSockets).length
             : 0;
-        const activeGames = this.roomManager ? this.roomManager.getRoomCount() : 0;
+        const activeRooms = this.roomManager ? this.roomManager.getRoomCount() : 0;
 
         return {
             connectedUsers,
-            activeGames,
+            activeRooms,
             totalConnections: this.stats.totalConnections,
-            gamesCreated: this.stats.gamesCreated,
+            matchesCreated: this.stats.matchesCreated,
             peakConcurrentUsers: this.stats.peakConcurrentUsers,
             serverUptime: Math.floor((Date.now() - this.stats.serverStartTime) / 1000),
             timestamp: Date.now(),
@@ -96,18 +96,18 @@ class StatsManager {
                 {
                     date: today,
                     totalConnections: this.stats.totalConnections,
-                    gamesCreated: this.stats.gamesCreated,
-                    gamesCompleted: this.stats.gamesCompleted,
+                    matchesCreated: this.stats.matchesCreated,
+                    matchesCompleted: this.stats.matchesCompleted,
                     peakConcurrentUsers: this.stats.peakConcurrentUsers,
                     currentConnectedUsers: currentStats.connectedUsers,
-                    currentActiveGames: currentStats.activeGames,
+                    currentActiveRooms: currentStats.activeRooms,
                     lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
                 },
                 { merge: true }
             );
 
             console.log(
-                `📊 [Stats] Synced to Firestore: ${currentStats.connectedUsers} users, ${currentStats.activeGames} games`
+                `📊 [Stats] Synced to Firestore: ${currentStats.connectedUsers} users, ${currentStats.activeRooms} rooms`
             );
         } catch (error) {
             console.error("⚠️ [Stats] Failed to sync:", error.message);

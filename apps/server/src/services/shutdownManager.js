@@ -1,4 +1,4 @@
-const gameManager = require("./gameManager");
+const roomManager = require("./roomManager");
 
 /**
  * ShutdownManager - Handles graceful server shutdown.
@@ -232,26 +232,30 @@ class ShutdownManager {
      * Save analytics for all active games that are not in lobby.
      */
     async finalizeActiveGames() {
-        const games = gameManager.getAllGames();
-        const gameIds = Object.keys(games);
+        const rooms = roomManager.getAllRooms();
+        const roomIds = Object.keys(rooms);
 
-        if (gameIds.length === 0) {
-            console.log("[Shutdown] No active games to finalize.");
+        if (roomIds.length === 0) {
+            console.log("[Shutdown] No active rooms to finalize.");
             return;
         }
 
-        console.log(`[Shutdown] Finalizing ${gameIds.length} active games...`);
+        console.log(`[Shutdown] Finalizing active matches in ${roomIds.length} rooms...`);
 
-        for (const gameId of gameIds) {
-            const game = games[gameId];
+        for (const roomId of roomIds) {
+            const room = rooms[roomId];
+            const match = room.currentMatch;
             try {
-                if (game.phase !== "lobby") {
-                    game.persistAnalytics("server_shutdown");
-                    console.log(`[Shutdown] Saved analytics for game ${gameId}`);
+                if (match && match.phase !== "lobby") {
+                    // Match analytics persistence
+                    if (typeof match.persistAnalytics === 'function') {
+                        match.persistAnalytics("server_shutdown");
+                        console.log(`[Shutdown] Saved analytics for match ${match.matchId} in room ${roomId}`);
+                    }
                 }
             } catch (error) {
                 console.error(
-                    `[Shutdown] Failed to save game ${gameId}:`,
+                    `[Shutdown] Failed to save match in room ${roomId}:`,
                     error.message
                 );
             }

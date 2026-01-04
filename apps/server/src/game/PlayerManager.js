@@ -1,5 +1,5 @@
-function addPlayer(game, user) {
-    if (!game.players.some((p) => p.uid === user.uid)) {
+function addPlayer(match, user) {
+    if (!match.players.some((p) => p.uid === user.uid)) {
         const joinedAt = Date.now();
         // Sanitize photoURL to avoid massive Base64 strings causing DB/Socket lag
         let safePhotoURL = user.photoURL || null;
@@ -10,66 +10,66 @@ function addPlayer(game, user) {
             safePhotoURL = null; // Discard invalid/huge URLs
         }
 
-        game.players.push({
+        match.players.push({
             uid: user.uid,
             name: user.name,
             photoURL: safePhotoURL,
             joinedAt: joinedAt,
         });
         // Guardar copia de datos del jugador
-        game.formerPlayers[user.uid] = {
+        match.formerPlayers[user.uid] = {
             name: user.name,
             photoURL: safePhotoURL,
         };
         // Solo inicializar puntuación si el jugador NO tiene puntos previos
         // Esto preserva puntos cuando un jugador se reconecta
-        if (!game.playerScores.hasOwnProperty(user.uid)) {
-            game.playerScores[user.uid] = 0;
+        if (!match.playerScores.hasOwnProperty(user.uid)) {
+            match.playerScores[user.uid] = 0;
         }
         // Actualizar orden base (OB)
-        updatePlayerOrder(game);
+        updatePlayerOrder(match);
     }
 }
 
-function removePlayer(game, userId) {
-    const playerIsImpostor = game.impostorId === userId;
-    const wasHost = game.hostId === userId;
+function removePlayer(match, userId) {
+    const playerIsImpostor = match.impostorId === userId;
+    const wasHost = match.hostId === userId;
 
     // CRITICAL: Guardar la fase ANTES de cualquier modificación
-    const phaseBeforeRemoval = game.phase;
+    const phaseBeforeRemoval = match.phase;
 
     // Guardar datos del jugador antes de eliminarlo
-    const leavingPlayer = game.players.find((p) => p.uid === userId);
+    const leavingPlayer = match.players.find((p) => p.uid === userId);
     if (leavingPlayer) {
-        game.formerPlayers[userId] = {
+        match.formerPlayers[userId] = {
             name: leavingPlayer.name,
             photoURL: leavingPlayer.photoURL || null,
         };
     }
 
-    game.players = game.players.filter((p) => p.uid !== userId);
-    game.roundPlayers = game.roundPlayers.filter((uid) => uid !== userId);
-    if (game.eliminatedPlayers) {
-        game.eliminatedPlayers = game.eliminatedPlayers.filter((uid) => uid !== userId);
+    match.players = match.players.filter((p) => p.uid !== userId);
+    match.roundPlayers = match.roundPlayers.filter((uid) => uid !== userId);
+    if (match.eliminatedPlayers) {
+        match.eliminatedPlayers = match.eliminatedPlayers.filter((uid) => uid !== userId);
     }
-    delete game.votes[userId];
+    delete match.votes[userId];
 
     // Actualizar orden base cuando un jugador se va
-    updatePlayerOrder(game);
+    updatePlayerOrder(match);
 
     // Transferir host si el que se fue era el host
     let newHostInfo = null;
-    if (wasHost && game.players.length > 0) {
-        const nextHostId = game.playerOrder.find((uid) => game.players.some((p) => p.uid === uid));
+    if (wasHost && match.players.length > 0) {
+        const nextHostId = match.playerOrder.find((uid) => match.players.some((p) => p.uid === uid));
         if (nextHostId) {
-            game.hostId = nextHostId;
-            const newHost = game.players.find((p) => p.uid === nextHostId);
+            match.hostId = nextHostId;
+            const newHost = match.players.find((p) => p.uid === nextHostId);
             newHostInfo = {
                 uid: nextHostId,
                 name: newHost ? newHost.name : "Jugador",
             };
             console.log(
-                `[Game ${game.gameId}] Host transferido a ${newHostInfo.name} (${nextHostId})`
+                `[Match ${match.matchId}] Host transferido a ${newHostInfo.name} (${nextHostId})`
             );
         }
     }
@@ -77,8 +77,8 @@ function removePlayer(game, userId) {
     // Si el impostor se va durante el juego, terminar la partida (amigos ganan)
     if (phaseBeforeRemoval === "playing" && playerIsImpostor) {
         const RoundManager = require("./RoundManager");
-        console.log(`[Game ${game.gameId}] Impostor eliminado. Amigos ganan.`);
-        RoundManager.endRound(game, true); // Amigos ganan - termina partida
+        console.log(`[Match ${match.matchId}] Impostor eliminado. Amigos ganan.`);
+        RoundManager.endRound(match, true); // Amigos ganan - termina partida
         // NO verificar votos - el impostor se fue, se acabó
         return { newHostInfo, playerIsImpostor };
     }
@@ -88,60 +88,60 @@ function removePlayer(game, userId) {
     if (phaseBeforeRemoval === "playing" && !playerIsImpostor) {
         const VotingManager = require("./VotingManager");
         console.log(
-            `[Game ${game.gameId}] Jugador eliminado durante votación. Verificando si todos votaron...`
+            `[Match ${match.matchId}] Jugador eliminado durante votación. Verificando si todos votaron...`
         );
-        VotingManager.checkIfAllVoted(game);
+        VotingManager.checkIfAllVoted(match);
     }
 
     return { newHostInfo, playerIsImpostor };
 }
 
-function updatePlayerOrder(game) {
-    const sortedPlayers = [...game.players].sort((a, b) => {
+function updatePlayerOrder(match) {
+    const sortedPlayers = [...match.players].sort((a, b) => {
         return (a.joinedAt || 0) - (b.joinedAt || 0);
     });
-    game.playerOrder = sortedPlayers.map((p) => p.uid);
-    console.log(`[Game ${game.gameId}] Orden base actualizado:`, game.playerOrder);
+    match.playerOrder = sortedPlayers.map((p) => p.uid);
+    console.log(`[Match ${match.matchId}] Orden base actualizado:`, match.playerOrder);
 }
 
-function calculateStartingPlayer(game) {
-    const eligiblePlayers = game.playerOrder.filter((uid) => game.roundPlayers.includes(uid));
+function calculateStartingPlayer(match) {
+    const eligiblePlayers = match.playerOrder.filter((uid) => match.roundPlayers.includes(uid));
 
     if (eligiblePlayers.length === 0) {
-        console.log(`[Game ${game.gameId}] No hay jugadores elegibles para iniciar ronda`);
+        console.log(`[Match ${match.matchId}] No hay jugadores elegibles para iniciar ronda`);
         return null;
     }
 
     let startingPlayerId;
 
     // Si es la primera partida (no hay historial), empieza el host
-    if (!game.lastStartingPlayerId) {
-        startingPlayerId = game.hostId;
-        console.log(`[Game ${game.gameId}] Primera partida: empieza el host`);
+    if (!match.lastStartingPlayerId) {
+        startingPlayerId = match.hostId;
+        console.log(`[Match ${match.matchId}] Primera sesión: empieza el host`);
     } else {
         // Buscar el índice del último jugador que empezó
-        const lastIndex = eligiblePlayers.indexOf(game.lastStartingPlayerId);
+        const lastIndex = eligiblePlayers.indexOf(match.lastStartingPlayerId);
 
         if (lastIndex !== -1) {
             // Rotar al siguiente jugador (con wrap-around)
             const nextIndex = (lastIndex + 1) % eligiblePlayers.length;
             startingPlayerId = eligiblePlayers[nextIndex];
             console.log(
-                `[Game ${game.gameId}] Rotación: de ${game.lastStartingPlayerId} a ${startingPlayerId}`
+                `[Match ${match.matchId}] Rotación: de ${match.lastStartingPlayerId} a ${startingPlayerId}`
             );
         } else {
             // El jugador anterior no está disponible, buscar el siguiente válido
             // Encontrar su posición original en playerOrder
-            const originalIndex = game.playerOrder.indexOf(game.lastStartingPlayerId);
+            const originalIndex = match.playerOrder.indexOf(match.lastStartingPlayerId);
             if (originalIndex !== -1) {
                 // Buscar hacia adelante el primer jugador elegible
-                for (let i = 1; i <= game.playerOrder.length; i++) {
-                    const candidateIndex = (originalIndex + i) % game.playerOrder.length;
-                    const candidateUid = game.playerOrder[candidateIndex];
+                for (let i = 1; i <= match.playerOrder.length; i++) {
+                    const candidateIndex = (originalIndex + i) % match.playerOrder.length;
+                    const candidateUid = match.playerOrder[candidateIndex];
                     if (eligiblePlayers.includes(candidateUid)) {
                         startingPlayerId = candidateUid;
                         console.log(
-                            `[Game ${game.gameId}] Jugador anterior no disponible. Siguiente elegible: ${startingPlayerId}`
+                            `[Match ${match.matchId}] Jugador anterior no disponible. Siguiente elegible: ${startingPlayerId}`
                         );
                         break;
                     }
@@ -150,8 +150,8 @@ function calculateStartingPlayer(game) {
 
             // Fallback final: el host
             if (!startingPlayerId) {
-                startingPlayerId = game.hostId;
-                console.log(`[Game ${game.gameId}] Fallback a host: ${startingPlayerId}`);
+                startingPlayerId = match.hostId;
+                console.log(`[Match ${match.matchId}] Fallback a host: ${startingPlayerId}`);
             }
         }
     }
@@ -160,21 +160,21 @@ function calculateStartingPlayer(game) {
     if (!eligiblePlayers.includes(startingPlayerId)) {
         startingPlayerId = eligiblePlayers[0];
         console.log(
-            `[Game ${game.gameId}] Jugador calculado no elegible. Usando primero: ${startingPlayerId}`
+            `[Match ${match.matchId}] Jugador calculado no elegible. Usando primero: ${startingPlayerId}`
         );
     }
 
-    const startingPlayer = game.players.find((p) => p.uid === startingPlayerId);
+    const startingPlayer = match.players.find((p) => p.uid === startingPlayerId);
     console.log(
-        `[Game ${game.gameId}] Ronda ${game.currentRound}: Jugador inicial = ${startingPlayer?.name}`
+        `[Match ${match.matchId}] Ronda ${match.currentRound}: Jugador inicial = ${startingPlayer?.name}`
     );
 
     return startingPlayerId;
 }
 
-function getActivePlayers(game) {
-    const eliminated = game.eliminatedPlayers || [];
-    const roundPlayers = game.roundPlayers || [];
+function getActivePlayers(match) {
+    const eliminated = match.eliminatedPlayers || [];
+    const roundPlayers = match.roundPlayers || [];
     return roundPlayers.filter((uid) => !eliminated.includes(uid));
 }
 

@@ -1,9 +1,10 @@
 /**
  * Integration tests for Anonymous (Guest) Users
- * Tests that anonymous users work correctly in all game scenarios
+ * Tests that anonymous users work correctly in all match scenarios
  */
 
 const { GameSimulator, createMockUser } = require("./GameSimulator");
+const Match = require("../../Match");
 
 /**
  * Create a mock anonymous user (no photoURL, has displayName)
@@ -37,73 +38,72 @@ describe("Anonymous User Integration", () => {
         sim = new GameSimulator();
     });
 
-    describe("Game Creation", () => {
-        test("Anonymous user can create a game as host", () => {
+    describe("Match Creation", () => {
+        test("Anonymous user can create a match as host", () => {
             const anonHost = createAnonymousUser("host", "InvitadoHost");
             sim.users = [anonHost];
-            sim.game = require("../../Game");
-            sim.game = new (require("../../Game"))(anonHost, { isRestoring: false });
-            sim.game.persist = jest.fn();
+            sim.match = new Match(anonHost, { isRestoring: false });
+            sim.match.persist = jest.fn();
 
-            expect(sim.game.hostId).toBe(anonHost.uid);
-            expect(sim.game.players.length).toBe(1);
-            expect(sim.game.players[0].name).toBe("InvitadoHost");
-            expect(sim.game.players[0].photoURL).toBeNull();
+            expect(sim.match.hostId).toBe(anonHost.uid);
+            expect(sim.match.players.length).toBe(1);
+            expect(sim.match.players[0].name).toBe("InvitadoHost");
+            expect(sim.match.players[0].photoURL).toBeNull();
         });
     });
 
-    describe("Joining Games", () => {
-        test("Anonymous user can join a game hosted by Google user", () => {
-            sim.createGame("GoogleHost");
+    describe("Joining Matches", () => {
+        test("Anonymous user can join a match hosted by Google user", () => {
+            sim.createMatch("GoogleHost");
             const anonPlayer = createAnonymousUser("player1", "InvitadoJuan");
             sim.users.push(anonPlayer);
-            sim.game.addPlayer(anonPlayer);
+            sim.match.addPlayer(anonPlayer);
 
-            expect(sim.game.players.length).toBe(2);
-            const addedPlayer = sim.game.players.find((p) => p.uid === anonPlayer.uid);
+            expect(sim.match.players.length).toBe(2);
+            const addedPlayer = sim.match.players.find((p) => p.uid === anonPlayer.uid);
             expect(addedPlayer).toBeDefined();
             expect(addedPlayer.name).toBe("InvitadoJuan");
             expect(addedPlayer.photoURL).toBeNull();
         });
 
-        test("Google user can join a game hosted by anonymous user", () => {
+        test("Google user can join a match hosted by anonymous user", () => {
             const anonHost = createAnonymousUser("host", "InvitadoHost");
             sim.users = [anonHost];
-            sim.game = new (require("../../Game"))(anonHost, { isRestoring: false });
-            sim.game.persist = jest.fn();
+            sim.match = new Match(anonHost, { isRestoring: false });
+            sim.match.persist = jest.fn();
 
             const googlePlayer = createGoogleUser("player1", "GooglePlayer");
             sim.users.push(googlePlayer);
-            sim.game.addPlayer(googlePlayer);
+            sim.match.addPlayer(googlePlayer);
 
-            expect(sim.game.players.length).toBe(2);
-            expect(sim.game.hostId).toBe(anonHost.uid);
+            expect(sim.match.players.length).toBe(2);
+            expect(sim.match.hostId).toBe(anonHost.uid);
         });
 
-        test("Multiple anonymous users can be in same game", () => {
-            sim.createGame("Host");
+        test("Multiple anonymous users can be in same match", () => {
+            sim.createMatch("Host");
             const anon1 = createAnonymousUser("player1", "Invitado1");
             const anon2 = createAnonymousUser("player2", "Invitado2");
             sim.users.push(anon1, anon2);
-            sim.game.addPlayer(anon1);
-            sim.game.addPlayer(anon2);
+            sim.match.addPlayer(anon1);
+            sim.match.addPlayer(anon2);
 
-            expect(sim.game.players.length).toBe(3);
-            // Host created by createGame also has null photoURL
-            const playersWithoutPhoto = sim.game.players.filter((p) => p.photoURL === null);
+            expect(sim.match.players.length).toBe(3);
+            // Host created by createMatch also has null photoURL
+            const playersWithoutPhoto = sim.match.players.filter((p) => p.photoURL === null);
             expect(playersWithoutPhoto.length).toBeGreaterThanOrEqual(2);
         });
 
         test("Anonymous users with same name have different UIDs", () => {
-            sim.createGame("Host");
+            sim.createMatch("Host");
             const anon1 = createAnonymousUser("p1", "MismoNombre");
             const anon2 = createAnonymousUser("p2", "MismoNombre");
             sim.users.push(anon1, anon2);
-            sim.game.addPlayer(anon1);
-            sim.game.addPlayer(anon2);
+            sim.match.addPlayer(anon1);
+            sim.match.addPlayer(anon2);
 
             expect(anon1.uid).not.toBe(anon2.uid);
-            expect(sim.game.players.length).toBe(3);
+            expect(sim.match.players.length).toBe(3);
         });
     });
 
@@ -111,22 +111,22 @@ describe("Anonymous User Integration", () => {
         test("Anonymous user can be assigned as impostor", () => {
             const anonHost = createAnonymousUser("host", "InvitadoHost");
             sim.users = [anonHost];
-            sim.game = new (require("../../Game"))(anonHost, { isRestoring: false });
-            sim.game.persist = jest.fn();
+            sim.match = new Match(anonHost, { isRestoring: false });
+            sim.match.persist = jest.fn();
 
             sim.addPlayers(["Player2", "Player3"]);
-            sim.startGame();
+            sim.startMatch();
 
             // Impostor is one of the players
-            const impostorId = sim.game.impostorId;
+            const impostorId = sim.match.impostorId;
             expect(sim.users.some((u) => u.uid === impostorId)).toBe(true);
         });
 
         test("Anonymous impostor sees correct state", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]);
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]);
 
-            // Force impostor to be the first player (for testing)
-            sim.game.startGame(sim.users[0].uid);
+            // Force match to start
+            sim.match.startMatch(sim.users[0].uid);
 
             const impostorState = sim.getStateForPlayer(sim.getImpostorIndex());
             expect(impostorState.role).toBe("impostor");
@@ -134,7 +134,7 @@ describe("Anonymous User Integration", () => {
         });
 
         test("Anonymous impostor can win by surviving 3 rounds", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
 
             // 3 ties means impostor survives all rounds
             sim.createTieVote();
@@ -150,7 +150,7 @@ describe("Anonymous User Integration", () => {
 
     describe("Gameplay - Anonymous as Friend", () => {
         test("Anonymous friend sees the secret word", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
 
             const friendState = sim.getStateForPlayer(sim.getNonImpostorIndex());
             expect(friendState.role).toBe("friend");
@@ -158,18 +158,18 @@ describe("Anonymous User Integration", () => {
         });
 
         test("Anonymous friend can vote", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
 
             const friendIndex = sim.getNonImpostorIndex();
             const targetIndex = (friendIndex + 1) % sim.users.length;
             const result = sim.vote(friendIndex, targetIndex);
 
             expect(result).toBeDefined();
-            expect(sim.game.votes[sim.users[friendIndex].uid]).toBe(sim.users[targetIndex].uid);
+            expect(sim.match.votes[sim.users[friendIndex].uid]).toBe(sim.users[targetIndex].uid);
         });
 
         test("Anonymous friend can be eliminated", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3", "Player4"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3", "Player4"]).startMatch();
 
             const targetIndex = sim.getNonImpostorIndex();
             sim.allVoteFor(targetIndex);
@@ -185,19 +185,19 @@ describe("Anonymous User Integration", () => {
             const anonPlayer = createAnonymousUser("ap", "Invitado2");
 
             sim.users = [anonHost, googlePlayer, anonPlayer];
-            sim.game = new (require("../../Game"))(anonHost, { isRestoring: false });
-            sim.game.persist = jest.fn();
-            sim.game.addPlayer(googlePlayer);
-            sim.game.addPlayer(anonPlayer);
-            sim.game.startGame(anonHost.uid);
+            sim.match = new Match(anonHost, { isRestoring: false });
+            sim.match.persist = jest.fn();
+            sim.match.addPlayer(googlePlayer);
+            sim.match.addPlayer(anonPlayer);
+            sim.match.startMatch(anonHost.uid);
 
             // Everyone votes for googlePlayer
             sim.vote(0, 1);
             sim.vote(1, 2); // Can't vote for self
             sim.vote(2, 1);
 
-            expect(sim.game.votes[anonHost.uid]).toBe(googlePlayer.uid);
-            expect(sim.game.votes[anonPlayer.uid]).toBe(googlePlayer.uid);
+            expect(sim.match.votes[anonHost.uid]).toBe(googlePlayer.uid);
+            expect(sim.match.votes[anonPlayer.uid]).toBe(googlePlayer.uid);
         });
     });
 
@@ -205,10 +205,10 @@ describe("Anonymous User Integration", () => {
         test("Anonymous player state includes name but no photoURL", () => {
             const anonHost = createAnonymousUser("host", "InvitadoTest");
             sim.users = [anonHost];
-            sim.game = new (require("../../Game"))(anonHost, { isRestoring: false });
-            sim.game.persist = jest.fn();
+            sim.match = new Match(anonHost, { isRestoring: false });
+            sim.match.persist = jest.fn();
             sim.addPlayers(["Player2", "Player3"]);
-            sim.startGame();
+            sim.startMatch();
 
             const state = sim.getStateForPlayer(0);
             const selfPlayer = state.players.find((p) => p.uid === anonHost.uid);
@@ -217,16 +217,16 @@ describe("Anonymous User Integration", () => {
             expect(selfPlayer.photoURL).toBeNull();
         });
 
-        test("Mixed game state shows correct photos for each user type", () => {
+        test("Mixed match state shows correct photos for each user type", () => {
             const anonHost = createAnonymousUser("host", "InvitadoHost");
             const googlePlayer = createGoogleUser("gp", "GooglePlayer");
 
             sim.users = [anonHost, googlePlayer];
-            sim.game = new (require("../../Game"))(anonHost, { isRestoring: false });
-            sim.game.persist = jest.fn();
-            sim.game.addPlayer(googlePlayer);
+            sim.match = new Match(anonHost, { isRestoring: false });
+            sim.match.persist = jest.fn();
+            sim.match.addPlayer(googlePlayer);
 
-            const state = sim.game.getStateFor(anonHost.uid);
+            const state = sim.match.getStateFor(anonHost.uid);
 
             const anonInState = state.players.find((p) => p.uid === anonHost.uid);
             const googleInState = state.players.find((p) => p.uid === googlePlayer.uid);
@@ -237,22 +237,22 @@ describe("Anonymous User Integration", () => {
     });
 
     describe("Reconnection", () => {
-        test("Anonymous user state persists during game", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+        test("Anonymous user state persists during match", () => {
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
 
             const anonPlayer = sim.users[1];
 
             // Verify player exists and has correct state
-            const player = sim.game.players.find((p) => p.uid === anonPlayer.uid);
+            const player = sim.match.players.find((p) => p.uid === anonPlayer.uid);
             expect(player).toBeDefined();
             expect(player.name).toBe("Player2");
-            expect(sim.game.roundPlayers).toContain(anonPlayer.uid);
+            expect(sim.match.roundPlayers).toContain(anonPlayer.uid);
         });
     });
 
-    describe("Game End - Podium", () => {
+    describe("Match End - Podium", () => {
         test("Anonymous winner has scores in lastRoundScores", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
 
             // Make impostor win by surviving 3 rounds
             sim.createTieVote();
@@ -261,12 +261,12 @@ describe("Anonymous User Integration", () => {
             sim.continueToNextRound();
             sim.createTieVote();
 
-            expect(sim.game.lastRoundScores).toBeDefined();
-            expect(Object.keys(sim.game.lastRoundScores).length).toBeGreaterThan(0);
+            expect(sim.match.lastRoundScores).toBeDefined();
+            expect(Object.keys(sim.match.lastRoundScores).length).toBeGreaterThan(0);
         });
 
-        test("Impostor ID is tracked after game ends", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+        test("Impostor ID is tracked after match ends", () => {
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
             sim.createTieVote();
             sim.continueToNextRound();
             sim.createTieVote();
@@ -274,8 +274,8 @@ describe("Anonymous User Integration", () => {
             sim.createTieVote();
 
             // impostorId should still be tracked
-            expect(sim.game.impostorId).toBeDefined();
-            expect(sim.getState().winnerId).toBe(sim.game.impostorId);
+            expect(sim.match.impostorId).toBeDefined();
+            expect(sim.getState().winnerId).toBe(sim.match.impostorId);
         });
     });
 });

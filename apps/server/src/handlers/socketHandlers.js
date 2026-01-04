@@ -39,24 +39,24 @@ function registerSocketHandlers(io, socket) {
     handleReconnection(socket, user);
 
     // Register event handlers
-    socket.on("create-game", (options) => handleCreateRoom(socket, user, options));
-    socket.on("join-game", (roomId) => handleJoinRoom(io, socket, user, roomId));
-    socket.on("start-game", (data) => {
+    socket.on("create-room", (options) => handleCreateRoom(socket, user, options));
+    socket.on("join-room", (roomId) => handleJoinRoom(io, socket, user, roomId));
+    socket.on("start-match", (data) => {
         const roomId = typeof data === 'string' ? data : data.roomId;
         const options = typeof data === 'object' ? data.options : {};
-        handleRoomAction(socket, user, roomId, (r) => r.startGame(user.uid, options));
+        handleRoomAction(socket, user, roomId, (r) => r.startMatch(user.uid, options));
     });
-    socket.on("end-game", (roomId) =>
+    socket.on("end-match", (roomId) =>
         handleRoomAction(socket, user, roomId, (r) => {
-            if (r.currentGame) {
-                r.currentGame.endGame(user.uid);
-                r.onGameEnd();
+            if (r.currentMatch) {
+                r.currentMatch.endMatch(user.uid);
+                r.onMatchEnd();
             }
         })
     );
     socket.on("next-round", (roomId) =>
         handleRoomAction(socket, user, roomId, (r) => {
-            if (r.currentGame) r.currentGame.continueToNextRound(user.uid);
+            if (r.currentMatch) r.currentMatch.continueToNextRound(user.uid);
         })
     );
     socket.on("play-again", (roomId) =>
@@ -66,9 +66,35 @@ function registerSocketHandlers(io, socket) {
         handleRoomAction(socket, user, roomId, (r) => r.updateOptions(user.uid, options))
     );
     socket.on("cast-vote", (data) => handleCastVote(socket, user, data));
-    socket.on("leave-game", (roomId, callback) =>
+
+    // NEW handles for terminology
+    socket.on("leave-match", (roomId, callback) =>
+        handleLeaveMatch(io, socket, user, roomId, callback)
+    );
+    socket.on("leave-room", (roomId, callback) =>
         handleLeaveRoom(io, socket, user, roomId, callback)
     );
+
+    // ============================================
+    // LEGACY ALIASES (Transition Period Support)
+    // ============================================
+    socket.on("join-game", (gameId) => handleJoinRoom(io, socket, user, gameId));
+    socket.on("leave-game", (gameId, callback) => handleLeaveRoom(io, socket, user, gameId, callback));
+    socket.on("start-game", (data) => {
+        const id = typeof data === 'string' ? data : (data.gameId || data.roomId);
+        const options = typeof data === 'object' ? data.options : {};
+        handleRoomAction(socket, user, id, (r) => r.startMatch(user.uid, options));
+    });
+    socket.on("end-game", (gameId) =>
+        handleRoomAction(socket, user, gameId, (r) => {
+            if (r.currentMatch) {
+                r.currentMatch.endMatch(user.uid);
+                r.onMatchEnd();
+            }
+        })
+    );
+    socket.on("create-game", (options) => handleCreateRoom(socket, user, options));
+
     socket.on("get-state", () => handleGetState(socket, user));
     socket.on("heartbeat", () => sessionManager.updateHeartbeat(user.uid));
     socket.on("disconnect", () => handleDisconnect(io, socket, user));
@@ -100,7 +126,7 @@ function handleReconnection(socket, user) {
     // Check if user has a pending disconnect
     const pending = sessionManager.getPendingDisconnect(user.uid);
     if (pending) {
-        const pendingRoom = roomManager.getRoom(pending.gameId);
+        const pendingRoom = roomManager.getRoom(pending.roomId);
         if (pendingRoom && pendingRoom.players.some((p) => p.uid === user.uid)) {
             socket.join(pendingRoom.roomId);
             console.log(`User ${user.name} reconnected to pending room ${pendingRoom.roomId}`);
@@ -167,7 +193,8 @@ async function handleJoinRoom(io, socket, user, roomId) {
 /**
  * Generic handler for room actions.
  */
-function handleRoomAction(socket, user, roomId, action) {
+function handleRoomAction(socket, user, data, action) {
+    const roomId = typeof data === 'string' ? data : (data?.roomId || data?.gameId);
     const room = roomManager.getRoom(roomId);
     if (!room) {
         return socket.emit("error-message", "La sala no existe.");
@@ -185,26 +212,27 @@ function handleRoomAction(socket, user, roomId, action) {
 }
 /**
  * Handle voting.
- * Votes go to the current Game within the Room.
+ * Votes go to the current Match within the Room.
  */
-function handleCastVote(socket, user, { gameId, targetId }) {
-    // gameId is actually roomId in new architecture
-    const room = roomManager.getRoom(gameId);
-    if (!room || !room.currentGame) {
+function handleCastVote(socket, user, { roomId, matchId, gameId, targetId }) {
+    // roomId is preferred to find the instance, fallback to gameId or matchId for compatibility
+    const idToSearch = roomId || gameId || matchId;
+    const room = roomManager.getRoom(idToSearch);
+    if (!room || !room.currentMatch) {
         return socket.emit("error-message", "La partida no existe.");
     }
-    const game = room.currentGame;
+    const match = room.currentMatch;
     if (!room.players.some((p) => p.uid === user.uid)) {
         return socket.emit("error-message", "No perteneces a esta sala.");
     }
     try {
-        const { phaseChanged, allVoted } = game.castVote(user.uid, targetId);
+        const { phaseChanged, allVoted } = match.castVote(user.uid, targetId);
 
         // Send full state when voting completes (phase change OR turn change)
         if (phaseChanged || allVoted) {
-            // Check if game ended
-            if (game.phase === "game_over") {
-                room.onGameEnd();
+            // Check if match ended
+            if (match.phase === "game_over") {
+                room.onMatchEnd();
             }
             roomManager.emitRoomState(room);
         } else {
@@ -212,13 +240,39 @@ function handleCastVote(socket, user, { gameId, targetId }) {
             roomManager.emitVoteUpdate(room, user.uid, targetId);
         }
     } catch (error) {
-        console.error(`Vote failed for room ${gameId}:`, error.message);
+        console.error(`Vote failed for room ${roomId}:`, error.message);
         socket.emit("error-message", error.message);
     }
 }
 
 /**
- * Handle explicit room leaving.
+ * Handle quitting the current match but staying in the room.
+ */
+function handleLeaveMatch(io, socket, user, roomId, callback) {
+    const safeCallback = () => {
+        if (typeof callback === "function") callback();
+    };
+
+    const room = roomManager.getRoom(roomId);
+    if (!room || !room.players.some((p) => p.uid === user.uid)) {
+        safeCallback();
+        return;
+    }
+
+    console.log(`User ${user.name} is leaving the MATCH but staying in ROOM ${roomId}`);
+
+    const result = room.leaveMatch(user.uid);
+
+    // Notify others
+    roomManager.emitRoomState(room);
+    roomManager.emitToast(roomId, `${user.name} ha vuelto a la sala`);
+
+    console.log(`User ${user.name} successfully left match in room ${roomId}`);
+    safeCallback();
+}
+
+/**
+ * Handle explicit room leaving (quitting entirely).
  */
 function handleLeaveRoom(io, socket, user, roomId, callback) {
     const safeCallback = () => {
@@ -281,6 +335,17 @@ function handleDisconnect(io, socket, user) {
     console.log(`User disconnected: ${user.name}`);
 
     const userRoom = roomManager.findUserRoom(user.uid);
+    const currentSocketId = sessionManager.getUserSocket(user.uid);
+
+    // If there's already a new socket for this user, don't start a grace timer
+    // We only care about disconnections of the CURRENT active session
+    if (currentSocketId && currentSocketId !== socket.id) {
+        console.log(`[Disconnect] Ignoring ${user.name} disconnect (session replaced)`);
+        sessionManager.removeUserSocket(user.uid, socket.id);
+        sessionManager.removeHeartbeat(user.uid);
+        return;
+    }
+
     if (userRoom) {
         const wasRecentlyActive = sessionManager.wasRecentlyActive(user.uid);
         const gracePeriod = wasRecentlyActive ? MOBILE_GRACE_PERIOD : INACTIVE_GRACE_PERIOD;

@@ -5,16 +5,16 @@ const RoundManager = require("./game/RoundManager");
 const GameStateSerializer = require("./game/GameStateSerializer");
 
 /**
- * Game - A single match (1-3 rounds) within a Room.
+ * Match - A single game session (1-3 rounds) within a Room.
  * 
- * Games are ephemeral and created fresh for each "Play Again".
+ * Matches are ephemeral and created fresh for each "Play Again".
  * Room-level state (playerOrder, host, history) is passed in from Room.
  */
-class Game {
+class Match {
     /**
-     * Create a new Game instance.
+     * Create a new Match instance.
      * @param {Room|Object} roomOrHostUser - Room instance or legacy hostUser object
-     * @param {Object} options - Game options
+     * @param {Object} options - Match options
      */
     constructor(roomOrHostUser, options = {}) {
         // Detect if this is a Room instance or a legacy hostUser object
@@ -27,7 +27,7 @@ class Game {
 
             // Room context
             this.roomId = room.roomId;
-            this.gameId = this.generateGameId();
+            this.matchId = this.generateMatchId();
             this.hostId = room.hostId;
 
             // Copy players from room (eligible players only)
@@ -38,7 +38,7 @@ class Game {
             this.impostorHistory = [...(room.impostorHistory || [])];
             this.formerPlayers = { ...room.formerPlayers };
 
-            // Game options
+            // Match options
             this.showImpostorHint = room.options?.showImpostorHint !== undefined
                 ? room.options.showImpostorHint : true;
             this.options = options.options || room.options;
@@ -47,8 +47,8 @@ class Game {
             const hostUser = roomOrHostUser;
 
             // Generate IDs
-            this.gameId = this.generateGameId();
-            this.roomId = options.roomId || this.gameId; // For legacy compat
+            this.matchId = this.generateMatchId();
+            this.roomId = options.roomId || this.matchId; // For legacy compat
             this.hostId = hostUser.uid;
 
             // Legacy player initialization
@@ -69,7 +69,7 @@ class Game {
             this.impostorHistory = [...(options.impostorHistory || [])];
             this.formerPlayers = {};
 
-            // Game options
+            // Match options
             this.showImpostorHint = options.showImpostorHint !== undefined
                 ? options.showImpostorHint : true;
             this.options = options;
@@ -78,7 +78,7 @@ class Game {
         // Timing
         this.startedAt = Date.now();
 
-        // Game-specific state (reset each match)
+        // Match-specific state (reset each match)
         this.phase = "lobby";
         this.secretWord = "";
         this.secretCategory = "";
@@ -113,33 +113,33 @@ class Game {
     }
 
     /**
-     * Generate unique game ID.
+     * Generate unique match ID.
      */
-    generateGameId() {
+    generateMatchId() {
         return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 7)}`.toUpperCase();
     }
 
     /**
-     * Persist game data and update player stats when match ends.
+     * Persist match data and update player stats when match ends.
      */
     persistAnalytics(endReason = "completed") {
-        const gameData = GameStateSerializer.getEnrichedGameData(this);
-        gameData.endReason = endReason;
+        const matchData = GameStateSerializer.getEnrichedGameData(this);
+        matchData.endReason = endReason;
 
         // Calculate match duration
         const durationSeconds = Math.floor((Date.now() - this.startedAt) / 1000);
 
-        // 1. Save full game record to /games collection
-        dbService.saveGame(this.gameId, gameData);
+        // Save full match record to /matches collection
+        dbService.saveMatch(this.matchId, matchData);
 
-        // 2. Also save to legacy /game_analytics (optional)
-        dbService.saveGameAnalytics(this.gameId, gameData);
-
-        // 3. Aggregate player statistics
+        // Aggregate player statistics
         this.players.forEach((player) => {
             const isImpostor = this.impostorId === player.uid;
-            const won = this.winnerId === player.uid ||
-                (this.winnerId === "amigos" && !isImpostor);
+
+            // Friends win if winnerId is set to a friend (not impostor, not tie, not null)
+            const friendsWon = this.winnerId &&
+                this.winnerId !== this.impostorId &&
+                this.winnerId !== "tie";
 
             const statsUpdate = {
                 displayName: player.name,
@@ -155,7 +155,8 @@ class Game {
                     statsUpdate.winsAsImpostor = 1;
                 }
             } else {
-                if (this.winnerId === "amigos") {
+                // All friends get winsAsFriend when friends win
+                if (friendsWon) {
                     statsUpdate.winsAsFriend = 1;
                 }
             }
@@ -179,15 +180,21 @@ class Game {
     }
 
     /**
-     * Iniciar el juego (nueva partida completa)
+     * Iniciar el match (nueva partida completa)
      */
-    startGame(userId) {
-        if (userId !== this.hostId) throw new Error("Solo el host puede iniciar la partida.");
+    startMatch(userId) {
+        if (userId !== this.hostId) throw new Error("Solo el host puede iniciar el match.");
         if (this.players.length < 2)
             throw new Error("Se necesitan al menos 2 jugadores para empezar.");
 
-        // Iniciar nueva partida (reset completo + nuevo impostor)
+        // Iniciar nuevo match (reset completo + nuevo impostor)
         RoundManager.startNewMatch(this);
+    }
+
+    // Alias for compatibility during transition if needed, but we wanted clean break
+    // Let's just rename it to startMatch
+    startGame(userId) {
+        return this.startMatch(userId);
     }
 
     /**
@@ -202,20 +209,24 @@ class Game {
         RoundManager.startNextRound(this);
     }
 
-    endGame(userId) {
-        if (userId !== this.hostId) throw new Error("Solo el host puede terminar la partida.");
+    endMatch(userId) {
+        if (userId !== this.hostId) throw new Error("Solo el host puede terminar el match.");
         this.phase = "game_over";
         this.persistAnalytics();
     }
 
+    endGame(userId) {
+        return this.endMatch(userId);
+    }
+
     /**
-     * Nueva partida (reset completo de puntos, nuevo impostor)
+     * Nuevo match (reset completo de puntos, nuevo impostor)
      */
     playAgain(userId) {
         if (userId !== this.hostId)
-            throw new Error("Solo el host puede empezar una nueva partida.");
+            throw new Error("Solo el host puede empezar un nuevo match.");
 
-        console.log(`[Game ${this.gameId}] playAgain called. Current phase: ${this.phase}`);
+        console.log(`[Match ${this.matchId}] playAgain called. Current phase: ${this.phase}`);
 
         // Limpiar formerPlayers para evitar crecimiento infinito del estado
         this.formerPlayers = {};
@@ -226,11 +237,11 @@ class Game {
             };
         });
 
-        // Iniciar nueva partida con reset completo
+        // Iniciar nuevo match con reset completo
         RoundManager.startNewMatch(this);
 
         console.log(
-            `[Game ${this.gameId}] ✅ Nueva partida iniciada. Jugadores: ${this.players.length}`
+            `[Match ${this.matchId}] ✅ Nuevo match iniciado. Jugadores: ${this.players.length}`
         );
     }
 
@@ -252,4 +263,4 @@ class Game {
     }
 }
 
-module.exports = Game;
+module.exports = Match;

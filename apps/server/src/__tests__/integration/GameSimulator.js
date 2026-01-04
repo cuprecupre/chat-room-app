@@ -1,9 +1,9 @@
 /**
- * GameSimulator - Utility for E2E game testing
- * Updated for new scoring system (no turns, 3 rounds, same impostor)
+ * GameSimulator - Utility for E2E match testing
+ * Updated for new Room/Match architecture
  */
 
-const Game = require("../../Game");
+const Match = require("../../Match");
 
 function createMockUser(id, name) {
     return { uid: id, name: name, photoURL: null };
@@ -11,17 +11,18 @@ function createMockUser(id, name) {
 
 class GameSimulator {
     constructor() {
-        this.game = null;
+        this.match = null;
         this.users = [];
         this.stateHistory = [];
     }
 
-    createGame(hostName = "Host") {
+    createMatch(hostName = "Host") {
         const host = createMockUser(`user_${Date.now()}_0`, hostName);
         this.users = [host];
-        this.game = new Game(host, { isRestoring: false });
-        this.game.persist = jest.fn();
-        this._captureState("Game created");
+        // Match constructor now takes (host, matchId)
+        this.match = new Match(host, `match_${Date.now()}`);
+        this.match.persist = jest.fn();
+        this._captureState("Match created");
         return this;
     }
 
@@ -29,20 +30,21 @@ class GameSimulator {
         names.forEach((name, i) => {
             const user = createMockUser(`user_${Date.now()}_${i + 1}`, name);
             this.users.push(user);
-            this.game.addPlayer(user);
+            // Match has addPlayer
+            this.match.addPlayer(user);
         });
         this._captureState(`Added ${names.length} players`);
         return this;
     }
 
-    startGame() {
-        this.game.startGame(this.users[0].uid);
-        this._captureState("Game started");
+    startMatch() {
+        this.match.startMatch(this.users[0].uid);
+        this._captureState("Match started");
         return this;
     }
 
     vote(voterIndex, targetIndex) {
-        const result = this.game.castVote(this.users[voterIndex].uid, this.users[targetIndex].uid);
+        const result = this.match.castVote(this.users[voterIndex].uid, this.users[targetIndex].uid);
         this._captureState(
             `${this.users[voterIndex].name} voted for ${this.users[targetIndex].name}`
         );
@@ -51,8 +53,8 @@ class GameSimulator {
 
     allVoteFor(targetIndex) {
         const results = [];
-        const eliminated = this.game.eliminatedPlayers || [];
-        const activePlayers = this.game.roundPlayers.filter((uid) => !eliminated.includes(uid));
+        const eliminated = this.match.eliminatedPlayers || [];
+        const activePlayers = this.match.roundPlayers.filter((uid) => !eliminated.includes(uid));
         activePlayers.forEach((uid) => {
             const voterIndex = this.users.findIndex((u) => u.uid === uid);
             if (uid !== this.users[targetIndex].uid) {
@@ -68,8 +70,8 @@ class GameSimulator {
     }
 
     createTieVote() {
-        const eliminated = this.game.eliminatedPlayers || [];
-        const activePlayers = this.game.roundPlayers.filter((uid) => !eliminated.includes(uid));
+        const eliminated = this.match.eliminatedPlayers || [];
+        const activePlayers = this.match.roundPlayers.filter((uid) => !eliminated.includes(uid));
         const results = [];
         activePlayers.forEach((uid, i) => {
             const voterIndex = this.users.findIndex((u) => u.uid === uid);
@@ -81,50 +83,51 @@ class GameSimulator {
     }
 
     getState() {
-        const eliminated = this.game.eliminatedPlayers || [];
+        const eliminated = this.match.eliminatedPlayers || [];
         return {
-            phase: this.game.phase,
-            currentRound: this.game.currentRound,
-            maxRounds: this.game.maxRounds,
+            phase: this.match.phase,
+            currentRound: this.match.currentRound,
+            maxRounds: this.match.maxRounds,
             eliminatedPlayers: eliminated,
-            impostorId: this.game.impostorId,
-            winnerId: this.game.winnerId,
-            votes: { ...this.game.votes },
-            playerCount: this.game.players.length,
-            playerScores: { ...this.game.playerScores },
-            activePlayerCount: this.game.roundPlayers.filter((uid) => !eliminated.includes(uid))
+            impostorId: this.match.impostorId,
+            winnerId: this.match.winnerId,
+            votes: { ...this.match.votes },
+            playerCount: this.match.players.length,
+            playerScores: { ...this.match.playerScores },
+            activePlayerCount: this.match.roundPlayers.filter((uid) => !eliminated.includes(uid))
                 .length,
         };
     }
 
     getStateForPlayer(playerIndex) {
-        return this.game.getStateFor(this.users[playerIndex].uid);
+        return this.match.getStateFor(this.users[playerIndex].uid);
     }
 
     getImpostorIndex() {
-        return this.users.findIndex((u) => u.uid === this.game.impostorId);
+        return this.users.findIndex((u) => u.uid === this.match.impostorId);
     }
 
     getNonImpostorIndex() {
-        const eliminated = this.game.eliminatedPlayers || [];
+        const eliminated = this.match.eliminatedPlayers || [];
         return this.users.findIndex(
             (u) =>
-                u.uid !== this.game.impostorId &&
-                this.game.roundPlayers.includes(u.uid) &&
+                u.uid !== this.match.impostorId &&
+                this.match.roundPlayers.includes(u.uid) &&
                 !eliminated.includes(u.uid)
         );
     }
 
     continueToNextRound() {
-        if (this.game.phase === "round_result") {
-            this.game.continueToNextRound(this.users[0].uid);
+        if (this.match.phase === "round_result") {
+            this.match.continueToNextRound(this.users[0].uid);
             this._captureState("Continued to next round");
         }
         return this;
     }
 
     playAgain() {
-        this.game.playAgain(this.users[0].uid);
+        // match.playAgain expects userId (host)
+        this.match.playAgain(this.users[0].uid);
         this._captureState("Started new match");
         return this;
     }
@@ -134,7 +137,7 @@ class GameSimulator {
     }
 
     printHistory() {
-        console.log("\n=== Game State History ===");
+        console.log("\n=== Match State History ===");
         this.stateHistory.forEach((entry, i) => {
             console.log(`\n[${i}] ${entry.action}`);
             console.log(`    Phase: ${entry.state.phase}, Round: ${entry.state.currentRound}`);

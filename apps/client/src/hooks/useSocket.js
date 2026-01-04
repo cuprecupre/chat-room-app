@@ -95,20 +95,12 @@ export function useSocket(user) {
                     }
                     attemptedResumeRef.current = false; // fresh session
                     const urlParams = new URLSearchParams(window.location.search);
-                    const gameIdFromUrl = urlParams.get("gameId");
-                    // if (gameIdFromUrl && !attemptedResumeRef.current) {
-                    //   attemptedResumeRef.current = true;
-                    //   // Intento de reanudar sesión
-                    //   socket.emit('join-game', gameIdFromUrl);
-                    //   // Si en 2s no llega estado, forzar UI de recuperación
-                    //   if (socket.resumeTimer) clearTimeout(socket.resumeTimer);
-                    //   socket.resumeTimer = setTimeout(() => {
-                    //     if (!socketRef.current) return;
-                    //     console.log('[Socket] Resume timeout, mostrando UI de unión');
-                    //     // No borrar el gameId de la URL: App mostrará la UI de unión/limpieza
-                    //     if (isMounted) setGameState(null);
-                    //   }, 2000);
-                    // }
+                    const roomIdFromUrl = urlParams.get("roomId");
+
+                    if (roomIdFromUrl && !attemptedResumeRef.current) {
+                        attemptedResumeRef.current = true;
+                        socket.emit("join-room", roomIdFromUrl);
+                    }
 
                     // Start heartbeat to keep connection alive
                     const heartbeatInterval = setInterval(() => {
@@ -296,7 +288,7 @@ export function useSocket(user) {
                     // Only attempt rejoin if roomId is still in URL (meaning user didn't leave)
                     if (roomIdFromUrl && !attemptedResumeRef.current) {
                         attemptedResumeRef.current = true;
-                        socket.emit("join-game", roomIdFromUrl);
+                        socket.emit("join-room", roomIdFromUrl);
                     }
                 });
 
@@ -363,7 +355,7 @@ export function useSocket(user) {
                         setGameState(null);
                         // Clear URL and show message
                         const url = new URL(window.location);
-                        url.searchParams.delete("gameId");
+                        url.searchParams.delete("roomId");
                         window.history.replaceState({}, "", url.toString());
                         showToast(data.message || "El servidor se está reiniciando...");
                     }

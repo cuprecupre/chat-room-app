@@ -62,7 +62,7 @@ export function ProtectedRoute({ user, connected, emit, gameState }) {
 
         // Force disconnect and clear state with Ack
         if (gameState?.roomId) {
-            emit("leave-game", gameState.roomId, handleCleanExit);
+            emit("leave-room", gameState.roomId, handleCleanExit);
             // Fallback timeout
             setTimeout(handleCleanExit, 2000);
         } else {

@@ -3,7 +3,6 @@ import { Button } from "./ui/Button";
 import { Modal } from "./ui/Modal";
 import { GameOverScreen } from "./GameOverScreen";
 import { RoundStartOverlay } from "./RoundStartOverlay";
-import { MigrationScreen } from "./game/MigrationScreen";
 import { LobbyScreen } from "./game/LobbyScreen";
 import { GameBoard } from "./game/GameBoard";
 import { TurnOverlay } from "./game/TurnOverlay";
@@ -11,7 +10,6 @@ import { TurnOverlay } from "./game/TurnOverlay";
 // Components extracted to apps/client/src/components/game/
 // - PlayerList.jsx
 // - HelpLink.jsx
-// - MigrationScreen.jsx
 // - LobbyScreen.jsx
 // - GameCard.jsx
 // - SpectatorMode.jsx
@@ -26,8 +24,8 @@ export function GameRoom({
     onEndGame,
     onPlayAgain,
     onNextRound,
-    onMigrateGame,
-    onLeaveGame,
+    onLeaveRoom,
+    onLeaveMatch,
     onUpdateOptions,
     onCopyLink,
     onCopyGameCode,
@@ -53,7 +51,7 @@ export function GameRoom({
     const showEndGameModal =
         showEndGameModalProp !== undefined ? showEndGameModalProp : showEndGameModalInternal;
     const setShowEndGameModal = onShowEndGameModal || setShowEndGameModalInternal;
-    const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
+    const [showLeaveModal, setShowLeaveModal] = useState(false);
 
     // Timeouts Refs
     const turnOverlayTimeoutRef = useRef(null);
@@ -147,11 +145,6 @@ export function GameRoom({
 
     return (
         <div className="w-full flex flex-col items-center space-y-3 md:space-y-6">
-            {/* Pantalla de migración para partidas con sistema antiguo */}
-            {state.phase === "needs_migration" && (
-                <MigrationScreen onMigrateGame={onMigrateGame} isHost={isHost} />
-            )}
-
             {state.phase === "lobby" && (
                 <LobbyScreen
                     state={state}
@@ -237,34 +230,52 @@ export function GameRoom({
 
             {/* Modal de confirmación para abandonar juego */}
             <Modal
-                isOpen={showLeaveGameModal}
-                onClose={() => setShowLeaveGameModal(false)}
-                title="¿Abandonar juego?"
+                isOpen={showLeaveModal}
+                onClose={() => setShowLeaveModal(false)}
+                title={state.phase === "playing" || state.phase === "round_result" ? "¿Dejar partida?" : "¿Abandonar sala?"}
                 size="sm"
             >
                 <div className="text-center space-y-4">
                     <p className="text-neutral-400">
-                        Saldrás del juego y volverás al lobby. ¿Estás seguro?
+                        {state.phase === "playing" || state.phase === "round_result"
+                            ? "Puedes volver al lobby de la sala o salir por completo."
+                            : "Saldrás de la sala. Deberás ser invitado nuevamente para entrar."}
                     </p>
-                    <div className="flex gap-3 pt-2">
-                        <Button
-                            onClick={() => setShowLeaveGameModal(false)}
-                            variant="outline"
-                            size="md"
-                            className="flex-1"
-                        >
-                            Cancelar
-                        </Button>
+
+                    <div className="flex flex-col gap-3 pt-2">
+                        {(state.phase === "playing" || state.phase === "round_result") && (
+                            <Button
+                                onClick={() => {
+                                    setShowLeaveModal(false);
+                                    onLeaveMatch();
+                                }}
+                                variant="primary"
+                                size="md"
+                                className="w-full"
+                            >
+                                Volver a la sala
+                            </Button>
+                        )}
+
                         <Button
                             onClick={() => {
-                                setShowLeaveGameModal(false);
-                                onLeaveGame();
+                                setShowLeaveModal(false);
+                                onLeaveRoom();
                             }}
-                            variant="primary"
+                            variant={state.phase === "playing" || state.phase === "round_result" ? "outline" : "primary"}
                             size="md"
-                            className="flex-1"
+                            className="w-full"
                         >
-                            Abandonar
+                            Abandonar sala
+                        </Button>
+
+                        <Button
+                            onClick={() => setShowLeaveModal(false)}
+                            variant="ghost"
+                            size="sm"
+                            className="w-full text-neutral-500"
+                        >
+                            Cancelar
                         </Button>
                     </div>
                 </div>

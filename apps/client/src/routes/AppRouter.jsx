@@ -73,7 +73,7 @@ function HomeRouteHandler({ user }) {
         return <Navigate to={`${ROUTES.GAME}?roomId=${urlRoomId}`} replace />;
     }
 
-    // If user is authenticated but no gameId, redirect to lobby
+    // If user is authenticated but no roomId, redirect to lobby
     if (user) {
         return <Navigate to={ROUTES.LOBBY} replace />;
     }
@@ -146,24 +146,27 @@ function AppRoutes({
         [gameState, user]
     );
 
-    const createGame = useCallback((options) => emit("create-game", options), [emit]);
-    const joinGame = useCallback((roomId) => emit("join-game", roomId), [emit]);
+    const createRoom = useCallback((options) => emit("create-room", options), [emit]);
+    const joinRoom = useCallback((roomId) => emit("join-room", roomId), [emit]);
     const updateOptions = useCallback(
         (options) => emit("update-options", { roomId: gameState?.roomId, options }),
         [emit, gameState]
     );
-    const startGame = useCallback(
-        (options) => emit("start-game", { roomId: gameState?.roomId, options }),
+    const startMatch = useCallback(
+        (options) => emit("start-match", { roomId: gameState?.roomId, options }),
         [emit, gameState]
     );
-    const endGame = useCallback(() => emit("end-game", gameState?.roomId), [emit, gameState]);
+    const endMatch = useCallback(() => emit("end-match", gameState?.roomId), [emit, gameState]);
     const playAgain = useCallback(() => emit("play-again", gameState?.roomId), [emit, gameState]);
-    const migrateGame = useCallback(
-        () => emit("migrate-game", gameState?.roomId),
-        [emit, gameState]
-    );
     const nextRound = useCallback(() => emit("next-round", gameState?.roomId), [emit, gameState]);
-    const leaveGame = useCallback(() => {
+
+    const leaveMatch = useCallback(() => {
+        if (gameState?.roomId) {
+            emit("leave-match", gameState.roomId);
+        }
+    }, [emit, gameState]);
+
+    const leaveRoom = useCallback(() => {
         if (gameState?.roomId) {
             // Remove roomId from URL immediately to prevent accidental reopen
             const url = new URL(window.location);
@@ -176,7 +179,7 @@ function AppRoutes({
             };
 
             // Emit with Ack callback
-            emit("leave-game", gameState.roomId, handleCleanExit);
+            emit("leave-room", gameState.roomId, handleCleanExit);
 
             // Fallback: if server doesn't respond in 2s, force exit anyway
             setTimeout(handleCleanExit, 2000);
@@ -186,7 +189,12 @@ function AppRoutes({
     const castVote = useCallback(
         (targetId) => {
             if (!gameState?.roomId) return;
-            emit("cast-vote", { gameId: gameState.roomId, targetId });
+            // Send matchId if available, fallback to roomId
+            emit("cast-vote", {
+                roomId: gameState.roomId,
+                matchId: gameState.matchId,
+                targetId,
+            });
         },
         [emit, gameState]
     );
@@ -367,7 +375,7 @@ function AppRoutes({
                         >
                             <Route
                                 path={ROUTES.LOBBY}
-                                element={<LobbyPage user={user} onCreateGame={createGame} />}
+                                element={<LobbyPage user={user} onCreateGame={createRoom} />}
                             />
                             <Route
                                 path={ROUTES.GAME}
@@ -376,17 +384,17 @@ function AppRoutes({
                                         gameState={gameState}
                                         user={user}
                                         emit={emit}
-                                        joinGame={joinGame}
+                                        joinGame={joinRoom}
                                         joinError={joinError}
                                         clearJoinError={clearJoinError}
                                         onOpenInstructions={() => setInstructionsOpen(true)}
-                                        onStartGame={startGame}
+                                        onStartGame={startMatch}
                                         onUpdateOptions={updateOptions}
-                                        onEndGame={endGame}
+                                        onEndGame={endMatch}
                                         onPlayAgain={playAgain}
                                         onNextRound={nextRound}
-                                        onMigrateGame={migrateGame}
-                                        onLeaveGame={leaveGame}
+                                        onLeaveRoom={leaveRoom}
+                                        onLeaveMatch={leaveMatch}
                                         onVote={castVote}
                                     />
                                 }

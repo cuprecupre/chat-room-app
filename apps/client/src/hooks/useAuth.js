@@ -29,13 +29,17 @@ export function useAuth() {
     });
 
     const [user, setUser] = useState(auth.currentUser); // Inicializar con usuario actual si existe
-    const [loading, setLoading] = useState(hasRedirect && !hasCurrentUser); // Solo loading si hay redirect Y no hay usuario
+    const [loading, setLoading] = useState(true); // Siempre empezar en true hasta resolver sesión
     const [error, setError] = useState(null);
     const redirectCheckRef = useRef(false);
 
     useEffect(() => {
         console.log("🔄 [useAuth] useEffect mounted");
         let isMounted = true;
+
+        // Asegurar que la persistencia esté configurada antes de cualquier otra cosa
+        ensurePersistence();
+
         let authResolved = false;
         let tokenRefreshInterval = null;
         let redirectCheckInterval = null;
@@ -59,14 +63,14 @@ export function useAuth() {
                         saveToken(token);
                         console.log("🔑 Token guardado después de auth state change");
 
-                        // Restore pending gameId from sessionStorage after OAuth login
-                        const pendingGameId = sessionStorage.getItem("pendingGameId");
-                        if (pendingGameId) {
-                            console.log("🔗 Restaurando gameId pendiente:", pendingGameId);
-                            sessionStorage.removeItem("pendingGameId");
+                        // Restore pending roomId from sessionStorage after OAuth login
+                        const pendingRoomId = sessionStorage.getItem("pendingRoomId");
+                        if (pendingRoomId) {
+                            console.log("🔗 Restaurando roomId pendiente:", pendingRoomId);
+                            sessionStorage.removeItem("pendingRoomId");
                             const url = new URL(window.location);
-                            if (!url.searchParams.has("gameId")) {
-                                url.searchParams.set("gameId", pendingGameId);
+                            if (!url.searchParams.has("roomId")) {
+                                url.searchParams.set("roomId", pendingRoomId);
                                 window.history.replaceState({}, "", url.toString());
                             }
                         }
@@ -151,7 +155,7 @@ export function useAuth() {
             try {
                 console.log("🧹 Limpiando sessionStorage flag");
                 sessionStorage.removeItem("auth:redirect");
-            } catch (_) {}
+            } catch (_) { }
         };
 
         // Ejecutar inmediatamente
@@ -255,11 +259,11 @@ export function useAuth() {
                 // Marcar que estamos iniciando un redirect
                 sessionStorage.setItem("auth:redirect", "1");
 
-                // Save pending gameId before OAuth redirect
-                const urlGameId = new URLSearchParams(window.location.search).get("gameId");
-                if (urlGameId) {
-                    console.log("🔗 Guardando gameId pendiente:", urlGameId);
-                    sessionStorage.setItem("pendingGameId", urlGameId);
+                // Save pending roomId before OAuth redirect
+                const urlRoomId = new URLSearchParams(window.location.search).get("roomId");
+                if (urlRoomId) {
+                    console.log("🔗 Guardando roomId pendiente:", urlRoomId);
+                    sessionStorage.setItem("pendingRoomId", urlRoomId);
                 }
 
                 // Redirigir a Google para autenticación
@@ -293,7 +297,7 @@ export function useAuth() {
             // Limpiar flag de redirect si falla
             try {
                 sessionStorage.removeItem("auth:redirect");
-            } catch (_) {}
+            } catch (_) { }
         }
     }, []);
 

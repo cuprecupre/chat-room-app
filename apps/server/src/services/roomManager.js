@@ -100,15 +100,15 @@ class RoomManager {
     }
 
     /**
-     * Emit minimal vote update (delegated to current game).
+     * Emit minimal vote update (delegated to current match).
      */
     emitVoteUpdate(room, voterId, targetId) {
-        if (!this.io || !room.currentGame) return;
+        if (!this.io || !room.currentMatch) return;
 
-        const game = room.currentGame;
-        const votedPlayers = Object.keys(game.votes);
-        const eliminated = game.eliminatedPlayers || [];
-        const roundPlayers = game.roundPlayers || [];
+        const match = room.currentMatch;
+        const votedPlayers = Object.keys(match.votes);
+        const eliminated = match.eliminatedPlayers || [];
+        const roundPlayers = match.roundPlayers || [];
         const activePlayers = roundPlayers.filter(uid => !eliminated.includes(uid));
 
         room.players.forEach(p => {
@@ -116,8 +116,8 @@ class RoomManager {
             if (playerSocketId) {
                 this.io.to(playerSocketId).emit("vote-update", {
                     votedPlayers,
-                    myVote: game.votes[p.uid] || null,
-                    hasVoted: game.votes.hasOwnProperty(p.uid),
+                    myVote: match.votes[p.uid] || null,
+                    hasVoted: match.votes.hasOwnProperty(p.uid),
                     activePlayers,
                 });
             }

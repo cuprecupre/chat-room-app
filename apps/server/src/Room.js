@@ -1,5 +1,5 @@
 const PlayerManager = require("./game/PlayerManager");
-const Game = require("./Game");
+const Match = require("./Match");
 const dbService = require("./services/db");
 
 /**
@@ -7,10 +7,10 @@ const dbService = require("./services/db");
  * 
  * Architecture:
  * - Room: Persistent lobby with players (identified by roomId/code)
- * - Game: Single match within a Room (1-3 rounds, created per "Play Again")
+ * - Match: Single match within a Room (1-3 rounds, created per "Play Again")
  * 
- * Players join Rooms. When host starts, a Game is created.
- * Late joiners see "lobby_wait" phase until next Game starts.
+ * Players join Rooms. When host starts, a Match is created.
+ * Late joiners see "lobby_wait" phase until next Match starts.
  */
 class Room {
     constructor(hostUser, options = {}) {
@@ -28,18 +28,18 @@ class Room {
         this.playerOrder = [];
         this.formerPlayers = {};
 
-        // Game options (Room-level settings)
+        // Match options (Room-level settings)
         this.options = {
             showImpostorHint: opts.showImpostorHint !== undefined
                 ? opts.showImpostorHint : true,
         };
 
-        // Rotation tracking (persists across games)
+        // Rotation tracking (persists across matches)
         this.lastStartingPlayerId = null;
         this.impostorHistory = [];
 
-        // Current active game (null when in lobby)
-        this.currentGame = null;
+        // Current active match (null when in lobby)
+        this.currentMatch = null;
 
         // Room phase: "lobby" | "playing" | "game_over"
         this.phase = "lobby";
@@ -127,13 +127,39 @@ class Room {
             }
         }
 
-        // Propagate removal to current game if exists
-        if (this.currentGame) {
-            const gameResult = this.currentGame.removePlayer(userId);
-            return { ...gameResult, newHostInfo };
+        // Propagate removal to current match if exists
+        if (this.currentMatch) {
+            const matchResult = this.currentMatch.removePlayer(userId);
+            return { ...matchResult, newHostInfo };
         }
 
         return { newHostInfo };
+    }
+
+    /**
+     * Remove a player from the current Match but keep them in the Room.
+     * Used for "Ir a la sala" button.
+     */
+    leaveMatch(userId) {
+        const player = this.players.find(p => p.uid === userId);
+        if (!player) return { error: "Player not found in room" };
+
+        // Mark as late joiner so they wait for the next match
+        player.isLateJoiner = true;
+        player.isPlaying = false;
+
+        if (this.currentMatch) {
+            const result = this.currentMatch.removePlayer(userId);
+
+            // If the match host was transferred, we might want to update something
+            // but usually Match.hostId and Room.hostId can diverge if host is still in room.
+            // If the Room host leaves the Match, the Match needs a new host to continue.
+            // PlayerManager.removePlayer already handles this.
+
+            return result;
+        }
+
+        return {};
     }
 
     /**
@@ -161,14 +187,14 @@ class Room {
     }
 
     /**
-     * Start a new Game (match) within this Room.
+     * Start a new Match within this Room.
      */
-    startGame(userId, options = {}) {
+    startMatch(userId, options = {}) {
         if (userId !== this.hostId) {
-            throw new Error("Only the host can start the game.");
+            throw new Error("Only the host can start the match.");
         }
         if (this.players.length < 2) {
-            throw new Error("At least 2 players needed to start.");
+            throw new Error("Se necesitan al menos 2 jugadores para comenzar.");
         }
 
         // Get eligible players (exclude late joiners)
@@ -184,8 +210,8 @@ class Room {
             this.persist();
         }
 
-        // Create new Game instance with Room context
-        this.currentGame = new Game(this, {
+        // Create new Match instance with Room context
+        this.currentMatch = new Match(this, {
             players: eligiblePlayers,
             hostId: this.hostId,
             lastStartingPlayerId: this.lastStartingPlayerId,
@@ -193,8 +219,8 @@ class Room {
             options: this.options,
         });
 
-        // Start the game logic (assign roles, secret word, etc.)
-        this.currentGame.startGame(userId);
+        // Start the match logic (assign roles, secret word, etc.)
+        this.currentMatch.startMatch(userId);
 
         this.phase = "playing";
 
@@ -205,51 +231,61 @@ class Room {
             }
         });
 
-        console.log(`[Room ${this.roomId}] Game started with ${eligiblePlayers.length} players`);
+        console.log(`[Room ${this.roomId}] Match started with ${eligiblePlayers.length} players`);
 
-        return this.currentGame;
+        return this.currentMatch;
+    }
+
+    // Keep startGame for internal compatibility if needed, but we should update it
+    startGame(userId, options = {}) {
+        return this.startMatch(userId, options);
     }
 
     /**
-     * Handle game ending - update Room state.
+     * Handle match ending - update Room state.
      */
-    onGameEnd(gameResult) {
+    onMatchEnd(matchResult) {
         this.phase = "game_over";
 
-        // Update rotation state for next game
-        if (this.currentGame) {
-            this.lastStartingPlayerId = this.currentGame.lastStartingPlayerId;
-            this.impostorHistory = this.currentGame.impostorHistory;
+        // Update rotation state for next match
+        if (this.currentMatch) {
+            this.lastStartingPlayerId = this.currentMatch.lastStartingPlayerId;
+            this.impostorHistory = this.currentMatch.impostorHistory;
         }
 
-        // Reset late joiner flags - everyone can play next game
+        // Reset late joiner flags - everyone can play next match
         this.players.forEach(p => {
             p.isLateJoiner = false;
             p.isPlaying = false;
         });
 
-        console.log(`[Room ${this.roomId}] Game ended. Players ready for next match: ${this.players.length}`);
+        console.log(`[Room ${this.roomId}] Match ended. Players ready for next match: ${this.players.length}`);
+    }
+
+    // Alias for compatibility
+    onGameEnd(gameResult) {
+        return this.onMatchEnd(gameResult);
     }
 
     /**
-     * Start a new game (Play Again).
+     * Start a new match (Play Again).
      */
     playAgain(userId) {
         if (userId !== this.hostId) {
-            throw new Error("Only the host can start a new game.");
+            throw new Error("Only the host can start a new match.");
         }
 
         // Reset room phase
         this.phase = "lobby";
-        this.currentGame = null;
+        this.currentMatch = null;
 
         // Clear late joiner flags
         this.players.forEach(p => {
             p.isLateJoiner = false;
         });
 
-        // Start new game immediately
-        return this.startGame(userId);
+        // Start new match immediately
+        return this.startMatch(userId);
     }
 
     /**
@@ -258,15 +294,16 @@ class Room {
     getStateFor(userId) {
         const player = this.players.find(p => p.uid === userId);
 
-        // If game is active, delegate to game
-        if (this.currentGame && this.phase === "playing") {
+        // If match is active, delegate to match
+        if (this.currentMatch && this.phase === "playing") {
             const isLateJoiner = player?.isLateJoiner;
 
             if (isLateJoiner) {
                 // Late joiner sees lobby_wait
                 return {
                     roomId: this.roomId,
-                    gameId: this.currentGame.gameId,
+                    matchId: this.currentMatch.matchId,
+                    gameId: this.currentMatch.matchId, // For legacy client compatibility
                     hostId: this.hostId,
                     players: this.players,
                     phase: "lobby_wait",
@@ -274,17 +311,18 @@ class Room {
                 };
             }
 
-            // Active player gets game state
+            // Active player gets match state
             return {
                 roomId: this.roomId,
-                ...this.currentGame.getStateFor(userId),
+                ...this.currentMatch.getStateFor(userId),
             };
         }
 
         // Lobby or game_over - return room state
-        // IMPORTANT: gameId = roomId for client compatibility
+        // IMPORTANT: matchId = roomId for client compatibility
         return {
             roomId: this.roomId,
+            matchId: this.roomId,
             gameId: this.roomId, // Client expects gameId always
             hostId: this.hostId,
             players: this.players,
@@ -292,8 +330,8 @@ class Room {
             playerOrder: this.playerOrder,
             options: this.options,
             // Include game_over data if available
-            ...(this.phase === "game_over" && this.currentGame
-                ? this.currentGame.getStateFor(userId)
+            ...(this.phase === "game_over" && this.currentMatch
+                ? this.currentMatch.getStateFor(userId)
                 : {}),
         };
     }
