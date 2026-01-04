@@ -6,8 +6,14 @@ const PlayerManager = require("../game/PlayerManager");
 const dbService = require("../services/db");
 jest.mock("../services/db", () => ({
     saveGameAnalytics: jest.fn(),
+    saveGame: jest.fn(),
+    saveRoom: jest.fn(),
+    updatePlayerStats: jest.fn(),
+    getPlayerStats: jest.fn(),
+    getGameState: jest.fn(),
     deleteGameState: jest.fn().mockResolvedValue(true),
     getActiveGames: jest.fn().mockResolvedValue([]),
+    initialize: jest.fn(),
 }));
 
 // Mock de Firestore (admin)

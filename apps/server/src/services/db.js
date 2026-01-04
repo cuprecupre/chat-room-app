@@ -3,7 +3,10 @@ const admin = require("firebase-admin");
 class DBService {
     constructor() {
         this.db = null;
-        this.collectionName = "games";
+        this.roomsCollection = "rooms";
+        this.gamesCollection = "games";
+        this.analyticsCollection = "game_analytics";
+        this.playerStatsCollection = "player_stats";
     }
 
     /**
@@ -13,7 +16,7 @@ class DBService {
         try {
             this.db = admin.firestore();
             this.db.settings({ ignoreUndefinedProperties: true });
-            console.log(`✅ [DB Service] Initialized. Collection: '${this.collectionName}'`);
+            console.log(`✅ [DB Service] Initialized.`);
         } catch (e) {
             console.error("❌ [DB Service] Failed to initialize Firestore:", e.message);
         }
@@ -40,13 +43,47 @@ class DBService {
     }
 
     /**
-     * Retrieves game state (for admin purposes).
+     * Saves room metadata to Firestore.
+     */
+    async saveRoom(roomId, roomData) {
+        if (!this.db) return;
+        try {
+            const docRef = this.db.collection(this.roomsCollection).doc(roomId);
+            await docRef.set({
+                ...roomData,
+                lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+            }, { merge: true });
+            console.log(`✅ [DB Service] Room ${roomId} persisted`);
+        } catch (error) {
+            console.error(`⚠️ [DB Service] Room save failed for ${roomId}: ${error.message}`);
+        }
+    }
+
+    /**
+     * Saves game results to Firestore.
+     */
+    async saveGame(gameId, gameData) {
+        if (!this.db) return;
+        try {
+            const docRef = this.db.collection(this.gamesCollection).doc(gameId);
+            await docRef.set({
+                ...gameData,
+                savedAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+            console.log(`✅ [DB Service] Game ${gameId} persisted`);
+        } catch (error) {
+            console.error(`⚠️ [DB Service] Game save failed for ${gameId}: ${error.message}`);
+        }
+    }
+
+    /**
+     * Retrieves game state (legacy/admin).
      */
     async getGameState(gameId) {
         if (!this.db) return null;
 
         try {
-            const doc = await this.db.collection(this.collectionName).doc(gameId).get();
+            const doc = await this.db.collection(this.gamesCollection).doc(gameId).get();
             return doc.exists ? doc.data() : null;
         } catch (error) {
             console.error(`⚠️ [DB Service] Load failed for ${gameId}: ${error.message}`);
@@ -55,13 +92,13 @@ class DBService {
     }
 
     /**
-     * Deletes a game from Firestore.
+     * Deletes a game state (legacy/admin).
      */
     async deleteGameState(gameId) {
         if (!this.db) return;
 
         try {
-            await this.db.collection(this.collectionName).doc(gameId).delete();
+            await this.db.collection(this.gamesCollection).doc(gameId).delete();
         } catch (error) {
             console.error(`⚠️ [DB Service] Delete failed for ${gameId}: ${error.message}`);
             throw error;
@@ -69,21 +106,79 @@ class DBService {
     }
 
     /**
-     * Saves game analytics to the game_analytics collection.
-     * Called only when a game ends (for analytics purposes).
+     * Saves legacy analytics.
+     * @deprecated Use saveGame instead.
      */
     async saveGameAnalytics(gameId, analyticsData) {
         if (!this.db) return;
 
         try {
-            const docRef = this.db.collection("game_analytics").doc(gameId);
+            const docRef = this.db.collection(this.analyticsCollection).doc(gameId);
             await docRef.set({
                 ...analyticsData,
                 savedAt: admin.firestore.FieldValue.serverTimestamp(),
             });
-            console.log(`✅ [DB Service] Analytics saved for game ${gameId}`);
+            console.log(`✅ [DB Service] Legacy analytics saved for game ${gameId}`);
         } catch (error) {
-            console.error(`⚠️ [DB Service] Analytics save failed for ${gameId}: ${error.message}`);
+            console.error(`⚠️ [DB Service] Legacy analytics save failed for ${gameId}: ${error.message}`);
+        }
+    }
+
+    /**
+     * Updates player statistics incrementally.
+     * @param {string} uid - User ID
+     * @param {Object} stats - Stats to increment/update
+     */
+    async updatePlayerStats(uid, stats = {}) {
+        if (!this.db || !uid) return;
+
+        try {
+            const docRef = this.db.collection(this.playerStatsCollection).doc(uid);
+
+            const updates = {
+                lastPlayedAt: admin.firestore.FieldValue.serverTimestamp(),
+            };
+
+            // Metadata updates (name, photo)
+            if (stats.displayName) updates.displayName = stats.displayName;
+            if (stats.photoURL) updates.photoURL = stats.photoURL;
+
+            // Numeric increments
+            const numericFields = [
+                'gamesPlayed',
+                'gamesAsImpostor',
+                'winsAsImpostor',
+                'winsAsFriend',
+                'points',
+                'playTimeSeconds'
+            ];
+
+            numericFields.forEach(field => {
+                if (stats[field]) {
+                    updates[field] = admin.firestore.FieldValue.increment(stats[field]);
+                }
+            });
+
+            await docRef.set(updates, { merge: true });
+            console.log(`✅ [DB Service] Stats updated for user ${uid}`);
+        } catch (error) {
+            console.error(`⚠️ [DB Service] Stats update failed for ${uid}: ${error.message}`);
+        }
+    }
+
+    /**
+     * Retrieves player statistics.
+     * @param {string} uid - User ID
+     */
+    async getPlayerStats(uid) {
+        if (!this.db || !uid) return null;
+
+        try {
+            const doc = await this.db.collection(this.playerStatsCollection).doc(uid).get();
+            return doc.exists ? doc.data() : null;
+        } catch (error) {
+            console.error(`⚠️ [DB Service] Profile load failed for ${uid}: ${error.message}`);
+            return null;
         }
     }
 }

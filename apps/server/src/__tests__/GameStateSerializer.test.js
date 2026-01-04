@@ -49,7 +49,7 @@ describe("GameStateSerializer - Eliminated Players", () => {
         const state = getStateForPlayer(mockGame, "user2");
 
         // Eliminated player was not the impostor
-        expect(state.role).toBe("amigo");
+        expect(state.role).toBe("friend");
     });
 
     test("eliminated player should receive eliminatedPlayers list", () => {

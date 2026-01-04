@@ -4,58 +4,164 @@ const VotingManager = require("./game/VotingManager");
 const RoundManager = require("./game/RoundManager");
 const GameStateSerializer = require("./game/GameStateSerializer");
 
+/**
+ * Game - A single match (1-3 rounds) within a Room.
+ * 
+ * Games are ephemeral and created fresh for each "Play Again".
+ * Room-level state (playerOrder, host, history) is passed in from Room.
+ */
 class Game {
-    constructor(hostUser, options = {}) {
-        this.gameId = Math.random().toString(36).substring(2, 7).toUpperCase();
-        this.hostId = hostUser.uid;
-        this.players = [];
+    /**
+     * Create a new Game instance.
+     * @param {Room|Object} roomOrHostUser - Room instance or legacy hostUser object
+     * @param {Object} options - Game options
+     */
+    constructor(roomOrHostUser, options = {}) {
+        // Detect if this is a Room instance or a legacy hostUser object
+        // Room has roomId property, hostUser has uid property
+        const isRoom = roomOrHostUser && roomOrHostUser.roomId !== undefined;
+
+        if (isRoom) {
+            // New Room-based architecture
+            const room = roomOrHostUser;
+
+            // Room context
+            this.roomId = room.roomId;
+            this.gameId = this.generateGameId();
+            this.hostId = room.hostId;
+
+            // Copy players from room (eligible players only)
+            this.players = [...(options.players || room.players || [])];
+
+            // Inherit Room-level tracking
+            this.lastStartingPlayerId = room.lastStartingPlayerId || null;
+            this.impostorHistory = [...(room.impostorHistory || [])];
+            this.formerPlayers = { ...room.formerPlayers };
+
+            // Game options
+            this.showImpostorHint = room.options?.showImpostorHint !== undefined
+                ? room.options.showImpostorHint : true;
+            this.options = options.options || room.options;
+        } else {
+            // Legacy mode: first argument is hostUser
+            const hostUser = roomOrHostUser;
+
+            // Generate IDs
+            this.gameId = this.generateGameId();
+            this.roomId = options.roomId || this.gameId; // For legacy compat
+            this.hostId = hostUser.uid;
+
+            // Legacy player initialization
+            this.players = [];
+
+            // Add host as first player if hostUser provided
+            if (hostUser && hostUser.uid) {
+                this.players.push({
+                    uid: hostUser.uid,
+                    name: hostUser.name,
+                    photoURL: hostUser.photoURL || null,
+                    joinedAt: Date.now(),
+                });
+            }
+
+            // Legacy tracking
+            this.lastStartingPlayerId = options.lastStartingPlayerId || null;
+            this.impostorHistory = [...(options.impostorHistory || [])];
+            this.formerPlayers = {};
+
+            // Game options
+            this.showImpostorHint = options.showImpostorHint !== undefined
+                ? options.showImpostorHint : true;
+            this.options = options;
+        }
+
+        // Timing
+        this.startedAt = Date.now();
+
+        // Game-specific state (reset each match)
         this.phase = "lobby";
         this.secretWord = "";
         this.secretCategory = "";
         this.impostorId = "";
         this.roundPlayers = [];
 
-        // Opciones del juego
-        this.showImpostorHint =
-            options.showImpostorHint !== undefined ? options.showImpostorHint : true;
-
-        // Sistema de rondas (nuevo: sin vueltas)
+        // Round system
         this.currentRound = 0;
-        this.maxRounds = RoundManager.MAX_ROUNDS; // 3
+        this.maxRounds = RoundManager.MAX_ROUNDS;
         this.eliminatedPlayers = [];
 
-        // Sistema de votación
+        // Voting
         this.votes = {};
         this.roundHistory = [];
 
-        // Sistema de puntos
+        // Scoring
         this.playerScores = {};
         this.lastRoundScores = {};
         this.winnerId = null;
 
-        // Sistema de orden y jugador inicial
+        // Turn tracking
         this.playerOrder = [];
         this.startingPlayerId = null;
-        this.lastStartingPlayerId = null; // Para rotación entre partidas
 
-        // Historial de impostores (para evitar repeticiones entre partidas)
-        this.impostorHistory = [];
+        // Initialize player scores
+        this.players.forEach(p => {
+            this.playerScores[p.uid] = 0;
+        });
 
-        // Jugadores que abandonaron
-        this.formerPlayers = {};
-
-        if (!options.isRestoring) {
-            PlayerManager.addPlayer(this, hostUser);
-        }
+        // Update player order
+        PlayerManager.updatePlayerOrder(this);
     }
 
     /**
-     * Persist analytics data when game ends.
+     * Generate unique game ID.
+     */
+    generateGameId() {
+        return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 7)}`.toUpperCase();
+    }
+
+    /**
+     * Persist game data and update player stats when match ends.
      */
     persistAnalytics(endReason = "completed") {
-        const analyticsData = GameStateSerializer.getAnalyticsState(this);
-        analyticsData.endReason = endReason;
-        dbService.saveGameAnalytics(this.gameId, analyticsData);
+        const gameData = GameStateSerializer.getEnrichedGameData(this);
+        gameData.endReason = endReason;
+
+        // Calculate match duration
+        const durationSeconds = Math.floor((Date.now() - this.startedAt) / 1000);
+
+        // 1. Save full game record to /games collection
+        dbService.saveGame(this.gameId, gameData);
+
+        // 2. Also save to legacy /game_analytics (optional)
+        dbService.saveGameAnalytics(this.gameId, gameData);
+
+        // 3. Aggregate player statistics
+        this.players.forEach((player) => {
+            const isImpostor = this.impostorId === player.uid;
+            const won = this.winnerId === player.uid ||
+                (this.winnerId === "amigos" && !isImpostor);
+
+            const statsUpdate = {
+                displayName: player.name,
+                photoURL: player.photoURL || null,
+                gamesPlayed: 1,
+                points: this.playerScores[player.uid] || 0,
+                playTimeSeconds: durationSeconds
+            };
+
+            if (isImpostor) {
+                statsUpdate.gamesAsImpostor = 1;
+                if (this.winnerId === this.impostorId) {
+                    statsUpdate.winsAsImpostor = 1;
+                }
+            } else {
+                if (this.winnerId === "amigos") {
+                    statsUpdate.winsAsFriend = 1;
+                }
+            }
+
+            dbService.updatePlayerStats(player.uid, statsUpdate);
+        });
     }
 
     addPlayer(user) {

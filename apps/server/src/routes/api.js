@@ -1,5 +1,5 @@
 const express = require("express");
-const gameManager = require("../services/gameManager");
+const roomManager = require("../services/roomManager");
 const dbService = require("../services/db");
 const statsManager = require("../services/statsManager");
 const shutdownManager = require("../services/shutdownManager");
@@ -33,27 +33,28 @@ function requireAdmin(req, res, next) {
 }
 
 /**
- * GET /api/game/:gameId
- * Get game preview info (for join links, social sharing, etc.)
- * Note: Only checks in-memory games (no Firestore fallback since games are not persisted during play)
+ * GET /api/game/:roomId
+ * Get room/game preview info (for join links, social sharing, etc.)
+ * Note: Now checks in-memory Rooms (Phase 1 architecture)
  */
-router.get("/game/:gameId", (req, res) => {
-    const { gameId } = req.params;
-    const safeGameId = (gameId || "").toUpperCase();
+router.get("/game/:roomId", (req, res) => {
+    const { roomId } = req.params;
+    const safeRoomId = (roomId || "").toUpperCase();
 
-    const game = gameManager.getGame(safeGameId);
+    const room = roomManager.getRoom(safeRoomId);
 
-    if (!game) {
-        return res.status(404).json({ error: "Game not found" });
+    if (!room) {
+        return res.status(404).json({ error: "Room not found" });
     }
 
-    const host = game.players.find((p) => p.uid === game.hostId);
+    const host = room.players.find((p) => p.uid === room.hostId);
 
     res.json({
-        gameId: safeGameId,
+        roomId: safeRoomId,
+        gameId: safeRoomId, // Maintain gameId for client compatibility
         hostName: host ? host.name : "Anfitrión desconocido",
-        playerCount: game.players.length,
-        status: game.phase,
+        playerCount: room.players.length,
+        status: room.phase,
     });
 });
 

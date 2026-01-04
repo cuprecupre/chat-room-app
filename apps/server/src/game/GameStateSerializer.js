@@ -33,7 +33,7 @@ function getStateForPlayer(game, userId) {
             baseState.phase = "lobby_wait";
         } else {
             // Player is active or eliminated - keep in playing phase
-            baseState.role = game.impostorId === userId ? "impostor" : "amigo";
+            baseState.role = game.impostorId === userId ? "impostor" : "friend";
             const isImpostor = game.impostorId === userId;
             baseState.secretWord = isImpostor ? "Descubre la palabra secreta" : game.secretWord;
             if (isImpostor && game.showImpostorHint) {
@@ -55,8 +55,8 @@ function getStateForPlayer(game, userId) {
         baseState.impostorName = impostor
             ? impostor.name
             : formerImpostor
-              ? formerImpostor.name
-              : "Jugador desconectado";
+                ? formerImpostor.name
+                : "Jugador desconectado";
         baseState.impostorId = game.impostorId;
         baseState.secretWord = game.secretWord;
         baseState.lastRoundScores = game.lastRoundScores;
@@ -113,7 +113,43 @@ function getAnalyticsState(game) {
     };
 }
 
+/**
+ * Returns enriched game data for full persistence in /games collection.
+ */
+function getEnrichedGameData(game) {
+    const playersInfo = game.players.map((p) => {
+        const isImpostor = game.impostorId === p.uid;
+        const eliminated = game.eliminatedPlayers || [];
+        return {
+            uid: p.uid,
+            name: p.name,
+            role: isImpostor ? "impostor" : "friend",
+            score: game.playerScores[p.uid] || 0,
+            wasEliminated: eliminated.includes(p.uid),
+        };
+    });
+
+    // Determine winning team
+    const impostorWon = game.winnerId === game.impostorId;
+    const winningTeam = game.winnerId === "tie" ? "tie" : impostorWon ? "impostor" : "friends";
+
+    return {
+        gameId: game.gameId,
+        roomId: game.roomId,
+        impostorId: game.impostorId,
+        winnerId: game.winnerId || null,
+        winningTeam,
+        roundCount: game.currentRound,
+        players: playersInfo,
+        rounds: game.roundHistory || [],
+        startedAt: game.startedAt || null,
+        endedAt: Date.now(),
+        options: game.options || {},
+    };
+}
+
 module.exports = {
     getStateForPlayer,
     getAnalyticsState,
+    getEnrichedGameData,
 };

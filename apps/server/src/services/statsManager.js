@@ -12,15 +12,15 @@ class StatsManager {
             serverStartTime: Date.now(),
         };
         this.sessionManager = null;
-        this.gameManager = null;
+        this.roomManager = null;
     }
 
     /**
      * Initialize the stats manager with dependencies.
      */
-    initialize(sessionManager, gameManager) {
+    initialize(sessionManager, roomManager) {
         this.sessionManager = sessionManager;
-        this.gameManager = gameManager;
+        this.roomManager = roomManager;
     }
 
     /**
@@ -64,7 +64,7 @@ class StatsManager {
         const connectedUsers = this.sessionManager
             ? Object.keys(this.sessionManager.userSockets).length
             : 0;
-        const activeGames = this.gameManager ? this.gameManager.getGameCount() : 0;
+        const activeGames = this.roomManager ? this.roomManager.getRoomCount() : 0;
 
         return {
             connectedUsers,

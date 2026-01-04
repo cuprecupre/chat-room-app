@@ -4,6 +4,10 @@ const PlayerManager = require("../game/PlayerManager");
 // Mock de DBService para evitar llamadas reales a Firestore
 jest.mock("../services/db", () => ({
     saveGameAnalytics: jest.fn(),
+    saveGame: jest.fn(),
+    saveRoom: jest.fn(),
+    updatePlayerStats: jest.fn(),
+    getPlayerStats: jest.fn(),
     initialize: jest.fn(),
 }));
 

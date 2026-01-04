@@ -153,7 +153,7 @@ describe("Anonymous User Integration", () => {
             sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
 
             const friendState = sim.getStateForPlayer(sim.getNonImpostorIndex());
-            expect(friendState.role).toBe("amigo");
+            expect(friendState.role).toBe("friend");
             expect(friendState.secretWord).not.toBe("Descubre la palabra secreta");
         });
 

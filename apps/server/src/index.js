@@ -12,7 +12,7 @@ const { createSocketServer } = require("./config/socketio");
 const { socketAuthMiddleware } = require("./middleware/auth");
 const apiRoutes = require("./routes/api");
 const dbService = require("./services/db");
-const gameManager = require("./services/gameManager");
+const roomManager = require("./services/roomManager");
 const sessionManager = require("./services/sessionManager");
 const statsManager = require("./services/statsManager");
 const { registerSocketHandlers } = require("./handlers/socketHandlers");
@@ -42,11 +42,11 @@ const server = http.createServer(app);
 // --- Create Socket.IO Server ---
 const io = createSocketServer(server);
 
-// --- Initialize GameManager with Socket.IO ---
-gameManager.initialize(io);
+// --- Initialize RoomManager with Socket.IO ---
+roomManager.initialize(io);
 
 // --- Initialize StatsManager ---
-statsManager.initialize(sessionManager, gameManager);
+statsManager.initialize(sessionManager, roomManager);
 
 // --- Socket.IO Authentication Middleware ---
 io.use(socketAuthMiddleware);

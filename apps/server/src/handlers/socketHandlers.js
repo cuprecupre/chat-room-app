@@ -1,4 +1,4 @@
-const gameManager = require("../services/gameManager");
+const roomManager = require("../services/roomManager");
 const sessionManager = require("../services/sessionManager");
 const statsManager = require("../services/statsManager");
 const shutdownManager = require("../services/shutdownManager");
@@ -39,25 +39,31 @@ function registerSocketHandlers(io, socket) {
     handleReconnection(socket, user);
 
     // Register event handlers
-    socket.on("create-game", (options) => handleCreateGame(socket, user, options));
-    socket.on("join-game", (gameId) => handleJoinGame(io, socket, user, gameId));
-    socket.on("start-game", (gameId) =>
-        handleGameAction(socket, user, gameId, (g) => g.startGame(user.uid))
+    socket.on("create-game", (options) => handleCreateRoom(socket, user, options));
+    socket.on("join-game", (roomId) => handleJoinRoom(io, socket, user, roomId));
+    socket.on("start-game", (roomId) =>
+        handleRoomAction(socket, user, roomId, (r) => r.startGame(user.uid))
     );
-    socket.on("end-game", (gameId) =>
-        handleGameAction(socket, user, gameId, (g) => g.endGame(user.uid))
+    socket.on("end-game", (roomId) =>
+        handleRoomAction(socket, user, roomId, (r) => {
+            if (r.currentGame) {
+                r.currentGame.endGame(user.uid);
+                r.onGameEnd();
+            }
+        })
     );
-    socket.on("next-round", (gameId) =>
-        handleGameAction(socket, user, gameId, (g) => g.continueToNextRound(user.uid))
+    socket.on("next-round", (roomId) =>
+        handleRoomAction(socket, user, roomId, (r) => {
+            if (r.currentGame) r.currentGame.continueToNextRound(user.uid);
+        })
     );
-    socket.on("play-again", (gameId) =>
-        handleGameAction(socket, user, gameId, (g) => g.playAgain(user.uid))
+    socket.on("play-again", (roomId) =>
+        handleRoomAction(socket, user, roomId, (r) => r.playAgain(user.uid))
     );
     socket.on("cast-vote", (data) => handleCastVote(socket, user, data));
-    socket.on("leave-game", (gameId, callback) =>
-        handleLeaveGame(io, socket, user, gameId, callback)
+    socket.on("leave-game", (roomId, callback) =>
+        handleLeaveRoom(io, socket, user, roomId, callback)
     );
-    socket.on("migrate-game", (gameId) => handleMigrateGame(io, socket, user, gameId));
     socket.on("get-state", () => handleGetState(socket, user));
     socket.on("heartbeat", () => sessionManager.updateHeartbeat(user.uid));
     socket.on("disconnect", () => handleDisconnect(io, socket, user));
@@ -76,27 +82,27 @@ function handleReconnection(socket, user) {
         return;
     }
 
-    // Check if user is already in a game
-    const existingGame = gameManager.findUserGame(user.uid);
-    if (existingGame) {
-        socket.join(existingGame.gameId);
-        console.log(`User ${user.name} reconnected to game ${existingGame.gameId}`);
+    // Check if user is already in a room
+    const existingRoom = roomManager.findUserRoom(user.uid);
+    if (existingRoom) {
+        socket.join(existingRoom.roomId);
+        console.log(`User ${user.name} reconnected to room ${existingRoom.roomId}`);
         sessionManager.clearPendingDisconnect(user.uid);
-        socket.emit("game-state", existingGame.getStateFor(user.uid));
+        socket.emit("game-state", existingRoom.getStateFor(user.uid));
         return;
     }
 
     // Check if user has a pending disconnect
     const pending = sessionManager.getPendingDisconnect(user.uid);
     if (pending) {
-        const pendingGame = gameManager.getGame(pending.gameId);
-        if (pendingGame && pendingGame.players.some((p) => p.uid === user.uid)) {
-            socket.join(pendingGame.gameId);
-            console.log(`User ${user.name} reconnected to pending game ${pendingGame.gameId}`);
+        const pendingRoom = roomManager.getRoom(pending.gameId);
+        if (pendingRoom && pendingRoom.players.some((p) => p.uid === user.uid)) {
+            socket.join(pendingRoom.roomId);
+            console.log(`User ${user.name} reconnected to pending room ${pendingRoom.roomId}`);
             sessionManager.clearPendingDisconnect(user.uid);
-            socket.emit("game-state", pendingGame.getStateFor(user.uid));
+            socket.emit("game-state", pendingRoom.getStateFor(user.uid));
         } else {
-            console.log(`User ${user.name} had pending disconnect but game/player no longer valid`);
+            console.log(`User ${user.name} had pending disconnect but room/player no longer valid`);
             sessionManager.clearPendingDisconnect(user.uid);
             socket.emit("game-state", null);
         }
@@ -104,10 +110,10 @@ function handleReconnection(socket, user) {
 }
 
 /**
- * Handle game creation.
+ * Handle room creation (renamed from handleCreateGame).
  */
-async function handleCreateGame(socket, user, options = {}) {
-    // Block new game creation during shutdown
+async function handleCreateRoom(socket, user, options = {}) {
+    // Block new room creation during shutdown
     if (shutdownManager.isShuttingDown) {
         return socket.emit(
             "error-message",
@@ -115,235 +121,151 @@ async function handleCreateGame(socket, user, options = {}) {
         );
     }
 
-    // Clean up ANY previous games the user might be in (ghost busting 👻)
-    await gameManager.cleanupUserPreviousGames(user.uid);
+    // Clean up ANY previous rooms the user might be in
+    await roomManager.cleanupUserPreviousRooms(user.uid);
 
-    const newGame = gameManager.createGame(user, options);
-    socket.join(newGame.gameId);
-    gameManager.emitGameState(newGame);
+    const newRoom = roomManager.createRoom(user, options);
+    socket.join(newRoom.roomId);
+    roomManager.emitRoomState(newRoom);
     statsManager.incrementGamesCreated();
-    console.log(`Game created: ${newGame.gameId} by ${user.name} with options:`, options);
+    console.log(`Room created: ${newRoom.roomId} by ${user.name} with options:`, options);
 }
 
 /**
- * Handle joining a game.
+ * Handle joining a room.
  */
-async function handleJoinGame(io, socket, user, gameId) {
-    const gameToJoin = gameManager.getGame(gameId);
-    if (!gameToJoin) {
-        return socket.emit("error-message", "La partida no existe.");
+async function handleJoinRoom(io, socket, user, roomId) {
+    const roomToJoin = roomManager.getRoom(roomId);
+    if (!roomToJoin) {
+        return socket.emit("error-message", "La sala no existe.");
     }
 
-    const isAlreadyInGame = gameToJoin.players.some((p) => p.uid === user.uid);
-    if (gameToJoin.phase === "playing" && !isAlreadyInGame) {
-        return socket.emit("error-message", "No puedes unirte a una partida en curso.");
-    }
+    const isAlreadyInRoom = roomToJoin.players.some((p) => p.uid === user.uid);
 
-    // Clean up ANY previous games the user might be in (except the one they are joining)
-    await gameManager.cleanupUserPreviousGames(user.uid, gameId);
+    // Players CAN join a room during a game - they become late joiners
+    // They'll wait in lobby_wait until the next game starts
 
-    gameToJoin.addPlayer(user);
-    socket.join(gameId);
-    gameManager.emitGameState(gameToJoin);
+    // Clean up ANY previous rooms the user might be in (except the one they are joining)
+    await roomManager.cleanupUserPreviousRooms(user.uid, roomId);
 
-    // Cancel any pending cleanup for this game (player rejoined)
-    gameManager.cancelEmptyGameCleanup(gameId);
+    roomToJoin.addPlayer(user);
+    socket.join(roomId);
+    roomManager.emitRoomState(roomToJoin);
 
-    console.log(`User ${user.name} joined game ${gameId}`);
+    // Cancel any pending cleanup for this room (player rejoined)
+    roomManager.cancelEmptyRoomCleanup(roomId);
+
+    console.log(`User ${user.name} joined room ${roomId}${roomToJoin.phase === 'playing' ? ' (late joiner)' : ''}`);
 }
 
 /**
- * Generic handler for game actions.
+ * Generic handler for room actions.
  */
-function handleGameAction(socket, user, gameId, action) {
-    const game = gameManager.getGame(gameId);
-    if (!game) {
-        return socket.emit("error-message", "La partida no existe.");
+function handleRoomAction(socket, user, roomId, action) {
+    const room = roomManager.getRoom(roomId);
+    if (!room) {
+        return socket.emit("error-message", "La sala no existe.");
     }
-    if (!game.players.some((p) => p.uid === user.uid)) {
-        return socket.emit("error-message", "No perteneces a esta partida.");
+    if (!room.players.some((p) => p.uid === user.uid)) {
+        return socket.emit("error-message", "No perteneces a esta sala.");
     }
     try {
-        action(game);
-        gameManager.emitGameState(game);
+        action(room);
+        roomManager.emitRoomState(room);
     } catch (error) {
-        console.error(`Action failed for game ${gameId}:`, error.message);
+        console.error(`Action failed for room ${roomId}:`, error.message);
         socket.emit("error-message", error.message);
     }
 }
 /**
  * Handle voting.
- * Optimized: sends minimal vote updates during voting, full state only when voting completes.
+ * Votes go to the current Game within the Room.
  */
 function handleCastVote(socket, user, { gameId, targetId }) {
-    const game = gameManager.getGame(gameId);
-    if (!game) {
+    // gameId is actually roomId in new architecture
+    const room = roomManager.getRoom(gameId);
+    if (!room || !room.currentGame) {
         return socket.emit("error-message", "La partida no existe.");
     }
-    if (!game.players.some((p) => p.uid === user.uid)) {
-        return socket.emit("error-message", "No perteneces a esta partida.");
+    const game = room.currentGame;
+    if (!room.players.some((p) => p.uid === user.uid)) {
+        return socket.emit("error-message", "No perteneces a esta sala.");
     }
     try {
         const { phaseChanged, allVoted } = game.castVote(user.uid, targetId);
 
         // Send full state when voting completes (phase change OR turn change)
-        // This ensures clients receive currentTurn updates for turn transitions
         if (phaseChanged || allVoted) {
-            gameManager.emitGameState(game);
+            // Check if game ended
+            if (game.phase === "game_over") {
+                room.onGameEnd();
+            }
+            roomManager.emitRoomState(room);
         } else {
-            // Just a vote - send minimal update (~100x less data)
-            gameManager.emitVoteUpdate(game, user.uid, targetId);
+            // Just a vote - send minimal update
+            roomManager.emitVoteUpdate(room, user.uid, targetId);
         }
     } catch (error) {
-        console.error(`Vote failed for game ${gameId}:`, error.message);
+        console.error(`Vote failed for room ${gameId}:`, error.message);
         socket.emit("error-message", error.message);
     }
 }
 
 /**
- * Handle explicit game leaving.
+ * Handle explicit room leaving.
  */
-function handleLeaveGame(io, socket, user, gameId, callback) {
+function handleLeaveRoom(io, socket, user, roomId, callback) {
     const safeCallback = () => {
         if (typeof callback === "function") callback();
     };
 
-    const game = gameManager.getGame(gameId);
-    if (!game || !game.players.some((p) => p.uid === user.uid)) {
+    const room = roomManager.getRoom(roomId);
+    if (!room || !room.players.some((p) => p.uid === user.uid)) {
         socket.emit("game-state", null);
         safeCallback();
         return;
     }
 
-    console.log(`User ${user.name} is EXPLICITLY leaving game ${gameId}`);
+    console.log(`User ${user.name} is EXPLICITLY leaving room ${roomId}`);
 
     sessionManager.markExplicitlyLeft(user.uid);
     sessionManager.clearPendingDisconnect(user.uid);
 
-    const newHostInfo = game.removePlayer(user.uid);
+    const { newHostInfo } = room.removePlayer(user.uid);
 
     // Reset leaving player state
     socket.emit("game-state", null);
-    socket.leave(gameId);
+    socket.leave(roomId);
 
     // Notify remaining players
-    gameManager.emitGameState(game);
+    roomManager.emitRoomState(room);
 
     // Send toast notification
-    if (game.players.length > 0) {
+    if (room.players.length > 0) {
         if (newHostInfo) {
-            gameManager.emitToast(
-                gameId,
+            roomManager.emitToast(
+                roomId,
                 `${user.name} ha abandonado. Ahora el anfitrión es ${newHostInfo.name}`
             );
             console.log(`[Host Transfer] ${user.name} abandonó. Nuevo host: ${newHostInfo.name}`);
         } else {
-            gameManager.emitToast(gameId, `${user.name} ha abandonado el juego`);
+            roomManager.emitToast(roomId, `${user.name} ha abandonado el juego`);
         }
     } else {
-        // Game is now empty - schedule for cleanup
-        gameManager.scheduleEmptyGameCleanup(gameId);
+        // Room is now empty - schedule for cleanup
+        roomManager.scheduleEmptyRoomCleanup(roomId);
     }
 
-    console.log(`User ${user.name} successfully left game ${gameId}`);
+    console.log(`User ${user.name} successfully left room ${roomId}`);
     safeCallback();
-}
-
-/**
- * Handle game migration (for old system games).
- * Creates a new game and moves all players to it.
- */
-async function handleMigrateGame(io, socket, user, oldGameId) {
-    const oldGame = gameManager.getGame(oldGameId);
-    if (!oldGame) {
-        return socket.emit("error-message", "La partida no existe.");
-    }
-
-    if (oldGame.phase !== "needs_migration") {
-        return socket.emit("error-message", "Esta partida no necesita migración.");
-    }
-
-    // Solo el host puede migrar
-    if (oldGame.hostId !== user.uid) {
-        return socket.emit("error-message", "Solo el anfitrión puede migrar la partida.");
-    }
-
-    const playersList = oldGame.players.map((p) => p.name).join(", ");
-    console.log(`[Migration] Starting migration for game ${oldGameId}`);
-    console.log(`[Migration]   - Players to migrate: ${playersList}`);
-
-    // Limpiar sesiones fantasma del HOST (excepto la partida actual de migración)
-    await gameManager.cleanupUserPreviousGames(user.uid, oldGameId);
-
-    // Crear nueva partida con el host
-    const newGame = gameManager.createGame(user, { showImpostorHint: oldGame.showImpostorHint });
-    console.log(`[Migration]   - New game created: ${newGame.gameId}`);
-
-    // Mover al host a la nueva partida
-    socket.leave(oldGameId);
-    socket.join(newGame.gameId);
-    console.log(`[Migration]   - Host ${user.name} moved to new game`);
-
-    // Mover a todos los demás jugadores
-    const otherPlayers = oldGame.players.filter((p) => p.uid !== user.uid);
-    for (const player of otherPlayers) {
-        // Limpiar sesiones fantasma del JUGADOR (excepto oldGameId)
-        await gameManager.cleanupUserPreviousGames(player.uid, oldGameId);
-
-        // Añadir a la nueva partida
-        newGame.addPlayer(player);
-
-        // Obtener el socket del jugador y moverlo
-        const playerSocketId = sessionManager.getUserSocket(player.uid);
-        if (playerSocketId) {
-            const playerSocket = io.sockets.sockets.get(playerSocketId);
-            if (playerSocket) {
-                playerSocket.leave(oldGameId);
-                playerSocket.join(newGame.gameId);
-                console.log(`[Migration]   - Player ${player.name} moved to new game`);
-            } else {
-                console.log(
-                    `[Migration]   ⚠️ Player ${player.name} socket not found in io.sockets`
-                );
-            }
-        } else {
-            console.log(`[Migration]   ⚠️ Player ${player.name} socket ID not found`);
-        }
-    }
-
-    // Limpiar la partida vieja de memoria
-    oldGame.players = [];
-    delete gameManager.games[oldGameId];
-
-    // IMPORTANTE: Borrar la partida vieja de Firestore para evitar que usuarios queden asociados
-    const dbService = require("../services/db");
-    dbService
-        .deleteGameState(oldGameId)
-        .then(() => {
-            console.log(`[Migration]   - Old game ${oldGameId} deleted from Firestore`);
-        })
-        .catch((err) => {
-            console.error(
-                `[Migration]   ⚠️ Failed to delete old game from Firestore:`,
-                err.message
-            );
-        });
-
-    console.log(
-        `[Migration] ✅ Migration complete: ${oldGameId} → ${newGame.gameId} (${newGame.players.length} players)`
-    );
-
-    // Emitir estado nuevo a todos los jugadores en la nueva room
-    gameManager.emitGameState(newGame);
-    statsManager.incrementGamesCreated();
 }
 
 /**
  * Handle state request.
  */
 function handleGetState(socket, user) {
-    const userGame = gameManager.findUserGame(user.uid);
-    socket.emit("game-state", userGame ? userGame.getStateFor(user.uid) : null);
+    const userRoom = roomManager.findUserRoom(user.uid);
+    socket.emit("game-state", userRoom ? userRoom.getStateFor(user.uid) : null);
 }
 
 /**
@@ -352,8 +274,8 @@ function handleGetState(socket, user) {
 function handleDisconnect(io, socket, user) {
     console.log(`User disconnected: ${user.name}`);
 
-    const userGame = gameManager.findUserGame(user.uid);
-    if (userGame) {
+    const userRoom = roomManager.findUserRoom(user.uid);
+    if (userRoom) {
         const wasRecentlyActive = sessionManager.wasRecentlyActive(user.uid);
         const gracePeriod = wasRecentlyActive ? MOBILE_GRACE_PERIOD : INACTIVE_GRACE_PERIOD;
         const graceType = wasRecentlyActive ? "mobile lock detected" : "was already inactive";
@@ -361,39 +283,39 @@ function handleDisconnect(io, socket, user) {
         const userName = user.name;
         sessionManager.setPendingDisconnect(
             user.uid,
-            userGame.gameId,
+            userRoom.roomId,
             () => {
-                const g = gameManager.getGame(userGame.gameId);
-                if (!g) return;
+                const room = roomManager.getRoom(userRoom.roomId);
+                if (!room) return;
 
                 console.log(
-                    `[Grace Expired] Removing user ${userName} from game ${userGame.gameId}`
+                    `[Grace Expired] Removing user ${userName} from room ${userRoom.roomId}`
                 );
-                const newHostInfo = g.removePlayer(user.uid);
-                gameManager.emitGameState(g);
+                const { newHostInfo } = room.removePlayer(user.uid);
+                roomManager.emitRoomState(room);
 
-                if (g.players.length > 0) {
+                if (room.players.length > 0) {
                     if (newHostInfo) {
-                        gameManager.emitToast(
-                            userGame.gameId,
+                        roomManager.emitToast(
+                            userRoom.roomId,
                             `${userName} se ha desconectado. Ahora el anfitrión es ${newHostInfo.name}`
                         );
                         console.log(
                             `[Host Transfer] ${userName} desconectado. Nuevo host: ${newHostInfo.name}`
                         );
                     } else {
-                        gameManager.emitToast(userGame.gameId, `${userName} se ha desconectado`);
+                        roomManager.emitToast(userRoom.roomId, `${userName} se ha desconectado`);
                     }
                 } else {
-                    // Game is now empty - schedule for cleanup
-                    gameManager.scheduleEmptyGameCleanup(userGame.gameId);
+                    // Room is now empty - schedule for cleanup
+                    roomManager.scheduleEmptyRoomCleanup(userRoom.roomId);
                 }
             },
             gracePeriod
         );
 
         console.log(
-            `[Disconnect] Grace timer started for user ${user.name} in game ${userGame.gameId} (${graceType})`
+            `[Disconnect] Grace timer started for user ${user.name} in room ${userRoom.roomId} (${graceType})`
         );
     }
 

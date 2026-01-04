@@ -141,7 +141,7 @@ describe("Round Transitions (Integration)", () => {
             expect(impostorState.role).toBe("impostor");
             expect(impostorState.secretWord).toBe("Descubre la palabra secreta");
 
-            expect(friendState.role).toBe("amigo");
+            expect(friendState.role).toBe("friend");
             expect(friendState.secretWord).not.toBe("Descubre la palabra secreta");
         });
     });
