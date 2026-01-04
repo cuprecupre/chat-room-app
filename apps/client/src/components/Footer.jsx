@@ -1,7 +1,9 @@
 import React from "react";
 import { LogOut, Coffee } from "lucide-react";
 
-export function Footer({ onOpenInstructions, onOpenFeedback, roomId, isMobile, onLeaveRoom }) {
+export function Footer({ onOpenInstructions, onOpenFeedback, roomId, isMobile, onLeaveRoom, onLeaveMatch, phase }) {
+    // Determine if in match (playing, round_result, game_over) vs lobby
+    const isInMatch = phase === "playing" || phase === "round_result" || phase === "game_over";
     return (
         <footer className="w-full pt-6 pb-40 sm:pb-6 px-6 relative z-10">
             {/* Divider para separar del contenido */}
@@ -9,13 +11,22 @@ export function Footer({ onOpenInstructions, onOpenFeedback, roomId, isMobile, o
             <div className="flex flex-col gap-4">
                 {/* Botones globales (Reglas / Feedback / Abandonar) */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-                    {roomId && onLeaveRoom && (
+                    {roomId && isInMatch && onLeaveMatch && (
+                        <button
+                            onClick={onLeaveMatch}
+                            className="inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"
+                        >
+                            <LogOut className="w-5 h-5" />
+                            <span>Abandonar partida</span>
+                        </button>
+                    )}
+                    {roomId && !isInMatch && onLeaveRoom && (
                         <button
                             onClick={onLeaveRoom}
                             className="inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"
                         >
                             <LogOut className="w-5 h-5" />
-                            <span>Abandonar sala</span>
+                            <span>Salir de la sala</span>
                         </button>
                     )}
 

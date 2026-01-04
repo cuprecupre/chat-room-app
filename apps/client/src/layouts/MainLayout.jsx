@@ -2,9 +2,9 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Coffee } from "lucide-react";
 import { Avatar } from "../components/ui/Avatar";
-import { Button } from "../components/ui/Button";
-import { Modal } from "../components/ui/Modal";
 import { Footer } from "../components/Footer";
+import { LeaveMatchModal } from "../components/LeaveMatchModal";
+import { LeaveRoomModal } from "../components/LeaveRoomModal";
 import { ROUTES } from "../routes/routes";
 
 export function MainLayout({
@@ -20,7 +20,7 @@ export function MainLayout({
 }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [showLeaveRoomModal, setShowLeaveRoomModal] = useState(false);
-    const [showEndMatchModal, setShowEndMatchModal] = useState(false);
+    const [showLeaveMatchModal, setShowLeaveMatchModal] = useState(false);
     const menuRef = useRef(null);
     const navigate = useNavigate();
     const location = useLocation();
@@ -44,6 +44,19 @@ export function MainLayout({
             setTimeout(handleCleanExit, 2000);
         }
     }, [emit, gameState]);
+
+    const leaveMatch = useCallback(() => {
+        if (gameState?.roomId) {
+            emit("leave-match", gameState.roomId);
+            setShowLeaveMatchModal(false);
+            setMenuOpen(false);
+        }
+    }, [emit, gameState]);
+
+    const handleLeaveMatchClick = useCallback(() => {
+        setShowLeaveMatchModal(true);
+        setMenuOpen(false);
+    }, []);
 
     const handleTitleClick = useCallback(() => {
         // If in a room (lobby or playing), show confirmation modal
@@ -79,10 +92,6 @@ export function MainLayout({
             console.error("Error during logout:", e);
         }
     }, [onLogout, emit, gameState]);
-
-    const endMatch = useCallback(() => {
-        emit("end-match", gameState?.roomId);
-    }, [emit, gameState]);
 
     // Close dropdown on outside click or Escape key
     useEffect(() => {
@@ -152,31 +161,28 @@ export function MainLayout({
                                         )}
                                     </div>
                                     <div className="my-1 h-px bg-white/10" />
-                                    {isHost && gameState?.phase === "playing" && (
-                                        <>
-                                            <button
-                                                onClick={() => {
-                                                    setShowEndMatchModal(true);
-                                                    setMenuOpen(false);
-                                                }}
-                                                className="block w-full text-left px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md"
-                                            >
-                                                Finalizar partida
-                                            </button>
-                                            <div className="my-1 h-px bg-white/10" />
-                                        </>
-                                    )}
+
                                     {gameState?.roomId && (
                                         <>
-                                            <button
-                                                onClick={() => {
-                                                    setShowLeaveRoomModal(true);
-                                                    setMenuOpen(false);
-                                                }}
-                                                className="block w-full text-left px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md"
-                                            >
-                                                Abandonar sala
-                                            </button>
+                                            {(gameState?.phase === "playing" || gameState?.phase === "round_result" || gameState?.phase === "game_over") && (
+                                                <button
+                                                    onClick={handleLeaveMatchClick}
+                                                    className="block w-full text-left px-3 py-2 text-orange-400 hover:text-orange-300 hover:bg-orange-500/10 rounded-md"
+                                                >
+                                                    Abandonar partida
+                                                </button>
+                                            )}
+                                            {!(gameState?.phase === "playing" || gameState?.phase === "round_result" || gameState?.phase === "game_over") && (
+                                                <button
+                                                    onClick={() => {
+                                                        setShowLeaveRoomModal(true);
+                                                        setMenuOpen(false);
+                                                    }}
+                                                    className="block w-full text-left px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md"
+                                                >
+                                                    Salir de la sala
+                                                </button>
+                                            )}
                                             <div className="my-1 h-px bg-white/10" />
                                         </>
                                     )}
@@ -202,64 +208,29 @@ export function MainLayout({
                 roomId={gameState?.roomId}
                 onCopyLink={onCopyLink}
                 isMobile={isMobile}
+                phase={gameState?.phase}
+                onLeaveMatch={handleLeaveMatchClick}
                 onLeaveRoom={() => setShowLeaveRoomModal(true)}
             />
 
             {/* Modal de confirmación para abandonar sala */}
-            <Modal
+            <LeaveRoomModal
                 isOpen={showLeaveRoomModal}
                 onClose={() => setShowLeaveRoomModal(false)}
-                title="¿Abandonar sala?"
-                size="sm"
-            >
-                <div className="text-center space-y-4">
-                    <p className="text-neutral-400">
-                        Saldrás de la sala por completo. Deberás ser invitado nuevamente para entrar.
-                    </p>
-                    <div className="space-y-2 pt-2">
-                        <Button
-                            onClick={() => {
-                                setShowLeaveRoomModal(false);
-                                leaveRoom();
-                            }}
-                            variant="danger"
-                        >
-                            Sí, abandonar
-                        </Button>
-                        <Button onClick={() => setShowLeaveRoomModal(false)} variant="outline">
-                            Cancelar
-                        </Button>
-                    </div>
-                </div>
-            </Modal>
+                onConfirm={() => {
+                    setShowLeaveRoomModal(false);
+                    leaveRoom();
+                }}
+            />
 
-            {/* Modal de confirmación para finalizar partida */}
-            <Modal
-                isOpen={showEndMatchModal}
-                onClose={() => setShowEndMatchModal(false)}
-                title="¿Finalizar la partida?"
-                size="sm"
-            >
-                <div className="text-center space-y-4">
-                    <p className="text-neutral-400">
-                        Esto terminará la partida actual para todos los jugadores y volverán al lobby de la sala.
-                    </p>
-                    <div className="space-y-2 pt-2">
-                        <Button
-                            onClick={() => {
-                                setShowEndMatchModal(false);
-                                endMatch();
-                            }}
-                            variant="danger"
-                        >
-                            Sí, finalizar
-                        </Button>
-                        <Button onClick={() => setShowEndMatchModal(false)} variant="outline">
-                            Cancelar
-                        </Button>
-                    </div>
-                </div>
-            </Modal>
+            {/* Modal de confirmación para abandonar partida */}
+            <LeaveMatchModal
+                isOpen={showLeaveMatchModal}
+                onClose={() => setShowLeaveMatchModal(false)}
+                onConfirm={leaveMatch}
+                isGameOver={gameState?.phase === "game_over"}
+            />
+
         </div>
     );
 }

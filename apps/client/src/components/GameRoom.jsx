@@ -232,7 +232,7 @@ export function GameRoom({
             <Modal
                 isOpen={showLeaveModal}
                 onClose={() => setShowLeaveModal(false)}
-                title={state.phase === "playing" || state.phase === "round_result" ? "¿Dejar partida?" : "¿Abandonar sala?"}
+                title={state.phase === "playing" || state.phase === "round_result" ? "¿Abandonar partida?" : "¿Salir de la sala?"}
                 size="sm"
             >
                 <div className="text-center space-y-4">
@@ -253,21 +253,23 @@ export function GameRoom({
                                 size="md"
                                 className="w-full"
                             >
-                                Volver a la sala
+                                Abandonar partida
                             </Button>
                         )}
 
-                        <Button
-                            onClick={() => {
-                                setShowLeaveModal(false);
-                                onLeaveRoom();
-                            }}
-                            variant={state.phase === "playing" || state.phase === "round_result" ? "outline" : "primary"}
-                            size="md"
-                            className="w-full"
-                        >
-                            Abandonar sala
-                        </Button>
+                        {state.phase === "lobby" && (
+                            <Button
+                                onClick={() => {
+                                    setShowLeaveModal(false);
+                                    onLeaveRoom();
+                                }}
+                                variant="primary"
+                                size="md"
+                                className="w-full"
+                            >
+                                Salir de la sala
+                            </Button>
+                        )}
 
                         <Button
                             onClick={() => setShowLeaveModal(false)}
