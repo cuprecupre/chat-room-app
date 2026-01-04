@@ -46,6 +46,7 @@ export function useSocket(user) {
             }
 
             try {
+                let token;
                 try {
                     // SIEMPRE obtener token fresco del usuario actual para asegurar coincidencia de identidad
                     // Esto previene errores de "Only the host..." si hay un token viejo en localStorage

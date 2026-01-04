@@ -5,13 +5,13 @@ export function GameNotFoundCard({ roomId, onCancel, onCreate }) {
     return (
         <InvitationCard
             roomId={roomId}
-            title="La partida ya no existe"
-            subtitle="No encontramos esta partida. Es posible que el anfitrión la haya cerrado o el enlace sea incorrecto."
+            title="La sala ya no existe"
+            subtitle="Crea una nueva sala para invitar a tus amigos a jugar otra partida."
             isError={true}
         >
             {onCreate && (
                 <Button onClick={onCreate} variant="primary" className="w-full mb-3">
-                    Crear nueva partida
+                    Crear nueva sala
                 </Button>
             )}
             <Button

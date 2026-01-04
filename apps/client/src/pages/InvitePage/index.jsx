@@ -52,7 +52,12 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
             <GameNotFoundCard
                 roomId={urlRoomId}
                 onCancel={handleCancel}
-                onCreate={() => emit("create-room", {})}
+                onCreate={() => {
+                    const url = new URL(window.location);
+                    url.searchParams.delete("roomId");
+                    window.history.replaceState({}, "", url.toString());
+                    emit("create-room", {});
+                }}
             />
         );
     }
@@ -75,7 +80,13 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
                 <GameNotFoundCard
                     roomId={urlRoomId}
                     onCancel={handleJoinErrorCancel}
-                    onCreate={() => emit("create-room", {})}
+                    onCreate={() => {
+                        // Clear URL first so useSocket accepts the new room state redirect
+                        const url = new URL(window.location);
+                        url.searchParams.delete("roomId");
+                        window.history.replaceState({}, "", url.toString());
+                        emit("create-room", {});
+                    }}
                 />
             );
         }
