@@ -14,6 +14,8 @@ const dbService = require("./services/db");
  */
 class Room {
     constructor(hostUser, options = {}) {
+        // Ensure options is an object
+        const opts = (options && typeof options === 'object') ? options : {};
         // Persistent Room identifier (the shareable code)
         this.roomId = this.generateRoomCode();
         this.createdBy = hostUser.uid;
@@ -28,8 +30,8 @@ class Room {
 
         // Game options (Room-level settings)
         this.options = {
-            showImpostorHint: options.showImpostorHint !== undefined
-                ? options.showImpostorHint : true,
+            showImpostorHint: opts.showImpostorHint !== undefined
+                ? opts.showImpostorHint : true,
         };
 
         // Rotation tracking (persists across games)
@@ -50,10 +52,16 @@ class Room {
     }
 
     /**
-     * Generate a 5-character room code.
+     * Generate a 10-character secure and readable room code.
+     * Alphabet excludes ambiguous characters: 0, 1, I, O, L.
      */
     generateRoomCode() {
-        return Math.random().toString(36).substring(2, 7).toUpperCase();
+        const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let result = '';
+        for (let i = 0; i < 10; i++) {
+            result += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+        }
+        return result;
     }
 
     /**
@@ -139,9 +147,23 @@ class Room {
     }
 
     /**
+     * Update room options.
+     */
+    updateOptions(userId, newOptions) {
+        if (userId !== this.hostId) {
+            throw new Error("Only the host can update room options.");
+        }
+
+        if (newOptions && typeof newOptions === "object") {
+            this.options = { ...this.options, ...newOptions };
+            this.persist();
+        }
+    }
+
+    /**
      * Start a new Game (match) within this Room.
      */
-    startGame(userId) {
+    startGame(userId, options = {}) {
         if (userId !== this.hostId) {
             throw new Error("Only the host can start the game.");
         }
@@ -154,6 +176,12 @@ class Room {
 
         if (eligiblePlayers.length < 2) {
             throw new Error("Not enough eligible players to start.");
+        }
+
+        // Update room options if provided
+        if (options.showImpostorHint !== undefined) {
+            this.options.showImpostorHint = options.showImpostorHint;
+            this.persist();
         }
 
         // Create new Game instance with Room context
@@ -262,6 +290,7 @@ class Room {
             players: this.players,
             phase: this.phase,
             playerOrder: this.playerOrder,
+            options: this.options,
             // Include game_over data if available
             ...(this.phase === "game_over" && this.currentGame
                 ? this.currentGame.getStateFor(userId)

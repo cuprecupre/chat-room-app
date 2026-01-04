@@ -70,21 +70,21 @@ export function useSocket(user) {
 
                 const socket = window.MockSocketIO
                     ? new window.MockSocketIO(socketURL, {
-                          auth: { token, name: user.displayName, photoURL: user.photoURL },
-                          transports: ["websocket", "polling"],
-                          reconnection: true,
-                          reconnectionAttempts: 10,
-                          reconnectionDelay: 1000,
-                          reconnectionDelayMax: 5000,
-                      })
+                        auth: { token, name: user.displayName, photoURL: user.photoURL },
+                        transports: ["websocket", "polling"],
+                        reconnection: true,
+                        reconnectionAttempts: 10,
+                        reconnectionDelay: 1000,
+                        reconnectionDelayMax: 5000,
+                    })
                     : io(socketURL, {
-                          auth: { token, name: user.displayName, photoURL: user.photoURL },
-                          transports: ["websocket", "polling"], // Prioritize WebSocket, fallback to polling
-                          reconnection: true,
-                          reconnectionAttempts: 10, // More attempts for flaky mobile
-                          reconnectionDelay: 1000,
-                          reconnectionDelayMax: 5000,
-                      });
+                        auth: { token, name: user.displayName, photoURL: user.photoURL },
+                        transports: ["websocket", "polling"], // Prioritize WebSocket, fallback to polling
+                        reconnection: true,
+                        reconnectionAttempts: 10, // More attempts for flaky mobile
+                        reconnectionDelay: 1000,
+                        reconnectionDelayMax: 5000,
+                    });
                 socketRef.current = socket;
 
                 socket.on("connect", () => {
@@ -175,14 +175,14 @@ export function useSocket(user) {
                         socket.resumeTimer = null;
                     }
                     const url = new URL(window.location);
-                    if (newState?.gameId) {
-                        const currentUrlId = url.searchParams.get("gameId");
+                    if (newState?.roomId) {
+                        const currentUrlId = url.searchParams.get("roomId");
 
                         // DETECCIÓN DE INVITACIÓN (Initial Load)
                         if (
                             initialLoadRef.current &&
                             currentUrlId &&
-                            currentUrlId !== newState.gameId
+                            currentUrlId !== newState.roomId
                         ) {
                             console.log(
                                 `[Socket] Invitation detected on load. Pending join to: ${currentUrlId}`
@@ -191,7 +191,7 @@ export function useSocket(user) {
                         }
 
                         // Si ya nos unimos a la partida deseada, apagar la bandera
-                        if (currentUrlId === newState.gameId) {
+                        if (currentUrlId === newState.roomId) {
                             isInvitationPendingRef.current = false;
                         }
 
@@ -200,44 +200,44 @@ export function useSocket(user) {
                             // Si estamos intentando unirnos a una invitación, IGNORAR actualizaciones del servidor
                             // que nos devuelvan a la partida vieja.
                             console.log(
-                                `[Socket] Ignoring URL update (Invitation Pending). Keep: ${currentUrlId}, Ignore: ${newState.gameId}`
+                                `[Socket] Ignoring URL update (Invitation Pending). Keep: ${currentUrlId}, Ignore: ${newState.roomId}`
                             );
                         } else {
                             // Comportamiento normal (Migración o Navegación dentro de partida)
-                            if (currentUrlId !== newState.gameId) {
+                            if (currentUrlId !== newState.roomId) {
                                 console.log(
-                                    `[Socket] Updating URL gameId: ${currentUrlId} → ${newState.gameId}`
+                                    `[Socket] Updating URL roomId: ${currentUrlId} → ${newState.roomId}`
                                 );
-                                url.searchParams.set("gameId", newState.gameId);
+                                url.searchParams.set("roomId", newState.roomId);
                                 window.history.replaceState({}, "", url.toString());
                             }
                         }
 
                         initialLoadRef.current = false;
                     } else {
-                        const urlGameId = url.searchParams.get("gameId");
+                        const urlRoomId = url.searchParams.get("roomId");
 
                         // PROTECCIÓN INVITACIONES (Estado Null):
-                        // Si entramos con un link ?gameId=XYZ y el servidor dice null,
-                        // es probable que sea una invitación a partida nueva.
-                        if (initialLoadRef.current && urlGameId) {
+                        // Si entramos con un link ?roomId=XYZ y el servidor dice null,
+                        // es probable que sea una invitación a sala nueva.
+                        if (initialLoadRef.current && urlRoomId) {
                             console.log(
-                                `[Socket] Invitation detected (Game not found yet). Pending join to: ${urlGameId}`
+                                `[Socket] Invitation detected (Room not found yet). Pending join to: ${urlRoomId}`
                             );
                             isInvitationPendingRef.current = true;
                         }
 
-                        if (isInvitationPendingRef.current && urlGameId) {
+                        if (isInvitationPendingRef.current && urlRoomId) {
                             console.log(
-                                `[Socket] Preserving URL gameId (Invitation Pending): ${urlGameId}`
+                                `[Socket] Preserving URL roomId (Invitation Pending): ${urlRoomId}`
                             );
                             // NO borrar URL
-                        } else if (urlGameId) {
+                        } else if (urlRoomId) {
                             // Solo borrar si NO es una invitación pendiente
                             console.log(
-                                "[Socket] Clearing gameId from URL after receiving null state"
+                                "[Socket] Clearing roomId from URL after receiving null state"
                             );
-                            url.searchParams.delete("gameId");
+                            url.searchParams.delete("roomId");
                             window.history.replaceState({}, "", url.toString());
                         }
 
@@ -292,11 +292,11 @@ export function useSocket(user) {
                 socket.on("reconnect", () => {
                     console.log("Socket reconnected, attempting to resume...");
                     const urlParams = new URLSearchParams(window.location.search);
-                    const gameIdFromUrl = urlParams.get("gameId");
-                    // Only attempt rejoin if gameId is still in URL (meaning user didn't leave)
-                    if (gameIdFromUrl && !attemptedResumeRef.current) {
+                    const roomIdFromUrl = urlParams.get("roomId");
+                    // Only attempt rejoin if roomId is still in URL (meaning user didn't leave)
+                    if (roomIdFromUrl && !attemptedResumeRef.current) {
                         attemptedResumeRef.current = true;
-                        socket.emit("join-game", gameIdFromUrl);
+                        socket.emit("join-game", roomIdFromUrl);
                     }
                 });
 
@@ -317,7 +317,7 @@ export function useSocket(user) {
                     if (/no perteneces/i.test(message)) {
                         // ... lógica anterior de limpieza ...
                         const url = new URL(window.location);
-                        url.searchParams.delete("gameId");
+                        url.searchParams.delete("roomId");
                         window.history.replaceState({}, "", url.toString());
                         if (isMounted) setGameState(null);
                     }
@@ -331,7 +331,7 @@ export function useSocket(user) {
                         setGameState(null);
                         setConnected(false);
                         const url = new URL(window.location);
-                        url.searchParams.delete("gameId");
+                        url.searchParams.delete("roomId");
                         window.history.replaceState({}, "", url.toString());
                     }
                 });

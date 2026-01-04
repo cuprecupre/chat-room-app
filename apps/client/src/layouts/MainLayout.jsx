@@ -26,10 +26,10 @@ export function MainLayout({
     const location = useLocation();
 
     const leaveGame = useCallback(() => {
-        if (gameState?.gameId) {
-            // Remove gameId from URL immediately to prevent accidental reopen
+        if (gameState?.roomId) {
+            // Remove roomId from URL immediately to prevent accidental reopen
             const url = new URL(window.location);
-            url.searchParams.delete("gameId");
+            url.searchParams.delete("roomId");
             window.history.replaceState({}, "", url.toString());
 
             const handleCleanExit = () => {
@@ -38,7 +38,7 @@ export function MainLayout({
             };
 
             // Emit with Ack callback
-            emit("leave-game", gameState.gameId, handleCleanExit);
+            emit("leave-game", gameState.roomId, handleCleanExit);
 
             // Fallback: if server doesn't respond in 2s, force exit anyway
             setTimeout(handleCleanExit, 2000);
@@ -46,11 +46,11 @@ export function MainLayout({
     }, [emit, gameState]);
 
     const handleTitleClick = useCallback(() => {
-        // If in a game (lobby or playing), show confirmation modal
-        if (gameState?.gameId) {
+        // If in a room (lobby or playing), show confirmation modal
+        if (gameState?.roomId) {
             setShowLeaveGameModal(true);
         } else {
-            // If not in game, go directly to lobby
+            // If not in room, go directly to lobby
             navigate(ROUTES.LOBBY);
         }
     }, [gameState, navigate]);
@@ -62,12 +62,12 @@ export function MainLayout({
 
             // Clear URL parameters before logout
             const url = new URL(window.location);
-            url.searchParams.delete("gameId");
+            url.searchParams.delete("roomId");
             window.history.replaceState({}, "", url.toString());
 
-            // Leave game if in one
-            if (gameState?.gameId) {
-                emit("leave-game", gameState.gameId);
+            // Leave room if in one
+            if (gameState?.roomId) {
+                emit("leave-game", gameState.roomId);
             }
 
             // useSocket hook handles emitting leave-game on disconnect
@@ -81,7 +81,7 @@ export function MainLayout({
     }, [onLogout, emit, gameState]);
 
     const endGame = useCallback(() => {
-        emit("end-game", gameState?.gameId);
+        emit("end-game", gameState?.roomId);
     }, [emit, gameState]);
 
     // Close dropdown on outside click or Escape key
@@ -106,33 +106,14 @@ export function MainLayout({
     return (
         <div className="bg-neutral-950 text-white min-h-[100dvh] font-sans flex flex-col">
             <div className="w-full max-w-4xl mx-auto px-6 py-4 sm:p-6 lg:p-8">
-                <header className="grid grid-cols-3 items-center mb-0 pb-4 sm:mb-6 sm:pb-6 border-b border-white/10">
+                <header className="flex justify-between items-center mb-0 pb-4 sm:mb-6 sm:pb-6 border-b border-white/10">
                     <button
                         onClick={handleTitleClick}
-                        className="text-xl sm:text-2xl font-serif text-neutral-50 hover:text-orange-400 transition-colors active:scale-95 cursor-pointer justify-self-start"
+                        className="text-xl sm:text-2xl font-serif text-neutral-50 hover:text-orange-400 transition-colors active:scale-95 cursor-pointer"
                     >
                         El Impostor
                     </button>
-                    <a
-                        href="https://buymeacoffee.com/elimpostor"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 sm:px-4 sm:py-2 bg-transparent hover:bg-yellow-400/10 text-yellow-400 hover:text-yellow-300 font-semibold text-sm rounded-full transition-all active:scale-95 justify-self-center flex items-center gap-1.5 sm:gap-2 whitespace-nowrap"
-                        aria-label="Apoya al desarrollador en Buy Me a Coffee"
-                        onClick={() => {
-                            window.dataLayer = window.dataLayer || [];
-                            window.dataLayer.push({
-                                event: 'support_click',
-                                location: 'header',
-                                link_url: 'https://buymeacoffee.com/elimpostor'
-                            });
-                        }}
-                    >
-                        <Coffee className="w-4 h-4 sm:w-5 sm:h-5" />
-                        <span className="sm:hidden">Apóyanos</span>
-                        <span className="hidden sm:inline">Apoya al desarrollador</span>
-                    </a>
-                    <div className="flex items-center gap-3 sm:gap-4 justify-self-end">
+                    <div className="flex items-center gap-3 sm:gap-4">
                         <span className="text-sm sm:text-base font-medium hidden sm:flex items-center">
                             {user.displayName}
                         </span>
@@ -185,7 +166,7 @@ export function MainLayout({
                                             <div className="my-1 h-px bg-white/10" />
                                         </>
                                     )}
-                                    {gameState?.gameId && (
+                                    {gameState?.roomId && (
                                         <>
                                             <button
                                                 onClick={() => {
@@ -218,7 +199,7 @@ export function MainLayout({
             <Footer
                 onOpenInstructions={onOpenInstructions}
                 onOpenFeedback={onOpenFeedback}
-                gameId={gameState?.gameId}
+                roomId={gameState?.roomId}
                 onCopyLink={onCopyLink}
                 isMobile={isMobile}
                 onLeaveGame={() => setShowLeaveGameModal(true)}

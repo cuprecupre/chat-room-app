@@ -11,33 +11,33 @@ import { ROUTES } from "../../routes/routes";
  */
 export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinError }) {
     const navigate = useNavigate();
-    const { urlGameId, previewHostName, error, clearPreview } = useGameInvite(gameState);
+    const { urlRoomId, previewHostName, error, clearPreview } = useGameInvite(gameState);
 
-    // If user joins a game successfully, redirect to game page
+    // If user joins a room successfully, redirect to game page
     useEffect(() => {
-        if (gameState?.gameId && urlGameId === gameState.gameId) {
-            navigate(ROUTES.GAME + `?gameId=${gameState.gameId}`);
+        if (gameState?.roomId && urlRoomId === gameState.roomId) {
+            navigate(ROUTES.GAME + `?roomId=${gameState.roomId}`);
         }
-    }, [gameState?.gameId, urlGameId, navigate]);
+    }, [gameState?.roomId, urlRoomId, navigate]);
 
     // No invite to show, redirect to lobby
     useEffect(() => {
-        if (!urlGameId) {
+        if (!urlRoomId) {
             navigate(ROUTES.LOBBY);
         }
-    }, [urlGameId, navigate]);
+    }, [urlRoomId, navigate]);
 
     // Handle cancel/go back
     const handleCancel = () => {
         clearJoinError?.();
         clearPreview();
         const url = new URL(window.location);
-        url.searchParams.delete("gameId");
+        url.searchParams.delete("roomId");
         window.history.replaceState({}, "", url.toString());
 
-        // If in a game, go back to that game; otherwise go to lobby
-        if (gameState?.gameId) {
-            navigate(ROUTES.GAME + `?gameId=${gameState.gameId}`);
+        // If in a room, go back to that room; otherwise go to lobby
+        if (gameState?.roomId) {
+            navigate(ROUTES.GAME + `?roomId=${gameState.roomId}`);
         } else {
             navigate(ROUTES.LOBBY);
         }
@@ -49,7 +49,7 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
     if (error === "NOT_FOUND") {
         return (
             <InvitationCard
-                gameId={urlGameId}
+                roomId={urlRoomId}
                 title="Enlace no válido"
                 subtitle="No encontramos esta partida. Es posible que el anfitrión la haya cerrado o el enlace sea incorrecto."
                 isError={true}
@@ -64,7 +64,7 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
     if (error === "IN_PROGRESS") {
         return (
             <InvitationCard
-                gameId={urlGameId}
+                roomId={urlRoomId}
                 title="Partida ya iniciada"
                 subtitle="Lo sentimos, esta partida ya comenzó y no acepta nuevos jugadores en este momento."
                 isError={true}
@@ -95,7 +95,7 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
 
         return (
             <InvitationCard
-                gameId={urlGameId}
+                roomId={urlRoomId}
                 title={errorTitle}
                 subtitle={errorMsg}
                 isError={true}
@@ -105,7 +105,7 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
                         clearJoinError();
                         clearPreview();
                         const url = new URL(window.location);
-                        url.searchParams.delete("gameId");
+                        url.searchParams.delete("roomId");
                         window.history.replaceState({}, "", url.toString());
                         navigate(ROUTES.LOBBY);
                     }}
@@ -119,29 +119,29 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
     }
 
     // ============================================
-    // Case: User is in ANOTHER game (lobby or playing)
+    // Case: User is in ANOTHER room (lobby or playing)
     // ============================================
-    if (urlGameId && gameState?.gameId && urlGameId !== gameState.gameId) {
+    if (urlRoomId && gameState?.roomId && urlRoomId !== gameState.roomId) {
         const isPlaying = gameState.phase === "playing";
 
         return (
             <InvitationCard
                 hostName={previewHostName}
-                gameId={urlGameId}
+                roomId={urlRoomId}
                 title="¡Te han invitado!"
                 subtitle={
                     isPlaying
                         ? "Estás en una partida en curso. Si te unes, la abandonarás."
-                        : "¿Quieres abandonar tu partida actual para unirte?"
+                        : ""
                 }
             >
                 <Button
-                    onClick={() => joinGame(urlGameId)}
+                    onClick={() => joinGame(urlRoomId)}
                     variant="primary"
                     size="lg"
                     className="w-full text-lg shadow-orange-900/20 shadow-lg"
                 >
-                    {isPlaying ? "Abandonar y Unirme" : "Unirme a la partida"}
+                    {isPlaying ? "Abandonar y Unirme" : "Unirme a la sala"}
                 </Button>
                 <Button
                     onClick={handleCancel}
@@ -149,30 +149,30 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
                     size="md"
                     className="w-full text-neutral-500 hover:text-neutral-300"
                 >
-                    {isPlaying ? "Volver a mi partida" : "Cancelar"}
+                    {isPlaying ? "Volver a mi sala" : "Cancelar"}
                 </Button>
             </InvitationCard>
         );
     }
 
     // ============================================
-    // Case: Normal invitation (user has no active game)
+    // Case: Normal invitation (user has no active room)
     // ============================================
-    if (urlGameId && !gameState?.gameId) {
+    if (urlRoomId && !gameState?.roomId) {
         return (
             <InvitationCard
                 hostName={previewHostName}
-                gameId={urlGameId}
+                roomId={urlRoomId}
                 title="¡Te han invitado!"
                 subtitle="¿Quieres entrar ahora?"
             >
                 <Button
-                    onClick={() => joinGame(urlGameId)}
+                    onClick={() => joinGame(urlRoomId)}
                     variant="primary"
                     size="lg"
                     className="w-full text-lg shadow-orange-900/20 shadow-lg"
                 >
-                    Entrar a la partida
+                    Entrar a la sala
                 </Button>
                 <Button
                     onClick={handleCancel}

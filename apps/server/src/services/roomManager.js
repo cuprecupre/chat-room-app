@@ -28,7 +28,8 @@ class RoomManager {
      * Create a new Room.
      */
     createRoom(user, options = {}) {
-        const room = new Room(user, options);
+        const opts = (options && typeof options === 'object') ? options : {};
+        const room = new Room(user, opts);
         this.rooms[room.roomId] = room;
         console.log(`[RoomManager] Created room ${room.roomId} by ${user.name}`);
         return room;

@@ -79,7 +79,7 @@ describe("Refactored Components", () => {
             expect(screen.getByText(/Invita a tus amigos/)).toBeInTheDocument();
 
             // Check for buttons (mobile and desktop versions might both be rendered by JSDOM)
-            const buttons = screen.getAllByText("Comenzar juego");
+            const buttons = screen.getAllByText("Comenzar partida");
             expect(buttons.length).toBeGreaterThan(0);
             buttons.forEach(btn => expect(btn).toBeDisabled());
         });
@@ -95,13 +95,13 @@ describe("Refactored Components", () => {
                 />
             );
             expect(screen.getByText(/La partida empezará pronto/)).toBeInTheDocument();
-            expect(screen.queryByText("Comenzar juego")).not.toBeInTheDocument();
+            expect(screen.queryByText("Comenzar partida")).not.toBeInTheDocument();
         });
     });
 
     describe("GameCard", () => {
         const mockStateFriend = {
-            role: "amigo",
+            role: "friend",
             secretWord: "Manzana"
         };
         const mockStateImpostor = {

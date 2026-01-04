@@ -28,6 +28,7 @@ export function GameRoom({
     onNextRound,
     onMigrateGame,
     onLeaveGame,
+    onUpdateOptions,
     onCopyLink,
     onCopyGameCode,
     onVote,
@@ -158,6 +159,7 @@ export function GameRoom({
                     user={user}
                     onCopyLink={onCopyLink}
                     onStartGame={onStartGame}
+                    onUpdateOptions={onUpdateOptions}
                     isMobile={isMobile}
                     onVote={onVote}
                     onOpenInstructions={onOpenInstructions}

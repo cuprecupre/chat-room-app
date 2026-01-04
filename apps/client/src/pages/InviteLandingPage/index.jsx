@@ -11,32 +11,32 @@ import { ROUTES } from "../../routes/routes";
  */
 export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
     const navigate = useNavigate();
-    const { urlGameId, previewHostName, error } = useGameInvite();
+    const { urlRoomId, previewHostName, error } = useGameInvite();
 
     // Handle cancel - go to landing page
     const handleCancel = () => {
         const url = new URL(window.location);
-        url.searchParams.delete("gameId");
+        url.searchParams.delete("roomId");
         window.history.replaceState({}, "", url.toString());
         navigate(ROUTES.HOME);
     };
 
-    // Handle email auth - preserve gameId in URL
+    // Handle email auth - preserve roomId in URL
     const handleGoToEmailAuth = () => {
-        // Navigate to auth page with gameId preserved
-        navigate(`${ROUTES.AUTH}?gameId=${urlGameId}`);
+        // Navigate to auth page with roomId preserved
+        navigate(`${ROUTES.AUTH}?roomId=${urlRoomId}`);
     };
 
-    // Handle guest auth - preserve gameId in URL
+    // Handle guest auth - preserve roomId in URL
     const handleGoToGuestAuth = () => {
-        navigate(`${ROUTES.GUEST_AUTH}?gameId=${urlGameId}`);
+        navigate(`${ROUTES.GUEST_AUTH}?roomId=${urlRoomId}`);
     };
 
     // Error state: Game not found
     if (error === "NOT_FOUND") {
         return (
             <InvitationCard
-                gameId={urlGameId}
+                roomId={urlRoomId}
                 title="Enlace no válido"
                 subtitle="No encontramos esta partida. Es posible que el anfitrión la haya cerrado o el enlace sea incorrecto."
                 isError={true}
@@ -52,7 +52,7 @@ export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
     if (error === "IN_PROGRESS") {
         return (
             <InvitationCard
-                gameId={urlGameId}
+                roomId={urlRoomId}
                 title="Partida ya iniciada"
                 subtitle="Lo sentimos, esta partida ya comenzó y no acepta nuevos jugadores en este momento."
                 isError={true}
@@ -68,7 +68,7 @@ export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
     return (
         <InvitationCard
             hostName={previewHostName}
-            gameId={urlGameId}
+            roomId={urlRoomId}
             title="¡Te han invitado!"
             subtitle="¿Quieres entrar ahora?"
         >

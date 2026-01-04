@@ -41,9 +41,11 @@ function registerSocketHandlers(io, socket) {
     // Register event handlers
     socket.on("create-game", (options) => handleCreateRoom(socket, user, options));
     socket.on("join-game", (roomId) => handleJoinRoom(io, socket, user, roomId));
-    socket.on("start-game", (roomId) =>
-        handleRoomAction(socket, user, roomId, (r) => r.startGame(user.uid))
-    );
+    socket.on("start-game", (data) => {
+        const roomId = typeof data === 'string' ? data : data.roomId;
+        const options = typeof data === 'object' ? data.options : {};
+        handleRoomAction(socket, user, roomId, (r) => r.startGame(user.uid, options));
+    });
     socket.on("end-game", (roomId) =>
         handleRoomAction(socket, user, roomId, (r) => {
             if (r.currentGame) {
@@ -59,6 +61,9 @@ function registerSocketHandlers(io, socket) {
     );
     socket.on("play-again", (roomId) =>
         handleRoomAction(socket, user, roomId, (r) => r.playAgain(user.uid))
+    );
+    socket.on("update-options", ({ roomId, options }) =>
+        handleRoomAction(socket, user, roomId, (r) => r.updateOptions(user.uid, options))
     );
     socket.on("cast-vote", (data) => handleCastVote(socket, user, data));
     socket.on("leave-game", (roomId, callback) =>
@@ -113,6 +118,7 @@ function handleReconnection(socket, user) {
  * Handle room creation (renamed from handleCreateGame).
  */
 async function handleCreateRoom(socket, user, options = {}) {
+    const opts = (options && typeof options === 'object') ? options : {};
     // Block new room creation during shutdown
     if (shutdownManager.isShuttingDown) {
         return socket.emit(
@@ -124,11 +130,11 @@ async function handleCreateRoom(socket, user, options = {}) {
     // Clean up ANY previous rooms the user might be in
     await roomManager.cleanupUserPreviousRooms(user.uid);
 
-    const newRoom = roomManager.createRoom(user, options);
+    const newRoom = roomManager.createRoom(user, opts);
     socket.join(newRoom.roomId);
     roomManager.emitRoomState(newRoom);
     statsManager.incrementGamesCreated();
-    console.log(`Room created: ${newRoom.roomId} by ${user.name} with options:`, options);
+    console.log(`Room created: ${newRoom.roomId} by ${user.name} with options:`, opts);
 }
 
 /**

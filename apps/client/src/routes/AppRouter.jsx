@@ -66,11 +66,11 @@ const DebugPreviewSingle = lazy(() =>
 
 function HomeRouteHandler({ user }) {
     const location = useLocation();
-    const urlGameId = new URLSearchParams(location.search).get("gameId");
+    const urlRoomId = new URLSearchParams(location.search).get("roomId");
 
-    // If user is authenticated and there's a gameId in the URL, redirect to game page with the gameId
-    if (user && urlGameId) {
-        return <Navigate to={`${ROUTES.GAME}?gameId=${urlGameId}`} replace />;
+    // If user is authenticated and there's a roomId in the URL, redirect to game page with the roomId
+    if (user && urlRoomId) {
+        return <Navigate to={`${ROUTES.GAME}?roomId=${urlRoomId}`} replace />;
     }
 
     // If user is authenticated but no gameId, redirect to lobby
@@ -92,10 +92,10 @@ function GameRouteHandler({
     ...props
 }) {
     const location = useLocation();
-    const urlGameId = new URLSearchParams(location.search).get("gameId");
+    const urlRoomId = new URLSearchParams(location.search).get("roomId");
 
-    // If there's a URL game ID but user is not in that game, show invite page
-    if (urlGameId && (!gameState?.gameId || urlGameId !== gameState.gameId)) {
+    // If there's a URL room ID but user is not in that room, show invite page
+    if (urlRoomId && (!gameState?.roomId || urlRoomId !== gameState.roomId)) {
         return (
             <InvitePage
                 gameState={gameState}
@@ -107,8 +107,8 @@ function GameRouteHandler({
         );
     }
 
-    // If user is in a game, show game room
-    if (gameState?.gameId) {
+    // If user is in a room, show game page
+    if (gameState?.roomId) {
         return <GamePage gameState={gameState} user={user} emit={emit} {...props} />;
     }
 
@@ -137,7 +137,7 @@ function AppRoutes({
     const location = useLocation();
     const [instructionsOpen, setInstructionsOpen] = useState(false);
     const [feedbackOpen, setFeedbackOpen] = useState(false);
-    const prevGameIdRef = useRef(null);
+    const prevRoomIdRef = useRef(null);
 
     const { copyLink, isMobile } = useCopyToClipboard();
 
@@ -147,20 +147,27 @@ function AppRoutes({
     );
 
     const createGame = useCallback((options) => emit("create-game", options), [emit]);
-    const joinGame = useCallback((gameId) => emit("join-game", gameId), [emit]);
-    const startGame = useCallback(() => emit("start-game", gameState?.gameId), [emit, gameState]);
-    const endGame = useCallback(() => emit("end-game", gameState?.gameId), [emit, gameState]);
-    const playAgain = useCallback(() => emit("play-again", gameState?.gameId), [emit, gameState]);
-    const migrateGame = useCallback(
-        () => emit("migrate-game", gameState?.gameId),
+    const joinGame = useCallback((roomId) => emit("join-game", roomId), [emit]);
+    const updateOptions = useCallback(
+        (options) => emit("update-options", { roomId: gameState?.roomId, options }),
         [emit, gameState]
     );
-    const nextRound = useCallback(() => emit("next-round", gameState?.gameId), [emit, gameState]);
+    const startGame = useCallback(
+        (options) => emit("start-game", { roomId: gameState?.roomId, options }),
+        [emit, gameState]
+    );
+    const endGame = useCallback(() => emit("end-game", gameState?.roomId), [emit, gameState]);
+    const playAgain = useCallback(() => emit("play-again", gameState?.roomId), [emit, gameState]);
+    const migrateGame = useCallback(
+        () => emit("migrate-game", gameState?.roomId),
+        [emit, gameState]
+    );
+    const nextRound = useCallback(() => emit("next-round", gameState?.roomId), [emit, gameState]);
     const leaveGame = useCallback(() => {
-        if (gameState?.gameId) {
-            // Remove gameId from URL immediately to prevent accidental reopen
+        if (gameState?.roomId) {
+            // Remove roomId from URL immediately to prevent accidental reopen
             const url = new URL(window.location);
-            url.searchParams.delete("gameId");
+            url.searchParams.delete("roomId");
             window.history.replaceState({}, "", url.toString());
 
             const handleCleanExit = () => {
@@ -169,7 +176,7 @@ function AppRoutes({
             };
 
             // Emit with Ack callback
-            emit("leave-game", gameState.gameId, handleCleanExit);
+            emit("leave-game", gameState.roomId, handleCleanExit);
 
             // Fallback: if server doesn't respond in 2s, force exit anyway
             setTimeout(handleCleanExit, 2000);
@@ -178,34 +185,34 @@ function AppRoutes({
 
     const castVote = useCallback(
         (targetId) => {
-            if (!gameState?.gameId) return;
-            emit("cast-vote", { gameId: gameState.gameId, targetId });
+            if (!gameState?.roomId) return;
+            emit("cast-vote", { gameId: gameState.roomId, targetId });
         },
         [emit, gameState]
     );
 
     const handleCopyLink = useCallback(() => {
-        copyLink(gameState?.gameId);
-    }, [copyLink, gameState?.gameId]);
+        copyLink(gameState?.roomId);
+    }, [copyLink, gameState?.roomId]);
 
-    // Navigate to game when a game is created or joined
+    // Navigate to game when a room is created or joined
     useEffect(() => {
-        const currentGameId = gameState?.gameId;
+        const currentRoomId = gameState?.roomId;
         const wasInLobby = location.pathname === ROUTES.LOBBY;
 
-        // If a new game ID appears and we're in the lobby, navigate to game
-        if (currentGameId && currentGameId !== prevGameIdRef.current && wasInLobby) {
-            console.log("🎮 Navigating to game:", currentGameId);
-            navigate(`${ROUTES.GAME}?gameId=${currentGameId}`);
+        // If a new room ID appears and we're in the lobby, navigate to game
+        if (currentRoomId && currentRoomId !== prevRoomIdRef.current && wasInLobby) {
+            console.log("🎮 Navigating to room:", currentRoomId);
+            navigate(`${ROUTES.GAME}?roomId=${currentRoomId}`);
         }
 
-        prevGameIdRef.current = currentGameId;
-    }, [gameState?.gameId, location.pathname, navigate]);
+        prevRoomIdRef.current = currentRoomId;
+    }, [gameState?.roomId, location.pathname, navigate]);
 
     // Reset scroll when major views change
     useEffect(() => {
         window.scrollTo(0, 0);
-    }, [user?.uid, gameState?.gameId]);
+    }, [user?.uid, gameState?.roomId]);
 
     return (
         <>
@@ -228,12 +235,12 @@ function AppRoutes({
                         <Route
                             path={ROUTES.HOME}
                             element={(() => {
-                                const urlGameId = new URLSearchParams(window.location.search).get(
-                                    "gameId"
+                                const urlRoomId = new URLSearchParams(window.location.search).get(
+                                    "roomId"
                                 );
 
-                                // If there's a gameId and user is NOT logged in, show InviteLandingPage
-                                if (urlGameId && !user) {
+                                // If there's a roomId and user is NOT logged in, show InviteLandingPage
+                                if (urlRoomId && !user) {
                                     return (
                                         <InviteLandingPage onLogin={login} isLoading={loading} />
                                     );
@@ -258,21 +265,21 @@ function AppRoutes({
                         <Route
                             path={ROUTES.AUTH}
                             element={(() => {
-                                const urlGameId = new URLSearchParams(window.location.search).get(
-                                    "gameId"
+                                const urlRoomId = new URLSearchParams(window.location.search).get(
+                                    "roomId"
                                 );
 
                                 if (user) {
-                                    // Si hay gameId, redirigir a game con el gameId
-                                    if (urlGameId) {
+                                    // Si hay roomId, redirigir a game con el roomId
+                                    if (urlRoomId) {
                                         return (
                                             <Navigate
-                                                to={`${ROUTES.GAME}?gameId=${urlGameId}`}
+                                                to={`${ROUTES.GAME}?roomId=${urlRoomId}`}
                                                 replace
                                             />
                                         );
                                     }
-                                    // Si no hay gameId, ir al lobby
+                                    // Si no hay roomId, ir al lobby
                                     return <Navigate to={ROUTES.LOBBY} replace />;
                                 }
 
@@ -290,21 +297,21 @@ function AppRoutes({
                         <Route
                             path={ROUTES.GUEST_AUTH}
                             element={(() => {
-                                const urlGameId = new URLSearchParams(window.location.search).get(
-                                    "gameId"
+                                const urlRoomId = new URLSearchParams(window.location.search).get(
+                                    "roomId"
                                 );
 
                                 if (user) {
-                                    // Si hay gameId, redirigir a game con el gameId
-                                    if (urlGameId) {
+                                    // Si hay roomId, redirigir a game con el roomId
+                                    if (urlRoomId) {
                                         return (
                                             <Navigate
-                                                to={`${ROUTES.GAME}?gameId=${urlGameId}`}
+                                                to={`${ROUTES.GAME}?roomId=${urlRoomId}`}
                                                 replace
                                             />
                                         );
                                     }
-                                    // Si no hay gameId, ir al lobby
+                                    // Si no hay roomId, ir al lobby
                                     return <Navigate to={ROUTES.LOBBY} replace />;
                                 }
 
@@ -374,6 +381,7 @@ function AppRoutes({
                                         clearJoinError={clearJoinError}
                                         onOpenInstructions={() => setInstructionsOpen(true)}
                                         onStartGame={startGame}
+                                        onUpdateOptions={updateOptions}
                                         onEndGame={endGame}
                                         onPlayAgain={playAgain}
                                         onNextRound={nextRound}
