@@ -312,8 +312,8 @@ function handleLeaveRoom(io, socket, user, roomId, callback) {
             roomManager.emitToast(roomId, `${user.name} ha abandonado el juego`);
         }
     } else {
-        // Room is now empty - schedule for cleanup
-        roomManager.scheduleEmptyRoomCleanup(roomId);
+        // Room is now empty - schedule for cleanup immediately
+        roomManager.scheduleEmptyRoomCleanup(roomId, 0);
     }
 
     console.log(`User ${user.name} successfully left room ${roomId}`);
@@ -378,8 +378,8 @@ function handleDisconnect(io, socket, user) {
                         roomManager.emitToast(userRoom.roomId, `${userName} se ha desconectado`);
                     }
                 } else {
-                    // Room is now empty - schedule for cleanup
-                    roomManager.scheduleEmptyRoomCleanup(userRoom.roomId);
+                    // Room is now empty - schedule for cleanup immediately
+                    roomManager.scheduleEmptyRoomCleanup(userRoom.roomId, 0);
                 }
             },
             gracePeriod
