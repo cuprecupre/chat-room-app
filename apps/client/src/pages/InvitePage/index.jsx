@@ -4,6 +4,7 @@ import { Button } from "../../components/ui/Button";
 import { InvitationCard } from "../../components/InvitationCard";
 import { useGameInvite } from "../../hooks/useGameInvite";
 import { ROUTES } from "../../routes/routes";
+import { GameNotFoundCard } from "../../components/InviteErrors";
 
 /**
  * InvitePage - Invitation screen for AUTHENTICATED users
@@ -48,31 +49,11 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
     // ============================================
     if (error === "NOT_FOUND") {
         return (
-            <InvitationCard
+            <GameNotFoundCard
                 roomId={urlRoomId}
-                title="Enlace no válido"
-                subtitle="No encontramos esta partida. Es posible que el anfitrión la haya cerrado o el enlace sea incorrecto."
-                isError={true}
-            >
-                <Button onClick={handleCancel} variant="primary" className="w-full">
-                    Volver al inicio
-                </Button>
-            </InvitationCard>
-        );
-    }
-
-    if (error === "IN_PROGRESS") {
-        return (
-            <InvitationCard
-                roomId={urlRoomId}
-                title="Partida ya iniciada"
-                subtitle="Lo sentimos, esta partida ya comenzó y no acepta nuevos jugadores en este momento."
-                isError={true}
-            >
-                <Button onClick={handleCancel} variant="primary" className="w-full">
-                    Volver al inicio
-                </Button>
-            </InvitationCard>
+                onCancel={handleCancel}
+                onCreate={() => emit("create-room", {})}
+            />
         );
     }
 
@@ -80,38 +61,34 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
     // Case: joinError from socket (e.g., game started while viewing)
     // ============================================
     if (joinError) {
-        let errorTitle = "No se pudo unir";
-        let errorMsg = joinError;
+        const handleJoinErrorCancel = () => {
+            clearJoinError?.();
+            clearPreview();
+            const url = new URL(window.location);
+            url.searchParams.delete("roomId");
+            window.history.replaceState({}, "", url.toString());
+            navigate(ROUTES.LOBBY);
+        };
 
-        if (/partida en curso/i.test(joinError)) {
-            errorTitle = "Partida ya iniciada";
-            errorMsg =
-                "Lo sentimos, esta partida ya comenzó y no acepta nuevos jugadores en este momento.";
-        } else if (/no existe/i.test(joinError)) {
-            errorTitle = "Enlace no válido";
-            errorMsg =
-                "No encontramos esta partida. Es posible que el anfitrión la haya cerrado o el enlace sea incorrecto.";
+        if (/no existe/i.test(joinError)) {
+            return (
+                <GameNotFoundCard
+                    roomId={urlRoomId}
+                    onCancel={handleJoinErrorCancel}
+                    onCreate={() => emit("create-room", {})}
+                />
+            );
         }
 
+        // Generic error
         return (
             <InvitationCard
                 roomId={urlRoomId}
-                title={errorTitle}
-                subtitle={errorMsg}
+                title="No se pudo unir"
+                subtitle={joinError}
                 isError={true}
             >
-                <Button
-                    onClick={() => {
-                        clearJoinError();
-                        clearPreview();
-                        const url = new URL(window.location);
-                        url.searchParams.delete("roomId");
-                        window.history.replaceState({}, "", url.toString());
-                        navigate(ROUTES.LOBBY);
-                    }}
-                    variant="primary"
-                    className="w-full"
-                >
+                <Button onClick={handleJoinErrorCancel} variant="primary" className="w-full">
                     Volver al inicio
                 </Button>
             </InvitationCard>
@@ -141,7 +118,7 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
                     size="lg"
                     className="w-full text-lg shadow-orange-900/20 shadow-lg"
                 >
-                    {isPlaying ? "Abandonar y Unirme" : "Unirme a la sala"}
+                    {isPlaying ? "Unirme" : "Unirme a la sala"}
                 </Button>
                 <Button
                     onClick={handleCancel}

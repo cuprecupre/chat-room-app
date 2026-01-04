@@ -46,17 +46,15 @@ export function useSocket(user) {
             }
 
             try {
-                // Intentar obtener token de localStorage primero (solución para iOS)
-                let token = getToken();
-
-                // Si no hay token en localStorage o está expirado, obtener de Firebase
-                if (!token || isTokenExpired()) {
-                    console.log("🔑 Obteniendo token desde Firebase Auth...");
-                    token = await user.getIdToken(true); // force refresh
-                    saveToken(token); // Guardar para próximas conexiones
-                    console.log("✅ Token obtenido y guardado desde Firebase");
-                } else {
-                    console.log("✅ Usando token de localStorage");
+                try {
+                    // SIEMPRE obtener token fresco del usuario actual para asegurar coincidencia de identidad
+                    // Esto previene errores de "Only the host..." si hay un token viejo en localStorage
+                    console.log("🔑 Obteniendo token de usuario actual...");
+                    token = await user.getIdToken();
+                    saveToken(token); // Mantener localStorage sincronizado
+                } catch (e) {
+                    console.warn("⚠️ Error obteniendo token de usuario, intentando fallback a storage:", e);
+                    token = getToken();
                 }
 
                 if (!isMounted) return;
@@ -97,10 +95,8 @@ export function useSocket(user) {
                     const urlParams = new URLSearchParams(window.location.search);
                     const roomIdFromUrl = urlParams.get("roomId");
 
-                    if (roomIdFromUrl && !attemptedResumeRef.current) {
-                        attemptedResumeRef.current = true;
-                        socket.emit("join-room", roomIdFromUrl);
-                    }
+                    // Auto-join removed to allow InvitePage to handle new connections.
+                    // Server handles automatic session resumption via handleReconnection.
 
                     // Start heartbeat to keep connection alive
                     const heartbeatInterval = setInterval(() => {

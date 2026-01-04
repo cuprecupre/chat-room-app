@@ -191,7 +191,8 @@ class Room {
      */
     startMatch(userId, options = {}) {
         if (userId !== this.hostId) {
-            throw new Error("Only the host can start the match.");
+            console.error(`[Room ${this.roomId}] startMatch denied: userId=${userId} !== hostId=${this.hostId}`);
+            throw new Error("Only the host can start a new match.");
         }
         if (this.players.length < 2) {
             throw new Error("Se necesitan al menos 2 jugadores para comenzar.");
@@ -272,6 +273,7 @@ class Room {
      */
     playAgain(userId) {
         if (userId !== this.hostId) {
+            console.error(`[Room ${this.roomId}] playAgain denied: userId=${userId} !== hostId=${this.hostId}`);
             throw new Error("Only the host can start a new match.");
         }
 

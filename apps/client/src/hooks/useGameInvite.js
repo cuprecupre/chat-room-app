@@ -40,10 +40,11 @@ export function useGameInvite(gameState) {
                         setPreviewHostName(data.hostName || null);
                         setGameStatus(data.status || null);
 
-                        // Check if game is in progress (can't join)
-                        if (data.status === "playing") {
-                            setError("IN_PROGRESS");
-                        }
+                        // Check if game is in progress (can't join) -> REMOVED
+                        // New behavior: Allow joining as late joiner / spectator
+                        // if (data.status === "playing") {
+                        //    setError("IN_PROGRESS");
+                        // }
                     } else if (res.status === 404) {
                         setError("NOT_FOUND");
                     }

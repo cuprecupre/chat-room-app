@@ -4,6 +4,7 @@ import { Spinner } from "../../components/ui/Spinner";
 import { InvitationCard } from "../../components/InvitationCard";
 import { useGameInvite } from "../../hooks/useGameInvite";
 import { ROUTES } from "../../routes/routes";
+import { GameNotFoundCard } from "../../components/InviteErrors";
 
 /**
  * InviteLandingPage - Invitation screen for NON-authenticated users
@@ -34,35 +35,10 @@ export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
 
     // Error state: Game not found
     if (error === "NOT_FOUND") {
-        return (
-            <InvitationCard
-                roomId={urlRoomId}
-                title="Enlace no válido"
-                subtitle="No encontramos esta partida. Es posible que el anfitrión la haya cerrado o el enlace sea incorrecto."
-                isError={true}
-            >
-                <Button onClick={handleCancel} variant="primary" className="w-full">
-                    Volver al inicio
-                </Button>
-            </InvitationCard>
-        );
+        return <GameNotFoundCard roomId={urlRoomId} onCancel={handleCancel} />;
     }
 
-    // Error state: Game in progress
-    if (error === "IN_PROGRESS") {
-        return (
-            <InvitationCard
-                roomId={urlRoomId}
-                title="Partida ya iniciada"
-                subtitle="Lo sentimos, esta partida ya comenzó y no acepta nuevos jugadores en este momento."
-                isError={true}
-            >
-                <Button onClick={handleCancel} variant="primary" className="w-full">
-                    Volver al inicio
-                </Button>
-            </InvitationCard>
-        );
-    }
+
 
     // Normal invitation screen with login buttons
     return (
