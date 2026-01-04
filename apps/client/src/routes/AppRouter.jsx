@@ -49,6 +49,12 @@ const InvitePage = lazy(() =>
 const InviteLandingPage = lazy(() =>
     import("../pages/InviteLandingPage").then((m) => ({ default: m.InviteLandingPage }))
 );
+const PrivacyPage = lazy(() =>
+    import("../pages/PrivacyPage").then((m) => ({ default: m.PrivacyPage }))
+);
+const CookiesPage = lazy(() =>
+    import("../pages/CookiesPage").then((m) => ({ default: m.CookiesPage }))
+);
 
 // Debug Page (Local Only - ignored in git)
 const DebugPreviews = lazy(() =>
@@ -313,6 +319,8 @@ function AppRoutes({
                             })()}
                         />
                         <Route path={ROUTES.RULES} element={<RulesPage />} />
+                        <Route path="/privacidad" element={<PrivacyPage />} />
+                        <Route path="/cookies" element={<CookiesPage />} />
                         {import.meta.env.DEV && (
                             <>
                                 <Route path="/debug" element={<DebugPreviews />} />

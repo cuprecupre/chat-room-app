@@ -8,27 +8,62 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 
-  <!-- Google Tag Manager -->
+  <!-- Google Tag Manager (with GDPR consent check) -->
   <script>
-    // Only load GTM in Production
-    if (window.location.hostname === 'impostor.me' || window.location.hostname === 'www.impostor.me') {
+    // Only load GTM in Production AND if user has consented to analytics
+    (function () {
+      var isProduction = window.location.hostname === 'impostor.me' || window.location.hostname === 'www.impostor.me';
+      if (!isProduction) {
+        console.log('📊 GTM Skipped: Non-production environment');
+        return;
+      }
+
+      // Check for cookie consent
+      var consent = localStorage.getItem('cookie_consent');
+      if (!consent) {
+        console.log('📊 GTM Skipped: No cookie consent yet');
+        return;
+      }
+
+      try {
+        var parsed = JSON.parse(consent);
+        if (!parsed.analytics) {
+          console.log('📊 GTM Skipped: Analytics not consented');
+          return;
+        }
+      } catch (e) {
+        console.log('📊 GTM Skipped: Invalid consent data');
+        return;
+      }
+
+      // Load GTM
       (function (w, d, s, l, i) {
         w[l] = w[l] || []; w[l].push({
-          'gtm.start':
-            new Date().getTime(), event: 'gtm.js'
-        }); var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-            'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+          'gtm.start': new Date().getTime(), event: 'gtm.js'
+        });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
       })(window, document, 'script', 'dataLayer', 'GTM-TPZPDF9L');
-    } else {
-      console.log('📊 GTM Skipped: Non-production environment');
-    }
+      console.log('📊 GTM Loaded: User consented');
+    })();
   </script>
   <!-- End Google Tag Manager -->
-  <link rel="icon" href="/favicon-48x48.png" sizes="48x48" />
-  <link rel="icon" href="/favicon-192x192.png" sizes="192x192" />
-  <link rel="icon" href="/favicon-512x512.png" sizes="512x512" />
-  <link rel="apple-touch-icon" sizes="192x192" href="/favicon-192x192.png" />
+
+  <!-- Google AdSense (always loads in production, components handle consent) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6211741187285412"
+    crossorigin="anonymous"></script>
+  <!-- End Google AdSense -->
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">

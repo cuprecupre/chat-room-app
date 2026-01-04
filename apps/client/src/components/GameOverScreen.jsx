@@ -3,6 +3,7 @@ import { Button } from "./ui/Button";
 import { Avatar } from "./ui/Avatar";
 import { PlayerList } from "./game/PlayerList";
 import { Modal } from "./ui/Modal";
+import { AdBanner } from "./ui/AdBanner";
 import { Info } from "lucide-react";
 import confetti from "canvas-confetti";
 
@@ -88,6 +89,12 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                     <p className="text-xl md:text-2xl text-neutral-300 mt-6">{winnerSubtitle}</p>
                 )}
             </div>
+
+            {/* Ad Banner - DESACTIVADO hasta verificación de AdSense
+            <div className="max-w-lg mx-auto mb-8">
+                <AdBanner slot="YOUR_AD_SLOT_ID" format="auto" />
+            </div>
+            */}
 
             <div className="grid grid-cols-1 gap-12 items-start max-w-lg mx-auto pb-32">
                 {/* Impostor Reveal */}

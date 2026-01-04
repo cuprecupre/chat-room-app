@@ -77,6 +77,17 @@ export function Footer({ onOpenInstructions, onOpenFeedback, gameId, isMobile, o
                         <span>Apoya al desarrollador</span>
                     </a>
                 </div>
+
+                {/* Legal Links */}
+                <div className="flex items-center justify-center gap-4 text-xs text-neutral-600 mt-4">
+                    <a href="/privacidad" className="hover:text-neutral-400 transition-colors">
+                        Privacidad
+                    </a>
+                    <span>·</span>
+                    <a href="/cookies" className="hover:text-neutral-400 transition-colors">
+                        Cookies
+                    </a>
+                </div>
             </div>
         </footer>
     );
