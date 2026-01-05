@@ -186,6 +186,12 @@ function AppRoutes({
         }
     }, [emit, gameState]);
 
+    const kickPlayer = useCallback((targetId) => {
+        if (gameState?.roomId && targetId) {
+            emit("kick-player", { roomId: gameState.roomId, targetId });
+        }
+    }, [emit, gameState]);
+
     const castVote = useCallback(
         (targetId) => {
             if (!gameState?.roomId) return;
@@ -396,6 +402,7 @@ function AppRoutes({
                                         onLeaveRoom={leaveRoom}
                                         onLeaveMatch={leaveMatch}
                                         onVote={castVote}
+                                        onKickPlayer={kickPlayer}
                                     />
                                 }
                             />

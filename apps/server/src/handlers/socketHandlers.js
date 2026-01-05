@@ -74,6 +74,9 @@ function registerSocketHandlers(io, socket) {
     socket.on("leave-room", (roomId, callback) =>
         handleLeaveRoom(io, socket, user, roomId, callback)
     );
+    socket.on("kick-player", ({ roomId, targetId }) =>
+        handleKickPlayer(io, socket, user, roomId, targetId)
+    );
 
     // ============================================
     // LEGACY ALIASES (Transition Period Support)
@@ -263,9 +266,25 @@ function handleLeaveMatch(io, socket, user, roomId, callback) {
 
     const result = room.leaveMatch(user.uid);
 
-    // Notify others
+    // Emit current state (will be host_cancelled if host left)
     roomManager.emitRoomState(room);
-    roomManager.emitToast(roomId, `${user.name} ha vuelto a la sala`);
+
+    if (result.hostCancelled) {
+        // Host cancelled the match - show special toast
+        roomManager.emitToast(roomId, `El anfitrión ha abandonado la partida`);
+        console.log(`[Room ${roomId}] Host cancelled match. Farewell screen showing for all players.`);
+
+        // Schedule lobby state emission after 5 seconds to sync clients
+        setTimeout(() => {
+            const freshRoom = roomManager.getRoom(roomId);
+            if (freshRoom && freshRoom.phase === "lobby") {
+                roomManager.emitRoomState(freshRoom);
+                console.log(`[Room ${roomId}] Emitted lobby state after host_cancelled timeout.`);
+            }
+        }, 5000);
+    } else {
+        roomManager.emitToast(roomId, `${user.name} ha vuelto a la sala`);
+    }
 
     console.log(`User ${user.name} successfully left match in room ${roomId}`);
     safeCallback();
@@ -318,6 +337,49 @@ function handleLeaveRoom(io, socket, user, roomId, callback) {
 
     console.log(`User ${user.name} successfully left room ${roomId}`);
     safeCallback();
+}
+
+/**
+ * Handle host kicking a player from the room.
+ */
+function handleKickPlayer(io, socket, user, roomId, targetId) {
+    const room = roomManager.getRoom(roomId);
+    if (!room) {
+        socket.emit("error", { message: "Sala no encontrada" });
+        return;
+    }
+
+    try {
+        const result = room.kickPlayer(user.uid, targetId);
+
+        // Find the kicked player's socket and notify them
+        const targetSocketId = sessionManager.getUserSocket(targetId);
+        if (targetSocketId) {
+            const targetSocket = io.sockets.sockets.get(targetSocketId);
+            if (targetSocket) {
+                targetSocket.emit("kicked", {
+                    message: "Has sido expulsado de la sala por el anfitrión"
+                });
+                targetSocket.emit("game-state", null);
+                targetSocket.leave(roomId);
+            }
+        }
+
+        // Clear session data for kicked player
+        sessionManager.clearPendingDisconnect(targetId);
+
+        // Emit updated room state to remaining players
+        roomManager.emitRoomState(room);
+
+        // Notify remaining players
+        roomManager.emitToast(roomId, `${result.kickedPlayer.name} ha sido expulsado de la sala`);
+
+        console.log(`[Room ${roomId}] Player ${result.kickedPlayer.name} kicked by host ${user.name}`);
+
+    } catch (error) {
+        socket.emit("error", { message: error.message });
+        console.error(`[Room ${roomId}] Kick error: ${error.message}`);
+    }
 }
 
 /**

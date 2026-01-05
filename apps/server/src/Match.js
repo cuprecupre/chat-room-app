@@ -215,6 +215,37 @@ class Match {
         this.persistAnalytics();
     }
 
+    /**
+     * Cancel the match when host leaves.
+     * No winners, no points. Special phase for UI trigger.
+     */
+    cancelByHost() {
+        console.log(`[Match ${this.matchId}] Match cancelled by host leaving`);
+
+        // Clear winner and scores - no one wins
+        this.winnerId = null;
+        this.playerScores = {};
+
+        // Set special phase for client UI
+        this.phase = "host_cancelled";
+
+        // Persist with special end reason (no stats updates for cancelled matches)
+        this.persistCancelledMatch();
+    }
+
+    /**
+     * Persist match as cancelled (no winner stats).
+     */
+    persistCancelledMatch() {
+        const matchData = GameStateSerializer.getEnrichedGameData(this);
+        matchData.endReason = "host_cancelled";
+        matchData.winnerId = null;
+
+        // Save match record but don't update player stats
+        dbService.saveMatch(this.matchId, matchData);
+        console.log(`[Match ${this.matchId}] Cancelled match persisted (no stats updated)`);
+    }
+
     endGame(userId) {
         return this.endMatch(userId);
     }

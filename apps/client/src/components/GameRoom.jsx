@@ -6,6 +6,8 @@ import { RoundStartOverlay } from "./RoundStartOverlay";
 import { LobbyScreen } from "./game/LobbyScreen";
 import { GameBoard } from "./game/GameBoard";
 import { TurnOverlay } from "./game/TurnOverlay";
+import { HostLeftScreen } from "./HostLeftScreen";
+import { WaitingForNextGame } from "./WaitingForNextGame";
 
 // Components extracted to apps/client/src/components/game/
 // - PlayerList.jsx
@@ -32,6 +34,7 @@ export function GameRoom({
     onVote,
     isMobile,
     onOpenInstructions,
+    onKickPlayer,
     showEndGameModal: showEndGameModalProp,
     onShowEndGameModal,
 }) {
@@ -156,6 +159,27 @@ export function GameRoom({
                     isMobile={isMobile}
                     onVote={onVote}
                     onOpenInstructions={onOpenInstructions}
+                    onKickPlayer={onKickPlayer}
+                />
+            )}
+
+            {/* Host cancelled match - show farewell screen with 4s countdown */}
+            {state.phase === "host_cancelled" && (
+                <HostLeftScreen
+                    onRedirectToLobby={() => {
+                        // Server already put everyone back in lobby phase,
+                        // client just needs to wait for the next state update
+                        // which will show the lobby screen
+                    }}
+                />
+            )}
+
+            {/* Late joiner waiting for next game */}
+            {state.phase === "lobby_wait" && (
+                <WaitingForNextGame
+                    state={state}
+                    onLeaveRoom={onLeaveRoom}
+                    onCopyLink={onCopyLink}
                 />
             )}
 

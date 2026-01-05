@@ -16,6 +16,7 @@ export function LobbyScreen({
     isMobile,
     onVote,
     onOpenInstructions,
+    onKickPlayer,
 }) {
     const [showImpostorHint, setShowImpostorHint] = useState(
         state.options?.showImpostorHint !== undefined ? state.options.showImpostorHint : true
@@ -114,6 +115,7 @@ export function LobbyScreen({
                                 gameState={state}
                                 onVote={onVote}
                                 onOpenInstructions={onOpenInstructions}
+                                onKickPlayer={onKickPlayer}
                             />
                         </div>
 

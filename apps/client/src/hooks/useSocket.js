@@ -312,6 +312,18 @@ export function useSocket(user) {
                     }
                 });
 
+                // Handle being kicked by host
+                socket.on("kicked", (data) => {
+                    console.log("[Socket] Kicked from room:", data?.message);
+                    showToast(data?.message || "Has sido expulsado de la sala");
+                    if (isMounted) {
+                        setGameState(null);
+                        const url = new URL(window.location);
+                        url.searchParams.delete("roomId");
+                        window.history.replaceState({}, "", url.toString());
+                    }
+                });
+
                 socket.on("session-replaced", (message) => {
                     console.log("Session replaced:", message);
                     showToast(message);

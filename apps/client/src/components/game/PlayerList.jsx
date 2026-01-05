@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "../ui/Button";
 import { Avatar } from "../ui/Avatar";
 import { HelpLink } from "./HelpLink";
+import { X } from "lucide-react";
 
 export function PlayerList({
     players,
@@ -11,7 +12,9 @@ export function PlayerList({
     gameState,
     onVote,
     onOpenInstructions,
+    onKickPlayer,
 }) {
+    const isLobby = gameState?.phase === "lobby";
     const isPlaying = gameState?.phase === "playing";
     const isRoundResult = gameState?.phase === "round_result";
     const isGameOver = gameState?.phase === "game_over";
@@ -192,6 +195,17 @@ export function PlayerList({
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Kick button - only visible to host in lobby, not for self */}
+                            {isLobby && isHost && p.uid !== currentUserId && onKickPlayer && (
+                                <button
+                                    onClick={() => onKickPlayer(p.uid)}
+                                    className="p-1.5 rounded-full hover:bg-red-500/20 text-neutral-500 hover:text-red-400 transition-colors"
+                                    title={`Expulsar a ${p.name}`}
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
 
                             {/* Mostrar puntos o botón de votar según fase */}
                             <div className="flex items-center gap-3">

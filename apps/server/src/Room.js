@@ -137,8 +137,45 @@ class Room {
     }
 
     /**
+     * Kick a player from the room (host only).
+     * The player is removed from both Room and any active Match.
+     */
+    kickPlayer(hostId, targetId) {
+        // Validate host
+        if (hostId !== this.hostId) {
+            throw new Error("Solo el anfitrión puede expulsar jugadores.");
+        }
+
+        // Prevent self-kick
+        if (hostId === targetId) {
+            throw new Error("No puedes expulsarte a ti mismo.");
+        }
+
+        // Find target player
+        const targetPlayer = this.players.find(p => p.uid === targetId);
+        if (!targetPlayer) {
+            throw new Error("Jugador no encontrado en la sala.");
+        }
+
+        console.log(`[Room ${this.roomId}] Host kicking player: ${targetPlayer.name}`);
+
+        // Remove player from room (and match if applicable)
+        const removeResult = this.removePlayer(targetId);
+
+        return {
+            kicked: true,
+            kickedPlayer: {
+                uid: targetId,
+                name: targetPlayer.name,
+            },
+            ...removeResult,
+        };
+    }
+
+    /**
      * Remove a player from the current Match but keep them in the Room.
      * Used for "Ir a la sala" button.
+     * If the HOST leaves the match, the match is CANCELLED for everyone.
      */
     leaveMatch(userId) {
         const player = this.players.find(p => p.uid === userId);
@@ -149,13 +186,15 @@ class Room {
         player.isPlaying = false;
 
         if (this.currentMatch) {
+            // If the Room HOST leaves the match, cancel the match for everyone
+            if (userId === this.hostId) {
+                console.log(`[Room ${this.roomId}] Host ${player.name} abandoned match - cancelling for all players`);
+                this.currentMatch.cancelByHost();
+                this.onMatchEnd();
+                return { hostCancelled: true };
+            }
+
             const result = this.currentMatch.removePlayer(userId);
-
-            // If the match host was transferred, we might want to update something
-            // but usually Match.hostId and Room.hostId can diverge if host is still in room.
-            // If the Room host leaves the Match, the Match needs a new host to continue.
-            // PlayerManager.removePlayer already handles this.
-
             return result;
         }
 
@@ -244,21 +283,45 @@ class Room {
 
     /**
      * Handle match ending - update Room state.
+     * For host_cancelled: Keep phase so client shows farewell screen,
+     * then auto-transition to lobby after delay.
      */
     onMatchEnd(matchResult) {
-        this.phase = "game_over";
+        // Check if match was cancelled by host
+        const wasHostCancelled = this.currentMatch?.phase === "host_cancelled";
 
-        // Update rotation state for next match
+        // Update rotation state for next match (before clearing)
         if (this.currentMatch) {
             this.lastStartingPlayerId = this.currentMatch.lastStartingPlayerId;
             this.impostorHistory = this.currentMatch.impostorHistory;
         }
+
+        // Clear current match
+        this.currentMatch = null;
 
         // Reset late joiner flags - everyone can play next match
         this.players.forEach(p => {
             p.isLateJoiner = false;
             p.isPlaying = false;
         });
+
+        if (wasHostCancelled) {
+            // Keep host_cancelled phase so client shows farewell UI
+            this.phase = "host_cancelled";
+            console.log(`[Room ${this.roomId}] Match cancelled by host. Farewell screen will show.`);
+
+            // Auto-transition to lobby after 5 seconds
+            setTimeout(() => {
+                if (this.phase === "host_cancelled") {
+                    this.phase = "lobby";
+                    console.log(`[Room ${this.roomId}] Auto-transitioned to lobby after host cancellation.`);
+                    // Note: roomManager.emitRoomState should be called here,
+                    // but we don't have access to it. Client will request state.
+                }
+            }, 5000);
+        } else {
+            this.phase = "game_over";
+        }
 
         console.log(`[Room ${this.roomId}] Match ended. Players ready for next match: ${this.players.length}`);
     }

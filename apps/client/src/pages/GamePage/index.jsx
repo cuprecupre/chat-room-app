@@ -15,6 +15,7 @@ export function GamePage({
     onLeaveMatch,
     onUpdateOptions,
     onVote,
+    onKickPlayer,
 }) {
     const { copyLink, copyGameCode, isMobile } = useCopyToClipboard();
 
@@ -48,6 +49,7 @@ export function GamePage({
             onVote={onVote}
             isMobile={isMobile}
             onOpenInstructions={onOpenInstructions}
+            onKickPlayer={onKickPlayer}
             showEndGameModal={false}
             onShowEndGameModal={() => { }}
         />

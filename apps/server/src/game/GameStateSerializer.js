@@ -76,6 +76,11 @@ function getStateForPlayer(match, userId) {
             baseState.winnerId = winnerId;
             baseState.impostorWon = winnerId === match.impostorId;
         }
+    } else if (match.phase === "host_cancelled") {
+        // Host left the match - no winner, no scores
+        baseState.hostCancelled = true;
+        baseState.winnerId = null;
+        baseState.winner = null;
     }
 
     // Always include formerPlayers for showing scores
