@@ -248,10 +248,10 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                             Jugar otra partida
                         </Button>
                     ) : (
-                        <div className="w-full bg-orange-900 border-t border-orange-500/50 py-2 px-4 pb-3 text-center shadow-2xl animate-slideUp">
-                            <p className="text-orange-50 text-base leading-relaxed">
+                        <div className="w-full bg-orange-900 px-3 py-2 shadow-2xl animate-slideUp flex items-center justify-center min-h-[64px]">
+                            <p className="text-orange-50 text-sm leading-tight text-center w-full">
                                 <svg
-                                    className="animate-spin h-5 w-5 text-orange-200 inline-block align-text-bottom mr-3"
+                                    className="animate-spin h-5 w-5 text-orange-200 inline-block align-middle mr-3 -translate-y-[1px]"
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
                                     viewBox="0 0 24 24"
