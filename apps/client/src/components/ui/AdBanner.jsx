@@ -13,7 +13,7 @@ const AD_HEIGHT = 100; // 300x100 or similar
  * - Only loads in production
  * 
  * Props:
- * - slot: Ad unit slot ID from AdSense (required for production)
+ * - slot: Ad unit slot ID from AdSense (required for production, default: 4497969935)
  * - format: 'auto', 'horizontal', 'rectangle', 'vertical' (default: 'auto')
  * - className: Additional CSS classes
  * - height: Fixed height in pixels (default: 100)

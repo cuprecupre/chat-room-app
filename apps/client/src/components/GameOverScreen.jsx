@@ -90,11 +90,10 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                 )}
             </div>
 
-            {/* Ad Banner - DESACTIVADO hasta verificación de AdSense
+            {/* Ad Banner - DESACTIVADO hasta verificación de AdSense */}
             <div className="max-w-lg mx-auto mb-8">
-                <AdBanner slot="YOUR_AD_SLOT_ID" format="auto" />
+                <AdBanner slot="4497969935" format="auto" />
             </div>
-            */}
 
             <div className="grid grid-cols-1 gap-12 items-start max-w-lg mx-auto pb-32">
                 {/* Impostor Reveal */}
