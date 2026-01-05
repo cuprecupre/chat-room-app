@@ -110,7 +110,7 @@ export function CookieConsent() {
                                 onClick={acceptNecessaryOnly}
                                 className="order-2 sm:order-2 px-4 py-2 bg-orange-700 hover:bg-orange-800 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
                             >
-                                Rechazar todas
+                                Aceptar las esenciales
                             </button>
                             <button
                                 onClick={acceptAll}
