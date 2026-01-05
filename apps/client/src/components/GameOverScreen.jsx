@@ -250,10 +250,10 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                             </Button>
                         </>
                     ) : (
-                        <div className="bg-neutral-900 rounded-xl p-4 text-center w-fit">
-                            <p className="text-neutral-400 text-sm leading-relaxed">
+                        <div className="bg-orange-900 border border-orange-500/50 rounded-xl p-4 text-center w-fit">
+                            <p className="text-orange-50 text-sm leading-relaxed">
                                 <svg
-                                    className="animate-spin h-4 w-4 text-orange-400 inline-block align-text-bottom mr-2"
+                                    className="animate-spin h-4 w-4 text-orange-200 inline-block align-text-bottom mr-2"
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
                                     viewBox="0 0 24 24"
@@ -272,7 +272,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                     ></path>
                                 </svg>
-                                Esperando a que <span className="text-orange-400 font-medium">
+                                Esperando a que <span className="text-white font-bold text-shadow-sm">
                                     {state.players.find((p) => p.uid === state.hostId)?.name ||
                                         "el anfitrión"}
                                 </span> inicie una nueva partida
