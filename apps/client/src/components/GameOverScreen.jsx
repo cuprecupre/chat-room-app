@@ -78,13 +78,13 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
     return (
         <div className="w-full max-w-4xl mx-auto animate-fadeIn pb-32 pt-10 px-4">
             {/* Ganador */}
-            <div className="text-center mb-12">
+            <div className="text-center mb-6 md:mb-12">
                 {winnerLabel && (
                     <p className="text-sm text-neutral-400 uppercase tracking-widest mb-2">
                         {winnerLabel}
                     </p>
                 )}
-                <h1 className="text-4xl md:text-6xl font-serif text-orange-400">{winnerTitle}</h1>
+                <h1 className="text-2xl md:text-5xl font-serif text-orange-400">{winnerTitle}</h1>
                 {winnerSubtitle && (
                     <p className="text-xl md:text-2xl text-neutral-300 mt-6">{winnerSubtitle}</p>
                 )}
@@ -106,7 +106,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                             </p>
                             {impostor ? (
                                 <div className="flex items-center justify-center w-full">
-                                    <span className="text-2xl text-white font-medium text-center break-words leading-tight max-w-full">
+                                    <span className="text-xl text-white font-medium text-center break-words leading-tight max-w-full">
                                         {impostor.name}
                                     </span>
                                 </div>
@@ -125,7 +125,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                                     <p className="text-xs uppercase tracking-wider text-neutral-400 mb-3">
                                         Palabra secreta
                                     </p>
-                                    <p className="text-2xl text-white font-medium capitalize">
+                                    <p className="text-xl text-white font-medium text-center break-words leading-tight max-w-full capitalize">
                                         {state.secretWord}
                                     </p>
                                 </div>
