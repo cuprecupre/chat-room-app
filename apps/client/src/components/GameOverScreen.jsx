@@ -76,7 +76,12 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
     }
 
     return (
-        <div className="w-full max-w-4xl mx-auto animate-fadeIn pb-32 pt-10 px-4">
+        <div className="w-full max-w-4xl mx-auto animate-fadeIn pb-32 pt-4 px-0 md:px-4">
+            {/* Ad Banner - DESACTIVADO hasta verificación de AdSense */}
+            <div className="max-w-lg mx-auto mb-10">
+                <AdBanner slot="4497969935" />
+            </div>
+
             {/* Ganador */}
             <div className="text-center mb-6 md:mb-12">
                 {winnerLabel && (
@@ -84,15 +89,10 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                         {winnerLabel}
                     </p>
                 )}
-                <h1 className="text-2xl md:text-5xl font-serif text-orange-400">{winnerTitle}</h1>
+                <h1 className="text-3xl md:text-5xl font-serif text-orange-400">{winnerTitle}</h1>
                 {winnerSubtitle && (
                     <p className="text-xl md:text-2xl text-neutral-300 mt-6">{winnerSubtitle}</p>
                 )}
-            </div>
-
-            {/* Ad Banner - DESACTIVADO hasta verificación de AdSense */}
-            <div className="max-w-lg mx-auto mb-8">
-                <AdBanner slot="4497969935" />
             </div>
 
             <div className="grid grid-cols-1 gap-12 items-start max-w-lg mx-auto pb-32">
@@ -228,32 +228,30 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                 </div>
             </Modal>
 
-            {/* Botón Play Again (Fixed Bottom) */}
-            <div className="fixed bottom-0 left-0 right-0 pt-16 pb-6 px-6 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent z-40">
-                <div className="w-full max-w-2xl mx-auto space-y-4 flex flex-col items-center">
+            {/* Bottom Bar (Fixed Bottom) */}
+            <div className="fixed bottom-0 left-0 right-0 pt-16 pb-0 px-0 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent z-40">
+                <div className="w-full flex flex-col items-center">
                     {isHost ? (
-                        <>
-                            <Button
-                                onClick={() => {
-                                    window.dataLayer = window.dataLayer || [];
-                                    window.dataLayer.push({
-                                        event: 'play_again_click',
-                                        location: 'game_over_screen',
-                                    });
-                                    onPlayAgain();
-                                }}
-                                variant="primary"
-                                size="lg"
-                                className="w-full max-w-sm text-lg py-6"
-                            >
-                                Jugar otra partida
-                            </Button>
-                        </>
+                        <Button
+                            onClick={() => {
+                                window.dataLayer = window.dataLayer || [];
+                                window.dataLayer.push({
+                                    event: 'play_again_click',
+                                    location: 'game_over_screen',
+                                });
+                                onPlayAgain();
+                            }}
+                            variant="primary"
+                            size="lg"
+                            className="w-full max-w-sm text-lg py-6 mb-6 mx-6"
+                        >
+                            Jugar otra partida
+                        </Button>
                     ) : (
-                        <div className="bg-orange-900 border border-orange-500/50 rounded-full p-4 text-center w-fit">
-                            <p className="text-orange-50 text-sm leading-relaxed">
+                        <div className="w-full bg-orange-900 border-t border-orange-500/50 py-2 px-4 pb-3 text-center shadow-2xl animate-slideUp">
+                            <p className="text-orange-50 text-base leading-relaxed">
                                 <svg
-                                    className="animate-spin h-4 w-4 text-orange-200 inline-block align-text-bottom mr-2"
+                                    className="animate-spin h-5 w-5 text-orange-200 inline-block align-text-bottom mr-3"
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
                                     viewBox="0 0 24 24"
@@ -271,10 +269,10 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                     ></path>
                                 </svg>
-                                Esperando a que <span className="text-orange-400 font-bold text-shadow-sm">
+                                Esperando a que <span className="text-orange-400 font-bold">
                                     {state.players.find((p) => p.uid === state.hostId)?.name ||
                                         "el anfitrión"}
-                                </span> inicie una nueva partida
+                                </span> inicie otra partida
                             </p>
                         </div>
                     )}
