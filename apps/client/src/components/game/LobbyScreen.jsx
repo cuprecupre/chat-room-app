@@ -40,15 +40,22 @@ export function LobbyScreen({
     const handleStartGame = () => {
         onStartGame({ showImpostorHint });
     };
+    const host = state.players?.find((p) => p.uid === state.hostId);
+    let hostName = host ? host.name.toUpperCase() : "EL ANFITRIÓN";
+
+    // Robustness: if I am the host, use my name directly
+    if (isHost && user?.name) {
+        hostName = user.name.toUpperCase();
+    }
+
     return (
-        <div className="w-full max-w-sm mx-auto text-center space-y-4 pb-24 sm:pb-0 pt-8">
-            {/* Header Image - 50% smaller (w-28 h-28) */}
-            <img
-                src={dualImpostorImg}
-                alt="Lobby"
-                className="mx-auto w-28 h-28 rounded-full object-cover shadow-lg ring-1 ring-white/10"
-                loading="lazy"
-            />
+        <div className="w-full max-w-sm mx-auto text-center space-y-4 pb-32 pt-10 px-0">
+            {/* Room Identifier Badge */}
+            <div className="flex items-center justify-center mb-6 animate-fadeIn">
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 rounded-full">
+                    SALA DE {hostName}
+                </span>
+            </div>
 
             {isHost ? (
                 /* HOST VIEW */
@@ -76,8 +83,8 @@ export function LobbyScreen({
                                 : "Copiar enlace de la sala"}
                         </Button>
 
-                        <p className="text-lg text-neutral-400 font-regular animate-pulse">
-                            Espera a que se unan todos los jugadores...
+                        <p className="text-sm text-neutral-400 font-regular animate-pulse max-w-[280px] mx-auto">
+                            Comparte el enlace y espera hasta que se unan para iniciar la partida
                         </p>
 
                         <div className="w-full pt-2">
@@ -88,7 +95,7 @@ export function LobbyScreen({
                                         <span className="text-sm font-semibold text-neutral-300">
                                             Jugar en modo fácil
                                         </span>
-                                        <p className="text-[11px] text-neutral-500 mt-1 leading-relaxed">
+                                        <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
                                             El Impostor recibirá una pequeña ayuda sobre la palabra
                                             secreta.
                                         </p>
@@ -159,9 +166,9 @@ export function LobbyScreen({
                     </h2>
 
                     <div className="space-y-6 mt-8">
-                        <p className="text-lg text-neutral-400 text-center">
+                        <p className="text-sm text-neutral-400 text-center">
                             <svg
-                                className="animate-spin inline-block h-4 w-4 text-orange-400 mr-2 align-middle"
+                                className="animate-spin inline-block h-3 w-3 text-orange-400 mr-2 align-middle"
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"

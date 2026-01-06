@@ -76,7 +76,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
     }
 
     return (
-        <div className="w-full max-w-4xl mx-auto animate-fadeIn pb-32 pt-10 px-4">
+        <div className="w-full max-w-4xl mx-auto animate-fadeIn pb-32 pt-10 px-0">
             {/* Ganador */}
             <div className="text-center mb-12">
                 {winnerLabel && (
