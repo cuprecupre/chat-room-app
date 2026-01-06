@@ -114,6 +114,9 @@ export function LobbyScreen({
                                 </label>
                             </div>
 
+                            <div className="text-sm font-semibold text-neutral-400 text-left px-1 mt-8 mb-3">
+                                Jugadores conectados: {state.players.length}
+                            </div>
                             <PlayerList
                                 players={state.players}
                                 currentUserId={user.uid}
@@ -202,6 +205,9 @@ export function LobbyScreen({
                                     </span>
                                 </div>
                             )}
+                            <div className="text-sm font-semibold text-neutral-400 text-left px-1 mt-8 mb-3">
+                                Jugadores conectados: {state.players.length}
+                            </div>
                             <PlayerList
                                 players={state.players}
                                 currentUserId={user.uid}
