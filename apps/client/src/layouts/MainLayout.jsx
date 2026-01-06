@@ -172,7 +172,7 @@ export function MainLayout({
                                                     Volver a la sala
                                                 </button>
                                             )}
-                                            {gameState?.phase === "lobby" && (
+                                            {(gameState?.phase === "lobby" || gameState?.phase === "lobby_wait") && (
                                                 <button
                                                     onClick={() => {
                                                         setShowLeaveRoomModal(true);

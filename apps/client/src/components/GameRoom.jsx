@@ -177,6 +177,7 @@ export function GameRoom({
             {state.phase === "lobby_wait" && (
                 <WaitingForNextGame
                     state={state}
+                    user={user}
                     onLeaveRoom={onLeaveRoom}
                     onCopyLink={onCopyLink}
                 />
@@ -282,7 +283,7 @@ export function GameRoom({
                             </Button>
                         )}
 
-                        {state.phase === "lobby" && (
+                        {(state.phase === "lobby" || state.phase === "lobby_wait") && (
                             <Button
                                 onClick={() => {
                                     setShowLeaveModal(false);
