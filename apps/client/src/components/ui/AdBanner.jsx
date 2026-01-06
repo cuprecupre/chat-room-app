@@ -56,7 +56,7 @@ export function AdBanner({
                 >
                     <div className="text-center">
                         <p className="text-neutral-500 text-xs">
-                            {width}x{height} Placeholder
+                            {width}x{height} Ads
                         </p>
                     </div>
                 </div>

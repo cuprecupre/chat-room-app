@@ -11,6 +11,7 @@ import { ShutdownToast } from "../components/ShutdownToast";
 import { MainLayout } from "../layouts/MainLayout";
 import { UnauthenticatedLayout } from "../layouts/UnauthenticatedLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
+import { AdminProtectedRoute } from "./AdminProtectedRoute";
 import { ROUTES } from "./routes";
 import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
 
@@ -62,6 +63,11 @@ const DebugPreviews = lazy(() =>
 );
 const DebugPreviewSingle = lazy(() =>
     import("../pages/DebugPreviewSingle").catch(() => ({ default: () => null }))
+);
+
+// Admin Pages (lazy loaded - only downloaded for admins)
+const AdminIndex = lazy(() =>
+    import("../pages/Admin").then((m) => ({ default: m.AdminIndex }))
 );
 
 function HomeRouteHandler({ user }) {
@@ -156,7 +162,6 @@ function AppRoutes({
         (options) => emit("start-match", { roomId: gameState?.roomId, options }),
         [emit, gameState]
     );
-    const endMatch = useCallback(() => emit("end-match", gameState?.roomId), [emit, gameState]);
     const playAgain = useCallback(() => emit("play-again", gameState?.roomId), [emit, gameState]);
     const nextRound = useCallback(() => emit("next-round", gameState?.roomId), [emit, gameState]);
 
@@ -389,7 +394,6 @@ function AppRoutes({
                                         onOpenInstructions={() => setInstructionsOpen(true)}
                                         onStartGame={startMatch}
                                         onUpdateOptions={updateOptions}
-                                        onEndGame={endMatch}
                                         onPlayAgain={playAgain}
                                         onNextRound={nextRound}
                                         onLeaveRoom={leaveRoom}
@@ -401,6 +405,16 @@ function AppRoutes({
                             />
                         </Route>
                     </Route>
+
+                    {/* Admin routes - protected by admin check */}
+                    <Route
+                        path={ROUTES.ADMIN}
+                        element={
+                            <AdminProtectedRoute>
+                                <AdminIndex />
+                            </AdminProtectedRoute>
+                        }
+                    />
 
                     {/* Catch-all redirect to home */}
                     <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />

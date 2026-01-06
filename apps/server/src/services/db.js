@@ -99,6 +99,8 @@ class DBService {
             // Numeric increments
             const numericFields = [
                 'gamesPlayed',
+                'gamesAbandoned',
+                'gamesCompleted',
                 'gamesAsImpostor',
                 'winsAsImpostor',
                 'winsAsFriend',

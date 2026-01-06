@@ -229,6 +229,7 @@ export function MainLayout({
                 onClose={() => setShowLeaveMatchModal(false)}
                 onConfirm={leaveMatch}
                 isGameOver={gameState?.phase === "game_over"}
+                isHost={isHost}
             />
 
         </div>

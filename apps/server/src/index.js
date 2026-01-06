@@ -11,6 +11,7 @@ const { createExpressApp } = require("./config/express");
 const { createSocketServer } = require("./config/socketio");
 const { socketAuthMiddleware } = require("./middleware/auth");
 const apiRoutes = require("./routes/api");
+const adminRoutes = require("./routes/adminRoutes");
 const dbService = require("./services/db");
 const roomManager = require("./services/roomManager");
 const sessionManager = require("./services/sessionManager");
@@ -28,6 +29,7 @@ const app = createExpressApp();
 
 // --- Register API Routes ---
 app.use("/api", apiRoutes);
+app.use("/api/admin", adminRoutes);
 
 // --- SPA Fallback (must be after API routes) ---
 const path = require("path");

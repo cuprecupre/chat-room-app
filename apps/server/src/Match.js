@@ -132,9 +132,21 @@ class Match {
         // Save full match record to /matches collection
         dbService.saveMatch(this.matchId, matchData);
 
-        // Aggregate player statistics
-        this.players.forEach((player) => {
-            const isImpostor = this.impostorId === player.uid;
+        // Collect all unique participant IDs (current + former players who have scores)
+        const participantIds = new Set([
+            ...this.players.map(p => p.uid),
+            ...Object.keys(this.formerPlayers).filter(uid => this.playerScores.hasOwnProperty(uid))
+        ]);
+
+        participantIds.forEach((uid) => {
+            // Get player info from current list or former players
+            const player = this.players.find(p => p.uid === uid) || {
+                uid,
+                ...this.formerPlayers[uid]
+            };
+
+            const isImpostor = this.impostorId === uid;
+            const hasAbandoned = !this.players.some(p => p.uid === uid);
 
             // Friends win if winnerId is set to a friend (not impostor, not tie, not null)
             const friendsWon = this.winnerId &&
@@ -145,23 +157,31 @@ class Match {
                 displayName: player.name,
                 photoURL: player.photoURL || null,
                 gamesPlayed: 1,
-                points: this.playerScores[player.uid] || 0,
+                points: this.playerScores[uid] || 0,
                 playTimeSeconds: durationSeconds
             };
 
+            // Track completion vs abandonment
+            if (hasAbandoned) {
+                statsUpdate.gamesAbandoned = 1;
+            } else {
+                statsUpdate.gamesCompleted = 1;
+            }
+
             if (isImpostor) {
                 statsUpdate.gamesAsImpostor = 1;
-                if (this.winnerId === this.impostorId) {
+                // Only give win if they didn't abandon OR if you want to allow impostor wins after abandon (usually not)
+                if (this.winnerId === this.impostorId && !hasAbandoned) {
                     statsUpdate.winsAsImpostor = 1;
                 }
             } else {
-                // All friends get winsAsFriend when friends win
-                if (friendsWon) {
+                // All friends get winsAsFriend when friends win (and they didn't abandon)
+                if (friendsWon && !hasAbandoned) {
                     statsUpdate.winsAsFriend = 1;
                 }
             }
 
-            dbService.updatePlayerStats(player.uid, statsUpdate);
+            dbService.updatePlayerStats(uid, statsUpdate);
         });
     }
 
