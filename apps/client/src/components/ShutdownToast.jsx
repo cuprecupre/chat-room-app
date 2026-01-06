@@ -47,7 +47,7 @@ export function ShutdownToast({ shutdownCountdown }) {
                 {/* Message */}
                 <div className="flex flex-col">
                     <span className="text-sm font-medium">
-                        {message || `Reinicio de servidor en ${timeDisplay}`}
+                        {message || "Reiniciaremos el servidor en un momento"}
                     </span>
                     <span className={`text-xs ${isUrgent ? "text-red-300" : "text-amber-300"}`}>
                         Podrás volver a jugar en unos instantes.
