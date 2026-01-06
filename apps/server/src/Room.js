@@ -309,9 +309,12 @@ class Room {
         // IMPORTANT: Do NOT clear currentMatch yet - we need it for game_over screen data
         // It will be cleared when starting a new match or returning to lobby
 
-        // Reset late joiner flags - everyone can play next match
+        // Reset late joiner flags - but ONLY for players who participated until the end
+        // Players who left the match early (isLateJoiner=true) should keep that flag
+        // so they see "lobby" phase instead of corrupted "game_over" data
         this.players.forEach(p => {
-            p.isLateJoiner = false;
+            // Don't reset isLateJoiner if player already left the match voluntarily
+            // They should stay in "lobby" view, not see game_over with missing data
             p.isPlaying = false;
         });
 
