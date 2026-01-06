@@ -8,47 +8,37 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 
-  <!-- Google Tag Manager (with GDPR consent check) -->
+  <!-- Google Consent Mode (v2) -->
   <script>
-    // Only load GTM in Production AND if user has consented to analytics
-    (function () {
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+
+    // Configuración por defecto: todo denegado
+    gtag('consent', 'default', {
+      'ad_storage': 'denied',
+      'analytics_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500
+    });
+  </script>
+
+  <!-- Google Tag Manager -->
+  <script>
+    (function (w, d, s, l, i) {
+      // Solo cargar en Producción
       var isProduction = window.location.hostname === 'impostor.me' || window.location.hostname === 'www.impostor.me';
-      if (!isProduction) {
-        console.log('📊 GTM Skipped: Non-production environment');
-        return;
-      }
+      if (!isProduction) return;
 
-      // Check for cookie consent
-      var consent = localStorage.getItem('cookie_consent');
-      if (!consent) {
-        console.log('📊 GTM Skipped: No cookie consent yet');
-        return;
-      }
-
-      try {
-        var parsed = JSON.parse(consent);
-        if (!parsed.analytics) {
-          console.log('📊 GTM Skipped: Analytics not consented');
-          return;
-        }
-      } catch (e) {
-        console.log('📊 GTM Skipped: Invalid consent data');
-        return;
-      }
-
-      // Load GTM
-      (function (w, d, s, l, i) {
-        w[l] = w[l] || []; w[l].push({
-          'gtm.start': new Date().getTime(), event: 'gtm.js'
-        });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
-        j.async = true;
-        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, 'script', 'dataLayer', 'GTM-TPZPDF9L');
-      console.log('📊 GTM Loaded: User consented');
-    })();
+      w[l] = w[l] || []; w[l].push({
+        'gtm.start': new Date().getTime(), event: 'gtm.js'
+      });
+      var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+      j.async = true;
+      j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-TPZPDF9L');
   </script>
   <!-- End Google Tag Manager -->
 

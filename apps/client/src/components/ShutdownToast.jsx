@@ -22,10 +22,9 @@ export function ShutdownToast({ shutdownCountdown }) {
             <div
                 className={`
                     flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg border
-                    ${
-                        isUrgent
-                            ? "bg-red-950/95 border-red-500/50 text-red-100"
-                            : "bg-amber-950/95 border-amber-500/50 text-amber-100"
+                    ${isUrgent
+                        ? "bg-red-950/95 border-red-500/50 text-red-100"
+                        : "bg-amber-950/95 border-amber-500/50 text-amber-100"
                     }
                     backdrop-blur-sm
                 `}
@@ -48,10 +47,10 @@ export function ShutdownToast({ shutdownCountdown }) {
                 {/* Message */}
                 <div className="flex flex-col">
                     <span className="text-sm font-medium">
-                        {message || `Mantenimiento del servidor en ${timeDisplay}`}
+                        {message || `Reinicio de servidor en ${timeDisplay}`}
                     </span>
                     <span className={`text-xs ${isUrgent ? "text-red-300" : "text-amber-300"}`}>
-                        Las partidas activas finalizarán pronto
+                        Podrás volver a jugar en unos instantes.
                     </span>
                 </div>
 

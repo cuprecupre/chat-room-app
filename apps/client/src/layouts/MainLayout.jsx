@@ -1,6 +1,6 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Coffee } from "lucide-react";
+
 import { Avatar } from "../components/ui/Avatar";
 import { Footer } from "../components/Footer";
 import { LeaveMatchModal } from "../components/LeaveMatchModal";
