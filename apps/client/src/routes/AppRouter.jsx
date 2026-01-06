@@ -11,6 +11,7 @@ import { ShutdownToast } from "../components/ShutdownToast";
 import { MainLayout } from "../layouts/MainLayout";
 import { UnauthenticatedLayout } from "../layouts/UnauthenticatedLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
+import { AdminProtectedRoute } from "./AdminProtectedRoute";
 import { ROUTES } from "./routes";
 import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
 
@@ -62,6 +63,11 @@ const DebugPreviews = lazy(() =>
 );
 const DebugPreviewSingle = lazy(() =>
     import("../pages/DebugPreviewSingle").catch(() => ({ default: () => null }))
+);
+
+// Admin Pages (lazy loaded - only downloaded for admins)
+const AdminIndex = lazy(() =>
+    import("../pages/Admin").then((m) => ({ default: m.AdminIndex }))
 );
 
 function HomeRouteHandler({ user }) {
@@ -399,6 +405,16 @@ function AppRoutes({
                             />
                         </Route>
                     </Route>
+
+                    {/* Admin routes - protected by admin check */}
+                    <Route
+                        path={ROUTES.ADMIN}
+                        element={
+                            <AdminProtectedRoute>
+                                <AdminIndex />
+                            </AdminProtectedRoute>
+                        }
+                    />
 
                     {/* Catch-all redirect to home */}
                     <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />

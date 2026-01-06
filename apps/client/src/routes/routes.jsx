@@ -6,6 +6,7 @@ export const ROUTES = {
     RULES: "/reglas",
     LOBBY: "/lobby",
     GAME: "/game",
+    ADMIN: "/admin",
 };
 
 // Route configuration with metadata
