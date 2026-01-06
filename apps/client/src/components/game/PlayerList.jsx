@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "../ui/Button";
 import { Avatar } from "../ui/Avatar";
 import { HelpLink } from "./HelpLink";
-import { X } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 export function PlayerList({
     players,
@@ -196,18 +196,7 @@ export function PlayerList({
                                 </div>
                             </div>
 
-                            {/* Kick button - only visible to host in lobby, not for self */}
-                            {isLobby && isHost && p.uid !== currentUserId && onKickPlayer && (
-                                <button
-                                    onClick={() => onKickPlayer(p.uid)}
-                                    className="p-1.5 rounded-full hover:bg-red-500/20 text-neutral-500 hover:text-red-400 transition-colors"
-                                    title={`Expulsar a ${p.name}`}
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
-                            )}
-
-                            {/* Mostrar puntos o botón de votar según fase */}
+                            {/* Right side: scores, vote buttons, and kick button */}
                             <div className="flex items-center gap-3">
                                 {isEliminated && isPlaying && (
                                     <span className="text-xs text-red-400 font-medium">
@@ -303,6 +292,17 @@ export function PlayerList({
                                             <span>{iVotedForThisPlayer ? "Votado" : "Votar"}</span>
                                         </Button>
                                     )
+                                )}
+
+                                {/* Kick button - only visible to host in lobby, not for self */}
+                                {isLobby && isHost && p.uid !== currentUserId && onKickPlayer && (
+                                    <button
+                                        onClick={() => onKickPlayer(p.uid)}
+                                        className="p-1.5 rounded-full hover:bg-red-500/20 text-red-500/70 hover:text-red-400 transition-colors"
+                                        title={`Expulsar a ${p.name}`}
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
                                 )}
                             </div>
                         </li>
