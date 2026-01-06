@@ -105,15 +105,28 @@ function getStateForPlayer(match, userId) {
  * Returns enriched match data for full persistence in /matches collection.
  */
 function getEnrichedGameData(match) {
-    const playersInfo = match.players.map((p) => {
-        const isImpostor = match.impostorId === p.uid;
+    // Collect all participants (current + former)
+    const participantIds = new Set([
+        ...match.players.map(p => p.uid),
+        ...Object.keys(match.formerPlayers || {}).filter(uid => match.playerScores?.hasOwnProperty(uid))
+    ]);
+
+    const playersInfo = Array.from(participantIds).map((uid) => {
+        const p = match.players.find((pp) => pp.uid === uid) || {
+            uid,
+            ...match.formerPlayers[uid]
+        };
+        const isImpostor = match.impostorId === uid;
         const eliminated = match.eliminatedPlayers || [];
+        const hasAbandoned = !match.players.some(pp => pp.uid === uid);
+
         return {
-            uid: p.uid,
+            uid: uid,
             name: p.name,
             role: isImpostor ? "impostor" : "friend",
-            score: match.playerScores[p.uid] || 0,
-            wasEliminated: eliminated.includes(p.uid),
+            score: match.playerScores[uid] || 0,
+            wasEliminated: eliminated.includes(uid),
+            abandoned: hasAbandoned
         };
     });
 
