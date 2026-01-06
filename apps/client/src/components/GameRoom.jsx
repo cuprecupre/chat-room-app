@@ -23,7 +23,6 @@ export function GameRoom({
     isHost,
     user,
     onStartGame,
-    onEndGame,
     onPlayAgain,
     onNextRound,
     onLeaveRoom,
@@ -35,8 +34,6 @@ export function GameRoom({
     isMobile,
     onOpenInstructions,
     onKickPlayer,
-    showEndGameModal: showEndGameModalProp,
-    onShowEndGameModal,
 }) {
     const prevTurnRef = useRef(state.currentRound);
     const prevPhaseRef = useRef(state.phase);
@@ -50,11 +47,6 @@ export function GameRoom({
     const [initialAnimationPending, setInitialAnimationPending] = useState(false);
 
     // Modals State
-    const [showEndGameModalInternal, setShowEndGameModalInternal] = useState(false);
-    const showEndGameModal =
-        showEndGameModalProp !== undefined ? showEndGameModalProp : showEndGameModalInternal;
-    const setShowEndGameModal = onShowEndGameModal || setShowEndGameModalInternal;
-    const [showLeaveModal, setShowLeaveModal] = useState(false);
 
     // Timeouts Refs
     const turnOverlayTimeoutRef = useRef(null);
@@ -219,95 +211,6 @@ export function GameRoom({
             />
             <RoundStartOverlay state={state} />
 
-            {/* Modal de confirmación para terminar juego */}
-            <Modal
-                isOpen={showEndGameModal}
-                onClose={() => setShowEndGameModal(false)}
-                title="¿Finalizar juego?"
-                size="sm"
-            >
-                <div className="text-center space-y-4">
-                    <p className="text-neutral-400">
-                        Esta acción finalizará el juego para todos los jugadores. ¿Estás seguro?
-                    </p>
-                    <div className="flex gap-3 pt-2">
-                        <Button
-                            onClick={() => setShowEndGameModal(false)}
-                            variant="outline"
-                            size="md"
-                            className="flex-1"
-                        >
-                            Cancelar
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                setShowEndGameModal(false);
-                                onEndGame();
-                            }}
-                            variant="primary"
-                            size="md"
-                            className="flex-1"
-                        >
-                            Terminar
-                        </Button>
-                    </div>
-                </div>
-            </Modal>
-
-            {/* Modal de confirmación para abandonar juego */}
-            <Modal
-                isOpen={showLeaveModal}
-                onClose={() => setShowLeaveModal(false)}
-                title={state.phase === "playing" || state.phase === "round_result" ? "¿Abandonar partida?" : "¿Salir de la sala?"}
-                size="sm"
-            >
-                <div className="text-center space-y-4">
-                    <p className="text-neutral-400">
-                        {state.phase === "playing"
-                            ? "Puedes volver al lobby de la sala o salir por completo."
-                            : "Saldrás de la sala. Deberás ser invitado nuevamente para entrar."}
-                    </p>
-
-                    <div className="flex flex-col gap-3 pt-2">
-                        {state.phase === "playing" && (
-                            <Button
-                                onClick={() => {
-                                    setShowLeaveModal(false);
-                                    onLeaveMatch();
-                                }}
-                                variant="primary"
-                                size="md"
-                                className="w-full"
-                            >
-                                Volver a la sala
-                            </Button>
-                        )}
-
-                        {(state.phase === "lobby" || state.phase === "lobby_wait") && (
-                            <Button
-                                onClick={() => {
-                                    setShowLeaveModal(false);
-                                    onLeaveRoom();
-                                }}
-                                variant="primary"
-                                size="md"
-                                className="w-full"
-                            >
-                                Salir de la sala
-                            </Button>
-                        )}
-
-                        <Button
-                            onClick={() => setShowLeaveModal(false)}
-                            variant="ghost"
-                            size="sm"
-                            className="w-full text-neutral-500"
-                        >
-                            Cancelar
-                        </Button>
-                    </div>
-                </div>
-            </Modal>
         </div>
     );
 }

@@ -7,21 +7,21 @@ export function LeaveMatchModal({ isOpen, onClose, onConfirm, isGameOver }) {
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title="¿Abandonar partida?"
+            title={isGameOver ? "¿Volver a la sala?" : "¿Abandonar partida?"}
             size="sm"
         >
             <div className="text-center space-y-4">
                 <p className="text-neutral-400">
                     {isGameOver
-                        ? "Volverás a la sala de espera."
-                        : "Perderás tu avance en esta partida y volverás a la sala de espera."}
+                        ? "Volverás a la sala."
+                        : "Perderás tu avance en esta partida y volverás a la sala."}
                 </p>
                 <div className="space-y-2 pt-2">
                     <Button
                         onClick={onConfirm}
                         variant="danger"
                     >
-                        Sí, abandonar
+                        Abandonar
                     </Button>
                     <Button onClick={onClose} variant="outline">
                         Cancelar

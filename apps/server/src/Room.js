@@ -194,6 +194,13 @@ class Room {
                 return { hostCancelled: true };
             }
 
+            // During game_over, don't remove from match - just mark as wanting to return to lobby
+            // This preserves match data (impostor, secret word) for other players
+            if (this.phase === "game_over") {
+                console.log(`[Room ${this.roomId}] Player ${player.name} left results screen - returning to lobby`);
+                return { leftGameOver: true };
+            }
+
             const result = this.currentMatch.removePlayer(userId);
             return result;
         }
@@ -388,6 +395,13 @@ class Room {
         }
 
         // Lobby or game_over - return room state
+        // If room is in game_over but player has left the results (isLateJoiner=true),
+        // show them the lobby phase instead.
+        let displayPhase = this.phase;
+        if (displayPhase === "game_over" && player?.isLateJoiner) {
+            displayPhase = "lobby";
+        }
+
         // IMPORTANT: matchId = roomId for client compatibility
         return {
             roomId: this.roomId,
@@ -395,11 +409,11 @@ class Room {
             gameId: this.roomId, // Client expects gameId always
             hostId: this.hostId,
             players: this.players,
-            phase: this.phase,
+            phase: displayPhase,
             playerOrder: this.playerOrder,
             options: this.options,
-            // Include game_over data if available
-            ...(this.phase === "game_over" && this.currentMatch
+            // Include game_over data if available (only for players still viewing results)
+            ...(displayPhase === "game_over" && this.currentMatch
                 ? this.currentMatch.getStateFor(userId)
                 : {}),
         };

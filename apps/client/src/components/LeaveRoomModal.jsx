@@ -12,14 +12,14 @@ export function LeaveRoomModal({ isOpen, onClose, onConfirm }) {
         >
             <div className="text-center space-y-4">
                 <p className="text-neutral-400">
-                    Saldrás de la sala por completo. Deberás ser invitado nuevamente para entrar.
+                    Saldrás de la sala y volverás al inicio.
                 </p>
                 <div className="space-y-2 pt-2">
                     <Button
                         onClick={onConfirm}
                         variant="danger"
                     >
-                        Sí, abandonar
+                        Salir
                     </Button>
                     <Button onClick={onClose} variant="outline">
                         Cancelar

@@ -156,7 +156,6 @@ function AppRoutes({
         (options) => emit("start-match", { roomId: gameState?.roomId, options }),
         [emit, gameState]
     );
-    const endMatch = useCallback(() => emit("end-match", gameState?.roomId), [emit, gameState]);
     const playAgain = useCallback(() => emit("play-again", gameState?.roomId), [emit, gameState]);
     const nextRound = useCallback(() => emit("next-round", gameState?.roomId), [emit, gameState]);
 
@@ -389,7 +388,6 @@ function AppRoutes({
                                         onOpenInstructions={() => setInstructionsOpen(true)}
                                         onStartGame={startMatch}
                                         onUpdateOptions={updateOptions}
-                                        onEndGame={endMatch}
                                         onPlayAgain={playAgain}
                                         onNextRound={nextRound}
                                         onLeaveRoom={leaveRoom}

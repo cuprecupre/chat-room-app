@@ -8,7 +8,6 @@ export function GamePage({
     emit,
     onOpenInstructions,
     onStartGame,
-    onEndGame,
     onPlayAgain,
     onNextRound,
     onLeaveRoom,
@@ -38,7 +37,6 @@ export function GamePage({
             isHost={isHost}
             user={user}
             onStartGame={onStartGame}
-            onEndGame={onEndGame}
             onPlayAgain={onPlayAgain}
             onNextRound={onNextRound}
             onLeaveRoom={onLeaveRoom}
@@ -50,8 +48,6 @@ export function GamePage({
             isMobile={isMobile}
             onOpenInstructions={onOpenInstructions}
             onKickPlayer={onKickPlayer}
-            showEndGameModal={false}
-            onShowEndGameModal={() => { }}
         />
     );
 }
