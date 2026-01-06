@@ -250,6 +250,9 @@ class Room {
             this.persist();
         }
 
+        // Clear previous match before creating new one
+        this.currentMatch = null;
+
         // Create new Match instance with Room context
         this.currentMatch = new Match(this, {
             players: eligiblePlayers,
@@ -296,8 +299,8 @@ class Room {
             this.impostorHistory = this.currentMatch.impostorHistory;
         }
 
-        // Clear current match
-        this.currentMatch = null;
+        // IMPORTANT: Do NOT clear currentMatch yet - we need it for game_over screen data
+        // It will be cleared when starting a new match or returning to lobby
 
         // Reset late joiner flags - everyone can play next match
         this.players.forEach(p => {
@@ -314,6 +317,7 @@ class Room {
             setTimeout(() => {
                 if (this.phase === "host_cancelled") {
                     this.phase = "lobby";
+                    this.currentMatch = null; // Clear match when returning to lobby
                     console.log(`[Room ${this.roomId}] Auto-transitioned to lobby after host cancellation.`);
                     // Note: roomManager.emitRoomState should be called here,
                     // but we don't have access to it. Client will request state.

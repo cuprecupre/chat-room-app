@@ -107,9 +107,8 @@ export function GameRoom({
 
         // Si pasamos a playing desde otra fase
         if (currentPhase === "playing" && prevPhase !== "playing") {
-            // Mostrar animación de entrada si viene del lobby, game_over o round_result
-            const shouldShowAnimation =
-                prevPhase === "lobby" || prevPhase === "game_over" || prevPhase === "round_result";
+            // Mostrar animación de entrada si viene del lobby o game_over
+            const shouldShowAnimation = prevPhase === "lobby" || prevPhase === "game_over";
 
             if (shouldShowAnimation) {
                 // Ocultar el resto de la UI hasta que termine la animación de la carta
@@ -183,7 +182,8 @@ export function GameRoom({
                 />
             )}
 
-            {/* Mostrar pantalla de playing si estamos en playing o round_result (Overlay handling) */}
+
+            {/* Mostrar pantalla de playing (incluye round_result para evitar pantalla negra en empates) */}
             {(state.phase === "playing" || state.phase === "round_result") && (
                 <GameBoard
                     state={state}
@@ -198,6 +198,7 @@ export function GameRoom({
                     showCardEntrance={showCardEntrance}
                 />
             )}
+
 
             {/* Overlay de nueva ronda */}
             {showTurnOverlay && (
@@ -261,13 +262,13 @@ export function GameRoom({
             >
                 <div className="text-center space-y-4">
                     <p className="text-neutral-400">
-                        {state.phase === "playing" || state.phase === "round_result"
+                        {state.phase === "playing"
                             ? "Puedes volver al lobby de la sala o salir por completo."
                             : "Saldrás de la sala. Deberás ser invitado nuevamente para entrar."}
                     </p>
 
                     <div className="flex flex-col gap-3 pt-2">
-                        {(state.phase === "playing" || state.phase === "round_result") && (
+                        {state.phase === "playing" && (
                             <Button
                                 onClick={() => {
                                     setShowLeaveModal(false);
@@ -277,7 +278,7 @@ export function GameRoom({
                                 size="md"
                                 className="w-full"
                             >
-                                Abandonar partida
+                                Volver a la sala
                             </Button>
                         )}
 

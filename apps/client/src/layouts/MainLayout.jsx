@@ -164,15 +164,15 @@ export function MainLayout({
 
                                     {gameState?.roomId && (
                                         <>
-                                            {(gameState?.phase === "playing" || gameState?.phase === "round_result" || gameState?.phase === "game_over") && (
+                                            {(gameState?.phase === "playing" || gameState?.phase === "game_over") && (
                                                 <button
                                                     onClick={handleLeaveMatchClick}
                                                     className="block w-full text-left px-3 py-2 text-orange-400 hover:text-orange-300 hover:bg-orange-500/10 rounded-md"
                                                 >
-                                                    Abandonar partida
+                                                    Volver a la sala
                                                 </button>
                                             )}
-                                            {!(gameState?.phase === "playing" || gameState?.phase === "round_result" || gameState?.phase === "game_over") && (
+                                            {gameState?.phase === "lobby" && (
                                                 <button
                                                     onClick={() => {
                                                         setShowLeaveRoomModal(true);

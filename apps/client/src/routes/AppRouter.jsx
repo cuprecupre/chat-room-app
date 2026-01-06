@@ -173,16 +173,9 @@ function AppRoutes({
             url.searchParams.delete("roomId");
             window.history.replaceState({}, "", url.toString());
 
-            const handleCleanExit = () => {
-                // Force page reload only after server ack or timeout
-                window.location.reload();
-            };
-
-            // Emit with Ack callback
-            emit("leave-room", gameState.roomId, handleCleanExit);
-
-            // Fallback: if server doesn't respond in 2s, force exit anyway
-            setTimeout(handleCleanExit, 2000);
+            // Emit leave event - server will send game-state: null
+            // GameRouteHandler will then redirect to lobby automatically
+            emit("leave-room", gameState.roomId);
         }
     }, [emit, gameState]);
 

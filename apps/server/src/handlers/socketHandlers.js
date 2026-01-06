@@ -269,7 +269,7 @@ function handleLeaveMatch(io, socket, user, roomId, callback) {
     // Emit current state (will be host_cancelled if host left)
     roomManager.emitRoomState(room);
 
-    if (result.hostCancelled) {
+    if (result && result.hostCancelled) {
         // Host cancelled the match - show special toast
         roomManager.emitToast(roomId, `El anfitrión ha abandonado la partida`);
         console.log(`[Room ${roomId}] Host cancelled match. Farewell screen showing for all players.`);
