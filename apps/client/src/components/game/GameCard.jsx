@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "../ui/Button";
-import { capitalize } from "./utils";
+import { capitalize, translateRole } from "./utils";
 
 // Firebase Storage CDN URLs
 const CDN_BASE = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2F";
@@ -123,7 +123,7 @@ export function GameCard({ state, initialAnimationPending, showCardEntrance, sho
                                                 <span>Tu rol</span>
                                             </div>
                                             <p className="text-xl font-serif mt-1 text-white">
-                                                {capitalize(state.role)}
+                                                {capitalize(translateRole(state.role))}
                                             </p>
                                         </div>
 

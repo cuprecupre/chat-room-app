@@ -14,7 +14,7 @@ describe("Round Transitions (Integration)", () => {
 
     describe("Basic Round Flow", () => {
         test("Round 1 starts with same impostor for entire match", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3", "Player4"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3", "Player4"]).startMatch();
 
             expect(sim.getState().currentRound).toBe(1);
             expect(sim.getState().phase).toBe("playing");
@@ -22,19 +22,19 @@ describe("Round Transitions (Integration)", () => {
         });
 
         test("Eliminating non-impostor ends round (impostor survives)", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3", "Player4"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3", "Player4"]).startMatch();
             const initialImpostor = sim.getState().impostorId;
 
             const targetIndex = sim.getNonImpostorIndex();
             sim.allVoteFor(targetIndex);
 
-            // Round ends but game continues
+            // Round ends but match continues
             expect(sim.getState().eliminatedPlayers).toContain(sim.users[targetIndex].uid);
             expect(sim.getState().impostorId).toBe(initialImpostor);
         });
 
         test("Tie gives impostor points and continues to next round", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
 
             sim.createTieVote();
 
@@ -44,8 +44,8 @@ describe("Round Transitions (Integration)", () => {
             expect(sim.getState().phase).toBe("round_result");
         });
 
-        test("Game ends when impostor is caught", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+        test("Match ends when impostor is caught", () => {
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
 
             sim.allVoteFor(sim.getImpostorIndex());
 
@@ -54,7 +54,7 @@ describe("Round Transitions (Integration)", () => {
         });
 
         test("Impostor wins if survives 3 rounds with ties", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
 
             // Round 1: tie
             sim.createTieVote();
@@ -67,7 +67,7 @@ describe("Round Transitions (Integration)", () => {
             sim.continueToNextRound();
             expect(sim.getState().currentRound).toBe(3);
 
-            // Round 3: tie - game ends
+            // Round 3: tie - match ends
             sim.createTieVote();
             expect(sim.getState().phase).toBe("game_over");
             expect(sim.getState().winnerId).toBe(sim.getState().impostorId);
@@ -76,7 +76,7 @@ describe("Round Transitions (Integration)", () => {
 
     describe("Scoring", () => {
         test("Impostor gets 2+2+6(bonus) = 10 points for surviving all rounds", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
             const impostorId = sim.getState().impostorId;
 
             // Survive all 3 rounds with ties
@@ -93,7 +93,7 @@ describe("Round Transitions (Integration)", () => {
         });
 
         test("Friends get +2 for correct vote when catching impostor", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
 
             sim.allVoteFor(sim.getImpostorIndex());
 
@@ -113,9 +113,9 @@ describe("Round Transitions (Integration)", () => {
 
     describe("State Broadcasting", () => {
         test("castVote returns allVoted=true when all vote", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
 
-            const activePlayers = sim.game.roundPlayers;
+            const activePlayers = sim.match.roundPlayers;
             const voter0 = sim.users.findIndex((u) => u.uid === activePlayers[0]);
             const target0 = sim.users.findIndex((u) => u.uid === activePlayers[1]);
             const result1 = sim.vote(voter0, target0);
@@ -133,7 +133,7 @@ describe("Round Transitions (Integration)", () => {
         });
 
         test("Impostor and friends see different info", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
 
             const impostorState = sim.getStateForPlayer(sim.getImpostorIndex());
             const friendState = sim.getStateForPlayer(sim.getNonImpostorIndex());
@@ -141,14 +141,14 @@ describe("Round Transitions (Integration)", () => {
             expect(impostorState.role).toBe("impostor");
             expect(impostorState.secretWord).toBe("Descubre la palabra secreta");
 
-            expect(friendState.role).toBe("amigo");
+            expect(friendState.role).toBe("friend");
             expect(friendState.secretWord).not.toBe("Descubre la palabra secreta");
         });
     });
 
     describe("Sudden Death", () => {
         test("Impostor wins with max points when only 2 players left", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
             const impostorId = sim.getState().impostorId;
 
             // Eliminate a friend (not impostor)
@@ -164,9 +164,9 @@ describe("Round Transitions (Integration)", () => {
 
     describe("New Match (Play Again)", () => {
         test("playAgain resets scores and selects new impostor", () => {
-            sim.createGame("Host").addPlayers(["Player2", "Player3"]).startGame();
+            sim.createMatch("Host").addPlayers(["Player2", "Player3"]).startMatch();
 
-            // End the game somehow
+            // End the match somehow
             sim.createTieVote();
             sim.continueToNextRound();
             sim.createTieVote();

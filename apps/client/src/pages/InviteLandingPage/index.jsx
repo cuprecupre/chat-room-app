@@ -4,6 +4,7 @@ import { Spinner } from "../../components/ui/Spinner";
 import { InvitationCard } from "../../components/InvitationCard";
 import { useGameInvite } from "../../hooks/useGameInvite";
 import { ROUTES } from "../../routes/routes";
+import { GameNotFoundCard } from "../../components/InviteErrors";
 
 /**
  * InviteLandingPage - Invitation screen for NON-authenticated users
@@ -11,64 +12,39 @@ import { ROUTES } from "../../routes/routes";
  */
 export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
     const navigate = useNavigate();
-    const { urlGameId, previewHostName, error } = useGameInvite();
+    const { urlRoomId, previewHostName, error } = useGameInvite();
 
     // Handle cancel - go to landing page
     const handleCancel = () => {
         const url = new URL(window.location);
-        url.searchParams.delete("gameId");
+        url.searchParams.delete("roomId");
         window.history.replaceState({}, "", url.toString());
         navigate(ROUTES.HOME);
     };
 
-    // Handle email auth - preserve gameId in URL
+    // Handle email auth - preserve roomId in URL
     const handleGoToEmailAuth = () => {
-        // Navigate to auth page with gameId preserved
-        navigate(`${ROUTES.AUTH}?gameId=${urlGameId}`);
+        // Navigate to auth page with roomId preserved
+        navigate(`${ROUTES.AUTH}?roomId=${urlRoomId}`);
     };
 
-    // Handle guest auth - preserve gameId in URL
+    // Handle guest auth - preserve roomId in URL
     const handleGoToGuestAuth = () => {
-        navigate(`${ROUTES.GUEST_AUTH}?gameId=${urlGameId}`);
+        navigate(`${ROUTES.GUEST_AUTH}?roomId=${urlRoomId}`);
     };
 
     // Error state: Game not found
     if (error === "NOT_FOUND") {
-        return (
-            <InvitationCard
-                gameId={urlGameId}
-                title="Enlace no válido"
-                subtitle="No encontramos esta partida. Es posible que el anfitrión la haya cerrado o el enlace sea incorrecto."
-                isError={true}
-            >
-                <Button onClick={handleCancel} variant="primary" className="w-full">
-                    Volver al inicio
-                </Button>
-            </InvitationCard>
-        );
+        return <GameNotFoundCard roomId={urlRoomId} onCancel={handleCancel} />;
     }
 
-    // Error state: Game in progress
-    if (error === "IN_PROGRESS") {
-        return (
-            <InvitationCard
-                gameId={urlGameId}
-                title="Partida ya iniciada"
-                subtitle="Lo sentimos, esta partida ya comenzó y no acepta nuevos jugadores en este momento."
-                isError={true}
-            >
-                <Button onClick={handleCancel} variant="primary" className="w-full">
-                    Volver al inicio
-                </Button>
-            </InvitationCard>
-        );
-    }
+
 
     // Normal invitation screen with login buttons
     return (
         <InvitationCard
             hostName={previewHostName}
-            gameId={urlGameId}
+            roomId={urlRoomId}
             title="¡Te han invitado!"
             subtitle="¿Quieres entrar ahora?"
         >

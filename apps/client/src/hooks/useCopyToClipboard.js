@@ -7,15 +7,15 @@ export function useCopyToClipboard() {
     }, []);
 
     const copyLink = useCallback(
-        async (gameId) => {
-            if (!gameId) return;
-            const url = `${window.location.origin}?gameId=${gameId}`;
+        async (roomId) => {
+            if (!roomId) return;
+            const url = `${window.location.origin}?roomId=${roomId}`;
 
             // On mobile, use native share API (requires HTTPS in production)
             if (isMobile && navigator.share) {
                 try {
                     await navigator.share({
-                        title: "Únete a mi juego de El Impostor",
+                        title: "¡Únete a mi partida de El Impostor!",
                         url: url,
                     });
                     return;
@@ -57,15 +57,15 @@ export function useCopyToClipboard() {
     );
 
     const copyGameCode = useCallback(
-        async (gameId) => {
-            if (!gameId) return;
+        async (roomId) => {
+            if (!roomId) return;
 
             // On mobile, use native share API (requires HTTPS in production)
             if (isMobile && navigator.share) {
                 try {
                     await navigator.share({
-                        title: "Código de partida - El Impostor",
-                        text: `Código de partida: ${gameId}`,
+                        title: "Código de sala - El Impostor",
+                        text: `Código de sala: ${roomId}`,
                     });
                     return;
                 } catch (err) {
@@ -82,11 +82,11 @@ export function useCopyToClipboard() {
             // On desktop or mobile without Web Share, copy to clipboard
             try {
                 if (navigator.clipboard && window.isSecureContext) {
-                    await navigator.clipboard.writeText(gameId);
+                    await navigator.clipboard.writeText(roomId);
                     showToast("Código copiado");
                 } else {
                     const textArea = document.createElement("textarea");
-                    textArea.value = gameId;
+                    textArea.value = roomId;
                     textArea.style.position = "fixed";
                     textArea.style.left = "-999999px";
                     document.body.appendChild(textArea);

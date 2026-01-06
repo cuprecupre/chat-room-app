@@ -7,7 +7,7 @@ const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.fire
  */
 export function InvitationCard({
     hostName,
-    gameId,
+    roomId,
     title = "¡Te han invitado!",
     subtitle = "¿Quieres entrar ahora?",
     isError = false,
@@ -22,9 +22,8 @@ export function InvitationCard({
                         <img
                             src={heroImg}
                             alt="Invitación"
-                            className={`w-24 h-24 rounded-full object-cover ring-4 shadow-2xl ${
-                                isError ? "ring-red-500/20 grayscale" : "ring-orange-500/30"
-                            }`}
+                            className={`w-24 h-24 rounded-full object-cover ring-4 shadow-2xl ${isError ? "ring-red-500/20 grayscale" : "ring-orange-500/30"
+                                }`}
                         />
                         {isError && (
                             <div className="absolute -bottom-2 -right-2 bg-neutral-900 rounded-full p-2 border border-neutral-800">
@@ -42,7 +41,7 @@ export function InvitationCard({
                             <>
                                 Has recibido un enlace para unirte a la partida de{" "}
                                 <span className="font-mono font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded">
-                                    {hostName || gameId}
+                                    {hostName || roomId}
                                 </span>
                                 .
                                 <br />

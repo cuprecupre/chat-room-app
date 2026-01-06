@@ -8,7 +8,7 @@ class SessionManager {
         this.userSockets = {};
         // { [userId]: { lastSeen: timestamp, timeout: timeoutId } }
         this.userHeartbeats = {};
-        // { [uid]: { timeout: timeoutId, gameId: string } }
+        // { [uid]: { timeout: timeoutId, roomId: string } }
         this.pendingDisconnects = {};
         // { [uid]: true } - Users who explicitly left games
         this.explicitlyLeftUsers = {};
@@ -120,12 +120,12 @@ class SessionManager {
     /**
      * Set a pending disconnect timer for a user.
      */
-    setPendingDisconnect(userId, gameId, callback, timeout) {
+    setPendingDisconnect(userId, roomId, callback, timeout) {
         // Clear any existing pending disconnect
         this.clearPendingDisconnect(userId);
 
         this.pendingDisconnects[userId] = {
-            gameId,
+            roomId,
             timeout: setTimeout(() => {
                 callback();
                 delete this.pendingDisconnects[userId];

@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "../ui/Button";
 import { Avatar } from "../ui/Avatar";
 import { HelpLink } from "./HelpLink";
+import { Trash2 } from "lucide-react";
+import { KickPlayerModal } from "../KickPlayerModal";
 
 export function PlayerList({
     players,
@@ -11,7 +13,12 @@ export function PlayerList({
     gameState,
     onVote,
     onOpenInstructions,
+    onKickPlayer,
 }) {
+    // State for kick confirmation modal
+    const [kickTarget, setKickTarget] = useState(null);
+
+    const isLobby = gameState?.phase === "lobby";
     const isPlaying = gameState?.phase === "playing";
     const isRoundResult = gameState?.phase === "round_result";
     const isGameOver = gameState?.phase === "game_over";
@@ -193,7 +200,7 @@ export function PlayerList({
                                 </div>
                             </div>
 
-                            {/* Mostrar puntos o botón de votar según fase */}
+                            {/* Right side: scores, vote buttons, and kick button */}
                             <div className="flex items-center gap-3">
                                 {isEliminated && isPlaying && (
                                     <span className="text-xs text-red-400 font-medium">
@@ -290,6 +297,17 @@ export function PlayerList({
                                         </Button>
                                     )
                                 )}
+
+                                {/* Kick button - only visible to host in lobby, not for self */}
+                                {isLobby && isHost && p.uid !== currentUserId && onKickPlayer && (
+                                    <button
+                                        onClick={() => setKickTarget(p)}
+                                        className="p-2 rounded-full border-2 border-red-500/30 hover:border-red-500/50 hover:bg-red-500/10 text-red-500/70 hover:text-red-400 transition-colors"
+                                        title={`Expulsar a ${p.name}`}
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                )}
                             </div>
                         </li>
                     );
@@ -308,6 +326,19 @@ export function PlayerList({
 
             {/* Enlace de ayuda solo durante la fase playing */}
             {isPlaying && <HelpLink onOpenInstructions={onOpenInstructions} />}
+
+            {/* Kick confirmation modal */}
+            <KickPlayerModal
+                isOpen={!!kickTarget}
+                onClose={() => setKickTarget(null)}
+                onConfirm={() => {
+                    if (kickTarget) {
+                        onKickPlayer(kickTarget.uid);
+                        setKickTarget(null);
+                    }
+                }}
+                playerName={kickTarget?.name || ""}
+            />
         </div>
     );
 }

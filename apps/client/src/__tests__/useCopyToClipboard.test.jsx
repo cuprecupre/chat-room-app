@@ -113,12 +113,12 @@ describe("useCopyToClipboard", () => {
             });
 
             expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-                "https://example.com?gameId=ABC12"
+                "https://example.com?roomId=ABC12"
             );
             expect(showToast).toHaveBeenCalledWith("Enlace copiado");
         });
 
-        test("should do nothing if gameId is empty", async () => {
+        test("should do nothing if roomId is empty", async () => {
             const { result } = renderHook(() => useCopyToClipboard());
 
             await act(async () => {
@@ -128,7 +128,7 @@ describe("useCopyToClipboard", () => {
             expect(navigator.clipboard.writeText).not.toHaveBeenCalled();
         });
 
-        test("should do nothing if gameId is null", async () => {
+        test("should do nothing if roomId is null", async () => {
             const { result } = renderHook(() => useCopyToClipboard());
 
             await act(async () => {
@@ -145,7 +145,7 @@ describe("useCopyToClipboard", () => {
             expect(typeof result.current.copyGameCode).toBe("function");
         });
 
-        test("should copy game code to clipboard on desktop", async () => {
+        test("should copy room code to clipboard on desktop", async () => {
             const { result } = renderHook(() => useCopyToClipboard());
 
             await act(async () => {
@@ -156,7 +156,7 @@ describe("useCopyToClipboard", () => {
             expect(showToast).toHaveBeenCalledWith("Código copiado");
         });
 
-        test("should do nothing if gameId is empty", async () => {
+        test("should do nothing if roomId is empty", async () => {
             const { result } = renderHook(() => useCopyToClipboard());
 
             await act(async () => {

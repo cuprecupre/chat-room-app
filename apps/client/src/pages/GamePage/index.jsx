@@ -11,9 +11,11 @@ export function GamePage({
     onEndGame,
     onPlayAgain,
     onNextRound,
-    onMigrateGame,
-    onLeaveGame,
+    onLeaveRoom,
+    onLeaveMatch,
+    onUpdateOptions,
     onVote,
+    onKickPlayer,
 }) {
     const { copyLink, copyGameCode, isMobile } = useCopyToClipboard();
 
@@ -23,12 +25,12 @@ export function GamePage({
     );
 
     const handleCopyLink = useCallback(() => {
-        copyLink(gameState?.gameId);
-    }, [copyLink, gameState?.gameId]);
+        copyLink(gameState?.roomId);
+    }, [copyLink, gameState?.roomId]);
 
-    const handleCopyGameCode = useCallback(() => {
-        copyGameCode(gameState?.gameId);
-    }, [copyGameCode, gameState?.gameId]);
+    const handleCopyCode = useCallback(() => {
+        copyGameCode(gameState?.roomId);
+    }, [copyGameCode, gameState?.roomId]);
 
     return (
         <GameRoom
@@ -39,15 +41,17 @@ export function GamePage({
             onEndGame={onEndGame}
             onPlayAgain={onPlayAgain}
             onNextRound={onNextRound}
-            onMigrateGame={onMigrateGame}
-            onLeaveGame={onLeaveGame}
+            onLeaveRoom={onLeaveRoom}
+            onLeaveMatch={onLeaveMatch}
+            onUpdateOptions={onUpdateOptions}
             onCopyLink={handleCopyLink}
-            onCopyGameCode={handleCopyGameCode}
+            onCopyGameCode={handleCopyCode}
             onVote={onVote}
             isMobile={isMobile}
             onOpenInstructions={onOpenInstructions}
+            onKickPlayer={onKickPlayer}
             showEndGameModal={false}
-            onShowEndGameModal={() => {}}
+            onShowEndGameModal={() => { }}
         />
     );
 }

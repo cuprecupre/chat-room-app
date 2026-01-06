@@ -3,15 +3,15 @@ import { Button } from "./ui/Button";
 import { Modal } from "./ui/Modal";
 import { GameOverScreen } from "./GameOverScreen";
 import { RoundStartOverlay } from "./RoundStartOverlay";
-import { MigrationScreen } from "./game/MigrationScreen";
 import { LobbyScreen } from "./game/LobbyScreen";
 import { GameBoard } from "./game/GameBoard";
 import { TurnOverlay } from "./game/TurnOverlay";
+import { HostLeftScreen } from "./HostLeftScreen";
+import { WaitingForNextGame } from "./WaitingForNextGame";
 
 // Components extracted to apps/client/src/components/game/
 // - PlayerList.jsx
 // - HelpLink.jsx
-// - MigrationScreen.jsx
 // - LobbyScreen.jsx
 // - GameCard.jsx
 // - SpectatorMode.jsx
@@ -26,13 +26,15 @@ export function GameRoom({
     onEndGame,
     onPlayAgain,
     onNextRound,
-    onMigrateGame,
-    onLeaveGame,
+    onLeaveRoom,
+    onLeaveMatch,
+    onUpdateOptions,
     onCopyLink,
     onCopyGameCode,
     onVote,
     isMobile,
     onOpenInstructions,
+    onKickPlayer,
     showEndGameModal: showEndGameModalProp,
     onShowEndGameModal,
 }) {
@@ -52,7 +54,7 @@ export function GameRoom({
     const showEndGameModal =
         showEndGameModalProp !== undefined ? showEndGameModalProp : showEndGameModalInternal;
     const setShowEndGameModal = onShowEndGameModal || setShowEndGameModalInternal;
-    const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
+    const [showLeaveModal, setShowLeaveModal] = useState(false);
 
     // Timeouts Refs
     const turnOverlayTimeoutRef = useRef(null);
@@ -105,9 +107,8 @@ export function GameRoom({
 
         // Si pasamos a playing desde otra fase
         if (currentPhase === "playing" && prevPhase !== "playing") {
-            // Mostrar animación de entrada si viene del lobby, game_over o round_result
-            const shouldShowAnimation =
-                prevPhase === "lobby" || prevPhase === "game_over" || prevPhase === "round_result";
+            // Mostrar animación de entrada si viene del lobby o game_over
+            const shouldShowAnimation = prevPhase === "lobby" || prevPhase === "game_over";
 
             if (shouldShowAnimation) {
                 // Ocultar el resto de la UI hasta que termine la animación de la carta
@@ -146,11 +147,6 @@ export function GameRoom({
 
     return (
         <div className="w-full flex flex-col items-center space-y-3 md:space-y-6">
-            {/* Pantalla de migración para partidas con sistema antiguo */}
-            {state.phase === "needs_migration" && (
-                <MigrationScreen onMigrateGame={onMigrateGame} isHost={isHost} />
-            )}
-
             {state.phase === "lobby" && (
                 <LobbyScreen
                     state={state}
@@ -158,13 +154,37 @@ export function GameRoom({
                     user={user}
                     onCopyLink={onCopyLink}
                     onStartGame={onStartGame}
+                    onUpdateOptions={onUpdateOptions}
                     isMobile={isMobile}
                     onVote={onVote}
                     onOpenInstructions={onOpenInstructions}
+                    onKickPlayer={onKickPlayer}
                 />
             )}
 
-            {/* Mostrar pantalla de playing si estamos en playing o round_result (Overlay handling) */}
+            {/* Host cancelled match - show farewell screen with 4s countdown */}
+            {state.phase === "host_cancelled" && (
+                <HostLeftScreen
+                    onRedirectToLobby={() => {
+                        // Server already put everyone back in lobby phase,
+                        // client just needs to wait for the next state update
+                        // which will show the lobby screen
+                    }}
+                />
+            )}
+
+            {/* Late joiner waiting for next game */}
+            {state.phase === "lobby_wait" && (
+                <WaitingForNextGame
+                    state={state}
+                    user={user}
+                    onLeaveRoom={onLeaveRoom}
+                    onCopyLink={onCopyLink}
+                />
+            )}
+
+
+            {/* Mostrar pantalla de playing (incluye round_result para evitar pantalla negra en empates) */}
             {(state.phase === "playing" || state.phase === "round_result") && (
                 <GameBoard
                     state={state}
@@ -179,6 +199,7 @@ export function GameRoom({
                     showCardEntrance={showCardEntrance}
                 />
             )}
+
 
             {/* Overlay de nueva ronda */}
             {showTurnOverlay && (
@@ -235,34 +256,54 @@ export function GameRoom({
 
             {/* Modal de confirmación para abandonar juego */}
             <Modal
-                isOpen={showLeaveGameModal}
-                onClose={() => setShowLeaveGameModal(false)}
-                title="¿Abandonar juego?"
+                isOpen={showLeaveModal}
+                onClose={() => setShowLeaveModal(false)}
+                title={state.phase === "playing" || state.phase === "round_result" ? "¿Abandonar partida?" : "¿Salir de la sala?"}
                 size="sm"
             >
                 <div className="text-center space-y-4">
                     <p className="text-neutral-400">
-                        Saldrás del juego y volverás al lobby. ¿Estás seguro?
+                        {state.phase === "playing"
+                            ? "Puedes volver al lobby de la sala o salir por completo."
+                            : "Saldrás de la sala. Deberás ser invitado nuevamente para entrar."}
                     </p>
-                    <div className="flex gap-3 pt-2">
+
+                    <div className="flex flex-col gap-3 pt-2">
+                        {state.phase === "playing" && (
+                            <Button
+                                onClick={() => {
+                                    setShowLeaveModal(false);
+                                    onLeaveMatch();
+                                }}
+                                variant="primary"
+                                size="md"
+                                className="w-full"
+                            >
+                                Volver a la sala
+                            </Button>
+                        )}
+
+                        {(state.phase === "lobby" || state.phase === "lobby_wait") && (
+                            <Button
+                                onClick={() => {
+                                    setShowLeaveModal(false);
+                                    onLeaveRoom();
+                                }}
+                                variant="primary"
+                                size="md"
+                                className="w-full"
+                            >
+                                Salir de la sala
+                            </Button>
+                        )}
+
                         <Button
-                            onClick={() => setShowLeaveGameModal(false)}
-                            variant="outline"
-                            size="md"
-                            className="flex-1"
+                            onClick={() => setShowLeaveModal(false)}
+                            variant="ghost"
+                            size="sm"
+                            className="w-full text-neutral-500"
                         >
                             Cancelar
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                setShowLeaveGameModal(false);
-                                onLeaveGame();
-                            }}
-                            variant="primary"
-                            size="md"
-                            className="flex-1"
-                        >
-                            Abandonar
                         </Button>
                     </div>
                 </div>

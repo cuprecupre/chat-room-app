@@ -6,19 +6,19 @@ export function useGameInvite(gameState) {
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    const getUrlGameId = () => {
+    const getUrlRoomId = () => {
         try {
-            return new URL(window.location).searchParams.get("gameId");
+            return new URL(window.location).searchParams.get("roomId");
         } catch (_) {
             return null;
         }
     };
 
     useEffect(() => {
-        const urlGameId = getUrlGameId();
+        const urlRoomId = getUrlRoomId();
         // Fetch preview if we have a URL ID and it's either a new session OR a mismatch with current session
-        if (urlGameId && (!gameState?.gameId || urlGameId !== gameState.gameId)) {
-            // Fetch game preview info
+        if (urlRoomId && (!gameState?.roomId || urlRoomId !== gameState.roomId)) {
+            // Fetch room preview info
             const controller = new AbortController();
             setIsLoading(true);
             setError(null);
@@ -31,7 +31,7 @@ export function useGameInvite(gameState) {
                             ? window.location.origin
                             : `${window.location.protocol}//${window.location.hostname}:3000`;
 
-                    const res = await fetch(`${apiBase}/api/game/${urlGameId}`, {
+                    const res = await fetch(`${apiBase}/api/game/${urlRoomId}`, {
                         signal: controller.signal,
                     });
 
@@ -40,16 +40,17 @@ export function useGameInvite(gameState) {
                         setPreviewHostName(data.hostName || null);
                         setGameStatus(data.status || null);
 
-                        // Check if game is in progress (can't join)
-                        if (data.status === "playing") {
-                            setError("IN_PROGRESS");
-                        }
+                        // Check if game is in progress (can't join) -> REMOVED
+                        // New behavior: Allow joining as late joiner / spectator
+                        // if (data.status === "playing") {
+                        //    setError("IN_PROGRESS");
+                        // }
                     } else if (res.status === 404) {
                         setError("NOT_FOUND");
                     }
                 } catch (e) {
                     if (e.name !== "AbortError") {
-                        console.warn("⚠️ No se pudo obtener info de la partida:", e);
+                        console.warn("⚠️ No se pudo obtener info de la sala:", e);
                         // Network error - treat as not found
                         setError("NOT_FOUND");
                     }
@@ -64,10 +65,10 @@ export function useGameInvite(gameState) {
             setGameStatus(null);
             setError(null);
         }
-    }, [gameState?.gameId]);
+    }, [gameState?.roomId]);
 
     return {
-        urlGameId: getUrlGameId(),
+        urlRoomId: getUrlRoomId(),
         previewHostName,
         gameStatus,
         error,

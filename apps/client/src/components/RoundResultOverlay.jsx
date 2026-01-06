@@ -1,23 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Button } from "./ui/Button";
-import { Avatar } from "./ui/Avatar";
 
 export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }) {
-    if (state.phase !== "round_result") return null;
+    const isActive = state.phase === "round_result";
 
-    // Timer Auto-Advance (30s)
+    // Hook SIEMPRE se ejecuta (regla de hooks), condición DENTRO
     useEffect(() => {
-        if (isHost) {
+        if (isActive && isHost) {
             const timer = setTimeout(() => {
                 onNextRound();
             }, 4000);
             return () => clearTimeout(timer);
         }
-    }, [isHost, onNextRound]);
+    }, [isActive, isHost, onNextRound]);
+
+    // Early return DESPUÉS de hooks
+    if (!isActive) return null;
 
     // Lógica de Resultado (Empate vs Eliminado)
     const lastRoundHistory = state.roundHistory?.[state.roundHistory.length - 1];
-    const isTie = lastRoundHistory?.tie;
     const eliminatedId = lastRoundHistory?.eliminated;
 
     // Identificar al eliminado
@@ -25,7 +26,7 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
         ? state.players.find((p) => p.uid === eliminatedId)
         : null;
 
-    // Obtener votantes (Transparencia)
+    // Obtener votantes
     const votes = lastRoundHistory?.votes || {};
     const votersName = [];
 
@@ -42,7 +43,6 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-neutral-950/90 backdrop-blur-sm animate-fadeIn">
             <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md space-y-8 text-center animate-scaleIn">
                 <div className="space-y-8">
-                    {/* Caso 1: Alguien eliminado */}
                     {eliminatedPlayer ? (
                         <div className="space-y-6">
                             <div className="space-y-2">
@@ -51,13 +51,11 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
                                 </h2>
                                 <p className="text-2xl text-neutral-300">ha sido eliminado/a</p>
                             </div>
-
                             <p className="text-sm text-red-500 font-medium uppercase tracking-wider">
                                 Votos en contra: {votersName.length}
                             </p>
                         </div>
                     ) : (
-                        /* Caso 2: Empate / Nadie eliminado */
                         <div className="space-y-4">
                             <h2 className="text-6xl font-serif text-white">Empate</h2>
                             <p className="text-2xl text-neutral-300">Nadie ha sido eliminado</p>
@@ -73,7 +71,6 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
                     </div>
                 </div>
 
-                {/* Botón Siguiente (Host) */}
                 {isHost && (
                     <div className="pt-4">
                         <Button
@@ -88,7 +85,6 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
                 )}
             </div>
 
-            {/* Loading Bar (Bottom - 30s) */}
             <div className="w-full h-3 bg-neutral-900 fixed bottom-0 left-0 right-0">
                 <div
                     className="h-full bg-orange-500 origin-left animate-progress"

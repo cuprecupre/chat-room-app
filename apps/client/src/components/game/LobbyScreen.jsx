@@ -1,5 +1,5 @@
-import React from "react";
-import { Link, Share } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Link, Share, Check } from "lucide-react";
 import { Button } from "../ui/Button";
 import { PlayerList } from "./PlayerList";
 
@@ -12,19 +12,50 @@ export function LobbyScreen({
     user,
     onCopyLink,
     onStartGame,
+    onUpdateOptions,
     isMobile,
     onVote,
     onOpenInstructions,
+    onKickPlayer,
 }) {
+    const [showImpostorHint, setShowImpostorHint] = useState(
+        state.options?.showImpostorHint !== undefined ? state.options.showImpostorHint : true
+    );
+
+    // Sync state when room options change (e.g. from server)
+    useEffect(() => {
+        if (state.options?.showImpostorHint !== undefined) {
+            setShowImpostorHint(state.options.showImpostorHint);
+        }
+    }, [state.options?.showImpostorHint]);
+
+    const handleToggleHint = () => {
+        const newValue = !showImpostorHint;
+        setShowImpostorHint(newValue);
+        if (onUpdateOptions) {
+            onUpdateOptions({ showImpostorHint: newValue });
+        }
+    };
+
+    const handleStartGame = () => {
+        onStartGame({ showImpostorHint });
+    };
+    const host = state.players?.find((p) => p.uid === state.hostId);
+    let hostName = host ? host.name.toUpperCase() : "EL ANFITRIÓN";
+
+    // Robustness: if I am the host, use my name directly
+    if (isHost && user?.name) {
+        hostName = user.name.toUpperCase();
+    }
+
     return (
-        <div className="w-full max-w-sm mx-auto text-center space-y-4 pb-24 sm:pb-0 pt-8">
-            {/* Header Image - 50% smaller (w-28 h-28) */}
-            <img
-                src={dualImpostorImg}
-                alt="Lobby"
-                className="mx-auto w-28 h-28 rounded-full object-cover shadow-lg ring-1 ring-white/10"
-                loading="lazy"
-            />
+        <div className="w-full max-w-sm mx-auto text-center space-y-4 pb-32 pt-10 px-0">
+            {/* Room Identifier Badge */}
+            <div className="flex items-center justify-center mb-6 animate-fadeIn">
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 rounded-full">
+                    SALA DE {hostName}
+                </span>
+            </div>
 
             {isHost ? (
                 /* HOST VIEW */
@@ -49,14 +80,43 @@ export function LobbyScreen({
                             )}
                             {isMobile
                                 ? "Compartir invitación"
-                                : "Copiar enlace de la partida"}
+                                : "Copiar enlace de la sala"}
                         </Button>
 
-                        <p className="text-lg text-neutral-400 font-regular animate-pulse">
-                            Espera a que se unan todos los jugadores...
+                        <p className="text-sm text-neutral-400 font-regular animate-pulse max-w-[280px] mx-auto">
+                            Comparte el enlace y espera hasta que se unan para iniciar la partida
                         </p>
 
                         <div className="w-full pt-2">
+                            {/* Opciones de juego (solo para el host antes de empezar) */}
+                            <div className="bg-white/5 rounded-md p-4 font-sans mb-4">
+                                <label className="flex items-center justify-between cursor-pointer gap-4">
+                                    <div className="flex-1 text-left">
+                                        <span className="text-sm font-semibold text-neutral-300">
+                                            Jugar en modo fácil
+                                        </span>
+                                        <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
+                                            El Impostor recibirá una pequeña ayuda sobre la palabra
+                                            secreta.
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={handleToggleHint}
+                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-neutral-950 ${showImpostorHint ? "bg-green-500" : "bg-neutral-700"
+                                            }`}
+                                    >
+                                        <span
+                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${showImpostorHint ? "translate-x-6" : "translate-x-1"
+                                                }`}
+                                        />
+                                    </button>
+                                </label>
+                            </div>
+
+                            <div className="text-sm font-semibold text-neutral-400 text-left px-1 mt-8 mb-3">
+                                Jugadores conectados: {state.players.length}
+                            </div>
                             <PlayerList
                                 players={state.players}
                                 currentUserId={user.uid}
@@ -65,19 +125,20 @@ export function LobbyScreen({
                                 gameState={state}
                                 onVote={onVote}
                                 onOpenInstructions={onOpenInstructions}
+                                onKickPlayer={onKickPlayer}
                             />
                         </div>
 
                         {/* Botón fijo en mobile, normal en desktop */}
                         <div className="hidden sm:block">
                             <Button
-                                onClick={onStartGame}
+                                onClick={handleStartGame}
                                 disabled={state.players.length < 2}
                                 variant="primary"
                                 size="md"
                                 className="w-full"
                             >
-                                Comenzar juego
+                                Comenzar partida
                             </Button>
                         </div>
                     </div>
@@ -88,13 +149,13 @@ export function LobbyScreen({
                         <div className="bg-neutral-950 px-4 pb-8">
                             <div className="max-w-sm mx-auto">
                                 <Button
-                                    onClick={onStartGame}
+                                    onClick={handleStartGame}
                                     disabled={state.players.length < 2}
                                     variant="primary"
                                     size="md"
                                     className="w-full shadow-lg"
                                 >
-                                    Comenzar juego
+                                    Comenzar partida
                                 </Button>
                             </div>
                         </div>
@@ -108,9 +169,9 @@ export function LobbyScreen({
                     </h2>
 
                     <div className="space-y-6 mt-8">
-                        <p className="text-lg text-neutral-400 text-center">
+                        <p className="text-sm text-neutral-400 text-center">
                             <svg
-                                className="animate-spin inline-block h-4 w-4 text-orange-400 mr-2 align-middle"
+                                className="animate-spin inline-block h-3 w-3 text-orange-400 mr-2 align-middle"
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
@@ -136,6 +197,17 @@ export function LobbyScreen({
                         </p>
 
                         <div className="w-full">
+                            {state.options?.showImpostorHint && (
+                                <div className="mb-4 flex items-center justify-center gap-2">
+                                    <Check className="w-3.5 h-3.5 text-green-500" strokeWidth={3} />
+                                    <span className="text-[10px] uppercase tracking-[0.15em] font-semibold text-green-500/80">
+                                        Modo fácil activado
+                                    </span>
+                                </div>
+                            )}
+                            <div className="text-sm font-semibold text-neutral-400 text-left px-1 mt-8 mb-3">
+                                Jugadores conectados: {state.players.length}
+                            </div>
                             <PlayerList
                                 players={state.players}
                                 currentUserId={user.uid}
@@ -164,7 +236,7 @@ export function LobbyScreen({
                                 )}
                                 {isMobile
                                     ? "Compartir invitación"
-                                    : "Copiar enlace de la partida"}
+                                    : "Copiar enlace de la sala"}
                             </Button>
                         </div>
                     </div>

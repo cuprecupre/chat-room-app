@@ -9,10 +9,10 @@
 
 const RoundManager = require("../game/RoundManager");
 
-// Helper to create a mock game object
-function createMockGame() {
+// Helper to create a mock match object
+function createMockMatch() {
     return {
-        gameId: "TEST1",
+        matchId: "TEST1",
         players: [
             { uid: "user1", name: "Player 1" },
             { uid: "user2", name: "Player 2" },
@@ -39,28 +39,28 @@ function createMockGame() {
 describe("RoundManager - New System", () => {
     describe("selectImpostor", () => {
         test("should select an impostor from players", () => {
-            const game = createMockGame();
+            const match = createMockMatch();
 
-            const impostor = RoundManager.selectImpostor(game);
+            const impostor = RoundManager.selectImpostor(match);
 
             expect(["user1", "user2", "user3"]).toContain(impostor);
         });
 
         test("should exclude player who was impostor last 2 matches", () => {
-            const game = createMockGame();
-            game.impostorHistory = ["user1", "user1"]; // user1 was impostor twice
+            const match = createMockMatch();
+            match.impostorHistory = ["user1", "user1"]; // user1 was impostor twice
 
-            const impostor = RoundManager.selectImpostor(game);
+            const impostor = RoundManager.selectImpostor(match);
 
             // user1 should be excluded
             expect(impostor).not.toBe("user1");
         });
 
         test("should allow repeated impostor if fewer than 2 in history", () => {
-            const game = createMockGame();
-            game.impostorHistory = ["user1"]; // Only once
+            const match = createMockMatch();
+            match.impostorHistory = ["user1"]; // Only once
 
-            const impostor = RoundManager.selectImpostor(game);
+            const impostor = RoundManager.selectImpostor(match);
 
             // user1 can be selected
             expect(["user1", "user2", "user3"]).toContain(impostor);
@@ -69,187 +69,187 @@ describe("RoundManager - New System", () => {
 
     describe("startNewMatch", () => {
         test("should reset all scores to 0", () => {
-            const game = createMockGame();
-            game.playerScores = { user1: 5, user2: 3, user3: 2 };
+            const match = createMockMatch();
+            match.playerScores = { user1: 5, user2: 3, user3: 2 };
 
-            RoundManager.startNewMatch(game);
+            RoundManager.startNewMatch(match);
 
-            expect(game.playerScores).toEqual({ user1: 0, user2: 0, user3: 0 });
+            expect(match.playerScores).toEqual({ user1: 0, user2: 0, user3: 0 });
         });
 
         test("should select a new impostor", () => {
-            const game = createMockGame();
+            const match = createMockMatch();
 
-            RoundManager.startNewMatch(game);
+            RoundManager.startNewMatch(match);
 
-            expect(game.impostorId).toBeTruthy();
-            expect(["user1", "user2", "user3"]).toContain(game.impostorId);
+            expect(match.impostorId).toBeTruthy();
+            expect(["user1", "user2", "user3"]).toContain(match.impostorId);
         });
 
         test("should set currentRound to 1", () => {
-            const game = createMockGame();
+            const match = createMockMatch();
 
-            RoundManager.startNewMatch(game);
+            RoundManager.startNewMatch(match);
 
-            expect(game.currentRound).toBe(1);
+            expect(match.currentRound).toBe(1);
         });
 
         test("should set phase to playing", () => {
-            const game = createMockGame();
+            const match = createMockMatch();
 
-            RoundManager.startNewMatch(game);
+            RoundManager.startNewMatch(match);
 
-            expect(game.phase).toBe("playing");
+            expect(match.phase).toBe("playing");
         });
 
         test("should clear eliminatedPlayers", () => {
-            const game = createMockGame();
-            game.eliminatedPlayers = ["user1"];
+            const match = createMockMatch();
+            match.eliminatedPlayers = ["user1"];
 
-            RoundManager.startNewMatch(game);
+            RoundManager.startNewMatch(match);
 
-            expect(game.eliminatedPlayers).toEqual([]);
+            expect(match.eliminatedPlayers).toEqual([]);
         });
 
         test("should add impostor to history", () => {
-            const game = createMockGame();
+            const match = createMockMatch();
 
-            RoundManager.startNewMatch(game);
+            RoundManager.startNewMatch(match);
 
-            expect(game.impostorHistory[0]).toBe(game.impostorId);
+            expect(match.impostorHistory[0]).toBe(match.impostorId);
         });
     });
 
     describe("startNextRound", () => {
         test("should increment currentRound", () => {
-            const game = createMockGame();
-            game.currentRound = 1;
-            game.players = [{ uid: "user1" }, { uid: "user2" }];
+            const match = createMockMatch();
+            match.currentRound = 1;
+            match.players = [{ uid: "user1" }, { uid: "user2" }];
 
-            RoundManager.startNextRound(game);
+            RoundManager.startNextRound(match);
 
-            expect(game.currentRound).toBe(2);
+            expect(match.currentRound).toBe(2);
         });
 
         test("should clear votes", () => {
-            const game = createMockGame();
-            game.currentRound = 1;
-            game.votes = { user1: "user2" };
+            const match = createMockMatch();
+            match.currentRound = 1;
+            match.votes = { user1: "user2" };
 
-            RoundManager.startNextRound(game);
+            RoundManager.startNextRound(match);
 
-            expect(game.votes).toEqual({});
+            expect(match.votes).toEqual({});
         });
 
         test("should set phase to playing", () => {
-            const game = createMockGame();
-            game.currentRound = 1;
-            game.phase = "round_result";
+            const match = createMockMatch();
+            match.currentRound = 1;
+            match.phase = "round_result";
 
-            RoundManager.startNextRound(game);
+            RoundManager.startNextRound(match);
 
-            expect(game.phase).toBe("playing");
+            expect(match.phase).toBe("playing");
         });
 
         test("should NOT change the word (word selected in startNewMatch)", () => {
-            const game = createMockGame();
-            game.currentRound = 1;
-            game.secretWord = "existing-word";
-            game.secretCategory = "existing-category";
+            const match = createMockMatch();
+            match.currentRound = 1;
+            match.secretWord = "existing-word";
+            match.secretCategory = "existing-category";
 
-            RoundManager.startNextRound(game);
+            RoundManager.startNextRound(match);
 
             // Word should remain the same across rounds
-            expect(game.secretWord).toBe("existing-word");
-            expect(game.secretCategory).toBe("existing-category");
+            expect(match.secretWord).toBe("existing-word");
+            expect(match.secretCategory).toBe("existing-category");
         });
     });
 
     describe("endRound - Impostor Caught", () => {
         test("should set phase to game_over when impostor caught", () => {
-            const game = createMockGame();
-            game.impostorId = "user1";
-            game.votes = { user2: "user1", user3: "user1" };
+            const match = createMockMatch();
+            match.impostorId = "user1";
+            match.votes = { user2: "user1", user3: "user1" };
 
-            RoundManager.endRound(game, true);
+            RoundManager.endRound(match, true);
 
-            expect(game.phase).toBe("game_over");
+            expect(match.phase).toBe("game_over");
         });
 
         test("should set winnerId to friend with most points", () => {
-            const game = createMockGame();
-            game.impostorId = "user1";
-            game.playerScores = { user1: 0, user2: 4, user3: 2 };
-            game.votes = { user2: "user1", user3: "user1" };
+            const match = createMockMatch();
+            match.impostorId = "user1";
+            match.playerScores = { user1: 0, user2: 4, user3: 2 };
+            match.votes = { user2: "user1", user3: "user1" };
 
-            RoundManager.endRound(game, true);
+            RoundManager.endRound(match, true);
 
-            expect(game.winnerId).toBe("user2");
+            expect(match.winnerId).toBe("user2");
         });
     });
 
     describe("endRound - Impostor Survives", () => {
         test("should set phase to round_result if not last round", () => {
-            const game = createMockGame();
-            game.currentRound = 1;
-            game.maxRounds = 3;
-            game.impostorId = "user1";
+            const match = createMockMatch();
+            match.currentRound = 1;
+            match.maxRounds = 3;
+            match.impostorId = "user1";
 
-            RoundManager.endRound(game, false);
+            RoundManager.endRound(match, false);
 
-            expect(game.phase).toBe("round_result");
+            expect(match.phase).toBe("round_result");
         });
 
         test("should set phase to game_over if last round", () => {
-            const game = createMockGame();
-            game.currentRound = 3;
-            game.maxRounds = 3;
-            game.impostorId = "user1";
+            const match = createMockMatch();
+            match.currentRound = 3;
+            match.maxRounds = 3;
+            match.impostorId = "user1";
 
-            RoundManager.endRound(game, false);
+            RoundManager.endRound(match, false);
 
-            expect(game.phase).toBe("game_over");
+            expect(match.phase).toBe("game_over");
         });
 
         test("should set winnerId to impostor if last round", () => {
-            const game = createMockGame();
-            game.currentRound = 3;
-            game.maxRounds = 3;
-            game.impostorId = "user1";
+            const match = createMockMatch();
+            match.currentRound = 3;
+            match.maxRounds = 3;
+            match.impostorId = "user1";
 
-            RoundManager.endRound(game, false);
+            RoundManager.endRound(match, false);
 
-            expect(game.winnerId).toBe("user1");
+            expect(match.winnerId).toBe("user1");
         });
     });
 
     describe("handleSuddenDeath", () => {
         test("should set winnerId to impostor", () => {
-            const game = createMockGame();
-            game.impostorId = "user1";
+            const match = createMockMatch();
+            match.impostorId = "user1";
 
-            RoundManager.handleSuddenDeath(game);
+            RoundManager.handleSuddenDeath(match);
 
-            expect(game.winnerId).toBe("user1");
+            expect(match.winnerId).toBe("user1");
         });
 
         test("should set phase to game_over", () => {
-            const game = createMockGame();
-            game.impostorId = "user1";
+            const match = createMockMatch();
+            match.impostorId = "user1";
 
-            RoundManager.handleSuddenDeath(game);
+            RoundManager.handleSuddenDeath(match);
 
-            expect(game.phase).toBe("game_over");
+            expect(match.phase).toBe("game_over");
         });
 
         test("should give impostor max points", () => {
-            const game = createMockGame();
-            game.impostorId = "user1";
-            game.playerScores = { user1: 3 };
+            const match = createMockMatch();
+            match.impostorId = "user1";
+            match.playerScores = { user1: 3 };
 
-            RoundManager.handleSuddenDeath(game);
+            RoundManager.handleSuddenDeath(match);
 
-            expect(game.playerScores["user1"]).toBe(10);
+            expect(match.playerScores["user1"]).toBe(10);
         });
     });
 
@@ -262,55 +262,55 @@ describe("RoundManager - New System", () => {
     // Integration Tests
     describe("Integration - Word Persistence", () => {
         test("word should remain the same across all 3 rounds", () => {
-            const game = createMockGame();
+            const match = createMockMatch();
 
             // Start new match - word is selected
-            RoundManager.startNewMatch(game);
-            const initialWord = game.secretWord;
-            const initialCategory = game.secretCategory;
+            RoundManager.startNewMatch(match);
+            const initialWord = match.secretWord;
+            const initialCategory = match.secretCategory;
 
             expect(initialWord).toBeTruthy();
             expect(initialCategory).toBeTruthy();
 
             // Advance to round 2
-            game.phase = "round_result";
-            RoundManager.startNextRound(game);
+            match.phase = "round_result";
+            RoundManager.startNextRound(match);
 
-            expect(game.currentRound).toBe(2);
-            expect(game.secretWord).toBe(initialWord);
-            expect(game.secretCategory).toBe(initialCategory);
+            expect(match.currentRound).toBe(2);
+            expect(match.secretWord).toBe(initialWord);
+            expect(match.secretCategory).toBe(initialCategory);
 
             // Advance to round 3
-            game.phase = "round_result";
-            RoundManager.startNextRound(game);
+            match.phase = "round_result";
+            RoundManager.startNextRound(match);
 
-            expect(game.currentRound).toBe(3);
-            expect(game.secretWord).toBe(initialWord);
-            expect(game.secretCategory).toBe(initialCategory);
+            expect(match.currentRound).toBe(3);
+            expect(match.secretWord).toBe(initialWord);
+            expect(match.secretCategory).toBe(initialCategory);
         });
     });
 
     describe("Integration - Impostor Disconnection", () => {
         test("game should end immediately when impostor disconnects during play", () => {
             const PlayerManager = require("../game/PlayerManager");
-            const game = createMockGame();
+            const match = createMockMatch();
 
             // Setup: Add players and start match
-            PlayerManager.addPlayer(game, { uid: "user1", name: "Player 1", photoURL: null });
-            PlayerManager.addPlayer(game, { uid: "user2", name: "Player 2", photoURL: null });
-            PlayerManager.addPlayer(game, { uid: "user3", name: "Player 3", photoURL: null });
+            PlayerManager.addPlayer(match, { uid: "user1", name: "Player 1", photoURL: null });
+            PlayerManager.addPlayer(match, { uid: "user2", name: "Player 2", photoURL: null });
+            PlayerManager.addPlayer(match, { uid: "user3", name: "Player 3", photoURL: null });
 
-            RoundManager.startNewMatch(game);
-            const impostorId = game.impostorId;
+            RoundManager.startNewMatch(match);
+            const impostorId = match.impostorId;
 
-            expect(game.phase).toBe("playing");
-            expect(game.currentRound).toBe(1);
+            expect(match.phase).toBe("playing");
+            expect(match.currentRound).toBe(1);
 
             // Action: Impostor disconnects
-            PlayerManager.removePlayer(game, impostorId);
+            PlayerManager.removePlayer(match, impostorId);
 
             // Assertion: Game should end (friends win by default when impostor leaves)
-            expect(game.phase).toBe("game_over");
+            expect(match.phase).toBe("game_over");
             // Note: winnerId can be null if no friends have points yet
         });
     });

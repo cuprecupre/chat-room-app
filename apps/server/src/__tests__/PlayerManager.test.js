@@ -4,10 +4,10 @@
 
 const PlayerManager = require("../game/PlayerManager");
 
-// Helper to create a mock game object
-function createMockGame() {
+// Helper to create a mock match object
+function createMockMatch() {
     return {
-        gameId: "TEST1",
+        matchId: "TEST1",
         hostId: null,
         players: [],
         playerScores: {},
@@ -34,131 +34,131 @@ function createMockUser(uid, name) {
 describe("PlayerManager", () => {
     describe("addPlayer", () => {
         test("should add a player to the game", () => {
-            const game = createMockGame();
+            const match = createMockMatch();
             const user = createMockUser("user1", "Player 1");
 
-            PlayerManager.addPlayer(game, user);
+            PlayerManager.addPlayer(match, user);
 
-            expect(game.players).toHaveLength(1);
-            expect(game.players[0].uid).toBe("user1");
-            expect(game.players[0].name).toBe("Player 1");
-            expect(game.players[0].photoURL).toBe("https://example.com/user1.jpg");
+            expect(match.players).toHaveLength(1);
+            expect(match.players[0].uid).toBe("user1");
+            expect(match.players[0].name).toBe("Player 1");
+            expect(match.players[0].photoURL).toBe("https://example.com/user1.jpg");
         });
 
         test("should initialize player score to 0", () => {
-            const game = createMockGame();
+            const match = createMockMatch();
             const user = createMockUser("user1", "Player 1");
 
-            PlayerManager.addPlayer(game, user);
+            PlayerManager.addPlayer(match, user);
 
-            expect(game.playerScores["user1"]).toBe(0);
+            expect(match.playerScores["user1"]).toBe(0);
         });
 
         test("should save player to formerPlayers", () => {
-            const game = createMockGame();
+            const match = createMockMatch();
             const user = createMockUser("user1", "Player 1");
 
-            PlayerManager.addPlayer(game, user);
+            PlayerManager.addPlayer(match, user);
 
-            expect(game.formerPlayers["user1"]).toEqual({
+            expect(match.formerPlayers["user1"]).toEqual({
                 name: "Player 1",
                 photoURL: "https://example.com/user1.jpg",
             });
         });
 
         test("should update player order after adding", () => {
-            const game = createMockGame();
+            const match = createMockMatch();
 
-            PlayerManager.addPlayer(game, createMockUser("user1", "Player 1"));
-            PlayerManager.addPlayer(game, createMockUser("user2", "Player 2"));
+            PlayerManager.addPlayer(match, createMockUser("user1", "Player 1"));
+            PlayerManager.addPlayer(match, createMockUser("user2", "Player 2"));
 
-            expect(game.playerOrder).toContain("user1");
-            expect(game.playerOrder).toContain("user2");
+            expect(match.playerOrder).toContain("user1");
+            expect(match.playerOrder).toContain("user2");
         });
 
         test("should not add duplicate player", () => {
-            const game = createMockGame();
+            const match = createMockMatch();
             const user = createMockUser("user1", "Player 1");
 
-            PlayerManager.addPlayer(game, user);
-            PlayerManager.addPlayer(game, user);
+            PlayerManager.addPlayer(match, user);
+            PlayerManager.addPlayer(match, user);
 
-            expect(game.players).toHaveLength(1);
+            expect(match.players).toHaveLength(1);
         });
 
         test("should handle null photoURL", () => {
-            const game = createMockGame();
+            const match = createMockMatch();
             const user = { uid: "user1", name: "Player 1", photoURL: null };
 
-            PlayerManager.addPlayer(game, user);
+            PlayerManager.addPlayer(match, user);
 
-            expect(game.players[0].photoURL).toBeNull();
+            expect(match.players[0].photoURL).toBeNull();
         });
     });
 
     describe("removePlayer", () => {
         test("should remove a player from the game", () => {
-            const game = createMockGame();
-            PlayerManager.addPlayer(game, createMockUser("user1", "Player 1"));
-            PlayerManager.addPlayer(game, createMockUser("user2", "Player 2"));
+            const match = createMockMatch();
+            PlayerManager.addPlayer(match, createMockUser("user1", "Player 1"));
+            PlayerManager.addPlayer(match, createMockUser("user2", "Player 2"));
 
-            PlayerManager.removePlayer(game, "user1");
+            PlayerManager.removePlayer(match, "user1");
 
-            expect(game.players).toHaveLength(1);
-            expect(game.players[0].uid).toBe("user2");
+            expect(match.players).toHaveLength(1);
+            expect(match.players[0].uid).toBe("user2");
         });
 
         test("should save player data to formerPlayers before removing", () => {
-            const game = createMockGame();
-            PlayerManager.addPlayer(game, createMockUser("user1", "Player 1"));
+            const match = createMockMatch();
+            PlayerManager.addPlayer(match, createMockUser("user1", "Player 1"));
 
-            PlayerManager.removePlayer(game, "user1");
+            PlayerManager.removePlayer(match, "user1");
 
-            expect(game.formerPlayers["user1"]).toEqual({
+            expect(match.formerPlayers["user1"]).toEqual({
                 name: "Player 1",
                 photoURL: "https://example.com/user1.jpg",
             });
         });
 
         test("should remove player from roundPlayers", () => {
-            const game = createMockGame();
-            PlayerManager.addPlayer(game, createMockUser("user1", "Player 1"));
-            game.roundPlayers = ["user1"];
+            const match = createMockMatch();
+            PlayerManager.addPlayer(match, createMockUser("user1", "Player 1"));
+            match.roundPlayers = ["user1"];
 
-            PlayerManager.removePlayer(game, "user1");
+            PlayerManager.removePlayer(match, "user1");
 
-            expect(game.roundPlayers).not.toContain("user1");
+            expect(match.roundPlayers).not.toContain("user1");
         });
 
         test("should remove player from eliminatedPlayers", () => {
-            const game = createMockGame();
-            PlayerManager.addPlayer(game, createMockUser("user1", "Player 1"));
-            game.eliminatedPlayers = ["user1"];
+            const match = createMockMatch();
+            PlayerManager.addPlayer(match, createMockUser("user1", "Player 1"));
+            match.eliminatedPlayers = ["user1"];
 
-            PlayerManager.removePlayer(game, "user1");
+            PlayerManager.removePlayer(match, "user1");
 
-            expect(game.eliminatedPlayers).not.toContain("user1");
+            expect(match.eliminatedPlayers).not.toContain("user1");
         });
 
         test("should delete player votes", () => {
-            const game = createMockGame();
-            PlayerManager.addPlayer(game, createMockUser("user1", "Player 1"));
-            game.votes["user1"] = "user2";
+            const match = createMockMatch();
+            PlayerManager.addPlayer(match, createMockUser("user1", "Player 1"));
+            match.votes["user1"] = "user2";
 
-            PlayerManager.removePlayer(game, "user1");
+            PlayerManager.removePlayer(match, "user1");
 
-            expect(game.votes["user1"]).toBeUndefined();
+            expect(match.votes["user1"]).toBeUndefined();
         });
 
         test("should transfer host when host leaves", () => {
-            const game = createMockGame();
-            PlayerManager.addPlayer(game, createMockUser("user1", "Player 1"));
-            PlayerManager.addPlayer(game, createMockUser("user2", "Player 2"));
-            game.hostId = "user1";
+            const match = createMockMatch();
+            PlayerManager.addPlayer(match, createMockUser("user1", "Player 1"));
+            PlayerManager.addPlayer(match, createMockUser("user2", "Player 2"));
+            match.hostId = "user1";
 
-            const { newHostInfo } = PlayerManager.removePlayer(game, "user1");
+            const { newHostInfo } = PlayerManager.removePlayer(match, "user1");
 
-            expect(game.hostId).toBe("user2");
+            expect(match.hostId).toBe("user2");
             expect(newHostInfo).toEqual({
                 uid: "user2",
                 name: "Player 2",
@@ -166,73 +166,73 @@ describe("PlayerManager", () => {
         });
 
         test("should not transfer host when non-host leaves", () => {
-            const game = createMockGame();
-            PlayerManager.addPlayer(game, createMockUser("user1", "Player 1"));
-            PlayerManager.addPlayer(game, createMockUser("user2", "Player 2"));
-            game.hostId = "user1";
+            const match = createMockMatch();
+            PlayerManager.addPlayer(match, createMockUser("user1", "Player 1"));
+            PlayerManager.addPlayer(match, createMockUser("user2", "Player 2"));
+            match.hostId = "user1";
 
-            const { newHostInfo } = PlayerManager.removePlayer(game, "user2");
+            const { newHostInfo } = PlayerManager.removePlayer(match, "user2");
 
-            expect(game.hostId).toBe("user1");
+            expect(match.hostId).toBe("user1");
             expect(newHostInfo).toBeNull();
         });
 
         test("should end round when impostor leaves during play", () => {
-            const game = createMockGame();
-            PlayerManager.addPlayer(game, createMockUser("user1", "Player 1"));
-            PlayerManager.addPlayer(game, createMockUser("user2", "Player 2"));
-            game.phase = "playing";
-            game.impostorId = "user1";
+            const match = createMockMatch();
+            PlayerManager.addPlayer(match, createMockUser("user1", "Player 1"));
+            PlayerManager.addPlayer(match, createMockUser("user2", "Player 2"));
+            match.phase = "playing";
+            match.impostorId = "user1";
 
-            const { playerIsImpostor } = PlayerManager.removePlayer(game, "user1");
+            const { playerIsImpostor } = PlayerManager.removePlayer(match, "user1");
 
             expect(playerIsImpostor).toBe(true);
             // When impostor leaves, friends win immediately (game_over)
-            expect(game.phase).toBe("game_over");
+            expect(match.phase).toBe("game_over");
         });
 
         test("should not end round when non-impostor leaves during play", () => {
-            const game = createMockGame();
-            PlayerManager.addPlayer(game, createMockUser("user1", "Player 1"));
-            PlayerManager.addPlayer(game, createMockUser("user2", "Player 2"));
-            game.phase = "playing";
-            game.impostorId = "user2";
-            game.roundPlayers = ["user1", "user2"];
+            const match = createMockMatch();
+            PlayerManager.addPlayer(match, createMockUser("user1", "Player 1"));
+            PlayerManager.addPlayer(match, createMockUser("user2", "Player 2"));
+            match.phase = "playing";
+            match.impostorId = "user2";
+            match.roundPlayers = ["user1", "user2"];
 
-            const { playerIsImpostor } = PlayerManager.removePlayer(game, "user1");
+            const { playerIsImpostor } = PlayerManager.removePlayer(match, "user1");
 
             expect(playerIsImpostor).toBe(false);
-            expect(game.phase).toBe("playing");
+            expect(match.phase).toBe("playing");
         });
     });
 
     describe("getActivePlayers", () => {
         test("should return players not eliminated", () => {
-            const game = createMockGame();
-            game.roundPlayers = ["user1", "user2", "user3"];
-            game.eliminatedPlayers = ["user2"];
+            const match = createMockMatch();
+            match.roundPlayers = ["user1", "user2", "user3"];
+            match.eliminatedPlayers = ["user2"];
 
-            const active = PlayerManager.getActivePlayers(game);
+            const active = PlayerManager.getActivePlayers(match);
 
             expect(active).toEqual(["user1", "user3"]);
         });
 
         test("should return all players when none eliminated", () => {
-            const game = createMockGame();
-            game.roundPlayers = ["user1", "user2", "user3"];
-            game.eliminatedPlayers = [];
+            const match = createMockMatch();
+            match.roundPlayers = ["user1", "user2", "user3"];
+            match.eliminatedPlayers = [];
 
-            const active = PlayerManager.getActivePlayers(game);
+            const active = PlayerManager.getActivePlayers(match);
 
             expect(active).toEqual(["user1", "user2", "user3"]);
         });
 
         test("should return empty array when all eliminated", () => {
-            const game = createMockGame();
-            game.roundPlayers = ["user1"];
-            game.eliminatedPlayers = ["user1"];
+            const match = createMockMatch();
+            match.roundPlayers = ["user1"];
+            match.eliminatedPlayers = ["user1"];
 
-            const active = PlayerManager.getActivePlayers(game);
+            const active = PlayerManager.getActivePlayers(match);
 
             expect(active).toEqual([]);
         });
@@ -240,106 +240,106 @@ describe("PlayerManager", () => {
 
     describe("calculateStartingPlayer", () => {
         test("should return host for first match (no lastStartingPlayerId)", () => {
-            const game = createMockGame();
-            game.hostId = "user1";
-            game.playerOrder = ["user1", "user2", "user3"];
-            game.roundPlayers = ["user1", "user2", "user3"];
-            game.currentRound = 1;
-            game.lastStartingPlayerId = null; // Primera partida
+            const match = createMockMatch();
+            match.hostId = "user1";
+            match.playerOrder = ["user1", "user2", "user3"];
+            match.roundPlayers = ["user1", "user2", "user3"];
+            match.currentRound = 1;
+            match.lastStartingPlayerId = null; // Primera partida
 
-            const startingPlayer = PlayerManager.calculateStartingPlayer(game);
+            const startingPlayer = PlayerManager.calculateStartingPlayer(match);
 
             expect(startingPlayer).toBe("user1"); // Host empieza
         });
 
         test("should rotate to next player on new match", () => {
-            const game = createMockGame();
-            game.hostId = "user1";
-            game.playerOrder = ["user1", "user2", "user3"];
-            game.roundPlayers = ["user1", "user2", "user3"];
-            game.currentRound = 1;
-            game.lastStartingPlayerId = "user1"; // User1 empezó la partida anterior
+            const match = createMockMatch();
+            match.hostId = "user1";
+            match.playerOrder = ["user1", "user2", "user3"];
+            match.roundPlayers = ["user1", "user2", "user3"];
+            match.currentRound = 1;
+            match.lastStartingPlayerId = "user1"; // User1 empezó la partida anterior
 
-            const startingPlayer = PlayerManager.calculateStartingPlayer(game);
+            const startingPlayer = PlayerManager.calculateStartingPlayer(match);
 
             expect(startingPlayer).toBe("user2"); // Rota al siguiente
         });
 
         test("should wrap around to first player after last", () => {
-            const game = createMockGame();
-            game.hostId = "user1";
-            game.playerOrder = ["user1", "user2", "user3"];
-            game.roundPlayers = ["user1", "user2", "user3"];
-            game.currentRound = 1;
-            game.lastStartingPlayerId = "user3"; // User3 empezó la partida anterior
+            const match = createMockMatch();
+            match.hostId = "user1";
+            match.playerOrder = ["user1", "user2", "user3"];
+            match.roundPlayers = ["user1", "user2", "user3"];
+            match.currentRound = 1;
+            match.lastStartingPlayerId = "user3"; // User3 empezó la partida anterior
 
-            const startingPlayer = PlayerManager.calculateStartingPlayer(game);
+            const startingPlayer = PlayerManager.calculateStartingPlayer(match);
 
             expect(startingPlayer).toBe("user1"); // Wrap-around
         });
 
         test("should skip disconnected player and advance to next eligible", () => {
-            const game = createMockGame();
-            game.hostId = "user1";
-            game.playerOrder = ["user1", "user2", "user3"];
-            game.roundPlayers = ["user1", "user3"]; // user2 se desconectó
-            game.currentRound = 1;
-            game.lastStartingPlayerId = "user1"; // User1 empezó antes
+            const match = createMockMatch();
+            match.hostId = "user1";
+            match.playerOrder = ["user1", "user2", "user3"];
+            match.roundPlayers = ["user1", "user3"]; // user2 se desconectó
+            match.currentRound = 1;
+            match.lastStartingPlayerId = "user1"; // User1 empezó antes
 
-            const startingPlayer = PlayerManager.calculateStartingPlayer(game);
+            const startingPlayer = PlayerManager.calculateStartingPlayer(match);
 
             // user2 debería ser el siguiente pero no está, así que salta a user3
             expect(startingPlayer).toBe("user3");
         });
 
         test("should return null when no eligible players", () => {
-            const game = createMockGame();
-            game.playerOrder = ["user1", "user2"];
-            game.roundPlayers = [];
-            game.currentRound = 1;
+            const match = createMockMatch();
+            match.playerOrder = ["user1", "user2"];
+            match.roundPlayers = [];
+            match.currentRound = 1;
 
-            const startingPlayer = PlayerManager.calculateStartingPlayer(game);
+            const startingPlayer = PlayerManager.calculateStartingPlayer(match);
 
             expect(startingPlayer).toBeNull();
         });
 
         test("should handle host disconnection gracefully", () => {
-            const game = createMockGame();
-            game.hostId = "user2"; // Host cambió a user2
-            game.playerOrder = ["user2", "user3"]; // user1 (host original) se fue
-            game.roundPlayers = ["user2", "user3"];
-            game.currentRound = 1;
-            game.lastStartingPlayerId = "user1"; // user1 empezó antes pero ya no está
+            const match = createMockMatch();
+            match.hostId = "user2"; // Host cambió a user2
+            match.playerOrder = ["user2", "user3"]; // user1 (host original) se fue
+            match.roundPlayers = ["user2", "user3"];
+            match.currentRound = 1;
+            match.lastStartingPlayerId = "user1"; // user1 empezó antes pero ya no está
 
-            const startingPlayer = PlayerManager.calculateStartingPlayer(game);
+            const startingPlayer = PlayerManager.calculateStartingPlayer(match);
 
             // Debería encontrar al siguiente elegible (user2 o user3)
             expect(["user2", "user3"]).toContain(startingPlayer);
         });
 
         test("should fallback to first eligible when lastStartingPlayerId not in playerOrder", () => {
-            const game = createMockGame();
-            game.hostId = "user2";
-            game.playerOrder = ["user2", "user3"]; // Nuevo orden sin user1
-            game.roundPlayers = ["user2", "user3"];
-            game.currentRound = 1;
-            game.lastStartingPlayerId = "deletedUser"; // Jugador que ya no existe en ninguna lista
+            const match = createMockMatch();
+            match.hostId = "user2";
+            match.playerOrder = ["user2", "user3"]; // Nuevo orden sin user1
+            match.roundPlayers = ["user2", "user3"];
+            match.currentRound = 1;
+            match.lastStartingPlayerId = "deletedUser"; // Jugador que ya no existe en ninguna lista
 
-            const startingPlayer = PlayerManager.calculateStartingPlayer(game);
+            const startingPlayer = PlayerManager.calculateStartingPlayer(match);
 
             // Fallback: debería usar el host (user2) o el primero elegible
             expect(startingPlayer).toBe("user2");
         });
 
         test("should always return a valid player when eligiblePlayers is not empty", () => {
-            const game = createMockGame();
-            game.hostId = "hostGone"; // Host que ya no existe
-            game.playerOrder = ["user3", "user4"];
-            game.roundPlayers = ["user3", "user4"];
-            game.currentRound = 1;
-            game.lastStartingPlayerId = "someoneGone"; // Alguien que ya no existe
+            const match = createMockMatch();
+            match.hostId = "hostGone"; // Host que ya no existe
+            match.playerOrder = ["user3", "user4"];
+            match.roundPlayers = ["user3", "user4"];
+            match.currentRound = 1;
+            match.lastStartingPlayerId = "someoneGone"; // Alguien que ya no existe
 
-            const startingPlayer = PlayerManager.calculateStartingPlayer(game);
+            const startingPlayer = PlayerManager.calculateStartingPlayer(match);
 
             // Debe devolver ALGÚN jugador válido (nunca undefined ni null si hay elegibles)
             expect(startingPlayer).not.toBeNull();

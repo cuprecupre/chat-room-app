@@ -86,6 +86,7 @@ export function GameBoard({
                 </div>
             </div>
             <RoundResultOverlay
+                key={`round-result-${state.currentRound}`}
                 state={state}
                 isHost={isHost}
                 onNextRound={onNextRound}

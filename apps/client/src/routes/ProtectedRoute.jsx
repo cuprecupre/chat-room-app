@@ -50,7 +50,7 @@ export function ProtectedRoute({ user, connected, emit, gameState }) {
     const handleForceExit = () => {
         // Clear URL parameters immediately
         const url = new URL(window.location);
-        url.searchParams.delete("gameId");
+        url.searchParams.delete("roomId");
         window.history.replaceState({}, "", url.toString());
 
         // Show toast immediately
@@ -61,20 +61,20 @@ export function ProtectedRoute({ user, connected, emit, gameState }) {
         };
 
         // Force disconnect and clear state with Ack
-        if (gameState?.gameId) {
-            emit("leave-game", gameState.gameId, handleCleanExit);
+        if (gameState?.roomId) {
+            emit("leave-room", gameState.roomId, handleCleanExit);
             // Fallback timeout
             setTimeout(handleCleanExit, 2000);
         } else {
-            // If no game ID known, just reload with small delay
+            // If no room ID known, just reload with small delay
             setTimeout(handleCleanExit, 100);
         }
     };
 
-    // Redirect to home if no user (preserve gameId for invitation flow)
+    // Redirect to home if no user (preserve roomId for invitation flow)
     if (!user) {
-        const urlGameId = new URLSearchParams(window.location.search).get("gameId");
-        const redirectTo = urlGameId ? `${ROUTES.HOME}?gameId=${urlGameId}` : ROUTES.HOME;
+        const urlRoomId = new URLSearchParams(window.location.search).get("roomId");
+        const redirectTo = urlRoomId ? `${ROUTES.HOME}?roomId=${urlRoomId}` : ROUTES.HOME;
         return <Navigate to={redirectTo} replace />;
     }
 
