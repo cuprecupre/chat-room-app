@@ -145,6 +145,7 @@ function getEnrichedGameData(match) {
         winnerId: match.winnerId || null,
         winningTeam,
         roundCount: match.currentRound,
+        playerCount: playersInfo.length, // Total players (including abandoned)
         players: playersInfo,
         rounds: match.roundHistory || [],
         startedAt: match.startedAt || null,

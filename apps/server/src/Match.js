@@ -1,4 +1,5 @@
 const dbService = require("./services/db");
+const statsManager = require("./services/statsManager");
 const PlayerManager = require("./game/PlayerManager");
 const VotingManager = require("./game/VotingManager");
 const RoundManager = require("./game/RoundManager");
@@ -131,6 +132,12 @@ class Match {
 
         // Save full match record to /matches collection
         dbService.saveMatch(this.matchId, matchData);
+
+        // Update server stats (games completed + users involved)
+        // Only count if it's a completed match (not cancelled)
+        if (endReason === "completed") {
+            statsManager.incrementGamesCompleted(this.players.length);
+        }
 
         // Collect all unique participant IDs (current + former players who have scores)
         const participantIds = new Set([

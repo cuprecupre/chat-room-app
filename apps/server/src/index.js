@@ -64,11 +64,11 @@ io.on("connection", (socket) => {
     registerSocketHandlers(io, socket);
 });
 
-// --- Sync Stats to Firestore (every 5 minutes) ---
-const STATS_SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes
+// --- Sync Peak Stats to Firestore (every 5 minutes) ---
+const PEAKS_SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes
 setInterval(() => {
-    statsManager.syncToFirestore();
-}, STATS_SYNC_INTERVAL);
+    statsManager.syncPeaksToFirestore();
+}, PEAKS_SYNC_INTERVAL);
 
 // --- Start Server ---
 server.listen(PORT, () => {

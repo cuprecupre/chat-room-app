@@ -6,9 +6,13 @@ class StatsManager {
     constructor() {
         this.stats = {
             totalConnections: 0, // Total connections since server start
-            matchesCreated: 0, // Total matches created since server start
+            roomsCreated: 0, // Total rooms created since server start
             matchesCompleted: 0, // Total matches completed since server start
+            totalUsersCompletedMatches: 0, // Total users that went through game_over
             peakConcurrentUsers: 0, // Peak concurrent users
+            peakConcurrentRooms: 0, // Peak concurrent rooms
+            peakEmptyRooms: 0, // Peak empty rooms
+            peakConcurrentMatches: 0, // Peak concurrent matches
             serverStartTime: Date.now(),
         };
         this.sessionManager = null;
@@ -32,17 +36,41 @@ class StatsManager {
     }
 
     /**
-     * Increment matches created counter.
+     * Increment rooms created counter.
      */
     incrementGamesCreated() {
-        this.stats.matchesCreated++;
+        this.stats.roomsCreated++;
     }
 
     /**
-     * Increment matches completed counter.
+     * Increment matches completed counter and persist to Firestore.
      */
-    incrementGamesCompleted() {
+    async incrementGamesCompleted(playerCount = 1) {
         this.stats.matchesCompleted++;
+        this.stats.totalUsersCompletedMatches += playerCount;
+
+        // Persist to Firestore (daily stats)
+        const admin = require("firebase-admin");
+        const ENABLE_DB_PERSISTENCE = process.env.ENABLE_DB_PERSISTENCE === "true";
+
+        if (ENABLE_DB_PERSISTENCE) {
+            try {
+                const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+                const docRef = admin.firestore().collection("peak_stats").doc(today);
+
+                await docRef.set(
+                    {
+                        date: today,
+                        usersCompletedMatches: admin.firestore.FieldValue.increment(playerCount),
+                        matchesCompleted: admin.firestore.FieldValue.increment(1),
+                        lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+                    },
+                    { merge: true }
+                );
+            } catch (error) {
+                console.error("⚠️ [Stats] Failed to persist games completed:", error.message);
+            }
+        }
     }
 
     /**
@@ -66,21 +94,63 @@ class StatsManager {
             : 0;
         const activeRooms = this.roomManager ? this.roomManager.getRoomCount() : 0;
 
+        // Enhanced room metrics
+        let usersInLobby = 0;
+        let usersInMatch = 0;
+        let activeMatches = 0;
+        let emptyRooms = 0;
+
+        if (this.roomManager) {
+            const rooms = Object.values(this.roomManager.getAllRooms());
+            rooms.forEach(room => {
+                const playerCount = room.players.length;
+                if (playerCount === 0) {
+                    emptyRooms++;
+                } else if (room.phase === 'playing' || room.phase === 'game_over' || room.phase === 'round_result') {
+                    // Count playing, game_over, and round_result as "in match"
+                    activeMatches++;
+                    usersInMatch += playerCount;
+                } else {
+                    usersInLobby += playerCount;
+                }
+            });
+        }
+
+        // Update peak rooms
+        if (activeRooms > this.stats.peakConcurrentRooms) {
+            this.stats.peakConcurrentRooms = activeRooms;
+        }
+
+        // Update peak empty rooms
+        if (emptyRooms > this.stats.peakEmptyRooms) {
+            this.stats.peakEmptyRooms = emptyRooms;
+        }
+
+        // Update peak matches (includes playing + game_over)
+        if (activeMatches > this.stats.peakConcurrentMatches) {
+            this.stats.peakConcurrentMatches = activeMatches;
+        }
+
         return {
             connectedUsers,
             activeRooms,
-            totalConnections: this.stats.totalConnections,
-            matchesCreated: this.stats.matchesCreated,
+            usersInLobby,
+            usersInMatch,
+            activeMatches,
+            emptyRooms,
             peakConcurrentUsers: this.stats.peakConcurrentUsers,
+            peakConcurrentRooms: this.stats.peakConcurrentRooms,
+            peakEmptyRooms: this.stats.peakEmptyRooms,
+            peakConcurrentMatches: this.stats.peakConcurrentMatches,
             serverUptime: Math.floor((Date.now() - this.stats.serverStartTime) / 1000),
             timestamp: Date.now(),
         };
     }
 
     /**
-     * Sync current stats to Firestore.
+     * Sync peak stats to Firestore (one document per day).
      */
-    async syncToFirestore() {
+    async syncPeaksToFirestore() {
         const admin = require("firebase-admin");
         const ENABLE_DB_PERSISTENCE = process.env.ENABLE_DB_PERSISTENCE === "true";
 
@@ -88,29 +158,25 @@ class StatsManager {
 
         try {
             const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-            const docRef = admin.firestore().collection("stats").doc(today);
-
-            const currentStats = this.getStats();
+            const docRef = admin.firestore().collection("peak_stats").doc(today);
 
             await docRef.set(
                 {
                     date: today,
-                    totalConnections: this.stats.totalConnections,
-                    matchesCreated: this.stats.matchesCreated,
-                    matchesCompleted: this.stats.matchesCompleted,
                     peakConcurrentUsers: this.stats.peakConcurrentUsers,
-                    currentConnectedUsers: currentStats.connectedUsers,
-                    currentActiveRooms: currentStats.activeRooms,
+                    peakConcurrentRooms: this.stats.peakConcurrentRooms,
+                    peakEmptyRooms: this.stats.peakEmptyRooms,
+                    peakConcurrentMatches: this.stats.peakConcurrentMatches,
                     lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
                 },
                 { merge: true }
             );
 
             console.log(
-                `📊 [Stats] Synced to Firestore: ${currentStats.connectedUsers} users, ${currentStats.activeRooms} rooms`
+                `📊 [Stats] Peaks synced for ${today}: users=${this.stats.peakConcurrentUsers}, rooms=${this.stats.peakConcurrentRooms}, empty=${this.stats.peakEmptyRooms}, matches=${this.stats.peakConcurrentMatches}`
             );
         } catch (error) {
-            console.error("⚠️ [Stats] Failed to sync:", error.message);
+            console.error("⚠️ [Stats] Failed to sync peaks:", error.message);
         }
     }
 }

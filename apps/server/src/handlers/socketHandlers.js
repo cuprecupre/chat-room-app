@@ -2,6 +2,7 @@ const roomManager = require("../services/roomManager");
 const sessionManager = require("../services/sessionManager");
 const statsManager = require("../services/statsManager");
 const shutdownManager = require("../services/shutdownManager");
+const dbService = require("../services/db");
 
 // Grace period constants
 const MOBILE_GRACE_PERIOD = 300000; // 5 minutes for mobile users
@@ -13,10 +14,6 @@ const INACTIVE_GRACE_PERIOD = 60000; // 1 minute for inactive users
 function registerSocketHandlers(io, socket) {
     const user = socket.user;
     console.log(`User connected: ${user.name} (${user.uid})`);
-
-    // Track stats
-    statsManager.incrementConnections();
-    statsManager.updatePeakUsers();
 
     // Handle multiple sessions: disconnect old socket if exists
     const oldSocketId = sessionManager.getUserSocket(user.uid);
@@ -32,8 +29,21 @@ function registerSocketHandlers(io, socket) {
         }
     }
 
+    // Register socket FIRST so peak users count is accurate
     sessionManager.setUserSocket(user.uid, socket.id);
     sessionManager.initHeartbeat(user.uid);
+
+    // Track stats (after socket registered)
+    statsManager.incrementConnections();
+    statsManager.updatePeakUsers();
+
+    // Track connection KPI per user
+    dbService.updatePlayerStats(user.uid, {
+        totalConnections: 1,
+        setFirstSeen: true,
+        displayName: user.name,
+        photoURL: user.photoURL
+    });
 
     // Handle reconnection logic
     handleReconnection(socket, user);
@@ -59,9 +69,10 @@ function registerSocketHandlers(io, socket) {
             if (r.currentMatch) r.currentMatch.continueToNextRound(user.uid);
         })
     );
-    socket.on("play-again", (roomId) =>
-        handleRoomAction(socket, user, roomId, (r) => r.playAgain(user.uid))
-    );
+    socket.on("play-again", (roomId) => {
+        dbService.updatePlayerStats(user.uid, { playAgainClicks: 1 });
+        handleRoomAction(socket, user, roomId, (r) => r.playAgain(user.uid));
+    });
     socket.on("update-options", ({ roomId, options }) =>
         handleRoomAction(socket, user, roomId, (r) => r.updateOptions(user.uid, options))
     );
@@ -163,6 +174,10 @@ async function handleCreateRoom(socket, user, options = {}) {
     socket.join(newRoom.roomId);
     roomManager.emitRoomState(newRoom);
     statsManager.incrementGamesCreated();
+
+    // Track room creation KPI
+    dbService.updatePlayerStats(user.uid, { roomsCreated: 1 });
+
     console.log(`Room created: ${newRoom.roomId} by ${user.name} with options:`, opts);
 }
 
@@ -189,6 +204,11 @@ async function handleJoinRoom(io, socket, user, roomId) {
 
     // Cancel any pending cleanup for this room (player rejoined)
     roomManager.cancelEmptyRoomCleanup(roomId);
+
+    // Track roomsJoined KPI (only for new joins, not reconnects)
+    if (!isAlreadyInRoom) {
+        dbService.updatePlayerStats(user.uid, { roomsJoined: 1 });
+    }
 
     console.log(`User ${user.name} joined room ${roomId}${roomToJoin.phase === 'playing' ? ' (late joiner)' : ''}`);
 }

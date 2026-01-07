@@ -96,6 +96,15 @@ class DBService {
             if (stats.displayName) updates.displayName = stats.displayName;
             if (stats.photoURL) updates.photoURL = stats.photoURL;
 
+            // Set firstSeenAt only if it doesn't exist (first time tracking)
+            if (stats.setFirstSeen) {
+                // Check if document exists and has firstSeenAt
+                const doc = await docRef.get();
+                if (!doc.exists || !doc.data()?.firstSeenAt) {
+                    updates.firstSeenAt = admin.firestore.FieldValue.serverTimestamp();
+                }
+            }
+
             // Numeric increments
             const numericFields = [
                 'gamesPlayed',
@@ -105,7 +114,12 @@ class DBService {
                 'winsAsImpostor',
                 'winsAsFriend',
                 'points',
-                'playTimeSeconds'
+                'playTimeSeconds',
+                // New KPI fields
+                'totalConnections',
+                'roomsCreated',
+                'roomsJoined',
+                'playAgainClicks'
             ];
 
             numericFields.forEach(field => {
