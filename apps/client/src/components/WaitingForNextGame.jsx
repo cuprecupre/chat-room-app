@@ -24,7 +24,7 @@ export function WaitingForNextGame({
         <div className="w-full max-w-sm mx-auto text-center space-y-4 pb-32 pt-10 px-0">
             {/* Room Identifier Badge */}
             <div className="flex items-center justify-center mb-6 animate-fadeIn">
-                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 rounded-full">
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-orange-400 rounded-full">
                     SALA DE {hostName}
                 </span>
             </div>
@@ -35,7 +35,7 @@ export function WaitingForNextGame({
             </h2>
 
             {/* Auto-join Message */}
-            <div className="flex items-center justify-center gap-2 py-2 animate-pulse">
+            <div className="flex items-center justify-center gap-2 py-3 px-4 bg-orange-500/10 rounded-lg border border-orange-500/20">
                 <svg
                     className="animate-spin h-3 w-3 text-orange-400"
                     xmlns="http://www.w3.org/2000/svg"
@@ -63,14 +63,14 @@ export function WaitingForNextGame({
 
             {/* Lists Container */}
             <div className="w-full pt-4 space-y-8">
-                {/* Active Players List */}
-                {activePlayers.length > 0 && (
+                {/* Waiting Players List */}
+                {waitingPlayers.length > 0 && (
                     <div className="space-y-3">
                         <div className="text-sm font-semibold text-neutral-400 text-left px-1">
-                            Jugadores en la partida
+                            Esperando para entrar: {waitingPlayers.length}
                         </div>
                         <PlayerList
-                            players={activePlayers}
+                            players={waitingPlayers}
                             currentUserId={user?.uid || ""}
                             isHost={false}
                             gameState={state}
@@ -78,14 +78,14 @@ export function WaitingForNextGame({
                     </div>
                 )}
 
-                {/* Waiting Players List */}
-                {waitingPlayers.length > 0 && (
+                {/* Active Players List */}
+                {activePlayers.length > 0 && (
                     <div className="space-y-3">
                         <div className="text-sm font-semibold text-neutral-400 text-left px-1">
-                            Esperando para entrar
+                            Jugadores en la partida: {activePlayers.length}
                         </div>
                         <PlayerList
-                            players={waitingPlayers}
+                            players={activePlayers}
                             currentUserId={user?.uid || ""}
                             isHost={false}
                             gameState={state}

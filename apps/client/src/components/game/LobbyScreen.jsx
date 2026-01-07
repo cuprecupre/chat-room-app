@@ -52,7 +52,7 @@ export function LobbyScreen({
         <div className="w-full max-w-sm mx-auto text-center space-y-4 pb-32 pt-10 px-0">
             {/* Room Identifier Badge */}
             <div className="flex items-center justify-center mb-6 animate-fadeIn">
-                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 rounded-full">
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-orange-400 rounded-full">
                     SALA DE {hostName}
                 </span>
             </div>
