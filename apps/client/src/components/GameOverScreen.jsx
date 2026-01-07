@@ -175,14 +175,14 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                                 <span className="text-neutral-300">
                                     Por cada ronda que votas al impostor
                                 </span>
-                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
+                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium whitespace-nowrap">
                                     +2 pts
                                 </span>
                             </li>
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">
-                                    <span className="text-yellow-400">★</span> Bonus (votas bien
-                                    todas las rondas y el impostor pierde)
+                                    <span className="text-yellow-400">★</span> Bonus (si votas bien
+                                    todas las rondas jugadas y el impostor pierde)
                                 </span>
                                 <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium whitespace-nowrap">
                                     10 pts
@@ -201,13 +201,13 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                                 <span className="text-neutral-300">
                                     Por cada ronda que sobrevives
                                 </span>
-                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium">
+                                <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium whitespace-nowrap">
                                     +2 pts
                                 </span>
                             </li>
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">
-                                    <span className="text-yellow-400">★</span> Bonus (sobrevives las
+                                    <span className="text-yellow-400">★</span> Bonus (si sobrevives las
                                     3 rondas)
                                 </span>
                                 <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium whitespace-nowrap">
