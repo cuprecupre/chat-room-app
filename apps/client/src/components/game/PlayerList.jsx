@@ -302,7 +302,7 @@ export function PlayerList({
                                 {isLobby && isHost && p.uid !== currentUserId && onKickPlayer && (
                                     <button
                                         onClick={() => setKickTarget(p)}
-                                        className="p-2 rounded-full border-2 border-red-500/30 hover:border-red-500/50 hover:bg-red-500/10 text-red-500/70 hover:text-red-400 transition-colors"
+                                        className="p-2 rounded-full border border-red-500 hover:border-red-400 hover:bg-red-500/10 text-red-500 hover:text-red-400 transition-colors"
                                         title={`Expulsar a ${p.name}`}
                                     >
                                         <Trash2 className="w-4 h-4" />
