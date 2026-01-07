@@ -8,18 +8,29 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 
-  <!-- Google Consent Mode (v2) -->
+  <!-- Google Consent Mode (v2) - Region-specific defaults -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
 
-    // Configuración por defecto: todo denegado
+    // Default GLOBAL: analytics allowed (for Americas, Asia, Africa, etc.)
+    // These regions don't have strict cookie consent laws like GDPR
+    gtag('consent', 'default', {
+      'ad_storage': 'denied',
+      'analytics_storage': 'granted',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied'
+    });
+
+    // Override for EEA + UK + EFTA: all denied until CMP updates consent
+    // This ensures GDPR compliance - user must accept via CMP popup
     gtag('consent', 'default', {
       'ad_storage': 'denied',
       'analytics_storage': 'denied',
       'ad_user_data': 'denied',
       'ad_personalization': 'denied',
-      'wait_for_update': 500
+      'wait_for_update': 500,
+      'region': ['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'GB', 'IS', 'LI', 'NO', 'CH']
     });
   </script>
 
