@@ -32,9 +32,15 @@ app.use("/api", apiRoutes);
 app.use("/api/admin", adminRoutes);
 
 // --- SPA Fallback (must be after API routes) ---
+// IMPORTANT: Set no-cache headers to prevent stale HTML after deploys
+// Without this, users accessing /lobby, /game, etc. may get cached HTML
+// that references old hashed assets that no longer exist
 const path = require("path");
 const clientBuildPath = path.join(__dirname, "../../client/dist");
 app.get("*", (req, res) => {
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
     res.sendFile(path.join(clientBuildPath, "index.html"));
 });
 
