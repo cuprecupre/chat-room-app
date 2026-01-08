@@ -54,8 +54,18 @@
   <!-- End Google Tag Manager -->
 
   <!-- Google AdSense (always loads in production, components handle consent) -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6211741187285412"
-    crossorigin="anonymous"></script>
+  <script>
+    (function () {
+      var isProduction = window.location.hostname === 'impostor.me' || window.location.hostname === 'www.impostor.me';
+      if (!isProduction) return;
+
+      var script = document.createElement('script');
+      script.async = true;
+      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6211741187285412";
+      script.crossOrigin = "anonymous";
+      document.head.appendChild(script);
+    })();
+  </script>
   <!-- End Google AdSense -->
   <!-- Favicons -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
