@@ -229,7 +229,7 @@ export function AppRouter() {
 
     if (loading && showLoader) {
         return (
-            <div className="w-full h-100dvh flex items-center justify-center bg-neutral-950 text-white">
+            <div className="w-full h-[100dvh] flex items-center justify-center bg-neutral-950 text-white">
                 <div className="flex flex-col items-center gap-6 text-center">
                     <img
                         src={heroImg}
