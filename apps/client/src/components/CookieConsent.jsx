@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { X, Cookie } from 'lucide-react';
 
 const CONSENT_KEY = 'cookie_consent';
@@ -78,21 +79,19 @@ export function CookieConsent() {
                             <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
                                 Utilizamos cookies 🍪 para mejorar tu experiencia, analizar el uso del sitio y mostrarte
                                 publicidad relevante.{' '}
-                                <a
-                                    href="/privacidad"
+                                <Link
+                                    to="/privacidad"
                                     className="text-orange-600 hover:text-orange-700 underline"
-                                    target="_blank"
                                 >
                                     Privacidad
-                                </a>
+                                </Link>
                                 {' · '}
-                                <a
-                                    href="/cookies"
+                                <Link
+                                    to="/cookies"
                                     className="text-orange-600 hover:text-orange-700 underline"
-                                    target="_blank"
                                 >
                                     Cookies
-                                </a>
+                                </Link>
                             </p>
                         </div>
 

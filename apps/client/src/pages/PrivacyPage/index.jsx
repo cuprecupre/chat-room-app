@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 export function PrivacyPage() {
@@ -6,13 +7,13 @@ export function PrivacyPage() {
         <div className="min-h-screen bg-neutral-950 text-neutral-50 py-12 px-6 pb-64 md:pb-24 font-sans">
             <div className="max-w-3xl mx-auto">
                 {/* Back Button */}
-                <a
-                    href="/"
+                <Link
+                    to="/"
                     className="inline-flex items-center gap-2 text-neutral-400 hover:text-white transition-colors mb-8"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     Volver al inicio
-                </a>
+                </Link>
 
                 <h1 className="text-4xl font-serif text-white mb-8">Política de Privacidad</h1>
 
@@ -42,7 +43,7 @@ export function PrivacyPage() {
                             <li><strong>Datos de cuenta:</strong> Nombre de usuario, email (si inicias sesión con Google) o nombre elegido (si juegas como invitado).</li>
                             <li><strong>Datos de uso:</strong> Información sobre cómo interactúas con el juego (partidas jugadas, acciones dentro del juego).</li>
                             <li><strong>Datos técnicos:</strong> Dirección IP, tipo de navegador, dispositivo y sistema operativo.</li>
-                            <li><strong>Cookies:</strong> Utilizamos cookies propias y de terceros. Consulta nuestra <a href="/cookies" className="text-orange-400 hover:text-orange-300 underline">Política de Cookies</a> para más información.</li>
+                            <li><strong>Cookies:</strong> Utilizamos cookies propias y de terceros. Consulta nuestra <Link to="/cookies" className="text-orange-400 hover:text-orange-300 underline">Política de Cookies</Link> para más información.</li>
                         </ul>
                     </section>
 

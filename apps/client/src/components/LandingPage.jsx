@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/Button";
 import { Spinner } from "./ui/Spinner";
 
@@ -28,6 +29,7 @@ export function LandingPage({
     const featuresRef = useRef(null);
     const [currentReview, setCurrentReview] = useState(0);
     const [openFaq, setOpenFaq] = useState(null);
+    const navigate = useNavigate();
 
     const toggleFaq = (index) => {
         setOpenFaq(openFaq === index ? null : index);
@@ -97,9 +99,9 @@ export function LandingPage({
             answer: (
                 <>
                     Puedes consultar todas las reglas del juego en nuestra{" "}
-                    <a href="/reglas" className="text-orange-400 hover:text-orange-300 underline">
+                    <Link to="/reglas" className="text-orange-400 hover:text-orange-300 underline">
                         página de reglas
-                    </a>
+                    </Link>
                     . Ahí encontrarás explicaciones detalladas sobre cómo jugar, puntuación y
                     consejos.
                 </>
@@ -145,12 +147,12 @@ export function LandingPage({
                     >
                         Cómo se juega
                     </button>
-                    <button
-                        onClick={() => (window.location.href = "/reglas")}
+                    <Link
+                        to="/reglas"
                         className="text-sm font-medium text-neutral-400 hover:text-white transition-colors"
                     >
                         Reglas
-                    </button>
+                    </Link>
                 </div>
                 <div>
                     <Button
@@ -469,8 +471,8 @@ export function LandingPage({
 
                     {/* Link to Rules */}
                     <div className="text-center mt-12">
-                        <a
-                            href="/reglas"
+                        <Link
+                            to="/reglas"
                             className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors text-lg"
                         >
                             <span>Ver reglas completas</span>
@@ -487,7 +489,7 @@ export function LandingPage({
                                     d="M17 8l4 4m0 0l-4 4m4-4H3"
                                 />
                             </svg>
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </section>
@@ -696,12 +698,12 @@ export function LandingPage({
                         </span>
                     </div>
                     <div className="flex gap-8 text-sm text-neutral-500">
-                        <button
-                            onClick={() => (window.location.href = "/reglas")}
+                        <Link
+                            to="/reglas"
                             className="hover:text-neutral-300 transition-colors"
                         >
                             Reglas
-                        </button>
+                        </Link>
                         <button
                             onClick={onOpenFeedback}
                             className="hover:text-neutral-300 transition-colors"

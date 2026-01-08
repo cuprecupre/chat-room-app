@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { io } from "socket.io-client";
+import { auth } from "../lib/firebase";
 import { getToken, saveToken, isTokenExpired } from "../lib/tokenStorage";
 import { showToast } from "../lib/toast";
 
@@ -48,11 +49,15 @@ export function useSocket(user) {
             try {
                 let token;
                 try {
-                    // SIEMPRE obtener token fresco del usuario actual para asegurar coincidencia de identidad
-                    // Esto previene errores de "Only the host..." si hay un token viejo en localStorage
+                    // Always get fresh token from auth.currentUser (guaranteed to have getIdToken method)
+                    // This prevents "Only the host..." errors if there's an old token in localStorage
                     console.log("🔑 Obteniendo token de usuario actual...");
-                    token = await user.getIdToken();
-                    saveToken(token); // Mantener localStorage sincronizado
+                    token = await auth.currentUser?.getIdToken();
+                    if (token) {
+                        saveToken(token);
+                    } else {
+                        throw new Error("No current user");
+                    }
                 } catch (e) {
                     console.warn("⚠️ Error obteniendo token de usuario, intentando fallback a storage:", e);
                     token = getToken();

@@ -32,18 +32,11 @@ export function MainLayout({
             url.searchParams.delete("roomId");
             window.history.replaceState({}, "", url.toString());
 
-            const handleCleanExit = () => {
-                // Force page reload only after server ack or timeout
-                window.location.reload();
-            };
-
-            // Emit with Ack callback
-            emit("leave-room", gameState.roomId, handleCleanExit);
-
-            // Fallback: if server doesn't respond in 2s, force exit anyway
-            setTimeout(handleCleanExit, 2000);
+            // Emit leave-room and navigate to lobby
+            emit("leave-room", gameState.roomId);
+            navigate(ROUTES.LOBBY);
         }
-    }, [emit, gameState]);
+    }, [emit, gameState, navigate]);
 
     const leaveMatch = useCallback(() => {
         if (gameState?.roomId) {
@@ -86,12 +79,12 @@ export function MainLayout({
             // useSocket hook handles emitting leave-game on disconnect
             await onLogout();
 
-            // Force page reload to clear all state
-            window.location.reload();
+            // Navigate to home page
+            navigate(ROUTES.HOME);
         } catch (e) {
             console.error("Error during logout:", e);
         }
-    }, [onLogout, emit, gameState]);
+    }, [onLogout, emit, gameState, navigate]);
 
     // Close dropdown on outside click or Escape key
     useEffect(() => {
