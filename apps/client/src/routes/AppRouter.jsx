@@ -1,10 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useSocket } from "../hooks/useSocket";
 import { Toaster } from "../components/Toaster";
 import { Spinner } from "../components/ui/Spinner";
-import { PageLoader } from "../components/ui/PageLoader";
 import { InstructionsModal } from "../components/InstructionsModal";
 import { FeedbackModal } from "../components/FeedbackModal";
 import { ShutdownToast } from "../components/ShutdownToast";
@@ -14,61 +13,22 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import { AdminProtectedRoute } from "./AdminProtectedRoute";
 import { ROUTES } from "./routes";
 import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
+import { LandingPage } from "../pages/LandingPage";
+import { EmailAuthPage } from "../pages/EmailAuthPage";
+import { GuestAuthPage } from "../pages/GuestAuthPage";
+import { LobbyPage } from "../pages/LobbyPage";
+import { GamePage } from "../pages/GamePage";
+import { RulesPage } from "../pages/RulesPage";
+import { InvitePage } from "../pages/InvitePage";
+import { InviteLandingPage } from "../pages/InviteLandingPage";
+import { PrivacyPage } from "../pages/PrivacyPage";
+import { CookiesPage } from "../pages/CookiesPage";
+import { AdminIndex } from "../pages/Admin";
+import DebugPreviews from "../pages/DebugPreviews";
+import DebugPreviewSingle from "../pages/DebugPreviewSingle";
 
 // Firebase Storage CDN URL
 const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
-
-// Handle ChunkLoadError during deploys - auto reload when old chunks are gone
-if (typeof window !== "undefined") {
-    window.addEventListener("error", (e) => {
-        if (
-            e.message?.includes("Loading chunk") ||
-            e.message?.includes("Failed to fetch dynamically imported module")
-        ) {
-            console.warn("Chunk load failed, reloading page...");
-            window.location.reload();
-        }
-    });
-}
-
-// Lazy-loaded pages for code splitting
-const LandingPage = lazy(() =>
-    import("../pages/LandingPage").then((m) => ({ default: m.LandingPage }))
-);
-const EmailAuthPage = lazy(() =>
-    import("../pages/EmailAuthPage").then((m) => ({ default: m.EmailAuthPage }))
-);
-const GuestAuthPage = lazy(() =>
-    import("../pages/GuestAuthPage").then((m) => ({ default: m.GuestAuthPage }))
-);
-const LobbyPage = lazy(() => import("../pages/LobbyPage").then((m) => ({ default: m.LobbyPage })));
-const GamePage = lazy(() => import("../pages/GamePage").then((m) => ({ default: m.GamePage })));
-const RulesPage = lazy(() => import("../pages/RulesPage").then((m) => ({ default: m.RulesPage })));
-const InvitePage = lazy(() =>
-    import("../pages/InvitePage").then((m) => ({ default: m.InvitePage }))
-);
-const InviteLandingPage = lazy(() =>
-    import("../pages/InviteLandingPage").then((m) => ({ default: m.InviteLandingPage }))
-);
-const PrivacyPage = lazy(() =>
-    import("../pages/PrivacyPage").then((m) => ({ default: m.PrivacyPage }))
-);
-const CookiesPage = lazy(() =>
-    import("../pages/CookiesPage").then((m) => ({ default: m.CookiesPage }))
-);
-
-// Debug Page (Local Only - ignored in git)
-const DebugPreviews = lazy(() =>
-    import("../pages/DebugPreviews").catch(() => ({ default: () => null }))
-);
-const DebugPreviewSingle = lazy(() =>
-    import("../pages/DebugPreviewSingle").catch(() => ({ default: () => null }))
-);
-
-// Admin Pages (lazy loaded - only downloaded for admins)
-const AdminIndex = lazy(() =>
-    import("../pages/Admin").then((m) => ({ default: m.AdminIndex }))
-);
 
 function HomeRouteHandler({ user }) {
     const location = useLocation();
@@ -221,11 +181,6 @@ function AppRoutes({
         prevRoomIdRef.current = currentRoomId;
     }, [gameState?.roomId, location.pathname, navigate]);
 
-    // Reset scroll when major views change
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [user?.uid, gameState?.roomId]);
-
     return (
         <>
             <Toaster />
@@ -240,8 +195,7 @@ function AppRoutes({
                 user={user}
             />
 
-            <Suspense fallback={<PageLoader />}>
-                <Routes>
+            <Routes>
                     {/* Public routes */}
                     <Route element={<UnauthenticatedLayout />}>
                         <Route
@@ -419,7 +373,6 @@ function AppRoutes({
                     {/* Catch-all redirect to home */}
                     <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
                 </Routes>
-            </Suspense>
         </>
     );
 }

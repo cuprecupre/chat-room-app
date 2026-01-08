@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 export function CookiesPage() {
@@ -6,13 +7,13 @@ export function CookiesPage() {
         <div className="min-h-screen bg-neutral-950 text-neutral-50 py-12 px-6 pb-64 md:pb-24 font-sans">
             <div className="max-w-3xl mx-auto">
                 {/* Back Button */}
-                <a
-                    href="/"
+                <Link
+                    to="/"
                     className="inline-flex items-center gap-2 text-neutral-400 hover:text-white transition-colors mb-8"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     Volver al inicio
-                </a>
+                </Link>
 
                 <h1 className="text-4xl font-serif text-white mb-8">Política de Cookies</h1>
 
@@ -129,9 +130,9 @@ export function CookiesPage() {
                         <h2 className="text-2xl font-serif text-orange-400">Más información</h2>
                         <p className="text-neutral-300 leading-relaxed">
                             Para más información sobre cómo tratamos tus datos, consulta nuestra {' '}
-                            <a href="/privacidad" className="text-orange-400 hover:text-orange-300 underline">
+                            <Link to="/privacidad" className="text-orange-400 hover:text-orange-300 underline">
                                 Política de Privacidad
-                            </a>.
+                            </Link>.
                         </p>
                         <p className="text-neutral-300 leading-relaxed">
                             Si tienes preguntas, contacta con nosotros en: {' '}

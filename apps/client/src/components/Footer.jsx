@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { LogOut, Coffee } from "lucide-react";
 
 export function Footer({ onOpenInstructions, onOpenFeedback, roomId, isMobile, onLeaveRoom, onLeaveMatch, phase }) {
@@ -92,13 +93,13 @@ export function Footer({ onOpenInstructions, onOpenFeedback, roomId, isMobile, o
                 {/* Legal Links - Only outside of games */}
                 {!roomId && (
                     <div className="flex items-center justify-center gap-4 text-xs text-neutral-600 mt-4">
-                        <a href="/privacidad" className="hover:text-neutral-400 transition-colors">
+                        <Link to="/privacidad" className="hover:text-neutral-400 transition-colors">
                             Privacidad
-                        </a>
+                        </Link>
                         <span>·</span>
-                        <a href="/cookies" className="hover:text-neutral-400 transition-colors">
+                        <Link to="/cookies" className="hover:text-neutral-400 transition-colors">
                             Cookies
-                        </a>
+                        </Link>
                     </div>
                 )}
             </div>
