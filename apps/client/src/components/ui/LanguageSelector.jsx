@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const languages = [
     { code: 'es', flag: '🇪🇸', name: 'Español', shortCode: 'ES' },
@@ -24,24 +25,40 @@ export function LanguageSelector({ className = '' }) {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    const navigate = useNavigate();
+    const location = useLocation();
+
     const handleChange = (langCode) => {
         i18n.changeLanguage(langCode);
         setIsOpen(false);
 
         // Update URL if on public pages
-        const path = window.location.pathname;
+        const path = location.pathname;
         const isEnglishPath = path.startsWith('/en');
-        const isPublicPage = path === '/' || path === '/en' || path === '/en/' ||
-            path.startsWith('/reglas') || path.startsWith('/en/rules');
 
-        if (isPublicPage) {
-            if (langCode === 'en' && !isEnglishPath) {
-                const newPath = path === '/' ? '/en' : `/en${path}`;
-                window.history.pushState({}, '', newPath);
-            } else if (langCode === 'es' && isEnglishPath) {
-                const newPath = path.replace(/^\/en\/?/, '/').replace('/rules', '/reglas') || '/';
-                window.history.pushState({}, '', newPath);
-            }
+        // Define route mappings for public pages
+        // Format: [CommonKey]: { es: '/path', en: '/en/path' }
+        const routeMap = {
+            home: { es: '/', en: '/en' },
+            rules: { es: '/reglas', en: '/en/rules' },
+            privacy: { es: '/privacidad', en: '/en/privacy' },
+            cookies: { es: '/cookies', en: '/en/cookies' },
+            auth: { es: '/auth', en: '/en/auth' },
+            guest: { es: '/guest', en: '/en/guest' }
+        };
+
+        // Find current route key
+        let currentRouteKey = null;
+        if (path === '/' || path === '/en' || path === '/en/') currentRouteKey = 'home';
+        else if (path === '/reglas' || path === '/en/rules') currentRouteKey = 'rules';
+        else if (path === '/privacidad' || path === '/en/privacy') currentRouteKey = 'privacy';
+        else if (path === '/cookies' || path === '/en/cookies') currentRouteKey = 'cookies';
+        else if (path === '/auth' || path === '/en/auth') currentRouteKey = 'auth';
+        else if (path === '/guest' || path === '/en/guest') currentRouteKey = 'guest';
+
+        if (currentRouteKey) {
+            const targetPath = routeMap[currentRouteKey][langCode];
+            navigate(targetPath);
         }
     };
 

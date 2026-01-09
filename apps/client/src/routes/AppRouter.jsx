@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { HelmetProvider } from "react-helmet-async";
 import { useAuth } from "../hooks/useAuth";
 import { useSocket } from "../hooks/useSocket";
 import { useGameActions } from "../hooks/useGameActions";
@@ -26,6 +27,19 @@ import DebugPreviewSingle from "../pages/DebugPreviewSingle";
 
 // Firebase Storage CDN URL
 const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
+
+// Helper to sync URL language with i18next
+function LanguageWrapper({ lang, children }) {
+    const { i18n } = useTranslation();
+    useEffect(() => {
+        // Only change if different to avoid infinite loops or unnecessary renders
+        if (i18n.language !== lang) {
+            i18n.changeLanguage(lang);
+        }
+    }, [lang, i18n]);
+
+    return children;
+}
 
 function AppRoutes({
     user,
@@ -80,11 +94,16 @@ function AppRoutes({
     // Navigate to game when a room is created or joined
     useEffect(() => {
         const currentRoomId = gameState?.roomId;
-        const wasInLobby = location.pathname === ROUTES.LOBBY;
+        const wasInLobby = location.pathname === ROUTES.LOBBY || location.pathname === "/en/lobby";
 
         // If a new room ID appears and we're in the lobby, navigate to game
+        // Note: Protected routes handle regex/paths, but better to keep simple redirect
         if (currentRoomId && currentRoomId !== prevRoomIdRef.current && wasInLobby) {
             console.log("Navigating to room:", currentRoomId);
+            const isEnglish = location.pathname.startsWith('/en');
+            // Always redirect to base game route, let language persist via state/cookie
+            // Or if implementing strict /en/game, would add check here. 
+            // For now, game routes are language-agnostic in URL (lang persists in memory)
             navigate(`${ROUTES.GAME}?roomId=${currentRoomId}`);
         }
 
@@ -135,6 +154,7 @@ function AppRoutes({
         emit,
         joinGame: joinRoom,
         joinError,
+        joinGameError: joinError, // Legacy prop name support if needed
         clearJoinError,
         onOpenInstructions: openInstructions,
         onStartGame: startMatch,
@@ -155,14 +175,23 @@ function AppRoutes({
             <FeedbackModal isOpen={feedbackOpen} onClose={closeFeedback} user={user} />
 
             <Routes>
-                {/* ==================== PUBLIC ROUTES ==================== */}
+                {/* ==================== PUBLIC ROUTES (ES - Default) ==================== */}
                 <Route element={<UnauthenticatedLayout />}>
-                    <Route path={ROUTES.HOME} element={<HomeRoute {...publicRouteProps} />} />
-                    <Route path={ROUTES.AUTH} element={<AuthRoute {...authRouteProps} />} />
-                    <Route path={ROUTES.GUEST_AUTH} element={<GuestAuthRoute {...authRouteProps} />} />
-                    <Route path={ROUTES.RULES} element={<RulesPage />} />
-                    <Route path="/privacidad" element={<PrivacyPage />} />
-                    <Route path="/cookies" element={<CookiesPage />} />
+                    <Route path={ROUTES.HOME} element={<LanguageWrapper lang="es"><HomeRoute {...publicRouteProps} /></LanguageWrapper>} />
+                    <Route path={ROUTES.AUTH} element={<LanguageWrapper lang="es"><AuthRoute {...authRouteProps} /></LanguageWrapper>} />
+                    <Route path={ROUTES.GUEST_AUTH} element={<LanguageWrapper lang="es"><GuestAuthRoute {...authRouteProps} /></LanguageWrapper>} />
+                    <Route path={ROUTES.RULES} element={<LanguageWrapper lang="es"><RulesPage /></LanguageWrapper>} />
+                    <Route path="/privacidad" element={<LanguageWrapper lang="es"><PrivacyPage /></LanguageWrapper>} />
+                    <Route path="/cookies" element={<LanguageWrapper lang="es"><CookiesPage /></LanguageWrapper>} />
+
+                    {/* ==================== PUBLIC ROUTES (EN) ==================== */}
+                    <Route path="/en" element={<LanguageWrapper lang="en"><HomeRoute {...publicRouteProps} /></LanguageWrapper>} />
+                    <Route path="/en/auth" element={<LanguageWrapper lang="en"><AuthRoute {...authRouteProps} /></LanguageWrapper>} />
+                    <Route path="/en/guest" element={<LanguageWrapper lang="en"><GuestAuthRoute {...authRouteProps} /></LanguageWrapper>} />
+                    <Route path="/en/rules" element={<LanguageWrapper lang="en"><RulesPage /></LanguageWrapper>} />
+                    <Route path="/en/privacy" element={<LanguageWrapper lang="en"><PrivacyPage /></LanguageWrapper>} />
+                    <Route path="/en/cookies" element={<LanguageWrapper lang="en"><CookiesPage /></LanguageWrapper>} />
+
                     {import.meta.env.DEV && (
                         <>
                             <Route path="/debug" element={<DebugPreviews />} />
@@ -172,6 +201,7 @@ function AppRoutes({
                 </Route>
 
                 {/* ==================== PROTECTED ROUTES ==================== */}
+                {/* Protected routes do not enforce language in URL, they use current state */}
                 <Route element={<ProtectedRoute {...protectedRouteProps} />}>
                     <Route element={<MainLayout {...layoutProps} />}>
                         <Route
@@ -251,24 +281,26 @@ export function AppRouter() {
     }
 
     return (
-        <BrowserRouter>
-            <AppRoutes
-                user={user}
-                loading={loading}
-                error={error}
-                login={login}
-                loginWithEmail={loginWithEmail}
-                registerWithEmail={registerWithEmail}
-                loginAsGuest={loginAsGuest}
-                logout={logout}
-                clearError={clearError}
-                connected={connected}
-                gameState={gameState}
-                emit={emit}
-                joinError={joinError}
-                clearJoinError={clearJoinError}
-                shutdownCountdown={shutdownCountdown}
-            />
-        </BrowserRouter>
+        <HelmetProvider>
+            <BrowserRouter>
+                <AppRoutes
+                    user={user}
+                    loading={loading}
+                    error={error}
+                    login={login}
+                    loginWithEmail={loginWithEmail}
+                    registerWithEmail={registerWithEmail}
+                    loginAsGuest={loginAsGuest}
+                    logout={logout}
+                    clearError={clearError}
+                    connected={connected}
+                    gameState={gameState}
+                    emit={emit}
+                    joinError={joinError}
+                    clearJoinError={clearJoinError}
+                    shutdownCountdown={shutdownCountdown}
+                />
+            </BrowserRouter>
+        </HelmetProvider>
     );
 }
