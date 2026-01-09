@@ -63,7 +63,12 @@
         "youAreFriend": "You are a Friend",
         "secretWord": "The secret word is",
         "category": "Category:",
-        "tryToBlend": "Try to blend in and don't get caught!"
+        "tryToBlend": "Try to blend in and don't get caught!",
+        "you": "You",
+        "eliminated": "Eliminated",
+        "total": "Total",
+        "someone": "Someone",
+        "givesFirstClue": "gives the first clue"
     },
     "roundResult": {
         "eliminated": "was eliminated",
@@ -93,10 +98,6 @@
             "confirm": "Yes, kick"
         }
     },
-    "spectator": {
-        "title": "You are spectating",
-        "description": "You joined after the game started. Wait for the next game."
-    },
     "hostLeft": {
         "title": "The host has left the game",
         "description": "The game has ended because the host left.",
@@ -111,5 +112,43 @@
         "description": "A game is currently in progress. You'll join when it ends.",
         "playersInGame": "Players in game"
     },
-    "disconnectedPlayer": "Disconnected player"
+    "disconnectedPlayer": "Disconnected player",
+    "card": {
+        "tapToFlip": "Tap to flip card",
+        "frontAlt": "Card front",
+        "viewCard": "View my card",
+        "backAlt": "Card back",
+        "flipBack": "Flip back",
+        "yourRole": "Your role",
+        "hint": "Hint:",
+        "hintDescription": "The secret word is related to...",
+        "secretWord": "Secret word",
+        "flipYourCard": "Reveal your card"
+    },
+    "board": {
+        "clueAndVoteRound": "Clue and voting round"
+    },
+    "spectator": {
+        "title": "You are spectating",
+        "description": "You joined after the game started. Wait for the next game.",
+        "eliminated": "You have been eliminated",
+        "waitHere": "Wait here. You will play again in the next game."
+    },
+    "help": {
+        "howToPlay": "How to play?",
+        "step1": "Flip your card and discover if you are a",
+        "friend": "friend",
+        "step1b": "(you'll see the secret word) or",
+        "impostor": "impostor",
+        "step1c": "(you won't see it).",
+        "step2": "Each player says a clue out loud. The one with ☀️ in the player list starts first.",
+        "ifFriend": "If you are a friend:",
+        "friendAdvice": "Say a subtle clue that proves you know the word, but without revealing it.",
+        "ifImpostor": "If you are the impostor:",
+        "impostorAdvice": "Pretend you know it by using vague clues or mimicking others.",
+        "step4": "When everyone has given their clue, it's time to vote!",
+        "step5": "Vote for who you think is the impostor. If it's you, try to incriminate someone else.",
+        "scoring": "Those who vote correctly earn points. If you're the impostor and survive, you earn points. If you're not the impostor but the majority votes for you, you're eliminated from the round.",
+        "viewFullRules": "View complete game rules"
+    }
 }

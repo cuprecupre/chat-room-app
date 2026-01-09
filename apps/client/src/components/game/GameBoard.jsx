@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { GameStepper } from "../ui/GameStepper";
 import { RoundResultOverlay } from "../RoundResultOverlay";
 import { PlayerList } from "./PlayerList";
@@ -17,6 +18,7 @@ export function GameBoard({
     initialAnimationPending,
     showCardEntrance,
 }) {
+    const { t } = useTranslation('game');
     // Detectar si el usuario actual está eliminado
     const isMeEliminated = state.eliminatedPlayers?.includes(user.uid) || false;
 
@@ -70,7 +72,7 @@ export function GameBoard({
                             className={`text-center md:text-left mb-5 ${showRestOfUI ? "animate-fadeIn animate-delay-400" : "opacity-0 pointer-events-none"}`}
                         >
                             <h2 className="text-3xl font-serif text-neutral-50">
-                                Ronda de pistas y votos
+                                {t('board.clueAndVoteRound', 'Clue and voting round')}
                             </h2>
                         </div>
                         <PlayerList

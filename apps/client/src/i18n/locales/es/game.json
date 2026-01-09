@@ -63,7 +63,12 @@
         "youAreFriend": "Eres Amigo",
         "secretWord": "La palabra secreta es",
         "category": "Categoría:",
-        "tryToBlend": "¡Intenta pasar desapercibido y no te pillen!"
+        "tryToBlend": "¡Intenta pasar desapercibido y no te pillen!",
+        "you": "Tú",
+        "eliminated": "Eliminado",
+        "total": "Total",
+        "someone": "Alguien",
+        "givesFirstClue": "da la primera pista"
     },
     "roundResult": {
         "eliminated": "ha sido eliminado",
@@ -93,10 +98,6 @@
             "confirm": "Sí, expulsar"
         }
     },
-    "spectator": {
-        "title": "Estás de espectador",
-        "description": "Te uniste después de que empezara la partida. Espera a la siguiente."
-    },
     "hostLeft": {
         "title": "El anfitrión ha abandonado la partida",
         "description": "La partida ha terminado porque el anfitrión abandonó.",
@@ -111,5 +112,43 @@
         "description": "Hay una partida en curso. Te unirás cuando termine.",
         "playersInGame": "Jugadores en la partida"
     },
-    "disconnectedPlayer": "Jugador desconectado"
+    "disconnectedPlayer": "Jugador desconectado",
+    "card": {
+        "tapToFlip": "Toca para voltear la carta",
+        "frontAlt": "Frente de la carta",
+        "viewCard": "Ver mi carta",
+        "backAlt": "Dorso de la carta",
+        "flipBack": "Volver al frente",
+        "yourRole": "Tu rol",
+        "hint": "Ayuda:",
+        "hintDescription": "La palabra secreta está relacionada con...",
+        "secretWord": "Palabra secreta",
+        "flipYourCard": "Descubre tu carta"
+    },
+    "board": {
+        "clueAndVoteRound": "Ronda de pistas y votos"
+    },
+    "spectator": {
+        "title": "Estás de espectador",
+        "description": "Te uniste después de que empezara la partida. Espera a la siguiente.",
+        "eliminated": "Has sido eliminado",
+        "waitHere": "Espera aquí. Volverás a jugar en la siguiente partida."
+    },
+    "help": {
+        "howToPlay": "¿Cómo jugar?",
+        "step1": "Voltea tu carta y descubre si eres",
+        "friend": "amigo",
+        "step1b": "(verás la palabra secreta) o",
+        "impostor": "impostor",
+        "step1c": "(no la verás).",
+        "step2": "Cada jugador dice una pista en voz alta. Empieza el que tenga el ☀️ indicado en el listado de jugadores.",
+        "ifFriend": "Si eres amigo:",
+        "friendAdvice": "Di en voz alta una pista sutil que demuestre que conoces la palabra, pero sin revelarla.",
+        "ifImpostor": "Si eres impostor:",
+        "impostorAdvice": "Finge que la conoces usando pistas vagas o que imiten a otros.",
+        "step4": "Cuando todos hayan dado su pista, ¡es hora de votar!",
+        "step5": "Vota a quien creas que es el impostor. Si eres tú, intenta incriminar a otro.",
+        "scoring": "Los que votan bien ganan puntos. Si eres impostor y sobrevives, ganas puntos. Si no eres impostor pero la mayoría te vota, quedas eliminado de la ronda.",
+        "viewFullRules": "Ver reglas completas del juego"
+    }
 }

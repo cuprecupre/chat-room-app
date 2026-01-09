@@ -57,5 +57,19 @@
         "rules": "Rules",
         "discord": "Discord",
         "contact": "Contact"
+    },
+    "feedback": {
+        "title": "Help us improve",
+        "successTitle": "Message sent!",
+        "successMessage": "Thanks for helping us improve.",
+        "typeLabel": "Message type",
+        "typeBug": "Problem",
+        "typeIdea": "Idea",
+        "typeOther": "Other",
+        "commentLabel": "Your comment",
+        "placeholder": "Tell us your problem, suggestion, or any comment to improve the game...",
+        "errorMessage": "There was an error sending the message. Try again.",
+        "sending": "Sending...",
+        "send": "Send"
     }
 }
