@@ -76,5 +76,27 @@
         "errorMessage": "There was an error sending the message. Try again.",
         "sending": "Sending...",
         "send": "Send"
+    },
+    "system": {
+        "sessionExpired": "Your session has expired. Please log in again.",
+        "sessionReplaced": "Your session has been replaced by a new tab",
+        "serverMaintenance": "Server is under maintenance. New games cannot be created.",
+        "shutdownCheck": "The server is restarting...",
+        "maintenanceCancelled": "Maintenance has been cancelled",
+        "kicked": "You have been kicked from the room",
+        "kickedByHost": "You have been kicked from the room by the host",
+        "roomNotFound": "Room does not exist.",
+        "notInRoom": "You do not belong to this room.",
+        "gameNotFound": "Game does not exist.",
+        "hostLeftMatch": "The host has left the match",
+        "userBackToRoom": "{{name}} returned to the room",
+        "userJoined": "{{name}} joined the room",
+        "hostTransfer": "{{name}} left. {{newHost}} is now the host",
+        "userLeft": "{{name}} has left the game",
+        "userKicked": "{{name}} has been kicked from the room",
+        "disconnectedHostTransfer": "{{name}} disconnected. {{newHost}} is now the host",
+        "userDisconnected": "{{name}} disconnected",
+        "authenticating": "Authenticating",
+        "verifyingSession": "Verifying session..."
     }
 }

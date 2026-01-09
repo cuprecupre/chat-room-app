@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../hooks/useAuth";
 import { useSocket } from "../hooks/useSocket";
 import { useGameActions } from "../hooks/useGameActions";
@@ -199,6 +200,7 @@ function AppRoutes({
 }
 
 export function AppRouter() {
+    const { t } = useTranslation('common');
     const {
         user,
         loading,
@@ -239,8 +241,8 @@ export function AppRouter() {
                     <div className="flex flex-col items-center gap-3">
                         <Spinner size="md" />
                         <div>
-                            <p>Autenticando</p>
-                            <p className="text-sm text-neutral-400 mt-1">Verificando sesión...</p>
+                            <p>{t('system.authenticating', 'Autenticando')}</p>
+                            <p className="text-sm text-neutral-400 mt-1">{t('system.verifyingSession', 'Verificando sesión...')}</p>
                         </div>
                     </div>
                 </div>

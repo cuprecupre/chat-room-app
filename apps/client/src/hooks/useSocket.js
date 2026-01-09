@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { io } from "socket.io-client";
+import { useTranslation } from "react-i18next";
 import { auth } from "../lib/firebase";
 import { getToken, saveToken, isTokenExpired } from "../lib/tokenStorage";
 import { showToast } from "../lib/toast";
 
 export function useSocket(user) {
+    const { t } = useTranslation('common');
     const socketRef = useRef(null);
     const [connected, setConnected] = useState(false);
     const [gameState, setGameState] = useState(null);
@@ -12,8 +14,52 @@ export function useSocket(user) {
     const initialLoadRef = useRef(true);
     const isInvitationPendingRef = useRef(false);
     const hasLoggedWaitingDisplayName = useRef(false);
-    const [joinError, setJoinError] = useState(null); // Nuevo estado para errores de unión
-    const [shutdownCountdown, setShutdownCountdown] = useState(null); // Shutdown countdown state
+    const [joinError, setJoinError] = useState(null);
+    const [shutdownCountdown, setShutdownCountdown] = useState(null);
+
+    // Helper to translate server messages
+    const translateServerMessage = useCallback((message) => {
+        if (!message) return "";
+
+        // Exact matches
+        const exactMap = {
+            "La sala no existe.": "system.roomNotFound",
+            "No perteneces a esta sala.": "system.notInRoom",
+            "La partida no existe.": "system.gameNotFound",
+            "El anfitrión ha abandonado la partida": "system.hostLeftMatch",
+            "Tu sesión ha sido reemplazada por una nueva pestaña": "system.sessionReplaced",
+            "El servidor está en mantenimiento. No se pueden crear nuevas partidas.": "system.serverMaintenance",
+            "Has sido expulsado de la sala por el anfitrión": "system.kickedByHost",
+        };
+
+        if (exactMap[message]) {
+            return t(exactMap[message]);
+        }
+
+        // Regex matches for dynamic messages
+        const patterns = [
+            { regex: /^(.+) ha vuelto a la sala$/, key: "system.userBackToRoom" },
+            { regex: /^(.+) se unió a la sala$/, key: "system.userJoined" },
+            { regex: /^(.+) abandonó\. Ahora el anfitrión es (.+)$/, key: "system.hostTransfer", multi: true },
+            { regex: /^(.+) ha abandonado el juego$/, key: "system.userLeft" },
+            { regex: /^(.+) ha sido expulsado de la sala$/, key: "system.userKicked" },
+            { regex: /^(.+) se ha desconectado\. Ahora el anfitrión es (.+)$/, key: "system.disconnectedHostTransfer", multi: true },
+            { regex: /^(.+) se ha desconectado$/, key: "system.userDisconnected" },
+        ];
+
+        for (const pattern of patterns) {
+            const match = message.match(pattern.regex);
+            if (match) {
+                if (pattern.multi) {
+                    return t(pattern.key, { name: match[1], newHost: match[2] });
+                }
+                return t(pattern.key, { name: match[1] });
+            }
+        }
+
+        // Fallback: return original message if no translation found
+        return message;
+    }, [t]);
 
     useEffect(() => {
         // No conectar socket si el usuario no tiene displayName
@@ -151,7 +197,7 @@ export function useSocket(user) {
                         } catch (refreshError) {
                             console.error("❌ No se pudo refrescar el token:", refreshError);
                             // Mostrar mensaje al usuario
-                            showToast("Tu sesión expiró. Por favor, vuelve a iniciar sesión.");
+                            showToast(t('system.sessionExpired', "Tu sesión expiró. Por favor, vuelve a iniciar sesión."));
                         }
                     }
                 });
@@ -298,11 +344,13 @@ export function useSocket(user) {
                     console.error("Server error:", message);
 
                     // Si el error es sobre unirse a partida, guardarlo en el estado
+                    // NOTA: Usamos el mensaje original para la lógica de regex, 
+                    // pero mostramos el traducido al usuario
                     if (/no existe|no perteneces|partida en curso/i.test(message)) {
-                        if (isMounted) setJoinError(message);
+                        if (isMounted) setJoinError(translateServerMessage(message));
                     } else {
                         // Solo mostrar toast para otros errores
-                        showToast(message);
+                        showToast(translateServerMessage(message));
                     }
 
                     // MODIFICADO: NO borrar la URL si es "partida en curso" o "no existe"
@@ -320,7 +368,8 @@ export function useSocket(user) {
                 // Handle being kicked by host
                 socket.on("kicked", (data) => {
                     console.log("[Socket] Kicked from room:", data?.message);
-                    showToast(data?.message || "Has sido expulsado de la sala");
+                    const msg = data?.message || "Has sido expulsado de la sala";
+                    showToast(translateServerMessage(msg));
                     if (isMounted) {
                         setGameState(null);
                         const url = new URL(window.location);
@@ -331,7 +380,7 @@ export function useSocket(user) {
 
                 socket.on("session-replaced", (message) => {
                     console.log("Session replaced:", message);
-                    showToast(message);
+                    showToast(translateServerMessage(message));
                     // Clear game state and redirect to lobby
                     if (isMounted) {
                         setGameState(null);
@@ -345,7 +394,7 @@ export function useSocket(user) {
                 // Escuchar toasts del servidor (ej: cambio de host)
                 socket.on("toast", (message) => {
                     console.log("[Socket] Toast from server:", message);
-                    showToast(message);
+                    showToast(translateServerMessage(message));
                 });
 
                 // ============================================
@@ -357,7 +406,7 @@ export function useSocket(user) {
                     if (isMounted) {
                         setShutdownCountdown({
                             remainingSeconds: data.remainingSeconds,
-                            message: data.message,
+                            message: translateServerMessage(data.message),
                         });
                     }
                 });
@@ -371,7 +420,8 @@ export function useSocket(user) {
                         const url = new URL(window.location);
                         url.searchParams.delete("roomId");
                         window.history.replaceState({}, "", url.toString());
-                        showToast(data.message || "El servidor se está reiniciando...");
+                        const msg = data.message || "El servidor se está reiniciando...";
+                        showToast(translateServerMessage(msg));
                     }
                 });
 
@@ -379,7 +429,8 @@ export function useSocket(user) {
                     console.log("[Socket] Shutdown cancelled:", data);
                     if (isMounted) {
                         setShutdownCountdown(null);
-                        showToast(data.message || "El mantenimiento ha sido cancelado");
+                        const msg = data.message || "El mantenimiento ha sido cancelado";
+                        showToast(translateServerMessage(msg));
                     }
                 });
             } catch (error) {
@@ -405,7 +456,7 @@ export function useSocket(user) {
                 socketRef.current = null;
             }
         };
-    }, [user, user?.displayName]);
+    }, [user, user?.displayName, t, translateServerMessage]);
 
     const emit = useCallback((event, payload, callback) => {
         socketRef.current?.emit(event, payload, callback);

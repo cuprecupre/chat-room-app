@@ -76,5 +76,27 @@
         "errorMessage": "Hubo un error al enviar el mensaje. Inténtalo de nuevo.",
         "sending": "Enviando...",
         "send": "Enviar"
+    },
+    "system": {
+        "sessionExpired": "Tu sesión expiró. Por favor, vuelve a iniciar sesión.",
+        "sessionReplaced": "Tu sesión ha sido reemplazada por una nueva pestaña",
+        "serverMaintenance": "El servidor está en mantenimiento. No se pueden crear nuevas partidas.",
+        "shutdownCheck": "El servidor se está reiniciando...",
+        "maintenanceCancelled": "El mantenimiento ha sido cancelado",
+        "kicked": "Has sido expulsado de la sala",
+        "kickedByHost": "Has sido expulsado de la sala por el anfitrión",
+        "roomNotFound": "La sala no existe.",
+        "notInRoom": "No pertenece a esta sala.",
+        "gameNotFound": "La partida no existe.",
+        "hostLeftMatch": "El anfitrión ha abandonado la partida",
+        "userBackToRoom": "{{name}} ha vuelto a la sala",
+        "userJoined": "{{name}} se unió a la sala",
+        "hostTransfer": "{{name}} abandonó. Ahora el anfitrión es {{newHost}}",
+        "userLeft": "{{name}} ha abandonado el juego",
+        "userKicked": "{{name}} ha sido expulsado de la sala",
+        "disconnectedHostTransfer": "{{name}} se ha desconectado. Ahora el anfitrión es {{newHost}}",
+        "userDisconnected": "{{name}} se ha desconectado",
+        "authenticating": "Autenticando",
+        "verifyingSession": "Verificando sesión..."
     }
 }
