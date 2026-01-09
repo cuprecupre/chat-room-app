@@ -34,6 +34,7 @@ i18n
     .init({
         resources,
         fallbackLng: 'es',
+        supportedLngs: ['es', 'en'], // Crucial for path detection to ignore non-language paths (e.g. /lobby)
         defaultNS: 'common',
         ns: ['common', 'landing', 'game', 'rules'],
 
