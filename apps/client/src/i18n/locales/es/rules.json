@@ -1,0 +1,74 @@
+{
+    "meta": {
+        "title": "Reglas de El Impostor - Cómo jugar",
+        "description": "Aprende a jugar El Impostor. Reglas completas, sistema de puntuación y consejos."
+    },
+    "introduction": {
+        "title": "Introducción",
+        "description": "es un juego en el que en cada partida, los jugadores deberán descubrir quién entre ellos es el",
+        "impostor": "Impostor",
+        "description2": ": un infiltrado que desconoce una palabra secreta que todos los demás conocen, y que debe pasar desapercibido mientras intenta deducirla para ganar.",
+        "recommendation": "Recomendación:",
+        "recommendationText": "Se requiere un mínimo de 4 jugadores. Es ideal jugarlo de manera presencial o por videollamada para facilitar la ronda de pistas y el debate."
+    },
+    "objective": {
+        "title": "Objetivo",
+        "description": "El objetivo depende de tu rol. Las partidas duran un máximo de",
+        "rounds": "3 rondas",
+        "asFriend": "Como Amigo",
+        "asFriendText": "Descubrir al Impostor votándolo en la ronda de eliminación. Cuantos más votos correctos acumules, más puntos ganas.",
+        "asImpostor": "Como Impostor",
+        "asImpostorText": "Sobrevivir las 3 rondas sin ser descubierto. Si sobrevives a la tercera ronda, ganas la partida."
+    },
+    "requirements": {
+        "title": "¿Qué necesitas para jugar?",
+        "phone": "Solo necesitas tu móvil para mantenerte conectado a la partida.",
+        "noDownload": "No es necesario descargar nada",
+        "browser": ", juegas directamente en el navegador.",
+        "communication": "La comunicación de las pistas y el debate se hace de manera",
+        "inPerson": "presencial o por videollamada"
+    },
+    "preparation": {
+        "title": "Preparación",
+        "step1Host": "Anfitrión:",
+        "step1Text": "Un jugador entra a la web, inicia sesión y crea la partida. Elige si el Impostor tendrá una Ayuda.",
+        "step2Invite": "Invitación:",
+        "step2Text": "El Anfitrión comparte el enlace de invitación con el resto de jugadores.",
+        "step3Register": "Registro:",
+        "step3Text": "Los demás jugadores entran al enlace, inician sesión y se unen automáticamente a la sala.",
+        "step4Start": "Inicio:",
+        "step4Text": "Cuando todos están en la sala, el Anfitrión comienza el juego."
+    },
+    "gameplay": {
+        "title": "Desarrollo de la Partida",
+        "step1Title": "Reparto de Cartas",
+        "step1Text": "La app asigna roles y palabra secreta.",
+        "step1Warning": "¡No le digas a nadie qué carta te ha tocado!",
+        "step1Friends": "Amigos:",
+        "step1FriendsText": "Ven la palabra secreta.",
+        "step1Impostor": "Impostor:",
+        "step1ImpostorText": "No ve la palabra. Si la ayuda está activada, verá la categoría a la que pertenece.",
+        "step2Title": "Ronda de Pistas",
+        "step2Text": "Cuando sea tu turno, debes decir una pista relacionada en voz alta con la palabra.",
+        "step2Warning": "No debe ser ni muy obvia (para no ayudar al Impostor) ni muy difícil (para no parecer sospechoso).",
+        "step3Title": "Debate y Votación",
+        "step3Text": "Una vez todos han dado su pista, se inicia la votación. Cuando todos votan, se revela el resultado.",
+        "step4Title": "Resolución",
+        "step4Text": "El jugador con más votos es eliminado de la partida y ya no juega la siguiente ronda.",
+        "step4IfImpostor": "Si se elimina al Impostor:",
+        "step4IfImpostorText": "La partida termina y el Impostor pierde.",
+        "step4IfFriend": "Si se elimina a un Amigo:",
+        "step4IfFriendText": "El Impostor sobrevive, gana puntos y la partida continúa una ronda más."
+    },
+    "scoring": {
+        "title": "Sistema de Puntuación",
+        "friends": "Amigos",
+        "impostor": "Impostor",
+        "perRoundVote": "Por cada ronda que votas al impostor:",
+        "bonusFriend": "Bonus (votas bien todas las rondas y el impostor pierde):",
+        "perRoundSurvive": "Por cada ronda que sobrevives:",
+        "bonusImpostor": "Bonus (sobrevives las 3 rondas):",
+        "tiesTitle": "Empates:",
+        "tiesText": "Si hay empate en la votación, nadie es eliminado y el Impostor recibe sus puntos de esa ronda."
+    }
+}

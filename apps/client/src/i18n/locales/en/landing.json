@@ -1,0 +1,65 @@
+{
+    "meta": {
+        "title": "The Impostor Game Online - Play Free No Download",
+        "description": "Find the impostor among your friends. Hidden role game online, free and no download. Create a room, invite your friends and start playing in seconds."
+    },
+    "hero": {
+        "playNowTo": "Play now",
+        "title": "The Impostor Online Free",
+        "titleLine2": "with your friends.",
+        "tagline": "Find out who's lying.",
+        "playButton": "Play now",
+        "findPlayersDiscord": "Find players on Discord",
+        "subtitle": "Start a game, invite your friends and dive into the best social deduction game."
+    },
+    "discordBanner": {
+        "text": "Now you can find players on our Discord server"
+    },
+    "features": {
+        "viralGame": "The viral game from TikTok and Instagram. Who is the impostor?",
+        "howToPlay": "How to Play The Impostor",
+        "howToPlaySubtitle": "Easy to learn hidden role mechanics. Find out who's lying in quick deduction rounds.",
+        "step1Title": "Get your word",
+        "step1Description": "Everyone gets the same secret word, except the",
+        "step1Impostor": "Impostor",
+        "step1End": ". They don't know anything, but must pretend they do.",
+        "step2Title": "Describe and Debate",
+        "step2Description": "Each player gives a clue about the word. The Impostor must listen carefully and lie to avoid being caught.",
+        "step3Title": "Vote and Win",
+        "step3Description": "Who's suspicious? Vote to eliminate them. If the Impostor is caught, friends win. If they escape, the Impostor wins!",
+        "seeFullRules": "See full rules"
+    },
+    "selling": {
+        "bestGameTitle": "The best game for",
+        "bestGameTitleLine2": "online gatherings",
+        "bestGameDescription": "Play directly in your web browser. No apps to download, no installation needed, works on all devices.",
+        "elImpostor": "The Impostor",
+        "bestGameEnd": "is the fastest way to start having fun with your group.",
+        "quickGames": "Quick 5-10 minute games",
+        "noDirectors": "No game master needed",
+        "freeMinAds": "Completely free with minimal ads"
+    },
+    "faq": {
+        "title": "Frequently Asked Questions",
+        "subtitle": "Everything you need to know before you start lying.",
+        "q1": "What is The Impostor?",
+        "a1": "It's a social deduction game where everyone receives a secret word except one: the Impostor. The goal? Find them before they figure out the word.",
+        "q2": "Do I need to install anything?",
+        "a2": "No. The game works directly in your phone, tablet or PC browser. You just need an internet connection.",
+        "q3": "Is it free?",
+        "a3": "Yes, 100% free. No hidden purchases. We support the game with non-intrusive ads.",
+        "q4": "How many players can play?",
+        "a4": "Minimum 4 players are needed for the game to work well. We recommend groups of 4 to 10 people.",
+        "q5": "Can we play remotely?",
+        "a5": "Of course! You can use a video call (Zoom, Meet, Discord) to talk and see each other, and use the app to manage cards and voting.",
+        "q6": "Where can I see the full rules?",
+        "a6": "You can check all the game rules on our",
+        "a6RulesLink": "rules page",
+        "a6End": ". There you'll find detailed explanations on how to play, scoring and tips."
+    },
+    "cta": {
+        "readyToPlay": "Ready to play?",
+        "ctaDescription": "Join now and show off your deception skills. No installation needed.",
+        "startFreeGame": "Start Free Game"
+    }
+}

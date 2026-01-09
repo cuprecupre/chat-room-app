@@ -1,0 +1,47 @@
+{
+    "nav": {
+        "howToPlay": "How to Play",
+        "rules": "Rules",
+        "playNow": "Play Now"
+    },
+    "buttons": {
+        "play": "Play",
+        "playAgain": "Play another game",
+        "continue": "Continue",
+        "close": "Close",
+        "copy": "Copy",
+        "copied": "Copied!",
+        "leave": "Leave",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "understood": "Got it",
+        "startGame": "Start game",
+        "nextRound": "Next round"
+    },
+    "auth": {
+        "authenticating": "Authenticating",
+        "verifyingSession": "Verifying session...",
+        "continueWithGoogle": "Continue with Google",
+        "continueAsGuest": "Continue as guest",
+        "logout": "Log out"
+    },
+    "errors": {
+        "generic": "An error occurred",
+        "connection": "Connection error",
+        "tryAgain": "Try again"
+    },
+    "labels": {
+        "free": "Free",
+        "noInstall": "No download",
+        "multiplayer": "Multiplayer",
+        "players": "players",
+        "round": "Round",
+        "points": "pts"
+    },
+    "footer": {
+        "copyright": "The Impostor © 2025",
+        "rules": "Rules",
+        "discord": "Discord",
+        "contact": "Contact"
+    }
+}

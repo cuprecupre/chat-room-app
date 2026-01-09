@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "./ui/Button";
 import { Spinner } from "./ui/Spinner";
+import { LanguageSelector } from "./ui/LanguageSelector";
 
 // Firebase Storage CDN URLs
 const CDN_BASE = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2F";
@@ -26,10 +28,15 @@ export function LandingPage({
     onOpenInstructions,
     onOpenFeedback,
 }) {
+    const { t, i18n } = useTranslation('landing');
+    const { t: tc } = useTranslation('common');
     const featuresRef = useRef(null);
     const [currentReview, setCurrentReview] = useState(0);
     const [openFaq, setOpenFaq] = useState(null);
     const navigate = useNavigate();
+
+    // Get rules path based on current language
+    const rulesPath = i18n.language === 'en' ? '/en/rules' : '/reglas';
 
     const toggleFaq = (index) => {
         setOpenFaq(openFaq === index ? null : index);
@@ -75,35 +82,34 @@ export function LandingPage({
 
     const faqs = [
         {
-            question: "¿Qué es El Impostor?",
-            answer: "Es un juego de deducción social donde todos reciben una palabra secreta excepto uno: el Impostor. ¿El objetivo? Descubrirlo antes de que él descubra la palabra.",
+            question: t('faq.q1'),
+            answer: t('faq.a1'),
         },
         {
-            question: "¿Necesito instalar algo?",
-            answer: "No. El juego funciona directamente en el navegador de tu móvil, tablet o PC. Solo necesitas conexión a internet.",
+            question: t('faq.q2'),
+            answer: t('faq.a2'),
         },
         {
-            question: "¿Es gratis?",
-            answer: "Sí, 100% gratuito. Sin compras ocultas. Mantenemos el juego con publicidad no intrusiva.",
+            question: t('faq.q3'),
+            answer: t('faq.a3'),
         },
         {
-            question: "¿Cuántos jugadores pueden jugar?",
-            answer: "Mínimo 4 jugadores son necesarios para que la dinámica funcione bien. Recomendamos grupos de entre 4 y 10 personas.",
+            question: t('faq.q4'),
+            answer: t('faq.a4'),
         },
         {
-            question: "¿Podemos jugar a distancia?",
-            answer: "¡Claro! Podéis usar una videollamada (Zoom, Meet, Discord) para hablar y veros las caras, y usar la app para gestionar las cartas y votaciones.",
+            question: t('faq.q5'),
+            answer: t('faq.a5'),
         },
         {
-            question: "¿Dónde puedo ver las reglas completas?",
+            question: t('faq.q6'),
             answer: (
                 <>
-                    Puedes consultar todas las reglas del juego en nuestra{" "}
-                    <Link to="/reglas" className="text-orange-400 hover:text-orange-300 underline">
-                        página de reglas
+                    {t('faq.a6')}{" "}
+                    <Link to={rulesPath} className="text-orange-400 hover:text-orange-300 underline">
+                        {t('faq.a6RulesLink')}
                     </Link>
-                    . Ahí encontrarás explicaciones detalladas sobre cómo jugar, puntuación y
-                    consejos.
+                    {t('faq.a6End')}
                 </>
             ),
         },
@@ -140,7 +146,7 @@ export function LandingPage({
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419z" />
                     </svg>
-                    Ahora puedes buscar jugadores en nuestro servidor de Discord
+                    {t('discordBanner.text')}
                     <svg className="w-3 h-3 md:w-4 md:h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
@@ -155,7 +161,7 @@ export function LandingPage({
                 >
                     <img src={heroImg} alt="Logo El Impostor" className="w-8 h-8 rounded-full" />
                     <span className="text-xl font-normal font-serif tracking-wide text-neutral-100">
-                        El Impostor
+                        {i18n.language === 'en' ? 'The Impostor' : 'El Impostor'}
                     </span>
                 </div>
                 <div className="hidden md:flex gap-6 items-center">
@@ -163,16 +169,17 @@ export function LandingPage({
                         onClick={scrollToFeatures}
                         className="text-sm font-medium text-neutral-400 hover:text-white transition-colors"
                     >
-                        Cómo se juega
+                        {tc('nav.howToPlay')}
                     </button>
                     <Link
-                        to="/reglas"
+                        to={rulesPath}
                         className="text-sm font-medium text-neutral-400 hover:text-white transition-colors"
                     >
-                        Reglas
+                        {tc('nav.rules')}
                     </Link>
                 </div>
-                <div>
+                <div className="flex items-center gap-3">
+                    <LanguageSelector />
                     <Button
                         onClick={onGoToGuestAuth}
                         variant="primary"
@@ -180,7 +187,7 @@ export function LandingPage({
                         className="w-auto !px-6 !py-1 !h-9 text-sm disabled:opacity-50 disabled:cursor-not-allowed rounded-full"
                         disabled={isLoading}
                     >
-                        Jugar Ahora
+                        {tc('nav.playNow')}
                     </Button>
                 </div>
             </nav>
@@ -206,13 +213,13 @@ export function LandingPage({
 
                     <h1 className="flex flex-col items-center gap-2 md:gap-3 animate-fadeIn animate-delay-400 drop-shadow-2xl">
                         <span className="text-xl md:text-2xl font-sans font-normal text-neutral-400">
-                            Juega ahora a
+                            {t('hero.playNowTo')}
                         </span>
                         <span className="text-4xl md:text-6xl/tight lg:text-6xl/tight font-serif font-normal text-white">
-                            El Impostor Online Gratis<br />con tus amigos.
+                            {t('hero.title')}<br />{t('hero.titleLine2')}
                         </span>
                         <span className="text-xl md:text-3xl lg:text-4xl font-serif font-normal tracking-tight mt-1 bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600">
-                            Descubre quién miente.
+                            {t('hero.tagline')}
                         </span>
                     </h1>
 
@@ -225,7 +232,7 @@ export function LandingPage({
                                 size="lg"
                                 className="px-8 w-full h-14 text-base rounded-full"
                             >
-                                <span className="align-middle font-semibold">Jugar ahora</span>
+                                <span className="align-middle font-semibold">{t('hero.playButton')}</span>
                             </Button>
                         </div>
                         <div className="w-full">
@@ -274,7 +281,7 @@ export function LandingPage({
                                     )}
                                 </span>
                                 <span className="align-middle font-semibold">
-                                    Continuar con Google
+                                    {tc('auth.continueWithGoogle')}
                                 </span>
                             </Button>
                         </div>
@@ -297,15 +304,14 @@ export function LandingPage({
                                 <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419z" />
                             </svg>
                             <span className="text-white font-semibold transition-colors">
-                                Buscar jugadores en Discord
+                                {t('hero.findPlayersDiscord')}
                             </span>
                         </a>
                     </div>
 
                     <div className="space-y-2 mt-8">
                         <p className="text-base md:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed animate-fadeIn animate-delay-500 font-light">
-                            Inicia una partida, invita a tus amigos y sumérgete en el mejor juego de
-                            deducción&nbsp;social.
+                            {t('hero.subtitle')}
                         </p>
                     </div>
 
@@ -359,7 +365,7 @@ export function LandingPage({
                                     d="M13 10V3L4 14h7v7l9-11h-7z"
                                 />
                             </svg>
-                            Sin instalación
+                            {tc('labels.noInstall')}
                         </span>
                         <span className="flex items-center gap-1.5">
                             <svg
@@ -375,7 +381,7 @@ export function LandingPage({
                                     d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                                 />
                             </svg>
-                            Multijugador
+                            {tc('labels.multiplayer')}
                         </span>
                     </div>
                 </div>
@@ -392,18 +398,17 @@ export function LandingPage({
 
                 <div className="max-w-4xl mx-auto text-center mb-20 relative z-10">
                     <h2 className="text-xl md:text-2xl text-orange-400 font-sans font-normal leading-relaxed animate-fadeIn">
-                        El juego viral de TikTok e Instagram. ¿Quién es el impostor?
+                        {t('features.viralGame')}
                     </h2>
                 </div>
 
                 <div className="max-w-7xl mx-auto relative z-10">
                     <div className="text-center mb-20 space-y-6">
                         <h2 className="text-3xl md:text-5xl font-serif font-normal text-neutral-100">
-                            Cómo se juega a El Impostor
+                            {t('features.howToPlay')}
                         </h2>
                         <p className="text-xl text-neutral-400 max-w-2xl mx-auto">
-                            Una mecánica de roles ocultos fácil de aprender. Descubre quién miente
-                            en partidas rápidas de deducción.
+                            {t('features.howToPlaySubtitle')}
                         </p>
                     </div>
 
@@ -431,14 +436,14 @@ export function LandingPage({
                                     </span>
                                 </div>
                                 <h3 className="text-xl md:text-2xl font-sans font-semibold mb-4 text-white">
-                                    Recibe tu palabra
+                                    {t('features.step1Title')}
                                 </h3>
                                 <p className="text-neutral-400 leading-relaxed text-lg">
-                                    Todos reciben la misma palabra secreta, excepto el{" "}
+                                    {t('features.step1Description')}{" "}
                                     <strong className="text-orange-400 font-medium">
-                                        Impostor
+                                        {t('features.step1Impostor')}
                                     </strong>
-                                    . Él no sabe nada, pero debe fingir que sí.
+                                    {t('features.step1End')}
                                 </p>
                             </div>
                         </div>
@@ -466,11 +471,10 @@ export function LandingPage({
                                     </span>
                                 </div>
                                 <h3 className="text-xl md:text-2xl font-sans font-semibold mb-4 text-white">
-                                    Describe y Debate
+                                    {t('features.step2Title')}
                                 </h3>
                                 <p className="text-neutral-400 leading-relaxed text-lg">
-                                    Cada jugador da una pista sobre la palabra. El Impostor debe
-                                    escuchar atentamente y mentir para no ser descubierto.
+                                    {t('features.step2Description')}
                                 </p>
                             </div>
                         </div>
@@ -498,11 +502,10 @@ export function LandingPage({
                                     </span>
                                 </div>
                                 <h3 className="text-xl md:text-2xl font-sans font-semibold mb-4 text-white">
-                                    Vota y Gana
+                                    {t('features.step3Title')}
                                 </h3>
                                 <p className="text-neutral-400 leading-relaxed text-lg">
-                                    ¿Quién es el sospechoso? Vota para expulsarlo. Si atrapan al
-                                    Impostor, ganan los amigos. ¡Si escapa, gana él!
+                                    {t('features.step3Description')}
                                 </p>
                             </div>
                         </div>
@@ -511,10 +514,10 @@ export function LandingPage({
                     {/* Link to Rules */}
                     <div className="text-center mt-12">
                         <Link
-                            to="/reglas"
+                            to={rulesPath}
                             className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors text-lg"
                         >
-                            <span>Ver reglas completas</span>
+                            <span>{t('features.seeFullRules')}</span>
                             <svg
                                 className="w-5 h-5"
                                 fill="none"
@@ -539,29 +542,24 @@ export function LandingPage({
                     <div className="flex flex-col md:flex-row items-center gap-16">
                         <div className="w-full md:w-1/2 space-y-8 relative z-10">
                             <h2 className="text-3xl md:text-5xl font-serif font-normal leading-tight">
-                                El mejor juego para
+                                {t('selling.bestGameTitle')}
                                 <br />
-                                reuniones online
+                                {t('selling.bestGameTitleLine2')}
                             </h2>
                             <p className="text-neutral-400 text-xl leading-relaxed">
-                                Juega directamente en tu navegador web. Sin descargar apps, sin
-                                instalaciones y compatible con todos los móviles.{" "}
-                                <strong>El Impostor</strong> es la forma más rápida de empezar a
-                                divertirse en grupo.
+                                {t('selling.bestGameDescription')}{" "}
+                                <strong>{t('selling.elImpostor')}</strong> {t('selling.bestGameEnd')}
                             </p>
 
                             <ul className="space-y-3 pt-2">
                                 <li className="flex items-center gap-3 text-neutral-300">
-                                    <span className="text-green-500">✓</span> Partidas rápidas de
-                                    5-10 minutos
+                                    <span className="text-green-500">✓</span> {t('selling.quickGames')}
                                 </li>
                                 <li className="flex items-center gap-3 text-neutral-300">
-                                    <span className="text-green-500">✓</span> Sin directores de
-                                    juego
+                                    <span className="text-green-500">✓</span> {t('selling.noDirectors')}
                                 </li>
                                 <li className="flex items-center gap-3 text-neutral-300">
-                                    <span className="text-green-500">✓</span> Totalmente gratis y
-                                    con publicidad mínima
+                                    <span className="text-green-500">✓</span> {t('selling.freeMinAds')}
                                 </li>
                             </ul>
                         </div>
@@ -636,10 +634,10 @@ export function LandingPage({
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-serif font-normal mb-4 text-white">
-                            Preguntas Frecuentes
+                            {t('faq.title')}
                         </h2>
                         <p className="text-neutral-400">
-                            Todo lo que necesitas saber antes de empezar a mentir.
+                            {t('faq.subtitle')}
                         </p>
                     </div>
 
@@ -707,11 +705,10 @@ export function LandingPage({
                         </div>
                     </div>
                     <h2 className="text-3xl md:text-5xl font-serif font-normal mb-4 tracking-tight text-white">
-                        ¿Listo para jugar?
+                        {t('cta.readyToPlay')}
                     </h2>
                     <p className="text-lg text-neutral-400 max-w-xl mx-auto">
-                        Únete ahora y demuestra tus habilidades de decepción. No necesitas instalar
-                        nada.
+                        {t('cta.ctaDescription')}
                     </p>
                     <div className="flex justify-center pt-4">
                         <Button
@@ -721,7 +718,7 @@ export function LandingPage({
                             className="px-8 h-12 text-base font-semibold transform hover:scale-105 transition-all duration-300 rounded-full w-auto"
                         >
                             <span className="align-middle font-semibold">
-                                Empezar Partida Gratis
+                                {t('cta.startFreeGame')}
                             </span>
                         </Button>
                     </div>
@@ -733,15 +730,15 @@ export function LandingPage({
                 <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
                     <div className="flex items-center">
                         <span className="text-neutral-500 text-sm font-serif">
-                            El Impostor © 2025
+                            {tc('footer.copyright')}
                         </span>
                     </div>
                     <div className="flex gap-8 text-sm text-neutral-500">
                         <Link
-                            to="/reglas"
+                            to={rulesPath}
                             className="hover:text-neutral-300 transition-colors"
                         >
-                            Reglas
+                            {tc('footer.rules')}
                         </Link>
                         <a
                             href="https://discord.gg/2N2tx7mjUE"
@@ -749,13 +746,13 @@ export function LandingPage({
                             rel="noopener noreferrer"
                             className="hover:text-neutral-300 transition-colors"
                         >
-                            Discord
+                            {tc('footer.discord')}
                         </a>
                         <button
                             onClick={onOpenFeedback}
                             className="hover:text-neutral-300 transition-colors"
                         >
-                            Contacto
+                            {tc('footer.contact')}
                         </button>
                     </div>
                 </div>

@@ -1,0 +1,94 @@
+{
+    "gameOver": {
+        "friendsWin": "Friends win the game",
+        "impostorWin": "The impostor wins the game",
+        "impostorCaught": "The impostor was caught",
+        "impostorWas": "The impostor was",
+        "secretWord": "Secret word",
+        "unknown": "Unknown",
+        "leaderboard": "Leaderboard",
+        "howPointsWork": "How are points calculated?",
+        "waitingForHost": "Waiting for",
+        "toStartAnother": "to start another game"
+    },
+    "scoring": {
+        "title": "Scoring System",
+        "ifFriend": "If you're a Friend",
+        "ifImpostor": "If you're the Impostor",
+        "perRoundVoteImpostor": "For each round you vote for the impostor",
+        "bonusFriend": "Bonus (if you vote correctly all rounds played and impostor loses)",
+        "perRoundSurvive": "For each round you survive",
+        "bonusImpostor": "Bonus (if you survive all 3 rounds)"
+    },
+    "lobby": {
+        "playersConnected": "players connected",
+        "waitingForPlayers": "Waiting for players",
+        "minPlayers": "Minimum 4 players to start",
+        "inviteFriends": "Invite your friends!",
+        "shareLink": "Share this link:",
+        "copyLink": "Copy link",
+        "gameCode": "Game code:",
+        "copyCode": "Copy code",
+        "impostorHelp": "Impostor help",
+        "impostorHelpOn": "The impostor sees the category",
+        "impostorHelpOff": "The impostor sees nothing",
+        "waitingForHostToStart": "Waiting for host to start",
+        "youAreHost": "You are the host",
+        "startGame": "Start game"
+    },
+    "playing": {
+        "round": "Round",
+        "yourTurn": "Your turn",
+        "giveClue": "Give a clue about the word",
+        "waitingFor": "Waiting for",
+        "toGiveClue": "to give a clue",
+        "vote": "Vote",
+        "voteDescription": "Who do you think is the impostor?",
+        "voted": "Voted",
+        "waitingVotes": "Waiting for votes",
+        "youAreImpostor": "You are the Impostor!",
+        "youAreFriend": "You are a Friend",
+        "secretWord": "The secret word is",
+        "category": "Category:",
+        "tryToBlend": "Try to blend in and don't get caught!"
+    },
+    "roundResult": {
+        "eliminated": "was eliminated",
+        "tie": "Tie! No one was eliminated",
+        "impostorSurvives": "The impostor survives!",
+        "nextRound": "Next round",
+        "continueToNext": "Continue to next round"
+    },
+    "modals": {
+        "leaveMatch": {
+            "title": "Leave game?",
+            "description": "If you leave, you won't be able to rejoin this game.",
+            "confirm": "Leave game"
+        },
+        "leaveRoom": {
+            "title": "Leave room?",
+            "description": "You will return to the main menu.",
+            "confirm": "Leave room"
+        },
+        "kickPlayer": {
+            "title": "Kick player?",
+            "description": "This player will be removed from the room.",
+            "confirm": "Kick"
+        }
+    },
+    "spectator": {
+        "title": "You are spectating",
+        "description": "You joined after the game started. Wait for the next game."
+    },
+    "hostLeft": {
+        "title": "The host left",
+        "description": "The game has ended because the host left.",
+        "redirecting": "Redirecting to lobby..."
+    },
+    "waitingNextGame": {
+        "title": "Game in progress",
+        "description": "A game is currently in progress. You'll join when it ends.",
+        "playersInGame": "Players in game"
+    },
+    "disconnectedPlayer": "Disconnected player"
+}

@@ -1,0 +1,47 @@
+{
+    "nav": {
+        "howToPlay": "Cómo se juega",
+        "rules": "Reglas",
+        "playNow": "Jugar Ahora"
+    },
+    "buttons": {
+        "play": "Jugar",
+        "playAgain": "Jugar otra partida",
+        "continue": "Continuar",
+        "close": "Cerrar",
+        "copy": "Copiar",
+        "copied": "¡Copiado!",
+        "leave": "Salir",
+        "cancel": "Cancelar",
+        "confirm": "Confirmar",
+        "understood": "Entendido",
+        "startGame": "Comenzar partida",
+        "nextRound": "Siguiente ronda"
+    },
+    "auth": {
+        "authenticating": "Autenticando",
+        "verifyingSession": "Verificando sesión...",
+        "continueWithGoogle": "Continuar con Google",
+        "continueAsGuest": "Continuar como invitado",
+        "logout": "Cerrar sesión"
+    },
+    "errors": {
+        "generic": "Ha ocurrido un error",
+        "connection": "Error de conexión",
+        "tryAgain": "Inténtalo de nuevo"
+    },
+    "labels": {
+        "free": "Gratis",
+        "noInstall": "Sin instalación",
+        "multiplayer": "Multijugador",
+        "players": "jugadores",
+        "round": "Ronda",
+        "points": "pts"
+    },
+    "footer": {
+        "copyright": "El Impostor © 2025",
+        "rules": "Reglas",
+        "discord": "Discord",
+        "contact": "Contacto"
+    }
+}

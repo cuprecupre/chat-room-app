@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "./ui/Button";
 import { Avatar } from "./ui/Avatar";
 import { PlayerList } from "./game/PlayerList";
@@ -8,6 +9,8 @@ import { Info } from "lucide-react";
 import confetti from "canvas-confetti";
 
 export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
+    const { t } = useTranslation('game');
+    const { t: tc } = useTranslation('common');
     const [showScoringModal, setShowScoringModal] = useState(false);
 
     // Confetti effect when game ends
@@ -49,7 +52,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
         const formerPlayer = state.formerPlayers?.[uid];
         return {
             uid,
-            name: formerPlayer?.name || "Jugador desconectado",
+            name: formerPlayer?.name || t('disconnectedPlayer'),
             photoURL: formerPlayer?.photoURL || null,
         };
     });
@@ -63,16 +66,16 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
     let winnerLabel, winnerTitle, winnerSubtitle;
     if (state.winner === "Empate") {
         winnerLabel = null;
-        winnerTitle = "Los amigos ganan la partida";
-        winnerSubtitle = "El impostor fue descubierto";
+        winnerTitle = t('gameOver.friendsWin');
+        winnerSubtitle = t('gameOver.impostorCaught');
     } else if (impostorWon) {
         winnerLabel = null;
-        winnerTitle = "El impostor gana la partida";
+        winnerTitle = t('gameOver.impostorWin');
         winnerSubtitle = null;
     } else {
         winnerLabel = null;
-        winnerTitle = "Los amigos ganan la partida";
-        winnerSubtitle = "El impostor fue descubierto";
+        winnerTitle = t('gameOver.friendsWin');
+        winnerSubtitle = t('gameOver.impostorCaught');
     }
 
     return (
@@ -102,7 +105,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                         {/* Impostor Column */}
                         <div className="flex flex-col items-center justify-center px-4">
                             <p className="text-xs uppercase tracking-wider text-neutral-400 mb-3">
-                                El impostor era
+                                {t('gameOver.impostorWas')}
                             </p>
                             {impostor ? (
                                 <div className="flex items-center justify-center w-full">
@@ -111,7 +114,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                                     </span>
                                 </div>
                             ) : (
-                                <span className="text-neutral-500">Desconocido</span>
+                                <span className="text-neutral-500">{t('gameOver.unknown')}</span>
                             )}
                         </div>
 
@@ -123,7 +126,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
 
                                 <div className="flex flex-col items-center justify-center px-4">
                                     <p className="text-xs uppercase tracking-wider text-neutral-400 mb-3">
-                                        Palabra secreta
+                                        {t('gameOver.secretWord')}
                                     </p>
                                     <p className="text-xl text-white font-medium text-center break-words leading-tight max-w-full capitalize">
                                         {state.secretWord}
@@ -134,10 +137,9 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                     </div>
                 </div>
 
-                {/* Leaderboard */}
                 <div className="w-full">
                     <h2 className="text-2xl font-serif text-white mb-6 text-center">
-                        Tabla de Posiciones
+                        {t('gameOver.leaderboard')}
                     </h2>
                     <div className="rounded-2xl p-1">
                         <PlayerList
@@ -153,7 +155,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                             className="mt-6 inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"
                         >
                             <Info className="w-5 h-5" />
-                            ¿Cómo se calculan los puntos?
+                            {t('gameOver.howPointsWork')}
                         </button>
                     </div>
                 </div>
@@ -163,29 +165,28 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
             <Modal
                 isOpen={showScoringModal}
                 onClose={() => setShowScoringModal(false)}
-                title="Sistema de Puntuación"
+                title={t('scoring.title')}
                 size="lg"
             >
                 <div className="space-y-8">
                     {/* Amigo */}
                     <div className="space-y-4">
-                        <h3 className="text-xl font-serif text-orange-400">Si eres Amigo</h3>
+                        <h3 className="text-xl font-serif text-orange-400">{t('scoring.ifFriend')}</h3>
                         <ul className="space-y-3">
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">
-                                    Por cada ronda que votas al impostor
+                                    {t('scoring.perRoundVoteImpostor')}
                                 </span>
                                 <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium whitespace-nowrap">
-                                    +2 pts
+                                    +2 {tc('labels.points')}
                                 </span>
                             </li>
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">
-                                    <span className="text-yellow-400">★</span> Bonus (si votas bien
-                                    todas las rondas jugadas y el impostor pierde)
+                                    <span className="text-yellow-400">★</span> {t('scoring.bonusFriend')}
                                 </span>
                                 <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium whitespace-nowrap">
-                                    10 pts
+                                    10 {tc('labels.points')}
                                 </span>
                             </li>
                         </ul>
@@ -195,23 +196,22 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
 
                     {/* Impostor */}
                     <div className="space-y-4">
-                        <h3 className="text-xl font-serif text-orange-400">Si eres Impostor</h3>
+                        <h3 className="text-xl font-serif text-orange-400">{t('scoring.ifImpostor')}</h3>
                         <ul className="space-y-3">
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">
-                                    Por cada ronda que sobrevives
+                                    {t('scoring.perRoundSurvive')}
                                 </span>
                                 <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium whitespace-nowrap">
-                                    +2 pts
+                                    +2 {tc('labels.points')}
                                 </span>
                             </li>
                             <li className="flex justify-between items-center">
                                 <span className="text-neutral-300">
-                                    <span className="text-yellow-400">★</span> Bonus (si sobrevives las
-                                    3 rondas)
+                                    <span className="text-yellow-400">★</span> {t('scoring.bonusImpostor')}
                                 </span>
                                 <span className="bg-white/5 px-3 py-1 rounded text-orange-400 font-medium whitespace-nowrap">
-                                    10 pts
+                                    10 {tc('labels.points')}
                                 </span>
                             </li>
                         </ul>
@@ -223,7 +223,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                         size="md"
                         className="w-full"
                     >
-                        Entendido
+                        {tc('buttons.understood')}
                     </Button>
                 </div>
             </Modal>
@@ -245,7 +245,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                             size="lg"
                             className="w-full max-w-sm text-lg py-6 mb-6 mx-6"
                         >
-                            Jugar otra partida
+                            {tc('buttons.playAgain')}
                         </Button>
                     ) : (
                         <div className="w-full bg-orange-900 px-3 py-2 shadow-2xl animate-slideUp flex items-center justify-center min-h-[64px]">
@@ -269,10 +269,10 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                     ></path>
                                 </svg>
-                                Esperando a que <span className="text-orange-400 font-bold">
+                                {t('gameOver.waitingForHost')} <span className="text-orange-400 font-bold">
                                     {state.players.find((p) => p.uid === state.hostId)?.name ||
-                                        "el anfitrión"}
-                                </span> inicie otra partida
+                                        "host"}
+                                </span> {t('gameOver.toStartAnother')}
                             </p>
                         </div>
                     )}

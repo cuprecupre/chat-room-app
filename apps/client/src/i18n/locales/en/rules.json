@@ -1,0 +1,74 @@
+{
+    "meta": {
+        "title": "The Impostor Rules - How to Play",
+        "description": "Learn how to play The Impostor. Complete rules, scoring system and tips."
+    },
+    "introduction": {
+        "title": "Introduction",
+        "description": "is a game where in each match, players must discover who among them is the",
+        "impostor": "Impostor",
+        "description2": ": an infiltrator who doesn't know a secret word that everyone else knows, and must blend in while trying to figure it out to win.",
+        "recommendation": "Recommendation:",
+        "recommendationText": "A minimum of 4 players is required. It's ideal to play in person or via video call to facilitate the clue round and debate."
+    },
+    "objective": {
+        "title": "Objective",
+        "description": "The objective depends on your role. Games last a maximum of",
+        "rounds": "3 rounds",
+        "asFriend": "As a Friend",
+        "asFriendText": "Discover the Impostor by voting for them in the elimination round. The more correct votes you accumulate, the more points you earn.",
+        "asImpostor": "As the Impostor",
+        "asImpostorText": "Survive all 3 rounds without being discovered. If you survive the third round, you win the game."
+    },
+    "requirements": {
+        "title": "What do you need to play?",
+        "phone": "You only need your phone to stay connected to the game.",
+        "noDownload": "No download required",
+        "browser": ", you play directly in your browser.",
+        "communication": "Clue communication and debate is done",
+        "inPerson": "in person or via video call"
+    },
+    "preparation": {
+        "title": "Preparation",
+        "step1Host": "Host:",
+        "step1Text": "One player enters the website, logs in and creates the game. They choose if the Impostor will have a Hint.",
+        "step2Invite": "Invitation:",
+        "step2Text": "The Host shares the invite link with the other players.",
+        "step3Register": "Join:",
+        "step3Text": "Other players enter the link, log in and automatically join the room.",
+        "step4Start": "Start:",
+        "step4Text": "When everyone is in the room, the Host starts the game."
+    },
+    "gameplay": {
+        "title": "How the Game Works",
+        "step1Title": "Card Dealing",
+        "step1Text": "The app assigns roles and the secret word.",
+        "step1Warning": "Don't tell anyone what card you got!",
+        "step1Friends": "Friends:",
+        "step1FriendsText": "See the secret word.",
+        "step1Impostor": "Impostor:",
+        "step1ImpostorText": "Doesn't see the word. If help is enabled, they'll see the category it belongs to.",
+        "step2Title": "Clue Round",
+        "step2Text": "When it's your turn, you must say a clue related to the word out loud.",
+        "step2Warning": "It shouldn't be too obvious (to not help the Impostor) or too vague (to not seem suspicious).",
+        "step3Title": "Debate and Voting",
+        "step3Text": "Once everyone has given their clue, voting begins. When everyone votes, the result is revealed.",
+        "step4Title": "Resolution",
+        "step4Text": "The player with the most votes is eliminated from the game and won't play the next round.",
+        "step4IfImpostor": "If the Impostor is eliminated:",
+        "step4IfImpostorText": "The game ends and the Impostor loses.",
+        "step4IfFriend": "If a Friend is eliminated:",
+        "step4IfFriendText": "The Impostor survives, earns points and the game continues for another round."
+    },
+    "scoring": {
+        "title": "Scoring System",
+        "friends": "Friends",
+        "impostor": "Impostor",
+        "perRoundVote": "For each round you vote for the impostor:",
+        "bonusFriend": "Bonus (vote correctly all rounds and impostor loses):",
+        "perRoundSurvive": "For each round you survive:",
+        "bonusImpostor": "Bonus (survive all 3 rounds):",
+        "tiesTitle": "Ties:",
+        "tiesText": "If there's a tie in the vote, no one is eliminated and the Impostor gets their points for that round."
+    }
+}

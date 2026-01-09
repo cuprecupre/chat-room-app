@@ -1,0 +1,94 @@
+{
+    "gameOver": {
+        "friendsWin": "Los amigos ganan la partida",
+        "impostorWin": "El impostor gana la partida",
+        "impostorCaught": "El impostor fue descubierto",
+        "impostorWas": "El impostor era",
+        "secretWord": "Palabra secreta",
+        "unknown": "Desconocido",
+        "leaderboard": "Tabla de Posiciones",
+        "howPointsWork": "¿Cómo se calculan los puntos?",
+        "waitingForHost": "Esperando a que",
+        "toStartAnother": "inicie otra partida"
+    },
+    "scoring": {
+        "title": "Sistema de Puntuación",
+        "ifFriend": "Si eres Amigo",
+        "ifImpostor": "Si eres Impostor",
+        "perRoundVoteImpostor": "Por cada ronda que votas al impostor",
+        "bonusFriend": "Bonus (si votas bien todas las rondas jugadas y el impostor pierde)",
+        "perRoundSurvive": "Por cada ronda que sobrevives",
+        "bonusImpostor": "Bonus (si sobrevives las 3 rondas)"
+    },
+    "lobby": {
+        "playersConnected": "jugadores conectados",
+        "waitingForPlayers": "Esperando jugadores",
+        "minPlayers": "Mínimo 4 jugadores para empezar",
+        "inviteFriends": "¡Invita a tus amigos!",
+        "shareLink": "Comparte este enlace:",
+        "copyLink": "Copiar enlace",
+        "gameCode": "Código de la partida:",
+        "copyCode": "Copiar código",
+        "impostorHelp": "Ayuda al impostor",
+        "impostorHelpOn": "El impostor ve la categoría",
+        "impostorHelpOff": "El impostor no ve nada",
+        "waitingForHostToStart": "Esperando a que el anfitrión empiece",
+        "youAreHost": "Eres el anfitrión",
+        "startGame": "Comenzar partida"
+    },
+    "playing": {
+        "round": "Ronda",
+        "yourTurn": "Tu turno",
+        "giveClue": "Da una pista sobre la palabra",
+        "waitingFor": "Esperando a",
+        "toGiveClue": "para que dé una pista",
+        "vote": "Votar",
+        "voteDescription": "¿Quién crees que es el impostor?",
+        "voted": "Votado",
+        "waitingVotes": "Esperando votos",
+        "youAreImpostor": "¡Eres el Impostor!",
+        "youAreFriend": "Eres Amigo",
+        "secretWord": "La palabra secreta es",
+        "category": "Categoría:",
+        "tryToBlend": "¡Intenta pasar desapercibido y no te pillen!"
+    },
+    "roundResult": {
+        "eliminated": "ha sido eliminado",
+        "tie": "¡Empate! Nadie fue eliminado",
+        "impostorSurvives": "¡El impostor sobrevive!",
+        "nextRound": "Siguiente ronda",
+        "continueToNext": "Continuar a la siguiente ronda"
+    },
+    "modals": {
+        "leaveMatch": {
+            "title": "¿Abandonar partida?",
+            "description": "Si abandonas, no podrás volver a unirte a esta partida.",
+            "confirm": "Abandonar partida"
+        },
+        "leaveRoom": {
+            "title": "¿Salir de la sala?",
+            "description": "Volverás al menú principal.",
+            "confirm": "Salir de la sala"
+        },
+        "kickPlayer": {
+            "title": "¿Expulsar jugador?",
+            "description": "Este jugador será eliminado de la sala.",
+            "confirm": "Expulsar"
+        }
+    },
+    "spectator": {
+        "title": "Estás de espectador",
+        "description": "Te uniste después de que empezara la partida. Espera a la siguiente."
+    },
+    "hostLeft": {
+        "title": "El anfitrión se ha ido",
+        "description": "La partida ha terminado porque el anfitrión abandonó.",
+        "redirecting": "Redirigiendo al lobby..."
+    },
+    "waitingNextGame": {
+        "title": "Partida en curso",
+        "description": "Hay una partida en curso. Te unirás cuando termine.",
+        "playersInGame": "Jugadores en partida"
+    },
+    "disconnectedPlayer": "Jugador desconectado"
+}

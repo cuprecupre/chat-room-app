@@ -1,0 +1,65 @@
+{
+    "meta": {
+        "title": "Juego El Impostor Online - Jugar gratis sin descargas",
+        "description": "Descubre al impostor entre tus amigos. Juego de roles ocultos online, gratis y sin descargar. Crea una sala, invita a tus amigos y empieza a jugar en segundos."
+    },
+    "hero": {
+        "playNowTo": "Juega ahora a",
+        "title": "El Impostor Online Gratis",
+        "titleLine2": "con tus amigos.",
+        "tagline": "Descubre quién miente.",
+        "playButton": "Jugar ahora",
+        "findPlayersDiscord": "Buscar jugadores en Discord",
+        "subtitle": "Inicia una partida, invita a tus amigos y sumérgete en el mejor juego de deducción social."
+    },
+    "discordBanner": {
+        "text": "Ahora puedes buscar jugadores en nuestro servidor de Discord"
+    },
+    "features": {
+        "viralGame": "El juego viral de TikTok e Instagram. ¿Quién es el impostor?",
+        "howToPlay": "Cómo se juega a El Impostor",
+        "howToPlaySubtitle": "Una mecánica de roles ocultos fácil de aprender. Descubre quién miente en partidas rápidas de deducción.",
+        "step1Title": "Recibe tu palabra",
+        "step1Description": "Todos reciben la misma palabra secreta, excepto el",
+        "step1Impostor": "Impostor",
+        "step1End": ". Él no sabe nada, pero debe fingir que sí.",
+        "step2Title": "Describe y Debate",
+        "step2Description": "Cada jugador da una pista sobre la palabra. El Impostor debe escuchar atentamente y mentir para no ser descubierto.",
+        "step3Title": "Vota y Gana",
+        "step3Description": "¿Quién es el sospechoso? Vota para expulsarlo. Si atrapan al Impostor, ganan los amigos. ¡Si escapa, gana él!",
+        "seeFullRules": "Ver reglas completas"
+    },
+    "selling": {
+        "bestGameTitle": "El mejor juego para",
+        "bestGameTitleLine2": "reuniones online",
+        "bestGameDescription": "Juega directamente en tu navegador web. Sin descargar apps, sin instalaciones y compatible con todos los móviles.",
+        "elImpostor": "El Impostor",
+        "bestGameEnd": "es la forma más rápida de empezar a divertirse en grupo.",
+        "quickGames": "Partidas rápidas de 5-10 minutos",
+        "noDirectors": "Sin directores de juego",
+        "freeMinAds": "Totalmente gratis y con publicidad mínima"
+    },
+    "faq": {
+        "title": "Preguntas Frecuentes",
+        "subtitle": "Todo lo que necesitas saber antes de empezar a mentir.",
+        "q1": "¿Qué es El Impostor?",
+        "a1": "Es un juego de deducción social donde todos reciben una palabra secreta excepto uno: el Impostor. ¿El objetivo? Descubrirlo antes de que él descubra la palabra.",
+        "q2": "¿Necesito instalar algo?",
+        "a2": "No. El juego funciona directamente en el navegador de tu móvil, tablet o PC. Solo necesitas conexión a internet.",
+        "q3": "¿Es gratis?",
+        "a3": "Sí, 100% gratuito. Sin compras ocultas. Mantenemos el juego con publicidad no intrusiva.",
+        "q4": "¿Cuántos jugadores pueden jugar?",
+        "a4": "Mínimo 4 jugadores son necesarios para que la dinámica funcione bien. Recomendamos grupos de entre 4 y 10 personas.",
+        "q5": "¿Podemos jugar a distancia?",
+        "a5": "¡Claro! Podéis usar una videollamada (Zoom, Meet, Discord) para hablar y veros las caras, y usar la app para gestionar las cartas y votaciones.",
+        "q6": "¿Dónde puedo ver las reglas completas?",
+        "a6": "Puedes consultar todas las reglas del juego en nuestra",
+        "a6RulesLink": "página de reglas",
+        "a6End": ". Ahí encontrarás explicaciones detalladas sobre cómo jugar, puntuación y consejos."
+    },
+    "cta": {
+        "readyToPlay": "¿Listo para jugar?",
+        "ctaDescription": "Únete ahora y demuestra tus habilidades de decepción. No necesitas instalar nada.",
+        "startFreeGame": "Empezar Partida Gratis"
+    }
+}
