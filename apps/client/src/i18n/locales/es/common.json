@@ -16,14 +16,28 @@
         "confirm": "Confirmar",
         "understood": "Entendido",
         "startGame": "Comenzar partida",
-        "nextRound": "Siguiente ronda"
+        "nextRound": "Siguiente ronda",
+        "back": "Volver"
     },
     "auth": {
         "authenticating": "Autenticando",
         "verifyingSession": "Verificando sesión...",
         "continueWithGoogle": "Continuar con Google",
         "continueAsGuest": "Continuar como invitado",
-        "logout": "Cerrar sesión"
+        "logout": "Cerrar sesión",
+        "guest": {
+            "title": "Jugar como invitado",
+            "subtitle": "Ingresa un nombre para que los demás jugadores te reconozcan",
+            "yourName": "Tu nombre",
+            "placeholder": "Ej: Juan",
+            "visibleNote": "Este nombre será visible para todos los jugadores",
+            "enterToPlay": "Entrar a jugar",
+            "entering": "Entrando...",
+            "errorMinLength": "El nombre debe tener al menos 2 caracteres.",
+            "errorMaxLength": "El nombre no puede tener más de 30 caracteres.",
+            "note1": "Como invitado podrás jugar sin registrarte.",
+            "note2": "Tu sesión se mantendrá hasta que cierres el navegador."
+        }
     },
     "errors": {
         "generic": "Ha ocurrido un error",

@@ -1,23 +1,34 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Modal } from "./ui/Modal";
 import { Button } from "./ui/Button";
 
 export function LeaveMatchModal({ isOpen, onClose, onConfirm, isGameOver, isHost }) {
+    const { t } = useTranslation('game');
+    const { t: tc } = useTranslation('common');
+
     const getMessage = () => {
         if (isGameOver) {
-            return "Volverás a la sala.";
+            return t('modals.leaveMatch.returnToRoom', 'You will return to the room.');
         }
         if (isHost) {
-            return "Como anfitrión si abandonas la partida se terminará para los demás jugadores. Todos irán juntos a la sala donde podrás comenzar una nueva partida.";
+            return t('modals.leaveMatch.hostWarning', 'As the host, if you leave, the game will end for all players. Everyone will go to the room where you can start a new game.');
         }
-        return "Perderás tu avance en esta partida y volverás a la sala.";
+        return t('modals.leaveMatch.description');
+    };
+
+    const getTitle = () => {
+        if (isGameOver) {
+            return t('modals.leaveMatch.returnTitle', 'Return to room?');
+        }
+        return t('modals.leaveMatch.title');
     };
 
     return (
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title={isGameOver ? "¿Volver a la sala?" : "¿Abandonar partida?"}
+            title={getTitle()}
             size="sm"
         >
             <div className="text-center space-y-4">
@@ -29,10 +40,10 @@ export function LeaveMatchModal({ isOpen, onClose, onConfirm, isGameOver, isHost
                         onClick={onConfirm}
                         variant="danger"
                     >
-                        Abandonar
+                        {t('modals.leaveMatch.confirm')}
                     </Button>
                     <Button onClick={onClose} variant="outline">
-                        Cancelar
+                        {tc('buttons.cancel')}
                     </Button>
                 </div>
             </div>

@@ -1,28 +1,32 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Modal } from "./ui/Modal";
 import { Button } from "./ui/Button";
 
 export function LeaveRoomModal({ isOpen, onClose, onConfirm }) {
+    const { t } = useTranslation('game');
+    const { t: tc } = useTranslation('common');
+
     return (
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title="¿Salir de la sala?"
+            title={t('modals.leaveRoom.title')}
             size="sm"
         >
             <div className="text-center space-y-4">
                 <p className="text-neutral-400">
-                    Saldrás de la sala y volverás al inicio.
+                    {t('modals.leaveRoom.description')}
                 </p>
                 <div className="space-y-2 pt-2">
                     <Button
                         onClick={onConfirm}
                         variant="danger"
                     >
-                        Salir
+                        {t('modals.leaveRoom.confirm')}
                     </Button>
                     <Button onClick={onClose} variant="outline">
-                        Cancelar
+                        {tc('buttons.cancel')}
                     </Button>
                 </div>
             </div>

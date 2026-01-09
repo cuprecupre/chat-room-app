@@ -21,7 +21,20 @@
         "bonusImpostor": "Bonus (si sobrevives las 3 rondas)"
     },
     "lobby": {
-        "playersConnected": "jugadores conectados",
+        "host": "EL ANFITRIÓN",
+        "inviteFriendsTitle": "Invita a tus amigos",
+        "toStart": "para empezar",
+        "shareInvite": "Compartir invitación",
+        "copyRoomLink": "Copiar enlace de la sala",
+        "shareAndWait": "Comparte el enlace y espera hasta que se unan para iniciar la partida",
+        "easyMode": "Jugar en modo fácil",
+        "easyModeDesc": "El Impostor recibirá una pequeña ayuda sobre la palabra secreta.",
+        "easyModeOn": "Modo fácil activado",
+        "playersConnected": "Jugadores conectados",
+        "gameStartingSoon": "La partida empezará pronto",
+        "waitingFor": "Esperando a que",
+        "toStartGame": "inicie la partida",
+        "alsoInvite": "También puedes invitar amigos a esta partida",
         "waitingForPlayers": "Esperando jugadores",
         "minPlayers": "Mínimo 4 jugadores para empezar",
         "inviteFriends": "¡Invita a tus amigos!",
@@ -62,18 +75,22 @@
     "modals": {
         "leaveMatch": {
             "title": "¿Abandonar partida?",
-            "description": "Si abandonas, no podrás volver a unirte a esta partida.",
-            "confirm": "Abandonar partida"
+            "returnTitle": "¿Volver a la sala?",
+            "description": "Perderás tu avance en esta partida y volverás a la sala.",
+            "returnToRoom": "Volverás a la sala.",
+            "hostWarning": "Como anfitrión si abandonas la partida se terminará para los demás jugadores. Todos irán juntos a la sala donde podrás comenzar una nueva partida.",
+            "confirm": "Abandonar"
         },
         "leaveRoom": {
             "title": "¿Salir de la sala?",
-            "description": "Volverás al menú principal.",
-            "confirm": "Salir de la sala"
+            "description": "Saldrás de la sala y volverás al inicio.",
+            "confirm": "Salir"
         },
         "kickPlayer": {
             "title": "¿Expulsar jugador?",
+            "confirmMessage": "¿Estás seguro de que quieres expulsar a",
             "description": "Este jugador será eliminado de la sala.",
-            "confirm": "Expulsar"
+            "confirm": "Sí, expulsar"
         }
     },
     "spectator": {
@@ -81,14 +98,18 @@
         "description": "Te uniste después de que empezara la partida. Espera a la siguiente."
     },
     "hostLeft": {
-        "title": "El anfitrión se ha ido",
+        "title": "El anfitrión ha abandonado la partida",
         "description": "La partida ha terminado porque el anfitrión abandonó.",
-        "redirecting": "Redirigiendo al lobby..."
+        "redirecting": "Te redirigiremos a la sala en unos instantes...",
+        "countdownText": "Redirigiendo en {{seconds}}s"
     },
     "waitingNextGame": {
         "title": "Partida en curso",
+        "roomOf": "SALA DE",
+        "autoJoin": "Te unirás automáticamente en la siguiente partida",
+        "waitingToEnter": "Esperando para entrar",
         "description": "Hay una partida en curso. Te unirás cuando termine.",
-        "playersInGame": "Jugadores en partida"
+        "playersInGame": "Jugadores en la partida"
     },
     "disconnectedPlayer": "Jugador desconectado"
 }

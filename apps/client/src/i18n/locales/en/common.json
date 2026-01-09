@@ -16,14 +16,28 @@
         "confirm": "Confirm",
         "understood": "Got it",
         "startGame": "Start game",
-        "nextRound": "Next round"
+        "nextRound": "Next round",
+        "back": "Back"
     },
     "auth": {
         "authenticating": "Authenticating",
         "verifyingSession": "Verifying session...",
         "continueWithGoogle": "Continue with Google",
         "continueAsGuest": "Continue as guest",
-        "logout": "Log out"
+        "logout": "Log out",
+        "guest": {
+            "title": "Play as guest",
+            "subtitle": "Enter a name so other players can recognize you",
+            "yourName": "Your name",
+            "placeholder": "Ex: John",
+            "visibleNote": "This name will be visible to all players",
+            "enterToPlay": "Enter to play",
+            "entering": "Entering...",
+            "errorMinLength": "Name must be at least 2 characters.",
+            "errorMaxLength": "Name cannot be more than 30 characters.",
+            "note1": "As a guest you can play without registering.",
+            "note2": "Your session will be kept until you close the browser."
+        }
     },
     "errors": {
         "generic": "An error occurred",

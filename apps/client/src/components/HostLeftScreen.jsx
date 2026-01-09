@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * HostLeftScreen - Displayed when the host abandons the match.
  * Shows a message with spinner for 4 seconds, then triggers redirect to lobby.
  */
 export function HostLeftScreen({ onRedirectToLobby }) {
+    const { t } = useTranslation('game');
     const [countdown, setCountdown] = useState(4);
 
     useEffect(() => {
@@ -27,12 +29,12 @@ export function HostLeftScreen({ onRedirectToLobby }) {
 
                 {/* Title */}
                 <h2 className="text-2xl font-serif text-neutral-50">
-                    El anfitrión ha abandonado la partida
+                    {t('hostLeft.title')}
                 </h2>
 
                 {/* Subtitle */}
                 <p className="text-neutral-400">
-                    Te redirigiremos a la sala en unos instantes...
+                    {t('hostLeft.redirecting')}
                 </p>
 
                 {/* Spinner */}
@@ -61,7 +63,7 @@ export function HostLeftScreen({ onRedirectToLobby }) {
 
                 {/* Countdown (subtle) */}
                 <p className="text-sm text-neutral-600">
-                    Redirigiendo en {countdown}s
+                    {t('hostLeft.countdownText', { seconds: countdown })}
                 </p>
             </div>
         </div>

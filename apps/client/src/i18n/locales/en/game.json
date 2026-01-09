@@ -21,7 +21,20 @@
         "bonusImpostor": "Bonus (if you survive all 3 rounds)"
     },
     "lobby": {
-        "playersConnected": "players connected",
+        "host": "THE HOST",
+        "inviteFriendsTitle": "Invite your friends",
+        "toStart": "to start",
+        "shareInvite": "Share invite",
+        "copyRoomLink": "Copy room link",
+        "shareAndWait": "Share the link and wait for players to join to start the game",
+        "easyMode": "Easy mode",
+        "easyModeDesc": "The Impostor will receive a small hint about the secret word.",
+        "easyModeOn": "Easy mode enabled",
+        "playersConnected": "Players connected",
+        "gameStartingSoon": "Game starting soon",
+        "waitingFor": "Waiting for",
+        "toStartGame": "to start the game",
+        "alsoInvite": "You can also invite friends to this game",
         "waitingForPlayers": "Waiting for players",
         "minPlayers": "Minimum 4 players to start",
         "inviteFriends": "Invite your friends!",
@@ -62,18 +75,22 @@
     "modals": {
         "leaveMatch": {
             "title": "Leave game?",
-            "description": "If you leave, you won't be able to rejoin this game.",
-            "confirm": "Leave game"
+            "returnTitle": "Return to room?",
+            "description": "You will lose your progress in this game and return to the room.",
+            "returnToRoom": "You will return to the room.",
+            "hostWarning": "As the host, if you leave, the game will end for all players. Everyone will go to the room where you can start a new game.",
+            "confirm": "Leave"
         },
         "leaveRoom": {
             "title": "Leave room?",
-            "description": "You will return to the main menu.",
-            "confirm": "Leave room"
+            "description": "You will leave the room and return to the home screen.",
+            "confirm": "Leave"
         },
         "kickPlayer": {
             "title": "Kick player?",
+            "confirmMessage": "Are you sure you want to kick",
             "description": "This player will be removed from the room.",
-            "confirm": "Kick"
+            "confirm": "Yes, kick"
         }
     },
     "spectator": {
@@ -81,12 +98,16 @@
         "description": "You joined after the game started. Wait for the next game."
     },
     "hostLeft": {
-        "title": "The host left",
+        "title": "The host has left the game",
         "description": "The game has ended because the host left.",
-        "redirecting": "Redirecting to lobby..."
+        "redirecting": "Redirecting you to the room...",
+        "countdownText": "Redirecting in {{seconds}}s"
     },
     "waitingNextGame": {
         "title": "Game in progress",
+        "roomOf": "ROOM OF",
+        "autoJoin": "You'll automatically join the next game",
+        "waitingToEnter": "Waiting to enter",
         "description": "A game is currently in progress. You'll join when it ends.",
         "playersInGame": "Players in game"
     },
