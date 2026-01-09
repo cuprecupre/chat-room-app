@@ -223,10 +223,18 @@ function AppRoutes({
                 />
 
                 {/* ==================== FALLBACK ==================== */}
-                <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+                <Route path="*" element={<SmartRedirect />} />
             </Routes>
         </>
     );
+}
+
+// Helper for language-aware redirects
+function SmartRedirect() {
+    const { i18n } = useTranslation();
+    const isEnglish = i18n.language.startsWith('en');
+    const target = isEnglish ? "/en" : "/";
+    return <Navigate to={target} replace />;
 }
 
 export function AppRouter() {

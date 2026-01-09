@@ -18,7 +18,7 @@
         "understood": "Got it",
         "startGame": "Start game",
         "nextRound": "Next round",
-        "back": "Back"
+        "back": "Back", "forceExit": "Force exit"
     },
     "auth": {
         "authenticating": "Authenticating",
@@ -43,7 +43,7 @@
     "errors": {
         "generic": "An error occurred",
         "connection": "Connection error",
-        "tryAgain": "Try again"
+        "tryAgain": "Try again", "connectionLost": "Connection lost", "cantConnect": "Cannot connect to server. This may be due to network issues or the server is down.", "retryConnection": "Retry connection", "sessionReset": "Session reset. Return to lobby."
     },
     "labels": {
         "free": "Free",

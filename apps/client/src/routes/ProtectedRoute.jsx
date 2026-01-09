@@ -1,15 +1,16 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Spinner } from "../components/ui/Spinner";
 import { Button } from "../components/ui/Button";
 import { RefreshCw } from "lucide-react";
-import { ROUTES } from "./routes";
 import { showToast } from "../lib/toast";
 
 // Firebase Storage CDN URL
 const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
 
 export function ProtectedRoute({ user, connected, emit, gameState }) {
+    const { t, i18n } = useTranslation('common');
     const [isStuck, setIsStuck] = useState(false);
     const [showConnectingLoader, setShowConnectingLoader] = useState(false);
     const connectingLoaderTimeoutRef = useRef(null);
@@ -54,7 +55,7 @@ export function ProtectedRoute({ user, connected, emit, gameState }) {
         window.history.replaceState({}, "", url.toString());
 
         // Show toast immediately
-        showToast("Sesión reiniciada. Vuelve al lobby.");
+        showToast(t('errors.sessionReset', "Sesión reiniciada. Vuelve al lobby."));
 
         const handleCleanExit = () => {
             window.location.reload();
@@ -74,7 +75,11 @@ export function ProtectedRoute({ user, connected, emit, gameState }) {
     // Redirect to home if no user (preserve roomId for invitation flow)
     if (!user) {
         const urlRoomId = new URLSearchParams(window.location.search).get("roomId");
-        const redirectTo = urlRoomId ? `${ROUTES.HOME}?roomId=${urlRoomId}` : ROUTES.HOME;
+        // Determine correct home route based on current language
+        const isEnglish = i18n.language.startsWith('en');
+        const baseHome = isEnglish ? "/en" : "/";
+
+        const redirectTo = urlRoomId ? `${baseHome}?roomId=${urlRoomId}` : baseHome;
         return <Navigate to={redirectTo} replace />;
     }
 
@@ -90,19 +95,18 @@ export function ProtectedRoute({ user, connected, emit, gameState }) {
                     </div>
                     <div>
                         <h2 className="text-2xl font-serif text-neutral-50 mb-2">
-                            Conexión perdida
+                            {t('errors.connectionLost', 'Conexión perdida')}
                         </h2>
                         <p className="text-neutral-400">
-                            No se puede conectar al servidor. Esto puede deberse a problemas de red
-                            o el servidor está inactivo.
+                            {t('errors.cantConnect', 'No se puede conectar al servidor. Esto puede deberse a problemas de red o el servidor está inactivo.')}
                         </p>
                     </div>
                     <div className="space-y-3 px-6">
                         <Button onClick={() => window.location.reload()} variant="primary">
-                            Reintentar conexión
+                            {t('errors.retryConnection', 'Reintentar conexión')}
                         </Button>
                         <Button onClick={handleForceExit} variant="outline">
-                            Forzar salida
+                            {t('buttons.forceExit', 'Forzar salida')}
                         </Button>
                     </div>
                 </div>
@@ -123,9 +127,9 @@ export function ProtectedRoute({ user, connected, emit, gameState }) {
                     <div className="flex flex-col items-center gap-3">
                         <Spinner size="md" />
                         <div>
-                            <p>Conectando al servidor</p>
+                            <p>{t('system.authenticating', 'Conectando al servidor')}</p>
                             <p className="text-sm text-neutral-400 mt-1">
-                                Estableciendo conexión...
+                                {t('system.verifyingSession', 'Estableciendo conexión...')}
                             </p>
                         </div>
                     </div>

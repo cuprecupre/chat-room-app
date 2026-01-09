@@ -18,7 +18,7 @@
         "understood": "Entendido",
         "startGame": "Comenzar partida",
         "nextRound": "Siguiente ronda",
-        "back": "Volver"
+        "back": "Volver", "forceExit": "Forzar salida"
     },
     "auth": {
         "authenticating": "Autenticando",
@@ -43,7 +43,7 @@
     "errors": {
         "generic": "Ha ocurrido un error",
         "connection": "Error de conexión",
-        "tryAgain": "Inténtalo de nuevo"
+        "tryAgain": "Inténtalo de nuevo", "connectionLost": "Conexión perdida", "cantConnect": "No se puede conectar al servidor. Esto puede deberse a problemas de red o el servidor está inactivo.", "retryConnection": "Reintentar conexión", "sessionReset": "Sesión reiniciada. Vuelve al lobby."
     },
     "labels": {
         "free": "Gratis",
