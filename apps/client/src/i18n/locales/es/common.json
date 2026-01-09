@@ -2,7 +2,8 @@
     "nav": {
         "howToPlay": "Cómo se juega",
         "rules": "Reglas",
-        "playNow": "Jugar Ahora"
+        "playNow": "Jugar Ahora",
+        "openMenu": "Abrir menú de usuario"
     },
     "buttons": {
         "play": "Jugar",
@@ -56,7 +57,11 @@
         "copyright": "El Impostor © 2025",
         "rules": "Reglas",
         "discord": "Discord",
-        "contact": "Contacto"
+        "contact": "Contacto",
+        "gameRules": "Reglas del juego",
+        "support": "Apoya al desarrollador",
+        "privacy": "Privacidad",
+        "cookies": "Cookies"
     },
     "feedback": {
         "title": "Ayúdanos a mejorar",

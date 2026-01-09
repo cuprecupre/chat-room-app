@@ -1,10 +1,12 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Avatar } from "../components/ui/Avatar";
 import { Footer } from "../components/Footer";
 import { LeaveMatchModal } from "../components/LeaveMatchModal";
 import { LeaveRoomModal } from "../components/LeaveRoomModal";
+import { LanguageSelector } from "../components/ui/LanguageSelector";
 import { ROUTES } from "../routes/routes";
 
 export function MainLayout({
@@ -18,6 +20,7 @@ export function MainLayout({
     isMobile,
     isHost,
 }) {
+    const { t } = useTranslation('common');
     const [menuOpen, setMenuOpen] = useState(false);
     const [showLeaveRoomModal, setShowLeaveRoomModal] = useState(false);
     const [showLeaveMatchModal, setShowLeaveMatchModal] = useState(false);
@@ -116,12 +119,15 @@ export function MainLayout({
                         El Impostor
                     </button>
                     <div className="flex items-center gap-3 sm:gap-4">
+                        {/* Language Selector */}
+                        <LanguageSelector />
+
                         <span className="text-sm sm:text-base font-medium hidden sm:flex items-center">
                             {user.displayName}
                         </span>
                         <div className="relative" ref={menuRef}>
                             <button
-                                aria-label="Abrir menú de usuario"
+                                aria-label={t('nav.openMenu', 'Open user menu')}
                                 onClick={() => setMenuOpen((v) => !v)}
                                 className="relative group rounded-full ring-1 ring-transparent focus:outline-none active:scale-95 transition-all duration-150"
                                 style={{
@@ -162,7 +168,7 @@ export function MainLayout({
                                                     onClick={handleLeaveMatchClick}
                                                     className="block w-full text-left px-3 py-2 text-orange-400 hover:text-orange-300 hover:bg-orange-500/10 rounded-md"
                                                 >
-                                                    Volver a la sala
+                                                    {t('game:modals.leaveMatch.returnTitle', 'Return to room')}
                                                 </button>
                                             )}
                                             {(gameState?.phase === "lobby" || gameState?.phase === "lobby_wait") && (
@@ -173,7 +179,7 @@ export function MainLayout({
                                                     }}
                                                     className="block w-full text-left px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md"
                                                 >
-                                                    Salir de la sala
+                                                    {t('game:modals.leaveRoom.title', 'Leave room')}
                                                 </button>
                                             )}
                                             <div className="my-1 h-px bg-white/10" />
@@ -183,7 +189,7 @@ export function MainLayout({
                                         onClick={handleLogout}
                                         className="block w-full text-left px-3 py-2 text-neutral-200 hover:text-white hover:bg-white/10 rounded-md"
                                     >
-                                        Cerrar sesión
+                                        {t('auth.logout', 'Log out')}
                                     </button>
                                 </div>
                             )}
