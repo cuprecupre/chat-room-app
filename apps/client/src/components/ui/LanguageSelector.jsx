@@ -75,7 +75,7 @@ export function LanguageSelector({ className = '' }) {
                 aria-haspopup="listbox"
             >
                 <span className="text-base">{currentLang.flag}</span>
-                <span className="text-sm font-medium text-neutral-200">{currentLang.shortCode}</span>
+                <span className="text-sm font-medium text-neutral-200 hidden sm:inline">{currentLang.shortCode}</span>
                 <svg
                     className={`w-3.5 h-3.5 text-neutral-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
                     fill="none"

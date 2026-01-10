@@ -122,9 +122,6 @@ export function MainLayout({
                         {/* Language Selector */}
                         <LanguageSelector />
 
-                        <span className="text-sm sm:text-base font-medium hidden sm:flex items-center">
-                            {user.displayName}
-                        </span>
                         <div className="relative" ref={menuRef}>
                             <button
                                 aria-label={t('nav.openMenu', 'Open user menu')}

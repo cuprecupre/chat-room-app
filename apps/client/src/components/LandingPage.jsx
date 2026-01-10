@@ -140,7 +140,7 @@ export function LandingPage({
                 href="https://discord.gg/2N2tx7mjUE"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="fixed top-0 left-0 right-0 h-9 z-50 bg-[#5865F2] flex items-center justify-center px-4 hover:bg-[#4752C4] transition-colors"
+                className="fixed top-0 left-0 right-0 h-[36px] z-50 bg-[#5865F2] flex items-center justify-center px-4 hover:bg-[#4752C4] transition-colors"
             >
                 <span className="text-white text-xs md:text-sm font-medium flex items-center gap-2">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -154,12 +154,11 @@ export function LandingPage({
             </a>
 
             {/* Navbar Fixed */}
-            <nav className="fixed top-9 left-0 right-0 z-40 bg-neutral-950/80 backdrop-blur-md border-b border-white/5 py-4 px-6 md:px-12 flex justify-between items-center transition-all duration-300">
+            <nav className="fixed top-[36px] left-0 right-0 z-40 bg-neutral-950/80 backdrop-blur-md border-b border-white/5 py-4 px-6 md:px-12 flex justify-between items-center transition-all duration-300">
                 <div
                     className="flex items-center gap-2 cursor-pointer"
                     onClick={() => window.scrollTo(0, 0)}
                 >
-                    <img src={heroImg} alt="Logo El Impostor" className="w-8 h-8 rounded-full" />
                     <span className="text-xl font-normal font-serif tracking-wide text-neutral-100">
                         {tc('login.appTitle')}
                     </span>
