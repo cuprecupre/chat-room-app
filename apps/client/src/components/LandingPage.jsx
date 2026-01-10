@@ -44,36 +44,36 @@ export function LandingPage({
 
     const reviews = [
         {
-            text: "La partida se puso tensísima cuando acusaron a María y resultó que yo era el impostor todo el tiempo. ¡Risas aseguradas!",
-            author: "Alex, Jugador Frecuente",
+            text: t('reviews.r1.text'),
+            author: t('reviews.r1.author'),
             stars: 5,
             image: avatarAlex,
             gradient: "from-orange-400 to-red-600",
         },
         {
-            text: "Lo mejor es que no hay que instalar nada. Mandas el link y en 10 segundos estamos todos jugando. Genial para romper el hielo.",
-            author: "Sofía, Jugador Frecuente",
+            text: t('reviews.r2.text'),
+            author: t('reviews.r2.author'),
             stars: 5,
             image: avatarSofia,
             gradient: "from-purple-400 to-blue-600",
         },
         {
-            text: "Simple pero adictivo. Las discusiones para encontrar al espía son lo mejor. Muy recomendado para noches de juegos.",
-            author: "Javi, Jugador Frecuente",
+            text: t('reviews.r3.text'),
+            author: t('reviews.r3.author'),
             stars: 5,
             image: avatarJavi,
             gradient: "from-green-400 to-emerald-600",
         },
         {
-            text: "Ideal para jugar con compañeros de trabajo en remoto. Nos reímos mucho y ayuda a desconectar del estrés del día a día.",
-            author: "Lucía, Team Lead",
+            text: t('reviews.r4.text'),
+            author: t('reviews.r4.author'),
             stars: 5,
             image: avatarLucia,
             gradient: "from-pink-400 to-rose-600",
         },
         {
-            text: "Increíble cómo un juego tan sencillo puede generar tanto debate. ¡Siempre acabamos gritando (de risa) al final de cada ronda!",
-            author: "Marco, Estudiante",
+            text: t('reviews.r5.text'),
+            author: t('reviews.r5.author'),
             stars: 5,
             image: avatarMarco,
             gradient: "from-cyan-400 to-blue-500",
@@ -161,7 +161,7 @@ export function LandingPage({
                 >
                     <img src={heroImg} alt="Logo El Impostor" className="w-8 h-8 rounded-full" />
                     <span className="text-xl font-normal font-serif tracking-wide text-neutral-100">
-                        {i18n.language === 'en' ? 'The Impostor' : 'El Impostor'}
+                        {tc('login.appTitle')}
                     </span>
                 </div>
                 <div className="hidden md:flex gap-6 items-center">
@@ -181,7 +181,10 @@ export function LandingPage({
                 <div className="flex items-center gap-3">
                     <LanguageSelector />
                     <Button
-                        onClick={onGoToGuestAuth}
+                        onClick={() => {
+                            if (onGoToGuestAuth) onGoToGuestAuth();
+                            else navigate(ROUTES.GUEST_AUTH);
+                        }}
                         variant="primary"
                         size="sm"
                         className="w-auto !px-6 !py-1 !h-9 text-sm disabled:opacity-50 disabled:cursor-not-allowed rounded-full"
@@ -190,15 +193,15 @@ export function LandingPage({
                         {tc('nav.playNow')}
                     </Button>
                 </div>
-            </nav>
+            </nav >
 
             {/* Hero Section */}
-            <header className="relative pt-24 pb-20 px-6 md:pt-32 md:pb-32 overflow-hidden flex flex-col items-center text-center">
+            < header className="relative pt-24 pb-20 px-6 md:pt-32 md:pb-32 overflow-hidden flex flex-col items-center text-center" >
                 {/* Dynamic Background Elements */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
+                < div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0" >
                     <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-amber-600/[0.08] md:bg-amber-600/15 rounded-full blur-[80px] md:blur-[100px]" />
                     <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] md:w-[600px] md:h-[600px] bg-orange-600/[0.08] md:bg-orange-600/15 rounded-full blur-[90px] md:blur-[120px]" />
-                </div>
+                </div >
 
                 <div className="relative z-10 max-w-4xl mx-auto space-y-8">
                     <div className="animate-scaleIn animate-delay-200 inline-block">
@@ -226,7 +229,10 @@ export function LandingPage({
                     <div className="flex flex-col gap-4 justify-center items-center animate-fadeIn animate-delay-600 w-full max-w-md mx-auto">
                         <div className="w-full">
                             <Button
-                                onClick={onGoToGuestAuth}
+                                onClick={() => {
+                                    if (onGoToGuestAuth) onGoToGuestAuth();
+                                    else navigate(ROUTES.GUEST_AUTH);
+                                }}
                                 disabled={isLoading}
                                 variant="primary"
                                 size="lg"
@@ -385,15 +391,15 @@ export function LandingPage({
                         </span>
                     </div>
                 </div>
-            </header>
+            </header >
 
             {/* Feature / Dynamics Section */}
-            <section
+            < section
                 ref={featuresRef}
                 className="py-32 px-6 relative bg-neutral-900/50 overflow-hidden"
             >
                 {/* Decoration */}
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-600/5 rounded-full blur-[100px] pointer-events-none" />
+                < div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-600/5 rounded-full blur-[100px] pointer-events-none" />
                 <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-orange-600/5 rounded-full blur-[100px] pointer-events-none" />
 
                 <div className="max-w-4xl mx-auto text-center mb-20 relative z-10">
@@ -534,10 +540,10 @@ export function LandingPage({
                         </Link>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* SEO Content & Selling Points */}
-            <section className="py-32 px-6 md:px-12 bg-neutral-950 relative">
+            < section className="py-32 px-6 md:px-12 bg-neutral-950 relative" >
                 <div className="max-w-6xl mx-auto space-y-24">
                     <div className="flex flex-col md:flex-row items-center gap-16">
                         <div className="w-full md:w-1/2 space-y-8 relative z-10">
@@ -627,10 +633,10 @@ export function LandingPage({
                         </div>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* FAQ Section */}
-            <section className="pt-24 pb-24 md:py-24 px-6 relative bg-neutral-950">
+            < section className="pt-24 pb-24 md:py-24 px-6 relative bg-neutral-950" >
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-serif font-normal mb-4 text-white">
@@ -691,10 +697,10 @@ export function LandingPage({
                         ))}
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* CTA Footer */}
-            <section className="pt-24 pb-32 px-6 text-center relative overflow-hidden">
+            < section className="pt-24 pb-32 px-6 text-center relative overflow-hidden" >
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-neutral-900/80 pointer-events-none" />
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-[300px] bg-orange-600/20 blur-[120px] rounded-full pointer-events-none" />
 
@@ -723,10 +729,10 @@ export function LandingPage({
                         </Button>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Main Footer */}
-            <footer className="border-t border-white/5 py-12 px-6 bg-neutral-950">
+            < footer className="border-t border-white/5 py-12 px-6 bg-neutral-950" >
                 <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
                     <div className="flex items-center">
                         <span className="text-neutral-500 text-sm font-serif">
@@ -756,7 +762,7 @@ export function LandingPage({
                         </button>
                     </div>
                 </div>
-            </footer>
-        </div>
+            </footer >
+        </div >
     );
 }

@@ -61,5 +61,27 @@
         "readyToPlay": "¿Listo para jugar?",
         "ctaDescription": "Únete ahora y demuestra tus habilidades de decepción. No necesitas instalar nada.",
         "startFreeGame": "Empezar Partida Gratis"
+    },
+    "reviews": {
+        "r1": {
+            "text": "La partida se puso tensísima cuando acusaron a María y resultó que yo era el impostor todo el tiempo. ¡Risas aseguradas!",
+            "author": "Alex, Jugador Frecuente"
+        },
+        "r2": {
+            "text": "Lo mejor es que no hay que instalar nada. Mandas el link y en 10 segundos estamos todos jugando. Genial para romper el hielo.",
+            "author": "Sofía, Jugador Frecuente"
+        },
+        "r3": {
+            "text": "Simple pero adictivo. Las discusiones para encontrar al espía son lo mejor. Muy recomendado para noches de juegos.",
+            "author": "Javi, Jugador Frecuente"
+        },
+        "r4": {
+            "text": "Ideal para jugar con compañeros de trabajo en remoto. Nos reímos mucho y ayuda a desconectar del estrés del día a día.",
+            "author": "Lucía, Team Lead"
+        },
+        "r5": {
+            "text": "Increíble cómo un juego tan sencillo puede generar tanto debate. ¡Siempre acabamos gritando (de risa) al final de cada ronda!",
+            "author": "Marco, Estudiante"
+        }
     }
 }

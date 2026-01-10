@@ -13,6 +13,7 @@ export function AuthRoute({
     loading,
     error,
     clearError,
+    onBack,
 }) {
     const roomId = useRoomIdFromUrl();
 
@@ -34,6 +35,7 @@ export function AuthRoute({
             isLoading={loading}
             error={error}
             clearError={clearError}
+            onBack={onBack}
         />
     );
 }

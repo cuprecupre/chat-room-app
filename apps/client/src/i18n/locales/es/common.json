@@ -18,14 +18,31 @@
         "understood": "Entendido",
         "startGame": "Comenzar partida",
         "nextRound": "Siguiente ronda",
-        "back": "Volver", "forceExit": "Forzar salida"
+        "back": "Volver",
+        "forceExit": "Forzar salida"
     },
     "auth": {
         "authenticating": "Autenticando",
         "verifyingSession": "Verificando sesión...",
         "continueWithGoogle": "Continuar con Google",
-        "continueAsGuest": "Continuar como invitado",
+        "continueWithEmail": "Continuar con Email",
+        "continueAsGuest": "Jugar como invitado",
         "logout": "Cerrar sesión",
+        "login": "Iniciar sesión",
+        "createAccount": "Crear cuenta",
+        "createNewAccount": "Crear nueva cuenta",
+        "email": "Email",
+        "password": "Contraseña",
+        "nameAndSurname": "Nombre y Apellido",
+        "loggingIn": "Iniciando...",
+        "creatingAccount": "Creando cuenta...",
+        "accountQuestion": "¿Ya tienes una cuenta o quieres crear una nueva?",
+        "minPassword": "Mínimo 6 caracteres",
+        "enterNameError": "Por favor, ingresa tu nombre y apellido.",
+        "helpImprove": "Ayúdanos a mejorar",
+        "emailPlaceholder": "tu@email.com",
+        "passwordPlaceholder": "••••••••",
+        "namePlaceholder": "Ej: Juan Pérez",
         "guest": {
             "title": "Jugar como invitado",
             "subtitle": "Ingresa un nombre para que los demás jugadores te reconozcan",
@@ -43,7 +60,11 @@
     "errors": {
         "generic": "Ha ocurrido un error",
         "connection": "Error de conexión",
-        "tryAgain": "Inténtalo de nuevo", "connectionLost": "Conexión perdida", "cantConnect": "No se puede conectar al servidor. Esto puede deberse a problemas de red o el servidor está inactivo.", "retryConnection": "Reintentar conexión", "sessionReset": "Sesión reiniciada. Vuelve al lobby."
+        "tryAgain": "Inténtalo de nuevo",
+        "connectionLost": "Conexión perdida",
+        "cantConnect": "No se puede conectar al servidor. Esto puede deberse a problemas de red o el servidor está inactivo.",
+        "retryConnection": "Reintentar conexión",
+        "sessionReset": "Sesión reiniciada. Vuelve al lobby."
     },
     "labels": {
         "free": "Gratis",
@@ -98,5 +119,47 @@
         "userDisconnected": "{{name}} se ha desconectado",
         "authenticating": "Autenticando",
         "verifyingSession": "Verificando sesión..."
+    },
+    "lobby": {
+        "startPlaying": "Empezar a jugar",
+        "subtitle": "Crea una sala, invita a tus amigos y empieza a jugar",
+        "createRoom": "Crear nueva sala",
+        "discordTitle": "¿Buscas gente para jugar?",
+        "discordText": "Entra a <0>nuestro Discord</0> y encuentra partidas.",
+        "remotePlay": "Si juegas a distancia con tus amigos, puedes hacer una videollamada por WhatsApp, Discord, Zoom, o la que prefieras."
+    },
+    "login": {
+        "appTitle": "El Impostor",
+        "tagline": "Alguien no dice la verdad.\n¿Lo vas a descubrir?"
+    },
+    "game": {
+        "tie": "Empate",
+        "nobodyEliminated": "Nadie ha sido eliminado",
+        "newClueRound": "Nueva ronda de pistas",
+        "impostorRemains": "El impostor sigue entre nosotros",
+        "round": "Ronda",
+        "votesAgainst": "Votos en contra",
+        "hasBeenEliminated": "ha sido eliminado/a",
+        "wasEliminated": "fue eliminado"
+    },
+    "invite": {
+        "title": "¡Te han invitado!",
+        "subtitle": "¿Quieres entrar ahora?",
+        "receivedLink": "Has recibido un enlace para unirte a la partida de",
+        "buttons": {
+            "guest": "Jugar como invitado",
+            "google": "Continuar con Google",
+            "cancel": "Cancelar",
+            "join": "Unirme",
+            "joinRoom": "Unirme a la sala",
+            "enter": "Entrar a la sala",
+            "backToHome": "Volver al inicio",
+            "backToRoom": "Volver a mi sala"
+        },
+        "errors": {
+            "notFound": "La partida no existe o ha terminado.",
+            "joinFailed": "No se pudo unir",
+            "inProgress": "Estás en una partida en curso. Si te unes, la abandonarás."
+        }
     }
 }

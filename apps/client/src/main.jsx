@@ -1,5 +1,6 @@
-import { StrictMode } from "react";
+import { StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
+import { Spinner } from "./components/ui/Spinner";
 import "./index.css";
 import "./i18n"; // Initialize i18n before App
 import App from "./App.jsx";
@@ -31,8 +32,16 @@ if (import.meta.env.DEV === "true") {
         });
 }
 
+
+
 createRoot(document.getElementById("root")).render(
     <StrictMode>
-        <App />
+        <Suspense fallback={
+            <div className="w-full h-screen flex items-center justify-center bg-neutral-950">
+                <Spinner size="lg" />
+            </div>
+        }>
+            <App />
+        </Suspense>
     </StrictMode>
 );

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "../../components/ui/Button";
 import { InvitationCard } from "../../components/InvitationCard";
 import { useGameInvite } from "../../hooks/useGameInvite";
@@ -12,6 +13,7 @@ import { GameNotFoundCard } from "../../components/InviteErrors";
  */
 export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinError }) {
     const navigate = useNavigate();
+    const { t } = useTranslation('common');
     const { urlRoomId, previewHostName, error, clearPreview } = useGameInvite(gameState);
 
     // If user joins a room successfully, redirect to game page
@@ -95,12 +97,12 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
         return (
             <InvitationCard
                 roomId={urlRoomId}
-                title="No se pudo unir"
+                title={t('invite.errors.joinFailed')}
                 subtitle={joinError}
                 isError={true}
             >
                 <Button onClick={handleJoinErrorCancel} variant="primary" className="w-full">
-                    Volver al inicio
+                    {t('invite.buttons.backToHome')}
                 </Button>
             </InvitationCard>
         );
@@ -116,10 +118,10 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
             <InvitationCard
                 hostName={previewHostName}
                 roomId={urlRoomId}
-                title="¡Te han invitado!"
+                title={t('invite.title')}
                 subtitle={
                     isPlaying
-                        ? "Estás en una partida en curso. Si te unes, la abandonarás."
+                        ? t('invite.errors.inProgress')
                         : ""
                 }
             >
@@ -129,7 +131,7 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
                     size="lg"
                     className="w-full text-lg shadow-orange-900/20 shadow-lg"
                 >
-                    {isPlaying ? "Unirme" : "Unirme a la sala"}
+                    {isPlaying ? t('invite.buttons.join') : t('invite.buttons.joinRoom')}
                 </Button>
                 <Button
                     onClick={handleCancel}
@@ -137,7 +139,7 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
                     size="md"
                     className="w-full text-neutral-500 hover:text-neutral-300"
                 >
-                    {isPlaying ? "Volver a mi sala" : "Cancelar"}
+                    {isPlaying ? t('invite.buttons.backToRoom') : t('invite.buttons.cancel')}
                 </Button>
             </InvitationCard>
         );
@@ -151,8 +153,8 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
             <InvitationCard
                 hostName={previewHostName}
                 roomId={urlRoomId}
-                title="¡Te han invitado!"
-                subtitle="¿Quieres entrar ahora?"
+                title={t('invite.title')}
+                subtitle={t('invite.subtitle')}
             >
                 <Button
                     onClick={() => joinGame(urlRoomId)}
@@ -160,7 +162,7 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
                     size="lg"
                     className="w-full text-lg shadow-orange-900/20 shadow-lg"
                 >
-                    Entrar a la sala
+                    {t('invite.buttons.enter')}
                 </Button>
                 <Button
                     onClick={handleCancel}
@@ -168,7 +170,7 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
                     size="md"
                     className="w-full text-neutral-500 hover:text-neutral-300"
                 >
-                    Volver al inicio
+                    {t('invite.buttons.backToHome')}
                 </Button>
             </InvitationCard>
         );

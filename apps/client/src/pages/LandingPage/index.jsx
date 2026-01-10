@@ -4,7 +4,13 @@ import { SEO } from "../../components/SEO";
 import { LandingPage as LandingPageComponent } from "../../components/LandingPage";
 import { ROUTES } from "../../routes/routes";
 
-export function LandingPage({ onLogin, isLoading, onOpenInstructions, onOpenFeedback }) {
+export function LandingPage({
+    onLogin,
+    isLoading,
+    onOpenInstructions,
+    onOpenFeedback,
+    onGoToGuestAuth,
+}) {
     const navigate = useNavigate();
     const { t } = useTranslation('landing');
 
@@ -13,7 +19,11 @@ export function LandingPage({ onLogin, isLoading, onOpenInstructions, onOpenFeed
     };
 
     const handleGoToGuestAuth = () => {
-        navigate(ROUTES.GUEST_AUTH);
+        if (onGoToGuestAuth) {
+            onGoToGuestAuth();
+        } else {
+            navigate(ROUTES.GUEST_AUTH);
+        }
     };
 
     return (

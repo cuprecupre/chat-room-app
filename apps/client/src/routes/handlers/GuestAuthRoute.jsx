@@ -12,6 +12,7 @@ export function GuestAuthRoute({
     loading,
     error,
     clearError,
+    onBack,
 }) {
     const roomId = useRoomIdFromUrl();
 
@@ -32,6 +33,7 @@ export function GuestAuthRoute({
             isLoading={loading}
             error={error}
             clearError={clearError}
+            onBack={onBack}
         />
     );
 }

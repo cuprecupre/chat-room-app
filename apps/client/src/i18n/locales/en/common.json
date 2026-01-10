@@ -18,14 +18,31 @@
         "understood": "Got it",
         "startGame": "Start game",
         "nextRound": "Next round",
-        "back": "Back", "forceExit": "Force exit"
+        "back": "Back",
+        "forceExit": "Force exit"
     },
     "auth": {
         "authenticating": "Authenticating",
         "verifyingSession": "Verifying session...",
         "continueWithGoogle": "Continue with Google",
-        "continueAsGuest": "Continue as guest",
+        "continueWithEmail": "Continue with Email",
+        "continueAsGuest": "Play as guest",
         "logout": "Log out",
+        "login": "Log in",
+        "createAccount": "Create account",
+        "createNewAccount": "Create new account",
+        "email": "Email",
+        "password": "Password",
+        "nameAndSurname": "Name and Surname",
+        "loggingIn": "Logging in...",
+        "creatingAccount": "Creating account...",
+        "accountQuestion": "Do you have an account or want to create a new one?",
+        "minPassword": "Minimum 6 characters",
+        "enterNameError": "Please enter your name and surname.",
+        "helpImprove": "Help us improve",
+        "emailPlaceholder": "you@email.com",
+        "passwordPlaceholder": "••••••••",
+        "namePlaceholder": "Ex: John Doe",
         "guest": {
             "title": "Play as guest",
             "subtitle": "Enter a name so other players can recognize you",
@@ -43,7 +60,11 @@
     "errors": {
         "generic": "An error occurred",
         "connection": "Connection error",
-        "tryAgain": "Try again", "connectionLost": "Connection lost", "cantConnect": "Cannot connect to server. This may be due to network issues or the server is down.", "retryConnection": "Retry connection", "sessionReset": "Session reset. Return to lobby."
+        "tryAgain": "Try again",
+        "connectionLost": "Connection lost",
+        "cantConnect": "Cannot connect to server. This may be due to network issues or the server is down.",
+        "retryConnection": "Retry connection",
+        "sessionReset": "Session reset. Return to lobby."
     },
     "labels": {
         "free": "Free",
@@ -98,5 +119,47 @@
         "userDisconnected": "{{name}} disconnected",
         "authenticating": "Authenticating",
         "verifyingSession": "Verifying session..."
+    },
+    "lobby": {
+        "startPlaying": "Start playing",
+        "subtitle": "Create a room, invite your friends and start playing",
+        "createRoom": "Create new room",
+        "discordTitle": "Looking for players?",
+        "discordText": "Join <0>our Discord</0> to find matches.",
+        "remotePlay": "If playing remotely with friends, you can use WhatsApp, Discord, Zoom, or whatever you prefer for a video call."
+    },
+    "login": {
+        "appTitle": "The Impostor",
+        "tagline": "Someone is not telling the truth.\nWill you catch them?"
+    },
+    "game": {
+        "tie": "Tie",
+        "nobodyEliminated": "No one was eliminated",
+        "newClueRound": "New clue round",
+        "impostorRemains": "The impostor is still among us",
+        "round": "Round",
+        "votesAgainst": "Votes against",
+        "hasBeenEliminated": "has been eliminated",
+        "wasEliminated": "was eliminated"
+    },
+    "invite": {
+        "title": "You've been invited!",
+        "subtitle": "Join now?",
+        "receivedLink": "You received a link to join the game of",
+        "buttons": {
+            "guest": "Play as guest",
+            "google": "Continue with Google",
+            "cancel": "Cancel",
+            "join": "Join",
+            "joinRoom": "Join room",
+            "enter": "Enter room",
+            "backToHome": "Back to start",
+            "backToRoom": "Back to my room"
+        },
+        "errors": {
+            "notFound": "Game does not exist or has ended.",
+            "joinFailed": "Could not join",
+            "inProgress": "You are in a game. If you join, you will leave it."
+        }
     }
 }

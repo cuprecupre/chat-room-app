@@ -39,10 +39,11 @@ i18n
         ns: ['common', 'landing', 'game', 'rules'],
 
         detection: {
-            // Order of detection: URL path first, then localStorage, then browser
-            order: ['path', 'localStorage', 'navigator'],
-            lookupFromPathIndex: 0,
-            // Cache user language in localStorage
+            // 1. localStorage: User's explicit choice (if they changed it manually)
+            // 2. navigator: Browser language (first visit detection)
+            // Note: 'path' is intentionally excluded - URL should not override user preference
+            order: ['localStorage', 'navigator'],
+            // Cache user language choice in localStorage
             caches: ['localStorage'],
         },
 

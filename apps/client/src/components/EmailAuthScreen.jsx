@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "./ui/Button";
 import { Spinner } from "./ui/Spinner";
 
@@ -30,6 +31,7 @@ export function EmailAuthScreen({
     error,
     clearError,
 }) {
+    const { t } = useTranslation('common');
     // Usar función inicializadora para ejecutar solo una vez
     const [initialState] = useState(getInitialState);
     const [mode, setMode] = useState(initialState.mode);
@@ -101,7 +103,7 @@ export function EmailAuthScreen({
         setLocalError("");
 
         if (!displayName.trim()) {
-            setLocalError("Por favor, ingresa tu nombre y apellido.");
+            setLocalError(t('auth.enterNameError'));
             return;
         }
         lastModeRef.current = "register";
@@ -126,8 +128,8 @@ export function EmailAuthScreen({
                         </div>
                         <h1 className="text-3xl font-serif text-neutral-50">
                             {mode === "select" && "Acceder con Email"}
-                            {mode === "login" && "Iniciar sesión"}
-                            {mode === "register" && "Crear cuenta"}
+                            {mode === "login" && t('auth.login')}
+                            {mode === "register" && t('auth.createAccount')}
                         </h1>
                     </div>
 
@@ -135,7 +137,7 @@ export function EmailAuthScreen({
                     {mode === "select" && (
                         <div className="space-y-4 animate-fadeIn">
                             <p className="text-neutral-300 text-center">
-                                ¿Ya tienes una cuenta o quieres crear una nueva?
+                                {t('auth.accountQuestion')}
                             </p>
 
                             <Button
@@ -148,7 +150,7 @@ export function EmailAuthScreen({
                                 size="lg"
                                 className="w-full"
                             >
-                                Iniciar sesión
+                                {t('auth.login')}
                             </Button>
 
                             <Button
@@ -161,7 +163,7 @@ export function EmailAuthScreen({
                                 size="lg"
                                 className="w-full"
                             >
-                                Crear nueva cuenta
+                                {t('auth.createNewAccount')}
                             </Button>
                         </div>
                     )}
@@ -174,7 +176,7 @@ export function EmailAuthScreen({
                                     htmlFor="email"
                                     className="block text-sm font-medium text-neutral-300 mb-2"
                                 >
-                                    Email
+                                    {t('auth.email')}
                                 </label>
                                 <input
                                     id="email"
@@ -184,7 +186,7 @@ export function EmailAuthScreen({
                                     required
                                     disabled={isLoading}
                                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
-                                    placeholder="tu@email.com"
+                                    placeholder={t('auth.emailPlaceholder')}
                                 />
                             </div>
 
@@ -193,7 +195,7 @@ export function EmailAuthScreen({
                                     htmlFor="password"
                                     className="block text-sm font-medium text-neutral-300 mb-2"
                                 >
-                                    Contraseña
+                                    {t('auth.password')}
                                 </label>
                                 <input
                                     id="password"
@@ -204,7 +206,7 @@ export function EmailAuthScreen({
                                     disabled={isLoading}
                                     minLength={6}
                                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
-                                    placeholder="••••••••"
+                                    placeholder={t('auth.passwordPlaceholder')}
                                 />
                             </div>
 
@@ -224,10 +226,10 @@ export function EmailAuthScreen({
                                 {isLoading ? (
                                     <span className="flex items-center justify-center gap-2">
                                         <Spinner size="sm" />
-                                        Iniciando...
+                                        {t('auth.loggingIn')}
                                     </span>
                                 ) : (
-                                    "Iniciar sesión"
+                                    t('auth.login')
                                 )}
                             </Button>
                         </form>
@@ -241,7 +243,7 @@ export function EmailAuthScreen({
                                     htmlFor="displayName"
                                     className="block text-sm font-medium text-neutral-300 mb-2"
                                 >
-                                    Nombre y Apellido
+                                    {t('auth.nameAndSurname')}
                                 </label>
                                 <input
                                     id="displayName"
@@ -251,7 +253,7 @@ export function EmailAuthScreen({
                                     required
                                     disabled={isLoading}
                                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
-                                    placeholder="Ej: Juan Pérez"
+                                    placeholder={t('auth.namePlaceholder')}
                                 />
                             </div>
 
@@ -260,7 +262,7 @@ export function EmailAuthScreen({
                                     htmlFor="email-register"
                                     className="block text-sm font-medium text-neutral-300 mb-2"
                                 >
-                                    Email
+                                    {t('auth.email')}
                                 </label>
                                 <input
                                     id="email-register"
@@ -270,7 +272,7 @@ export function EmailAuthScreen({
                                     required
                                     disabled={isLoading}
                                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
-                                    placeholder="tu@email.com"
+                                    placeholder={t('auth.emailPlaceholder')}
                                 />
                             </div>
 
@@ -279,7 +281,7 @@ export function EmailAuthScreen({
                                     htmlFor="password-register"
                                     className="block text-sm font-medium text-neutral-300 mb-2"
                                 >
-                                    Contraseña
+                                    {t('auth.password')}
                                 </label>
                                 <input
                                     id="password-register"
@@ -290,9 +292,9 @@ export function EmailAuthScreen({
                                     disabled={isLoading}
                                     minLength={6}
                                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
-                                    placeholder="••••••••"
+                                    placeholder={t('auth.passwordPlaceholder')}
                                 />
-                                <p className="text-xs text-neutral-400 mt-1">Mínimo 6 caracteres</p>
+                                <p className="text-xs text-neutral-400 mt-1">{t('auth.minPassword')}</p>
                             </div>
 
                             {displayError && (
@@ -311,10 +313,10 @@ export function EmailAuthScreen({
                                 {isLoading ? (
                                     <span className="flex items-center justify-center gap-2">
                                         <Spinner size="sm" />
-                                        Creando cuenta...
+                                        {t('auth.creatingAccount')}
                                     </span>
                                 ) : (
-                                    "Crear cuenta"
+                                    t('auth.createAccount')
                                 )}
                             </Button>
                         </form>
@@ -341,7 +343,7 @@ export function EmailAuthScreen({
                                 d="M15 19l-7-7 7-7"
                             />
                         </svg>
-                        <span>Volver</span>
+                        <span>{t('buttons.back')}</span>
                     </Button>
                 </div>
             </div>
@@ -349,7 +351,7 @@ export function EmailAuthScreen({
             <footer className="w-full py-4 px-6">
                 <div className="flex items-center justify-center">
                     <p className="text-xs sm:text-sm text-neutral-500">
-                        © 2025 El impostor. Todos los derechos reservados.
+                        {t('footer.copyright')}
                     </p>
                 </div>
             </footer>

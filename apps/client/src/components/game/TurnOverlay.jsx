@@ -1,7 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Avatar } from "../ui/Avatar";
 
 export function TurnOverlay({ roundNumber, eliminatedPlayerInfo, isOverlayClosing }) {
+    const { t } = useTranslation('common');
+
     return (
         <div
             className={`fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/95 backdrop-blur-sm px-4 transition-opacity duration-300 ${isOverlayClosing ? "opacity-0" : "animate-fadeIn"}`}
@@ -10,7 +13,7 @@ export function TurnOverlay({ roundNumber, eliminatedPlayerInfo, isOverlayClosin
                 className={`text-center space-y-8 max-w-md transition-all duration-300 ${isOverlayClosing ? "opacity-0 scale-95" : "animate-scaleIn"}`}
             >
                 <h2 className="text-6xl font-serif text-orange-400">
-                    Ronda {roundNumber}
+                    {t('game.round')} {roundNumber}
                 </h2>
 
                 {eliminatedPlayerInfo ? (
@@ -26,17 +29,17 @@ export function TurnOverlay({ roundNumber, eliminatedPlayerInfo, isOverlayClosin
                                 <span className="text-red-400">
                                     {eliminatedPlayerInfo.name}
                                 </span>{" "}
-                                fue eliminado
+                                {t('game.wasEliminated')}
                             </p>
                         </div>
                         <p className="text-3xl text-neutral-200">
-                            El impostor sigue entre nosotros
+                            {t('game.impostorRemains')}
                         </p>
                     </div>
                 ) : (
                     <div className="space-y-7">
-                        <p className="text-3xl text-neutral-200">Nadie ha sido eliminado</p>
-                        <p className="text-2xl text-neutral-400">Nueva ronda de pistas</p>
+                        <p className="text-3xl text-neutral-200">{t('game.nobodyEliminated')}</p>
+                        <p className="text-2xl text-neutral-400">{t('game.newClueRound')}</p>
                     </div>
                 )}
             </div>

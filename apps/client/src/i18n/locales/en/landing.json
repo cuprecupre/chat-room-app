@@ -61,5 +61,27 @@
         "readyToPlay": "Ready to play?",
         "ctaDescription": "Join now and show off your deception skills. No installation needed.",
         "startFreeGame": "Start Free Game"
+    },
+    "reviews": {
+        "r1": {
+            "text": "The game got so tense when they accused Maria and it turned out I was the impostor all along. Guaranteed laughs!",
+            "author": "Alex, Frequent Player"
+        },
+        "r2": {
+            "text": "The best part is no installation needed. Send the link and in 10 seconds we are all playing. Great icebreaker.",
+            "author": "Sofia, Frequent Player"
+        },
+        "r3": {
+            "text": "Simple but addictive. The discussions to find the spy are the best. Highly recommended for game nights.",
+            "author": "Javi, Frequent Player"
+        },
+        "r4": {
+            "text": "Ideal for remote play with coworkers. We laughed a lot and it helps disconnect from daily stress.",
+            "author": "Lucia, Team Lead"
+        },
+        "r5": {
+            "text": "Unbelievable how such a simple game can generate so much debate. We always end up shouting (with laughter) at the end of every round!",
+            "author": "Marco, Student"
+        }
     }
 }

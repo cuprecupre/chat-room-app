@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 // Firebase Storage CDN URL
 const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
 
@@ -8,11 +10,17 @@ const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.fire
 export function InvitationCard({
     hostName,
     roomId,
-    title = "¡Te han invitado!",
-    subtitle = "¿Quieres entrar ahora?",
+    title,
+    subtitle,
     isError = false,
     children,
 }) {
+    const { t } = useTranslation('common');
+
+    // Default values if not provided, using translation keys
+    const displayTitle = title || t('invite.title');
+    const displaySubtitle = subtitle || t('invite.subtitle');
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950 text-white">
             <div className="w-full max-w-sm mx-auto text-center space-y-6 px-6">
@@ -35,11 +43,11 @@ export function InvitationCard({
 
                 {/* Title */}
                 <div>
-                    <h2 className="text-3xl font-serif text-neutral-50 mb-4">{title}</h2>
+                    <h2 className="text-3xl font-serif text-neutral-50 mb-4">{displayTitle}</h2>
                     <p className="text-neutral-300 text-lg leading-relaxed">
                         {!isError && (
                             <>
-                                Has recibido un enlace para unirte a la partida de{" "}
+                                {t('invite.receivedLink')}{" "}
                                 <span className="font-mono font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded">
                                     {hostName || roomId}
                                 </span>
@@ -47,7 +55,7 @@ export function InvitationCard({
                                 <br />
                             </>
                         )}
-                        <span className="text-sm text-neutral-500 mt-2 block">{subtitle}</span>
+                        <span className="text-sm text-neutral-500 mt-2 block">{displaySubtitle}</span>
                     </p>
                 </div>
 

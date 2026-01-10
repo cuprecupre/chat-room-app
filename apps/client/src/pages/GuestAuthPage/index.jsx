@@ -2,11 +2,15 @@ import { useNavigate } from "react-router-dom";
 import { GuestAuthScreen } from "../../components/GuestAuthScreen";
 import { ROUTES } from "../../routes/routes";
 
-export function GuestAuthPage({ onLoginAsGuest, isLoading, error, clearError }) {
+export function GuestAuthPage({ onLoginAsGuest, isLoading, error, clearError, onBack }) {
     const navigate = useNavigate();
 
     const handleBack = () => {
-        navigate(ROUTES.HOME);
+        if (onBack) {
+            onBack();
+        } else {
+            navigate(ROUTES.HOME);
+        }
         if (clearError) clearError();
     };
 

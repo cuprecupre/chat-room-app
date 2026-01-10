@@ -8,11 +8,16 @@ export function EmailAuthPage({
     isLoading,
     error,
     clearError,
+    onBack,
 }) {
     const navigate = useNavigate();
 
     const handleBack = () => {
-        navigate(ROUTES.HOME);
+        if (onBack) {
+            onBack();
+        } else {
+            navigate(ROUTES.HOME);
+        }
         clearError();
     };
 

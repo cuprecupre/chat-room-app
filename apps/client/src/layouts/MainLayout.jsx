@@ -116,7 +116,7 @@ export function MainLayout({
                         onClick={handleTitleClick}
                         className="text-xl sm:text-2xl font-serif text-neutral-50 hover:text-orange-400 transition-colors active:scale-95 cursor-pointer"
                     >
-                        El Impostor
+                        {t('login.appTitle')}
                     </button>
                     <div className="flex items-center gap-3 sm:gap-4">
                         {/* Language Selector */}

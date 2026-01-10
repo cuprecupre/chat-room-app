@@ -28,19 +28,6 @@ import DebugPreviewSingle from "../pages/DebugPreviewSingle";
 // Firebase Storage CDN URL
 const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
 
-// Helper to sync URL language with i18next
-function LanguageWrapper({ lang, children }) {
-    const { i18n } = useTranslation();
-    useEffect(() => {
-        // Only change if different to avoid infinite loops or unnecessary renders
-        if (i18n.language !== lang) {
-            i18n.changeLanguage(lang);
-        }
-    }, [lang, i18n]);
-
-    return children;
-}
-
 function AppRoutes({
     user,
     loading,
@@ -110,6 +97,16 @@ function AppRoutes({
         prevRoomIdRef.current = currentRoomId;
     }, [gameState?.roomId, location.pathname, navigate]);
 
+    const handleGoToGuestAuth = () => {
+        const isEnglish = location.pathname.startsWith('/en');
+        navigate(isEnglish ? '/en/guest' : ROUTES.GUEST_AUTH);
+    };
+
+    const handleBackToHome = () => {
+        const isEnglish = location.pathname.startsWith('/en');
+        navigate(isEnglish ? '/en' : ROUTES.HOME);
+    };
+
     // Props for different route groups
     const publicRouteProps = {
         user,
@@ -117,6 +114,7 @@ function AppRoutes({
         loading,
         onOpenInstructions: openInstructions,
         onOpenFeedback: openFeedback,
+        onGoToGuestAuth: handleGoToGuestAuth,
     };
 
     const authRouteProps = {
@@ -127,6 +125,7 @@ function AppRoutes({
         loading,
         error,
         clearError,
+        onBack: handleBackToHome,
     };
 
     const protectedRouteProps = {
@@ -177,20 +176,20 @@ function AppRoutes({
             <Routes>
                 {/* ==================== PUBLIC ROUTES (ES - Default) ==================== */}
                 <Route element={<UnauthenticatedLayout />}>
-                    <Route path={ROUTES.HOME} element={<LanguageWrapper lang="es"><HomeRoute {...publicRouteProps} /></LanguageWrapper>} />
-                    <Route path={ROUTES.AUTH} element={<LanguageWrapper lang="es"><AuthRoute {...authRouteProps} /></LanguageWrapper>} />
-                    <Route path={ROUTES.GUEST_AUTH} element={<LanguageWrapper lang="es"><GuestAuthRoute {...authRouteProps} /></LanguageWrapper>} />
-                    <Route path={ROUTES.RULES} element={<LanguageWrapper lang="es"><RulesPage /></LanguageWrapper>} />
-                    <Route path="/privacidad" element={<LanguageWrapper lang="es"><PrivacyPage /></LanguageWrapper>} />
-                    <Route path="/cookies" element={<LanguageWrapper lang="es"><CookiesPage /></LanguageWrapper>} />
+                    <Route path={ROUTES.HOME} element={<RootHandler><HomeRoute {...publicRouteProps} /></RootHandler>} />
+                    <Route path={ROUTES.AUTH} element={<AuthRoute {...authRouteProps} />} />
+                    <Route path={ROUTES.GUEST_AUTH} element={<GuestAuthRoute {...authRouteProps} />} />
+                    <Route path={ROUTES.RULES} element={<RulesPage />} />
+                    <Route path="/privacidad" element={<PrivacyPage />} />
+                    <Route path="/cookies" element={<CookiesPage />} />
 
                     {/* ==================== PUBLIC ROUTES (EN) ==================== */}
-                    <Route path="/en" element={<LanguageWrapper lang="en"><HomeRoute {...publicRouteProps} /></LanguageWrapper>} />
-                    <Route path="/en/auth" element={<LanguageWrapper lang="en"><AuthRoute {...authRouteProps} /></LanguageWrapper>} />
-                    <Route path="/en/guest" element={<LanguageWrapper lang="en"><GuestAuthRoute {...authRouteProps} /></LanguageWrapper>} />
-                    <Route path="/en/rules" element={<LanguageWrapper lang="en"><RulesPage /></LanguageWrapper>} />
-                    <Route path="/en/privacy" element={<LanguageWrapper lang="en"><PrivacyPage /></LanguageWrapper>} />
-                    <Route path="/en/cookies" element={<LanguageWrapper lang="en"><CookiesPage /></LanguageWrapper>} />
+                    <Route path="/en" element={<HomeRoute {...publicRouteProps} />} />
+                    <Route path="/en/auth" element={<AuthRoute {...authRouteProps} />} />
+                    <Route path="/en/guest" element={<GuestAuthRoute {...authRouteProps} />} />
+                    <Route path="/en/rules" element={<RulesPage />} />
+                    <Route path="/en/privacy" element={<PrivacyPage />} />
+                    <Route path="/en/cookies" element={<CookiesPage />} />
 
                     {import.meta.env.DEV && (
                         <>
@@ -235,6 +234,25 @@ function SmartRedirect() {
     const isEnglish = i18n.language.startsWith('en');
     const target = isEnglish ? "/en" : "/";
     return <Navigate to={target} replace />;
+}
+
+// Root handler for automatic language-based redirect
+// - If user's i18n language is 'en', redirect to '/en' for SEO
+// - Otherwise render Spanish content directly
+// - Does NOT change language state - only handles URL routing
+function RootHandler({ children }) {
+    const { i18n } = useTranslation();
+    const location = useLocation();
+
+    // If user's language preference is English, redirect to /en path for SEO
+    // The i18n state is the source of truth, we just adjust the URL
+    if (i18n.language?.startsWith('en')) {
+        const target = `/en${location.search}`;
+        return <Navigate to={target} replace />;
+    }
+
+    // Spanish users stay on / path
+    return children;
 }
 
 export function AppRouter() {
