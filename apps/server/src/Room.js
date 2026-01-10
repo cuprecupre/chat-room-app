@@ -231,6 +231,13 @@ class Room {
 
         if (newOptions && typeof newOptions === "object") {
             this.options = { ...this.options, ...newOptions };
+
+            // Update language if provided in options (e.g. from Lobby)
+            if (newOptions.language) {
+                this.language = newOptions.language;
+                console.log(`[Room ${this.roomId}] Language updated to: ${this.language}`);
+            }
+
             this.persist();
         }
     }

@@ -9,7 +9,7 @@ import { Info } from "lucide-react";
 import confetti from "canvas-confetti";
 
 export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
-    const { t } = useTranslation('game');
+    const { t, i18n } = useTranslation('game');
     const { t: tc } = useTranslation('common');
     const [showScoringModal, setShowScoringModal] = useState(false);
 
@@ -62,7 +62,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
     // Determinar si ganó el impostor
     const impostorWon = state.winnerId === state.impostorId;
 
-    // Título y subtítulo de ganador
+    // Titulo y subtitulo de ganador
     let winnerLabel, winnerTitle, winnerSubtitle;
     if (state.winner === "Empate") {
         winnerLabel = null;
@@ -76,6 +76,18 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
         winnerLabel = null;
         winnerTitle = t('gameOver.friendsWin');
         winnerSubtitle = t('gameOver.impostorCaught');
+    }
+
+    // Determine displayed secret word based on client language
+    const currentLang = i18n.language?.startsWith('en') ? 'en' : 'es';
+    let displaySecretWord = state.secretWord;
+
+    if (state.secretWordTranslations) {
+        if (currentLang === 'en' && state.secretWordTranslations.en) {
+            displaySecretWord = state.secretWordTranslations.en.word;
+        } else if (currentLang === 'es' && state.secretWordTranslations.es) {
+            displaySecretWord = state.secretWordTranslations.es.word;
+        }
     }
 
     return (
@@ -129,7 +141,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                                         {t('gameOver.secretWord')}
                                     </p>
                                     <p className="text-xl text-white font-medium text-center break-words leading-tight max-w-full capitalize">
-                                        {state.secretWord}
+                                        {displaySecretWord}
                                     </p>
                                 </div>
                             </>

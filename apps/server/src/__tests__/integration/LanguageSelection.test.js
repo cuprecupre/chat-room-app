@@ -68,4 +68,28 @@ describe("Language Selection Integration", () => {
         const secretWord = room.currentMatch.secretWord;
         expect(isWordInLanguage(secretWord, 'es')).toBe(true);
     });
+
+    test("Updating room options should update language", () => {
+        // 1. Create room (defaults to 'es')
+        const room = new Room(hostUser, {});
+        room.addPlayer(player2);
+
+        expect(room.language).toBe('es');
+
+        // 2. Update options to 'en'
+        room.updateOptions(hostUser.uid, { language: 'en' });
+
+        // 3. Verify room language updated
+        expect(room.language).toBe('en');
+
+        // 4. Start match
+        room.startMatch(hostUser.uid);
+
+        // 5. Verify match language is 'en' and word is English
+        expect(room.currentMatch.language).toBe('en');
+        const secretWord = room.currentMatch.secretWord;
+
+        console.log(`[Update Test] Secret word: ${secretWord}`);
+        expect(isWordInLanguage(secretWord, 'en')).toBe(true);
+    });
 });

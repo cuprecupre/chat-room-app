@@ -1,10 +1,13 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * ShutdownToast - Displays a persistent countdown toast during server shutdown.
  * Shows the remaining time until server maintenance begins.
  */
 export function ShutdownToast({ shutdownCountdown }) {
+    const { t } = useTranslation('common');
+
     if (!shutdownCountdown) return null;
 
     const { remainingSeconds, message } = shutdownCountdown;
@@ -47,10 +50,10 @@ export function ShutdownToast({ shutdownCountdown }) {
                 {/* Message */}
                 <div className="flex flex-col">
                     <span className="text-sm font-medium">
-                        {message || "Reiniciaremos el servidor en un momento"}
+                        {message || t('system.shutdownMessage')}
                     </span>
                     <span className={`text-xs ${isUrgent ? "text-red-300" : "text-amber-300"}`}>
-                        Podrás volver a jugar en unos instantes.
+                        {t('system.shutdownNote')}
                     </span>
                 </div>
 

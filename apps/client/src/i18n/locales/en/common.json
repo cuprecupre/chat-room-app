@@ -118,7 +118,9 @@
         "disconnectedHostTransfer": "{{name}} disconnected. {{newHost}} is now the host",
         "userDisconnected": "{{name}} disconnected",
         "authenticating": "Authenticating",
-        "verifyingSession": "Verifying session..."
+        "verifyingSession": "Verifying session...",
+        "shutdownMessage": "Server restarting shortly",
+        "shutdownNote": "You will be able to play again in a few moments."
     },
     "lobby": {
         "startPlaying": "Start playing",
