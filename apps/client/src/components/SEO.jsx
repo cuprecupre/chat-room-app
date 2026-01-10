@@ -25,7 +25,7 @@ export function SEO({ title, description, path = "" }) {
     return (
         <Helmet>
             <html lang={currentLang} />
-            <title>{title ? `${title} | ${gameName}` : gameName}</title>
+            <title>{title || gameName}</title>
             <meta name="description" content={description} />
 
             {/* Open Graph */}
