@@ -154,10 +154,15 @@
             "joinRoom": "Join room",
             "enter": "Enter room",
             "backToHome": "Back to start",
-            "backToRoom": "Back to my room"
+            "backToRoom": "Back to my room",
+            "createNewRoom": "Create new room"
         },
         "errors": {
             "notFound": "Game does not exist or has ended.",
+            "roomNotFound": {
+                "title": "Room no longer exists",
+                "subtitle": "Create a new room to invite your friends to play another game."
+            },
             "joinFailed": "Could not join",
             "inProgress": "You are in a game. If you join, you will leave it."
         }

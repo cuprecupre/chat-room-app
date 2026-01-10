@@ -7,9 +7,13 @@
         "lastChance": "Última oportunidad para descubrir al impostor",
         "firstTurnFor": "El primer turno es para:"
     },
+    "roles": {
+        "impostor": "Impostor",
+        "friend": "Amigo"
+    },
     "gameOver": {
-        "friendsWin": "Los amigos ganan la partida",
-        "impostorWin": "El impostor gana la partida",
+        "friendsWin": "¡Los Amigos ganan!",
+        "impostorWin": "¡El Impostor gana!",
         "impostorCaught": "El impostor fue descubierto",
         "impostorWas": "El impostor era",
         "secretWord": "Palabra secreta",
@@ -58,6 +62,8 @@
         "startGame": "Comenzar partida"
     },
     "playing": {
+        "impostorHint": "Ayuda extra: La palabra secreta\nestá relacionada con...",
+        "mission": "Tu misión",
         "round": "Ronda",
         "yourTurn": "Tu turno",
         "giveClue": "Da una pista sobre la palabra",
@@ -71,7 +77,7 @@
         "youAreFriend": "Eres Amigo",
         "secretWord": "La palabra secreta es",
         "category": "Categoría:",
-        "tryToBlend": "¡Intenta pasar desapercibido y no te pillen!",
+        "tryToBlend": "Intenta pasar desapercibido",
         "you": "Tú",
         "eliminated": "Eliminado",
         "total": "Total",
@@ -87,15 +93,15 @@
     },
     "modals": {
         "leaveMatch": {
-            "title": "¿Abandonar partida?",
-            "returnTitle": "¿Volver a la sala?",
+            "title": "Abandonar partida",
+            "returnTitle": "Volver a la sala",
             "description": "Perderás tu avance en esta partida y volverás a la sala.",
             "returnToRoom": "Volverás a la sala.",
             "hostWarning": "Como anfitrión si abandonas la partida se terminará para los demás jugadores. Todos irán juntos a la sala donde podrás comenzar una nueva partida.",
             "confirm": "Abandonar"
         },
         "leaveRoom": {
-            "title": "¿Salir de la sala?",
+            "title": "Salir de la sala",
             "description": "Saldrás de la sala y volverás al inicio.",
             "confirm": "Salir"
         },
@@ -122,16 +128,16 @@
     },
     "disconnectedPlayer": "Jugador desconectado",
     "card": {
-        "tapToFlip": "Toca para voltear la carta",
+        "tapToFlip": "Toca para girar",
         "frontAlt": "Frente de la carta",
         "viewCard": "Ver mi carta",
         "backAlt": "Dorso de la carta",
-        "flipBack": "Volver al frente",
+        "flipBack": "Volver a girar",
         "yourRole": "Tu rol",
-        "hint": "Ayuda:",
+        "hint": "Pista:",
         "hintDescription": "La palabra secreta está relacionada con...",
         "secretWord": "Palabra secreta",
-        "flipYourCard": "Descubre tu carta"
+        "flipYourCard": "Revelar tu carta"
     },
     "board": {
         "clueAndVoteRound": "Ronda de pistas y votos"

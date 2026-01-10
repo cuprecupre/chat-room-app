@@ -70,7 +70,7 @@ export function LanguageSelector({ className = '' }) {
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/10 transition-all duration-200"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 transition-all duration-200"
                 aria-expanded={isOpen}
                 aria-haspopup="listbox"
             >
@@ -88,13 +88,13 @@ export function LanguageSelector({ className = '' }) {
 
             {/* Dropdown Menu */}
             {isOpen && (
-                <div className="absolute top-full right-0 mt-2 py-2 min-w-[140px] bg-neutral-900 border border-white/10 rounded-xl shadow-2xl z-50 animate-fadeIn">
+                <div className="absolute top-full right-0 mt-2 w-48 bg-neutral-950/95 backdrop-blur-md border border-white/10 ring-1 ring-white/10 rounded-xl shadow-2xl z-50 animate-fadeIn p-2">
                     {languages.map((lang) => (
                         <button
                             type="button"
                             key={lang.code}
                             onClick={() => handleChange(lang.code)}
-                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-white/5 transition-colors ${i18n.language?.startsWith(lang.code) ? 'text-orange-400' : 'text-neutral-300'
+                            className={`w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-white/10 rounded-md transition-colors ${i18n.language?.startsWith(lang.code) ? 'text-orange-400 bg-white/5' : 'text-neutral-200'
                                 }`}
                             role="option"
                             aria-selected={i18n.language?.startsWith(lang.code)}
@@ -102,7 +102,7 @@ export function LanguageSelector({ className = '' }) {
                             <span className="text-base">{lang.flag}</span>
                             <span className="text-sm font-medium flex-1">{lang.name}</span>
                             {i18n.language?.startsWith(lang.code) && (
-                                <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                                 </svg>
                             )}

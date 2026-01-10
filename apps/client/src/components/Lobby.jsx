@@ -7,9 +7,11 @@ import { Button } from "./ui/Button";
 const homeImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
 
 export function Lobby({ onCreateGame }) {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
     const handleCreateGame = () => {
-        onCreateGame();
+        // Pass current language so server uses correct word list
+        const lang = i18n.language?.startsWith('en') ? 'en' : 'es';
+        onCreateGame({ language: lang });
     };
 
     return (

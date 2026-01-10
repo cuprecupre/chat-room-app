@@ -7,9 +7,13 @@
         "lastChance": "Last chance to catch the impostor",
         "firstTurnFor": "First turn goes to:"
     },
+    "roles": {
+        "impostor": "Impostor",
+        "friend": "Friend"
+    },
     "gameOver": {
-        "friendsWin": "Friends win the game",
-        "impostorWin": "The impostor wins the game",
+        "friendsWin": "Friends win!",
+        "impostorWin": "The Impostor wins!",
         "impostorCaught": "The impostor was caught",
         "impostorWas": "The impostor was",
         "secretWord": "Secret word",
@@ -58,6 +62,8 @@
         "startGame": "Start game"
     },
     "playing": {
+        "impostorHint": "Extra hint: The secret word\nis related to...",
+        "mission": "Your mission",
         "round": "Round",
         "yourTurn": "Your turn",
         "giveClue": "Give a clue about the word",
@@ -71,7 +77,7 @@
         "youAreFriend": "You are a Friend",
         "secretWord": "The secret word is",
         "category": "Category:",
-        "tryToBlend": "Try to blend in and don't get caught!",
+        "tryToBlend": "Try to blend in",
         "you": "You",
         "eliminated": "Eliminated",
         "total": "Total",
@@ -87,15 +93,15 @@
     },
     "modals": {
         "leaveMatch": {
-            "title": "Leave game?",
-            "returnTitle": "Return to room?",
+            "title": "Leave game",
+            "returnTitle": "Return to room",
             "description": "You will lose your progress in this game and return to the room.",
             "returnToRoom": "You will return to the room.",
             "hostWarning": "As the host, if you leave, the game will end for all players. Everyone will go to the room where you can start a new game.",
             "confirm": "Leave"
         },
         "leaveRoom": {
-            "title": "Leave room?",
+            "title": "Leave room",
             "description": "You will leave the room and return to the home screen.",
             "confirm": "Leave"
         },

@@ -84,9 +84,10 @@ function startNewMatch(match) {
     }
 
     // Seleccionar palabra para todo el match (NO cambia entre rondas)
-    const { word, category } = getRandomWordWithCategory();
+    const { word, category, translations } = getRandomWordWithCategory(match.language || 'es');
     match.secretWord = word;
     match.secretCategory = category;
+    match.secretWordTranslations = translations;
 
     // Calcular jugador inicial UNA VEZ para todo el match
     // (roundPlayers debe estar configurado antes de calcular)

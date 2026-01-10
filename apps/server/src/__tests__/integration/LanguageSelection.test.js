@@ -1,0 +1,71 @@
+const Room = require("../../Room");
+const { wordData } = require("../../words");
+
+// Helper to check if a word belongs to a language
+function isWordInLanguage(word, lang) {
+    const langWords = wordData[lang];
+    // Flatten all words for that language
+    const allWords = Object.values(langWords).flat();
+    return allWords.includes(word);
+}
+
+describe("Language Selection Integration", () => {
+    const hostUser = { uid: "host1", name: "Host", photoURL: null };
+    const player2 = { uid: "p2", name: "Player 2", photoURL: null };
+
+    test("Room created with 'es' should select Spanish words", () => {
+        const room = new Room(hostUser, { language: 'es' });
+        room.addPlayer(player2);
+
+        // Start match
+        room.startMatch(hostUser.uid);
+
+        const secretWord = room.currentMatch.secretWord;
+
+        // Verify language
+        expect(room.language).toBe('es');
+        expect(room.currentMatch.language).toBe('es');
+
+        // Verify word is in Spanish dict
+        const isSpanish = isWordInLanguage(secretWord, 'es');
+        const isEnglish = isWordInLanguage(secretWord, 'en');
+
+        // Note: Some words might exist in both (comparatively rare, but "radio" etc)
+        // Check if it's DEFINITELY not English if exclusively Spanish, or just exists in Spanish
+        console.log(`[ES Test] Secret word: ${secretWord}`);
+        expect(isSpanish).toBe(true);
+    });
+
+    test("Room created with 'en' should select English words", () => {
+        const room = new Room(hostUser, { language: 'en' });
+        room.addPlayer(player2);
+
+        // Start match
+        room.startMatch(hostUser.uid);
+
+        const secretWord = room.currentMatch.secretWord;
+
+        // Verify language
+        expect(room.language).toBe('en');
+        expect(room.currentMatch.language).toBe('en');
+
+        // Verify word is in English dict
+        const isEnglish = isWordInLanguage(secretWord, 'en');
+
+        console.log(`[EN Test] Secret word: ${secretWord}`);
+        expect(isEnglish).toBe(true);
+    });
+
+    test("Room defaulted should use 'es'", () => {
+        const room = new Room(hostUser, {}); // No language
+        room.addPlayer(player2);
+
+        room.startMatch(hostUser.uid);
+
+        expect(room.language).toBe('es');
+        expect(room.currentMatch.language).toBe('es');
+
+        const secretWord = room.currentMatch.secretWord;
+        expect(isWordInLanguage(secretWord, 'es')).toBe(true);
+    });
+});

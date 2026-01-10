@@ -13,8 +13,9 @@ import { GameNotFoundCard } from "../../components/InviteErrors";
  */
 export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinError }) {
     const navigate = useNavigate();
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
     const { urlRoomId, previewHostName, error, clearPreview } = useGameInvite(gameState);
+    const lang = i18n.language?.startsWith('en') ? 'en' : 'es';
 
     // If user joins a room successfully, redirect to game page
     useEffect(() => {
@@ -58,7 +59,7 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
                     const url = new URL(window.location);
                     url.searchParams.delete("roomId");
                     window.history.replaceState({}, "", url.toString());
-                    emit("create-room", {});
+                    emit("create-room", { language: lang });
                 }}
             />
         );
@@ -87,7 +88,7 @@ export function InvitePage({ gameState, emit, joinGame, joinError, clearJoinErro
                         const url = new URL(window.location);
                         url.searchParams.delete("roomId");
                         window.history.replaceState({}, "", url.toString());
-                        emit("create-room", {});
+                        emit("create-room", { language: lang });
                     }}
                 />
             );

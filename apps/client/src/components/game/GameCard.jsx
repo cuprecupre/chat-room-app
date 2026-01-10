@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../ui/Button";
-import { capitalize, translateRole } from "./utils";
+import { capitalize } from "./utils";
 
 // Firebase Storage CDN URLs
 const CDN_BASE = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2F";
@@ -10,7 +10,7 @@ const cardImg = `${CDN_BASE}card.jpg${CDN_SUFFIX}`;
 const cardBackImg = `${CDN_BASE}card-back.jpg${CDN_SUFFIX}`;
 
 export function GameCard({ state, initialAnimationPending, showCardEntrance, showRestOfUI }) {
-    const { t } = useTranslation('game');
+    const { t, i18n } = useTranslation('game');
     const [reveal, setReveal] = useState(false);
     const [cardAnimating, setCardAnimating] = useState(false);
     const revealTimeoutRef = useRef(null);
@@ -119,53 +119,83 @@ export function GameCard({ state, initialAnimationPending, showCardEntrance, sho
                                     className="relative z-10 text-center p-8 backdrop-blur-sm rounded-xl pointer-events-none"
                                     title={t('card.flipBack', 'Flip back')}
                                 >
-                                    <div className="space-y-4">
-                                        <div>
-                                            <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-orange-400">
-                                                <span>{t('card.yourRole', 'Your role')}</span>
-                                            </div>
-                                            <p className="text-xl font-serif mt-1 text-white">
-                                                {capitalize(translateRole(state.role))}
-                                            </p>
-                                        </div>
+                                    {/* Main Content (Role & Word) */}
+                                    <div className="flex-1 flex flex-col items-center justify-center py-6 gap-8">
+                                        {(() => {
+                                            // Dynamic Content Resolution
+                                            const langKey = i18n.language?.split('-')[0] || 'es';
+                                            const translations = state.secretWordTranslations?.[langKey];
 
-                                        {/* Línea separadora */}
-                                        <div className="w-full h-px bg-white/20"></div>
+                                            // Resolve Word
+                                            let displayWord = translations?.word || state.secretWord;
 
-                                        {state.role === "impostor" ? (
-                                            <>
-                                                {state.secretCategory && (
+                                            // Handle special keys (Impostor Hint)
+                                            if (displayWord === 'SECRET_WORD_HINT') {
+                                                displayWord = t('card.hint');
+                                            }
+
+                                            // Resolve Category
+                                            const displayCategory = translations?.category || state.secretCategory;
+
+                                            return (
+                                                <>
                                                     <div>
-                                                        <div className="flex flex-col items-center justify-center gap-1 text-xs tracking-wider text-orange-400">
-                                                            <span className="uppercase">
-                                                                {t('card.hint', 'Hint:')}
-                                                            </span>
-                                                            <span className="normal-case">
-                                                                {t('card.hintDescription', 'The secret word is related to...')}
-                                                            </span>
-                                                        </div>
-                                                        <p className="font-serif text-xl mt-1 text-white underline decoration-dotted underline-offset-4">
-                                                            {capitalize(
-                                                                state.secretCategory
-                                                            )}
-                                                        </p>
+                                                        {state.role === 'impostor' ? (
+                                                            <div className="flex flex-col items-center">
+                                                                <p className="text-xl font-serif mt-1 text-white">
+                                                                    {t('playing.youAreImpostor')}
+                                                                </p>
+                                                                <p className="text-white text-xs leading-relaxed mt-2 opacity-90">
+                                                                    {t('playing.tryToBlend')}
+                                                                </p>
+                                                            </div>
+                                                        ) : (
+                                                            <>
+                                                                <div className="flex items-center justify-center gap-2 text-xs text-orange-400 uppercase font-medium">
+                                                                    <span>{t('card.yourRole', 'Your role')}</span>
+                                                                </div>
+                                                                <p className="text-xl font-serif mt-1 text-white">
+                                                                    {capitalize(t(`roles.${state.role}`, state.role))}
+                                                                </p>
+                                                            </>
+                                                        )}
                                                     </div>
-                                                )}
-                                            </>
-                                        ) : (
-                                            <div>
-                                                <div className="flex items-center justify-center gap-2 text-xs tracking-wider uppercase text-orange-400">
-                                                    <span>
-                                                        {t('card.secretWord', 'Secret word')}
-                                                    </span>
-                                                </div>
-                                                <p className="font-serif text-xl mt-1 text-white">
-                                                    {capitalize(
-                                                        state.secretWord
-                                                    )}
-                                                </p>
-                                            </div>
-                                        )}
+
+                                                    <div className="w-full">
+                                                        {state.role === 'impostor' ? (
+                                                            // Impostor View
+                                                            <div className="w-full px-1 mx-auto">
+                                                                {displayCategory && (
+                                                                    <div className="mb-6">
+                                                                        <div className="text-center">
+                                                                            <span className="text-xs text-orange-400 block mb-1 uppercase font-medium whitespace-pre-line">
+                                                                                {t('playing.impostorHint')}
+                                                                            </span>
+                                                                            <span className="text-xl font-serif text-white block">
+                                                                                {capitalize(displayCategory)}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+
+                                                        ) : (
+                                                            // Friend View
+                                                            <div className="min-w-[180px] mx-auto">
+                                                                <div className="flex flex-col items-center gap-3">
+                                                                    <p className="text-orange-400 text-xs uppercase font-medium">
+                                                                        {t('card.secretWord')}
+                                                                    </p>
+                                                                    <p className="text-xl font-serif text-white mb-2">
+                                                                        {capitalize(displayWord)}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div >
+                                                </>
+                                            );
+                                        })()}
                                     </div>
                                 </div>
                             </div>
@@ -199,6 +229,8 @@ export function GameCard({ state, initialAnimationPending, showCardEntrance, sho
                     <span>{t('card.flipYourCard', 'Reveal your card')}</span>
                 </Button>
             </div>
-        </div>
+        </div >
     );
 }
+
+export default GameCard;

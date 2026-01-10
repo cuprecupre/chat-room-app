@@ -6,6 +6,15 @@
  * - getEnrichedGameData: Full match data for persistence
  */
 
+// Role and message translations
+// Role and message keys (Client will translate)
+const KEYS = {
+    IMPOSTOR: 'impostor',
+    FRIEND: 'friend',
+    SECRET_WORD_HINT: 'SECRET_WORD_HINT',
+    DISCONNECTED_PLAYER: 'DISCONNECTED_PLAYER',
+};
+
 function getStateForPlayer(match, userId) {
     const player = match.players.find((p) => p.uid === userId);
     if (!player) return null;
@@ -35,11 +44,22 @@ function getStateForPlayer(match, userId) {
             baseState.phase = "lobby_wait";
         } else {
             // Player is active or eliminated - keep in playing phase
-            baseState.role = match.impostorId === userId ? "impostor" : "friend";
+            // const lang = match.language || 'es'; // Deprecated server-side translation
             const isImpostor = match.impostorId === userId;
-            baseState.secretWord = isImpostor ? "Descubre la palabra secreta" : match.secretWord;
+            baseState.role = isImpostor ? KEYS.IMPOSTOR : KEYS.FRIEND;
+            baseState.secretWord = isImpostor
+                ? KEYS.SECRET_WORD_HINT
+                : match.secretWord;
             if (isImpostor && match.showImpostorHint) {
                 baseState.secretCategory = match.secretCategory;
+                // Send ONLY categories to impostor to prevent leaking the word
+                baseState.secretWordTranslations = {
+                    es: { category: match.secretWordTranslations?.es?.category },
+                    en: { category: match.secretWordTranslations?.en?.category }
+                };
+            } else if (!isImpostor) {
+                // Friends get everything
+                baseState.secretWordTranslations = match.secretWordTranslations;
             }
 
             // Info de votación
@@ -52,19 +72,22 @@ function getStateForPlayer(match, userId) {
             baseState.roundHistory = match.roundHistory;
         }
     } else if (match.phase === "round_result" || match.phase === "game_over") {
+        // const lang = match.language || 'es';
         const impostor = match.players.find((p) => p.uid === match.impostorId);
         const formerImpostor = match.formerPlayers[match.impostorId];
         baseState.impostorName = impostor
             ? impostor.name
             : formerImpostor
                 ? formerImpostor.name
-                : "Jugador desconectado";
+                : KEYS.DISCONNECTED_PLAYER;
         baseState.impostorId = match.impostorId;
         baseState.secretWord = match.secretWord;
         baseState.lastRoundScores = match.lastRoundScores;
         baseState.eliminatedPlayers = eliminated;
+        baseState.eliminatedPlayers = eliminated;
         baseState.formerPlayers = match.formerPlayers;
         baseState.playerBonus = match.playerBonus || {};
+        baseState.secretWordTranslations = match.secretWordTranslations;
         baseState.roundHistory = match.roundHistory;
 
         if (match.phase === "game_over") {

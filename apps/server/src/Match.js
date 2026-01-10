@@ -43,6 +43,9 @@ class Match {
             this.showImpostorHint = room.options?.showImpostorHint !== undefined
                 ? room.options.showImpostorHint : true;
             this.options = options.options || room.options;
+
+            // Language for words/roles (from Room)
+            this.language = options.language || room.language || 'es';
         } else {
             // Legacy mode: first argument is hostUser
             const hostUser = roomOrHostUser;
@@ -74,6 +77,9 @@ class Match {
             this.showImpostorHint = options.showImpostorHint !== undefined
                 ? options.showImpostorHint : true;
             this.options = options;
+
+            // Language for words/roles
+            this.language = options.language || 'es';
         }
 
         // Timing

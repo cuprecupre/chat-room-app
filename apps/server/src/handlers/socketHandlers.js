@@ -179,6 +179,7 @@ async function handleCreateRoom(socket, user, options = {}) {
     dbService.updatePlayerStats(user.uid, { roomsCreated: 1 });
 
     console.log(`Room created: ${newRoom.roomId} by ${user.name} with options:`, opts);
+    console.log(`[DEBUG] Room language set to: ${newRoom.language}`);
 }
 
 /**

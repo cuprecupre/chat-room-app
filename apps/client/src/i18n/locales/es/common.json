@@ -154,10 +154,15 @@
             "joinRoom": "Unirme a la sala",
             "enter": "Entrar a la sala",
             "backToHome": "Volver al inicio",
-            "backToRoom": "Volver a mi sala"
+            "backToRoom": "Volver a mi sala",
+            "createNewRoom": "Crear nueva sala"
         },
         "errors": {
             "notFound": "La partida no existe o ha terminado.",
+            "roomNotFound": {
+                "title": "La sala ya no existe",
+                "subtitle": "Crea una nueva sala para invitar a tus amigos a jugar otra partida."
+            },
             "joinFailed": "No se pudo unir",
             "inProgress": "Estás en una partida en curso. Si te unes, la abandonarás."
         }
