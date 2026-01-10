@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export function RoundStartOverlay({ state }) {
+    const { t } = useTranslation('game');
     const [visible, setVisible] = useState(false);
     const [displayedRound, setDisplayedRound] = useState(1);
 
@@ -25,25 +27,25 @@ export function RoundStartOverlay({ state }) {
                 <div className="space-y-6">
                     {displayedRound === 1 && (
                         <p className="text-xl uppercase tracking-[0.2em] text-white font-medium mb-1">
-                            Nueva partida
+                            {t('roundStart.newGame')}
                         </p>
                     )}
 
                     {displayedRound === 3 && (
                         <p className="text-xl uppercase tracking-[0.2em] text-white font-medium mb-1">
-                            Última ronda
+                            {t('roundStart.lastRound')}
                         </p>
                     )}
 
                     {/* Round Number */}
-                    <h1 className="text-7xl font-serif text-orange-400">Ronda {displayedRound}</h1>
+                    <h1 className="text-7xl font-serif text-orange-400">{t('roundStart.round')} {displayedRound}</h1>
 
                     {displayedRound === 2 && (
-                        <p className="text-2xl text-neutral-300">Nueva ronda de pistas</p>
+                        <p className="text-2xl text-neutral-300">{t('roundStart.newClueRound')}</p>
                     )}
                     {displayedRound === 3 && (
                         <p className="text-2xl text-neutral-300">
-                            Última oportunidad para descubrir al impostor
+                            {t('roundStart.lastChance')}
                         </p>
                     )}
                 </div>
@@ -53,7 +55,7 @@ export function RoundStartOverlay({ state }) {
                 {/* Starting Player - Solo en Ronda 1 */}
                 {startingPlayer && displayedRound === 1 && (
                     <div className="space-y-2">
-                        <p className="text-xl text-neutral-400">El primer turno es para:</p>
+                        <p className="text-xl text-neutral-400">{t('roundStart.firstTurnFor')}</p>
                         <p className="text-2xl font-serif text-white">
                             {startingPlayer.name}
                         </p>

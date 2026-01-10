@@ -10,19 +10,12 @@ export function CookiesPage() {
     const { t, i18n } = useTranslation('common');
     const isEn = i18n.language.startsWith('en');
 
-    // Title mapping
-    const title = isEn ? "Cookie Policy" : "Política de Cookies";
-    const backText = isEn ? "Back to home" : "Volver al inicio";
-
     return (
         <div className="min-h-screen bg-neutral-950 text-neutral-50 py-12 px-6 pb-64 md:pb-24 font-sans">
             <SEO
-                title={title}
-                description={isEn
-                    ? "Cookie Policy for The Impostor game. Learn about the cookies we use."
-                    : "Política de Cookies del juego El Impostor. Conoce qué cookies utilizamos."
-                }
-                path="/cookies"
+                title={t('legal.cookies.title')}
+                description={t('legal.cookies.description')}
+                path={isEn ? '/en/cookies' : '/cookies'}
             />
 
             <div className="max-w-3xl mx-auto">
@@ -32,10 +25,10 @@ export function CookiesPage() {
                     className="inline-flex items-center gap-2 text-neutral-400 hover:text-white transition-colors mb-8"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    {backText}
+                    {t('legal.cookies.backToHome')}
                 </Link>
 
-                <h1 className="text-4xl font-serif text-white mb-8">{title}</h1>
+                <h1 className="text-4xl font-serif text-white mb-8">{t('legal.cookies.title')}</h1>
 
                 {isEn ? <CookiesPolicyEN /> : <CookiesPolicyES />}
             </div>

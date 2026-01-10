@@ -161,5 +161,17 @@
             "joinFailed": "Could not join",
             "inProgress": "You are in a game. If you join, you will leave it."
         }
+    },
+    "legal": {
+        "privacy": {
+            "title": "Privacy Policy",
+            "description": "Privacy Policy for The Impostor game. Learn how we handle your data.",
+            "backToHome": "Back to home"
+        },
+        "cookies": {
+            "title": "Cookie Policy",
+            "description": "Cookie Policy for The Impostor game. Learn about the cookies we use.",
+            "backToHome": "Back to home"
+        }
     }
 }

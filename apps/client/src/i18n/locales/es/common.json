@@ -161,5 +161,17 @@
             "joinFailed": "No se pudo unir",
             "inProgress": "Estás en una partida en curso. Si te unes, la abandonarás."
         }
+    },
+    "legal": {
+        "privacy": {
+            "title": "Política de Privacidad",
+            "description": "Política de Privacidad del juego El Impostor. Conoce cómo tratamos tus datos.",
+            "backToHome": "Volver al inicio"
+        },
+        "cookies": {
+            "title": "Política de Cookies",
+            "description": "Política de Cookies del juego El Impostor. Conoce qué cookies utilizamos.",
+            "backToHome": "Volver al inicio"
+        }
     }
 }

@@ -12,7 +12,9 @@ export function LandingPage({
     onGoToGuestAuth,
 }) {
     const navigate = useNavigate();
-    const { t } = useTranslation('landing');
+    const { t, i18n } = useTranslation('landing');
+
+    const isEn = i18n.language.startsWith('en');
 
     const handleGoToEmailAuth = () => {
         navigate(ROUTES.AUTH);
@@ -29,9 +31,9 @@ export function LandingPage({
     return (
         <>
             <SEO
-                title={t('landing:meta.title')}
-                description={t('landing:meta.description')}
-                path="/"
+                title={t('meta.title')}
+                description={t('meta.description')}
+                path={isEn ? '/en' : '/'}
             />
             <LandingPageComponent
                 onLogin={onLogin}

@@ -1,4 +1,12 @@
 {
+    "roundStart": {
+        "newGame": "Nueva partida",
+        "lastRound": "Última ronda",
+        "round": "Ronda",
+        "newClueRound": "Nueva ronda de pistas",
+        "lastChance": "Última oportunidad para descubrir al impostor",
+        "firstTurnFor": "El primer turno es para:"
+    },
     "gameOver": {
         "friendsWin": "Los amigos ganan la partida",
         "impostorWin": "El impostor gana la partida",

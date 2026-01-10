@@ -1,4 +1,12 @@
 {
+    "roundStart": {
+        "newGame": "New game",
+        "lastRound": "Last round",
+        "round": "Round",
+        "newClueRound": "New clue round",
+        "lastChance": "Last chance to catch the impostor",
+        "firstTurnFor": "First turn goes to:"
+    },
     "gameOver": {
         "friendsWin": "Friends win the game",
         "impostorWin": "The impostor wins the game",

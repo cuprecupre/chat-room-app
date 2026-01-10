@@ -3,14 +3,15 @@ import { SEO } from "../../components/SEO";
 import { RulesPage as RulesPageComponent } from "../../components/RulesPage";
 
 export function RulesPage() {
-    const { t } = useTranslation('rules');
+    const { t, i18n } = useTranslation('rules');
+    const isEn = i18n.language.startsWith('en');
 
     return (
         <>
             <SEO
                 title={t('meta.title')}
                 description={t('meta.description')}
-                path="/reglas"
+                path={isEn ? '/en/rules' : '/reglas'}
             />
             <RulesPageComponent />
         </>
