@@ -44,6 +44,47 @@ export function SEO({ title, description, path = "" }) {
             <link rel="alternate" hreflang="es" href={esUrl} />
             <link rel="alternate" hreflang="en" href={enUrl} />
             <link rel="canonical" href={currentUrl} />
+
+            {/* Structured Data (JSON-LD) */}
+            <script type="application/ld+json">
+                {JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "WebSite",
+                    "name": "El Impostor",
+                    "alternateName": ["El Impostor Online", "The Impostor Game"],
+                    "url": "https://impostor.me/"
+                })}
+            </script>
+
+            <script type="application/ld+json">
+                {JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "Game",
+                    "name": currentLang === 'en' ? "The Impostor Online" : "El Impostor Online",
+                    "url": "https://impostor.me/",
+                    "description": currentLang === 'en'
+                        ? "Play Impostor online for free with friends. The impostor game in your browser without downloads."
+                        : "Juega al impostor online gratis con amigos. El juego del impostor en tu navegador sin descargar.",
+                    "genre": currentLang === 'en'
+                        ? ["Impostor Game", "Online Game", "Multiplayer", "Browser Game"]
+                        : ["Juego Impostor", "Juego Online", "Multijugador", "Juego Navegador"],
+                    "gamePlatform": "Web Browser",
+                    "applicationCategory": "Game",
+                    "numberOfPlayers": {
+                        "@type": "QuantitativeValue",
+                        "minValue": 4,
+                        "maxValue": 100
+                    },
+                    "playMode": "MultiPlayer",
+                    "offers": {
+                        "@type": "Offer",
+                        "price": "0",
+                        "priceCurrency": "EUR",
+                        "availability": "https://schema.org/InStock"
+                    },
+                    "inLanguage": currentLang
+                })}
+            </script>
         </Helmet>
     );
 }
