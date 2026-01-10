@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { hasConsent } from '../CookieConsent';
 
 // Fixed height for rectangle ad (used in GameOver)
 const AD_WIDTH = 300;
@@ -9,8 +8,7 @@ const AD_HEIGHT = 250;
  * AdBanner Component
  * 
  * Displays a Google AdSense ad unit with fixed dimensions.
- * - Shows personalized ads if consent given
- * - Shows non-personalized ads if consent denied (GDPR compliant)
+ * - Consent is now handled by Google CMP / Global settings in index.html
  * - Only loads in production
  * 
  * Props:
@@ -31,11 +29,8 @@ export function AdBanner({
     const isProduction = typeof window !== 'undefined' &&
         (window.location.hostname === 'impostor.me' || window.location.hostname === 'www.impostor.me');
 
-    // Check if user has consented to personalized ads
-    const hasPersonalizedConsent = hasConsent('advertising');
-
     useEffect(() => {
-        // Push ad in production (personalized or not based on consent)
+        // Push ad in production
         if (isProduction && adRef.current && window.adsbygoogle && !adPushed) {
             try {
                 (window.adsbygoogle = window.adsbygoogle || []).push({});
@@ -77,7 +72,6 @@ export function AdBanner({
                 }}
                 data-ad-client="ca-pub-6211741187285412"
                 data-ad-slot={slot}
-                {...(!hasPersonalizedConsent && { 'data-npa': '1' })}
             />
         </div>
     );
