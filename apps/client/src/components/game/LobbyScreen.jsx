@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, Share, Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "../ui/Button";
 import { PlayerList } from "./PlayerList";
 
@@ -40,8 +41,10 @@ export function LobbyScreen({
     const handleStartGame = () => {
         onStartGame({ showImpostorHint });
     };
+    const { t } = useTranslation('game');
+    const { t: tc } = useTranslation('common');
     const host = state.players?.find((p) => p.uid === state.hostId);
-    let hostName = host ? host.name.toUpperCase() : "EL ANFITRIÓN";
+    let hostName = host ? host.name.toUpperCase() : (t('lobby.host') || 'HOST');
 
     // Robustness: if I am the host, use my name directly
     if (isHost && user?.name) {
@@ -61,9 +64,9 @@ export function LobbyScreen({
                 /* HOST VIEW */
                 <>
                     <h2 className="text-4xl font-serif text-neutral-50 leading-tight">
-                        Invita a tus amigos
+                        {t('lobby.inviteFriendsTitle', 'Invite your friends')}
                         <br />
-                        para empezar
+                        {t('lobby.toStart', 'to start')}
                     </h2>
 
                     <div className="w-full space-y-4 mt-8">
@@ -79,12 +82,12 @@ export function LobbyScreen({
                                 <Link className="w-4 h-4" />
                             )}
                             {isMobile
-                                ? "Compartir invitación"
-                                : "Copiar enlace de la sala"}
+                                ? t('lobby.shareInvite', 'Share invite')
+                                : t('lobby.copyRoomLink', 'Copy room link')}
                         </Button>
 
                         <p className="text-sm text-neutral-400 font-regular animate-pulse max-w-[280px] mx-auto">
-                            Comparte el enlace y espera hasta que se unan para iniciar la partida
+                            {t('lobby.shareAndWait', 'Share the link and wait for players to join')}
                         </p>
 
                         <div className="w-full pt-2">
@@ -93,11 +96,10 @@ export function LobbyScreen({
                                 <label className="flex items-center justify-between cursor-pointer gap-4">
                                     <div className="flex-1 text-left">
                                         <span className="text-sm font-semibold text-neutral-300">
-                                            Jugar en modo fácil
+                                            {t('lobby.easyMode', 'Easy mode')}
                                         </span>
                                         <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
-                                            El Impostor recibirá una pequeña ayuda sobre la palabra
-                                            secreta.
+                                            {t('lobby.easyModeDesc', 'The Impostor will receive a hint about the secret word.')}
                                         </p>
                                     </div>
                                     <button
@@ -115,7 +117,7 @@ export function LobbyScreen({
                             </div>
 
                             <div className="text-sm font-semibold text-neutral-400 text-left px-1 mt-8 mb-3">
-                                Jugadores conectados: {state.players.length}
+                                {t('lobby.playersConnected', 'Players connected')}: {state.players.length}
                             </div>
                             <PlayerList
                                 players={state.players}
@@ -138,7 +140,7 @@ export function LobbyScreen({
                                 size="md"
                                 className="w-full"
                             >
-                                Comenzar partida
+                                {tc('buttons.startGame')}
                             </Button>
                         </div>
                     </div>
@@ -165,7 +167,7 @@ export function LobbyScreen({
                 /* GUEST VIEW */
                 <>
                     <h2 className="text-4xl font-serif text-neutral-50 leading-tight">
-                        La partida empezará pronto
+                        {t('lobby.gameStartingSoon', 'Game starting soon')}
                     </h2>
 
                     <div className="space-y-6 mt-8">
@@ -190,10 +192,10 @@ export function LobbyScreen({
                                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                 ></path>
                             </svg>
-                            Esperando a que <span className="text-orange-400 font-medium">
+                            {t('lobby.waitingFor', 'Waiting for')} <span className="text-orange-400 font-medium">
                                 {state.players.find((p) => p.uid === state.hostId)?.name ||
-                                    "el anfitrión"}
-                            </span> inicie la partida
+                                    "host"}
+                            </span> {t('lobby.toStartGame', 'to start the game')}
                         </p>
 
                         <div className="w-full">
@@ -201,12 +203,12 @@ export function LobbyScreen({
                                 <div className="mb-4 flex items-center justify-center gap-2">
                                     <Check className="w-3.5 h-3.5 text-green-500" strokeWidth={3} />
                                     <span className="text-[10px] uppercase tracking-[0.15em] font-semibold text-green-500/80">
-                                        Modo fácil activado
+                                        {t('lobby.easyModeOn', 'Easy mode enabled')}
                                     </span>
                                 </div>
                             )}
                             <div className="text-sm font-semibold text-neutral-400 text-left px-1 mt-8 mb-3">
-                                Jugadores conectados: {state.players.length}
+                                {t('lobby.playersConnected', 'Players connected')}: {state.players.length}
                             </div>
                             <PlayerList
                                 players={state.players}
@@ -221,7 +223,7 @@ export function LobbyScreen({
 
                         <div className="pt-4 space-y-3">
                             <p className="text-sm text-neutral-500">
-                                También puedes invitar amigos a esta partida
+                                {t('lobby.alsoInvite', 'You can also invite friends')}
                             </p>
                             <Button
                                 onClick={onCopyLink}
@@ -235,8 +237,8 @@ export function LobbyScreen({
                                     <Link className="w-4 h-4" />
                                 )}
                                 {isMobile
-                                    ? "Compartir invitación"
-                                    : "Copiar enlace de la sala"}
+                                    ? t('lobby.shareInvite', 'Share invite')
+                                    : t('lobby.copyRoomLink', 'Copy room link')}
                             </Button>
                         </div>
                     </div>

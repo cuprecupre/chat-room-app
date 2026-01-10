@@ -34,6 +34,9 @@ class Room {
                 ? opts.showImpostorHint : true,
         };
 
+        // Room language (set by host, used for words/roles)
+        this.language = opts.language || 'es';
+
         // Rotation tracking (persists across matches)
         this.lastStartingPlayerId = null;
         this.impostorHistory = [];
@@ -267,6 +270,7 @@ class Room {
             lastStartingPlayerId: this.lastStartingPlayerId,
             impostorHistory: this.impostorHistory,
             options: this.options,
+            language: this.language,
         });
 
         // Start the match logic (assign roles, secret word, etc.)

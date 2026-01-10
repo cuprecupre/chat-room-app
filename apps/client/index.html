@@ -13,17 +13,17 @@
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
 
-    // Default GLOBAL: analytics allowed (for Americas, Asia, Africa, etc.)
-    // These regions don't have strict cookie consent laws like GDPR
+    // Default GLOBAL: analytics AND ads allowed (Opt-out model for US/World)
+    // This enables personalized ads in US by default, complying with CCPA/CPRA (requires Opt-out mechanism)
     gtag('consent', 'default', {
-      'ad_storage': 'denied',
+      'ad_storage': 'granted',
       'analytics_storage': 'granted',
-      'ad_user_data': 'denied',
-      'ad_personalization': 'denied'
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted'
     });
 
-    // Override for EEA + UK + EFTA: all denied until CMP updates consent
-    // This ensures GDPR compliance - user must accept via CMP popup
+    // Override for EEA + UK + EFTA + Canada (optional): all denied until CMP updates consent
+    // This ensures GDPR compliance - user must accept via CMP popup (Opt-in model)
     gtag('consent', 'default', {
       'ad_storage': 'denied',
       'analytics_storage': 'denied',
@@ -117,42 +117,7 @@
     content="El Impostor Online - Juega gratis con amigos. Sin descargar, directo en el navegador." />
   <meta name="twitter:image" content="https://impostor.me/images/og.jpg" />
 
-  <!-- JSON-LD Structured Data for Google Site Name -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "El Impostor",
-    "alternateName": ["El Impostor Online", "Juego del Impostor"],
-    "url": "https://impostor.me/"
-  }
-  </script>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Game",
-    "name": "El Impostor Online",
-    "url": "https://impostor.me/",
-    "description": "Juega al impostor online gratis con amigos. El juego del impostor en tu navegador sin descargar.",
-    "genre": ["Juego Impostor", "Juego Online", "Multijugador", "Juego Navegador"],
-    "gamePlatform": "Web Browser",
-    "applicationCategory": "Game",
-    "numberOfPlayers": {
-        "@type": "QuantitativeValue",
-        "minValue": 4,
-        "maxValue": 100
-    },
-    "playMode": "MultiPlayer",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "EUR",
-      "availability": "https://schema.org/InStock"
-    },
-    "inLanguage": "es"
-  }
-  </script>
+  <!-- JSON-LD Structured Data moved to SEO.jsx for dynamic localization -->
 
   <title>Juego El Impostor Online - Jugar gratis sin descargas</title>
 </head>

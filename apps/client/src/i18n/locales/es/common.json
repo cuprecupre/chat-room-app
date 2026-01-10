@@ -1,0 +1,182 @@
+{
+    "nav": {
+        "howToPlay": "Cómo se juega",
+        "rules": "Reglas",
+        "playNow": "Jugar Ahora",
+        "openMenu": "Abrir menú de usuario"
+    },
+    "buttons": {
+        "play": "Jugar",
+        "playAgain": "Jugar otra partida",
+        "continue": "Continuar",
+        "close": "Cerrar",
+        "copy": "Copiar",
+        "copied": "¡Copiado!",
+        "leave": "Salir",
+        "cancel": "Cancelar",
+        "confirm": "Confirmar",
+        "understood": "Entendido",
+        "startGame": "Comenzar partida",
+        "nextRound": "Siguiente ronda",
+        "back": "Volver",
+        "forceExit": "Forzar salida"
+    },
+    "auth": {
+        "authenticating": "Autenticando",
+        "verifyingSession": "Verificando sesión...",
+        "continueWithGoogle": "Continuar con Google",
+        "continueWithEmail": "Continuar con Email",
+        "continueAsGuest": "Jugar como invitado",
+        "logout": "Cerrar sesión",
+        "login": "Iniciar sesión",
+        "createAccount": "Crear cuenta",
+        "createNewAccount": "Crear nueva cuenta",
+        "email": "Email",
+        "password": "Contraseña",
+        "nameAndSurname": "Nombre y Apellido",
+        "loggingIn": "Iniciando...",
+        "creatingAccount": "Creando cuenta...",
+        "accountQuestion": "¿Ya tienes una cuenta o quieres crear una nueva?",
+        "minPassword": "Mínimo 6 caracteres",
+        "enterNameError": "Por favor, ingresa tu nombre y apellido.",
+        "helpImprove": "Ayúdanos a mejorar",
+        "emailPlaceholder": "tu@email.com",
+        "passwordPlaceholder": "••••••••",
+        "namePlaceholder": "Ej: Juan Pérez",
+        "guest": {
+            "title": "Jugar como invitado",
+            "subtitle": "Ingresa un nombre para que los demás jugadores te reconozcan",
+            "yourName": "Tu nombre",
+            "placeholder": "Ej: Juan",
+            "visibleNote": "Este nombre será visible para todos los jugadores",
+            "enterToPlay": "Entrar a jugar",
+            "entering": "Entrando...",
+            "errorMinLength": "El nombre debe tener al menos 2 caracteres.",
+            "errorMaxLength": "El nombre no puede tener más de 30 caracteres.",
+            "note1": "Como invitado podrás jugar sin registrarte.",
+            "note2": "Tu sesión se mantendrá hasta que cierres el navegador."
+        }
+    },
+    "errors": {
+        "generic": "Ha ocurrido un error",
+        "connection": "Error de conexión",
+        "tryAgain": "Inténtalo de nuevo",
+        "connectionLost": "Conexión perdida",
+        "cantConnect": "No se puede conectar al servidor. Esto puede deberse a problemas de red o el servidor está inactivo.",
+        "retryConnection": "Reintentar conexión",
+        "sessionReset": "Sesión reiniciada. Vuelve al lobby."
+    },
+    "labels": {
+        "free": "Gratis",
+        "noInstall": "Sin instalación",
+        "multiplayer": "Multijugador",
+        "players": "jugadores",
+        "round": "Ronda",
+        "points": "pts"
+    },
+    "footer": {
+        "copyright": "El Impostor © 2025",
+        "rules": "Reglas",
+        "discord": "Discord",
+        "contact": "Contacto",
+        "gameRules": "Reglas del juego",
+        "support": "Apoya al desarrollador",
+        "privacy": "Privacidad",
+        "cookies": "Cookies"
+    },
+    "feedback": {
+        "title": "Ayúdanos a mejorar",
+        "successTitle": "¡Mensaje enviado!",
+        "successMessage": "Gracias por ayudarnos a mejorar.",
+        "typeLabel": "Tipo de mensaje",
+        "typeBug": "Problema",
+        "typeIdea": "Idea",
+        "typeOther": "Otros",
+        "commentLabel": "Tu comentario",
+        "placeholder": "Cuéntanos tu problema, sugerencia o cualquier comentario que tengas para mejorar el juego...",
+        "errorMessage": "Hubo un error al enviar el mensaje. Inténtalo de nuevo.",
+        "sending": "Enviando...",
+        "send": "Enviar"
+    },
+    "system": {
+        "sessionExpired": "Tu sesión expiró. Por favor, vuelve a iniciar sesión.",
+        "sessionReplaced": "Tu sesión ha sido reemplazada por una nueva pestaña",
+        "serverMaintenance": "El servidor está en mantenimiento. No se pueden crear nuevas partidas.",
+        "shutdownCheck": "El servidor se está reiniciando...",
+        "maintenanceCancelled": "El mantenimiento ha sido cancelado",
+        "kicked": "Has sido expulsado de la sala",
+        "kickedByHost": "Has sido expulsado de la sala por el anfitrión",
+        "roomNotFound": "La sala no existe.",
+        "notInRoom": "No pertenece a esta sala.",
+        "gameNotFound": "La partida no existe.",
+        "hostLeftMatch": "El anfitrión ha abandonado la partida",
+        "userBackToRoom": "{{name}} ha vuelto a la sala",
+        "userJoined": "{{name}} se unió a la sala",
+        "hostTransfer": "{{name}} abandonó. Ahora el anfitrión es {{newHost}}",
+        "userLeft": "{{name}} ha abandonado el juego",
+        "userKicked": "{{name}} ha sido expulsado de la sala",
+        "disconnectedHostTransfer": "{{name}} se ha desconectado. Ahora el anfitrión es {{newHost}}",
+        "userDisconnected": "{{name}} se ha desconectado",
+        "authenticating": "Autenticando",
+        "verifyingSession": "Verificando sesión..."
+    },
+    "lobby": {
+        "startPlaying": "Empezar a jugar",
+        "subtitle": "Crea una sala, invita a tus amigos y empieza a jugar",
+        "createRoom": "Crear nueva sala",
+        "discordTitle": "¿Buscas gente para jugar?",
+        "discordText": "Entra a <0>nuestro Discord</0> y encuentra partidas.",
+        "remotePlay": "Si juegas a distancia con tus amigos, puedes hacer una videollamada por WhatsApp, Discord, Zoom, o la que prefieras."
+    },
+    "login": {
+        "appTitle": "El Impostor",
+        "tagline": "Alguien no dice la verdad.\n¿Lo vas a descubrir?"
+    },
+    "game": {
+        "tie": "Empate",
+        "nobodyEliminated": "Nadie ha sido eliminado",
+        "newClueRound": "Nueva ronda de pistas",
+        "impostorRemains": "El impostor sigue entre nosotros",
+        "round": "Ronda",
+        "votesAgainst": "Votos en contra",
+        "hasBeenEliminated": "ha sido eliminado/a",
+        "wasEliminated": "fue eliminado"
+    },
+    "invite": {
+        "title": "¡Te han invitado!",
+        "subtitle": "¿Quieres entrar ahora?",
+        "receivedLink": "Has recibido un enlace para unirte a la partida de",
+        "buttons": {
+            "guest": "Jugar como invitado",
+            "google": "Continuar con Google",
+            "cancel": "Cancelar",
+            "join": "Unirme",
+            "joinRoom": "Unirme a la sala",
+            "enter": "Entrar a la sala",
+            "backToHome": "Volver al inicio",
+            "backToRoom": "Volver a mi sala",
+            "createNewRoom": "Crear nueva sala"
+        },
+        "errors": {
+            "notFound": "La partida no existe o ha terminado.",
+            "roomNotFound": {
+                "title": "La sala ya no existe",
+                "subtitle": "Crea una nueva sala para invitar a tus amigos a jugar otra partida."
+            },
+            "joinFailed": "No se pudo unir",
+            "inProgress": "Estás en una partida en curso. Si te unes, la abandonarás."
+        }
+    },
+    "legal": {
+        "privacy": {
+            "title": "Política de Privacidad",
+            "description": "Política de Privacidad del juego El Impostor. Conoce cómo tratamos tus datos.",
+            "backToHome": "Volver al inicio"
+        },
+        "cookies": {
+            "title": "Política de Cookies",
+            "description": "Política de Cookies del juego El Impostor. Conoce qué cookies utilizamos.",
+            "backToHome": "Volver al inicio"
+        }
+    }
+}

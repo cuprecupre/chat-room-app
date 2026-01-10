@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "./ui/Button";
 
 export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }) {
+    const { t } = useTranslation('common');
     const isActive = state.phase === "round_result";
 
     // Hook SIEMPRE se ejecuta (regla de hooks), condición DENTRO
@@ -49,16 +51,16 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
                                 <h2 className="text-6xl font-serif text-red-500">
                                     {eliminatedPlayer.name}
                                 </h2>
-                                <p className="text-2xl text-neutral-300">ha sido eliminado/a</p>
+                                <p className="text-2xl text-neutral-300">{t('game.hasBeenEliminated')}</p>
                             </div>
                             <p className="text-sm text-red-500 font-medium uppercase tracking-wider">
-                                Votos en contra: {votersName.length}
+                                {t('game.votesAgainst')}: {votersName.length}
                             </p>
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            <h2 className="text-6xl font-serif text-white">Empate</h2>
-                            <p className="text-2xl text-neutral-300">Nadie ha sido eliminado</p>
+                            <h2 className="text-6xl font-serif text-white">{t('game.tie')}</h2>
+                            <p className="text-2xl text-neutral-300">{t('game.nobodyEliminated')}</p>
                         </div>
                     )}
 
@@ -66,7 +68,7 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
 
                     <div>
                         <p className="text-2xl font-serif italic text-orange-400">
-                            El impostor sigue entre nosotros
+                            {t('game.impostorRemains')}
                         </p>
                     </div>
                 </div>
@@ -79,7 +81,7 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
                             size="lg"
                             className="!w-auto"
                         >
-                            Siguiente Ronda
+                            {t('buttons.nextRound')}
                         </Button>
                     </div>
                 )}

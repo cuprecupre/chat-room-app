@@ -1,0 +1,95 @@
+{
+    "meta": {
+        "title": "The Impostor Rules - How to Play",
+        "description": "Learn how to play The Impostor. Complete rules, scoring system and tips."
+    },
+    "modalTitle": "Instructions",
+    "introduction": {
+        "title": "Introduction",
+        "gameName": "The Impostor",
+        "description": "is a game where in each match, players must discover who among them is the Impostor: an infiltrator who doesn't know a secret word that everyone else knows, and must blend in while trying to figure it out to win.",
+        "recommendation": "Recommendation:",
+        "recommendationText": "A minimum of 4 players is required. It's ideal to play in person or via video call to facilitate the clue round and debate."
+    },
+    "objective": {
+        "title": "Objective",
+        "description": "The objective depends on your role. Games last a maximum of",
+        "rounds": "3 rounds",
+        "asFriend": "As a Friend",
+        "friendDescription": "Discover the Impostor by voting for them in the elimination round. The more correct votes you accumulate, the more points you earn.",
+        "asImpostor": "As the Impostor",
+        "impostorDescription": "Survive all 3 rounds without being discovered. If you survive the third round, you win the game."
+    },
+    "requirements": {
+        "title": "What do you need to play?",
+        "device1": "You only need your",
+        "phone": "phone",
+        "device2": "to stay connected to the game.",
+        "noDownload": "No download required",
+        "device3": ", you play directly in your browser.",
+        "communication1": "Clue communication and debate is done",
+        "communicationType": "in person or via video call"
+    },
+    "preparation": {
+        "title": "Preparation",
+        "step1": {
+            "title": "Host:",
+            "text": "One player enters the website, logs in and creates the game. They choose if the Impostor will have a",
+            "help": "Hint"
+        },
+        "step2": {
+            "title": "Invitation:",
+            "text": "The Host shares the invite link with the other players."
+        },
+        "step3": {
+            "title": "Join:",
+            "text": "Other players enter the link, log in and automatically join the room."
+        },
+        "step4": {
+            "title": "Start:",
+            "text": "When everyone is in the room, the Host starts the game."
+        }
+    },
+    "gameplay": {
+        "title": "How the Game Works",
+        "step1": {
+            "title": "Card Dealing",
+            "text": "The app assigns roles and the secret word.",
+            "warning": "Don't tell anyone what card you got!",
+            "friends": "Friends:",
+            "friendsText": "See the secret word.",
+            "impostor": "Impostor:",
+            "impostorText": "Doesn't see the word. If help is enabled, they'll see the category it belongs to."
+        },
+        "step2": {
+            "title": "Clue Round",
+            "text": "When it's your turn, you must say a clue related to the word out loud.",
+            "tip": "It shouldn't be too obvious (to not help the Impostor) or too vague (to not seem suspicious)."
+        },
+        "step3": {
+            "title": "Debate and Voting",
+            "text": "Once everyone has given their clue, voting begins. When everyone votes, the result is revealed."
+        },
+        "step4": {
+            "title": "Resolution",
+            "text1": "The player with the most votes is",
+            "eliminated": "eliminated from the game",
+            "text2": "and won't play the next round.",
+            "ifImpostor": "If the Impostor is eliminated:",
+            "ifImpostorText": "The game ends and the Impostor loses.",
+            "ifFriend": "If a Friend is eliminated:",
+            "ifFriendText": "The Impostor survives, earns points and the game continues for another round."
+        }
+    },
+    "scoring": {
+        "title": "Scoring System",
+        "friends": "Friends",
+        "impostor": "Impostor",
+        "friendsVote": "For each round you vote for the impostor:",
+        "friendsBonus": "Bonus (vote correctly all rounds and impostor loses):",
+        "impostorSurvive": "For each round you survive:",
+        "impostorBonus": "Bonus (survive all 3 rounds):",
+        "tieTitle": "Ties:",
+        "tieText": "If there's a tie in the vote, no one is eliminated and the Impostor gets their points for that round."
+    }
+}

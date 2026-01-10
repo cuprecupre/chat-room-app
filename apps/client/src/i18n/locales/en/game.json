@@ -1,0 +1,168 @@
+{
+    "roundStart": {
+        "newGame": "New game",
+        "lastRound": "Last round",
+        "round": "Round",
+        "newClueRound": "New clue round",
+        "lastChance": "Last chance to catch the impostor",
+        "firstTurnFor": "First turn goes to:"
+    },
+    "roles": {
+        "impostor": "Impostor",
+        "friend": "Friend"
+    },
+    "gameOver": {
+        "friendsWin": "Friends win!",
+        "impostorWin": "The Impostor wins!",
+        "impostorCaught": "The impostor was caught",
+        "impostorWas": "The impostor was",
+        "secretWord": "Secret word",
+        "unknown": "Unknown",
+        "leaderboard": "Leaderboard",
+        "howPointsWork": "How are points calculated?",
+        "waitingForHost": "Waiting for",
+        "toStartAnother": "to start another game"
+    },
+    "scoring": {
+        "title": "Scoring System",
+        "ifFriend": "If you're a Friend",
+        "ifImpostor": "If you're the Impostor",
+        "perRoundVoteImpostor": "For each round you vote for the impostor",
+        "bonusFriend": "Bonus (if you vote correctly all rounds played and impostor loses)",
+        "perRoundSurvive": "For each round you survive",
+        "bonusImpostor": "Bonus (if you survive all 3 rounds)"
+    },
+    "lobby": {
+        "host": "THE HOST",
+        "inviteFriendsTitle": "Invite your friends",
+        "toStart": "to start",
+        "shareInvite": "Share invite",
+        "copyRoomLink": "Copy room link",
+        "shareAndWait": "Share the link and wait for players to join to start the game",
+        "easyMode": "Easy mode",
+        "easyModeDesc": "The Impostor will receive a small hint about the secret word.",
+        "easyModeOn": "Easy mode enabled",
+        "playersConnected": "Players connected",
+        "gameStartingSoon": "Game starting soon",
+        "waitingFor": "Waiting for",
+        "toStartGame": "to start the game",
+        "alsoInvite": "You can also invite friends to this game",
+        "waitingForPlayers": "Waiting for players",
+        "minPlayers": "Minimum 4 players to start",
+        "inviteFriends": "Invite your friends!",
+        "shareLink": "Share this link:",
+        "copyLink": "Copy link",
+        "gameCode": "Game code:",
+        "copyCode": "Copy code",
+        "impostorHelp": "Impostor help",
+        "impostorHelpOn": "The impostor sees the category",
+        "impostorHelpOff": "The impostor sees nothing",
+        "waitingForHostToStart": "Waiting for host to start",
+        "youAreHost": "You are the host",
+        "startGame": "Start game"
+    },
+    "playing": {
+        "impostorHint": "Extra hint: The secret word\nis related to...",
+        "mission": "Your mission",
+        "round": "Round",
+        "yourTurn": "Your turn",
+        "giveClue": "Give a clue about the word",
+        "waitingFor": "Waiting for",
+        "toGiveClue": "to give a clue",
+        "vote": "Vote",
+        "voteDescription": "Who do you think is the impostor?",
+        "voted": "Voted",
+        "waitingVotes": "Waiting for votes",
+        "youAreImpostor": "You are the Impostor!",
+        "youAreFriend": "You are a Friend",
+        "secretWord": "The secret word is",
+        "category": "Category:",
+        "tryToBlend": "Try to blend in",
+        "you": "You",
+        "eliminated": "Eliminated",
+        "total": "Total",
+        "someone": "Someone",
+        "givesFirstClue": "gives the first clue"
+    },
+    "roundResult": {
+        "eliminated": "was eliminated",
+        "tie": "Tie! No one was eliminated",
+        "impostorSurvives": "The impostor survives!",
+        "nextRound": "Next round",
+        "continueToNext": "Continue to next round"
+    },
+    "modals": {
+        "leaveMatch": {
+            "title": "Leave game",
+            "returnTitle": "Return to room",
+            "description": "You will lose your progress in this game and return to the room.",
+            "returnToRoom": "You will return to the room.",
+            "hostWarning": "As the host, if you leave, the game will end for all players. Everyone will go to the room where you can start a new game.",
+            "confirm": "Leave"
+        },
+        "leaveRoom": {
+            "title": "Leave room",
+            "description": "You will leave the room and return to the home screen.",
+            "confirm": "Leave"
+        },
+        "kickPlayer": {
+            "title": "Kick player?",
+            "confirmMessage": "Are you sure you want to kick",
+            "description": "This player will be removed from the room.",
+            "confirm": "Yes, kick"
+        }
+    },
+    "hostLeft": {
+        "title": "The host has left the game",
+        "description": "The game has ended because the host left.",
+        "redirecting": "Redirecting you to the room...",
+        "countdownText": "Redirecting in {{seconds}}s"
+    },
+    "waitingNextGame": {
+        "title": "Game in progress",
+        "roomOf": "ROOM OF",
+        "autoJoin": "You'll automatically join the next game",
+        "waitingToEnter": "Waiting to enter",
+        "description": "A game is currently in progress. You'll join when it ends.",
+        "playersInGame": "Players in game"
+    },
+    "disconnectedPlayer": "Disconnected player",
+    "card": {
+        "tapToFlip": "Tap to flip card",
+        "frontAlt": "Card front",
+        "viewCard": "View my card",
+        "backAlt": "Card back",
+        "flipBack": "Flip back",
+        "yourRole": "Your role",
+        "hint": "Hint:",
+        "hintDescription": "The secret word is related to...",
+        "secretWord": "Secret word",
+        "flipYourCard": "Reveal your card"
+    },
+    "board": {
+        "clueAndVoteRound": "Clue and voting round"
+    },
+    "spectator": {
+        "title": "You are spectating",
+        "description": "You joined after the game started. Wait for the next game.",
+        "eliminated": "You have been eliminated",
+        "waitHere": "Wait here. You will play again in the next game."
+    },
+    "help": {
+        "howToPlay": "How to play?",
+        "step1": "Flip your card and discover if you are a",
+        "friend": "friend",
+        "step1b": "(you'll see the secret word) or",
+        "impostor": "impostor",
+        "step1c": "(you won't see it).",
+        "step2": "Each player says a clue out loud. The one with ☀️ in the player list starts first.",
+        "ifFriend": "If you are a friend:",
+        "friendAdvice": "Say a subtle clue that proves you know the word, but without revealing it.",
+        "ifImpostor": "If you are the impostor:",
+        "impostorAdvice": "Pretend you know it by using vague clues or mimicking others.",
+        "step4": "When everyone has given their clue, it's time to vote!",
+        "step5": "Vote for who you think is the impostor. If it's you, try to incriminate someone else.",
+        "scoring": "Those who vote correctly earn points. If you're the impostor and survive, you earn points. If you're not the impostor but the majority votes for you, you're eliminated from the round.",
+        "viewFullRules": "View complete game rules"
+    }
+}

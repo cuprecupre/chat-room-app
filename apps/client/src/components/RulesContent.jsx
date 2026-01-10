@@ -1,6 +1,8 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export function RulesContent({ isModal = false }) {
+    const { t } = useTranslation('rules');
     // Si estamos en modal, usar un fondo más oscuro (950) porque el modal ya es 900.
     // Si estamos en página, usar 900 (porque el fondo de página es negro/oscuro)
     const boxBg = isModal ? "bg-neutral-950" : "bg-neutral-900";
@@ -9,44 +11,37 @@ export function RulesContent({ isModal = false }) {
         <div className="divide-y divide-white/10 text-neutral-300">
             {/* Introducción */}
             <section className="py-12 first:pt-0 last:pb-0">
-                <h3 className="text-2xl font-serif text-orange-400 mb-6">Introducción</h3>
+                <h3 className="text-2xl font-serif text-orange-400 mb-6">{t('introduction.title')}</h3>
                 <p className="text-lg leading-relaxed font-light">
-                    <strong>El Impostor</strong> es un juego en el que en cada partida, los
-                    jugadores deberán descubrir quién entre ellos es el <strong>Impostor</strong>:
-                    un infiltrado que desconoce una palabra secreta que todos los demás conocen, y
-                    que debe pasar desapercibido mientras intenta deducirla para ganar.
+                    <strong>{t('introduction.gameName')}</strong> {t('introduction.description')}
                 </p>
                 <div className={`mt-4 p-4 ${boxBg} rounded-lg`}>
                     <p className="text-base">
-                        <strong>Recomendación:</strong> Se requiere un mínimo de 4 jugadores. Es
-                        ideal jugarlo de manera presencial o por videollamada para facilitar la
-                        ronda de pistas y el debate.
+                        <strong>{t('introduction.recommendation')}</strong> {t('introduction.recommendationText')}
                     </p>
                 </div>
             </section>
 
             {/* Objetivo */}
             <section className="py-12 first:pt-0 last:pb-0">
-                <h3 className="text-2xl font-serif text-orange-400 mb-6">Objetivo</h3>
+                <h3 className="text-2xl font-serif text-orange-400 mb-6">{t('objective.title')}</h3>
                 <p className="text-lg leading-relaxed mb-6 font-light">
-                    El objetivo depende de tu rol. Las partidas duran un máximo de{" "}
-                    <strong className="text-orange-400">3 rondas</strong>.
+                    {t('objective.description')}{" "}
+                    <strong className="text-orange-400">{t('objective.rounds')}</strong>.
                 </p>
                 <div className="grid md:grid-cols-2 gap-6">
                     <div className={`${boxBg} p-6 rounded-xl`}>
-                        <h4 className="text-white font-semibold mb-3 text-lg">Como Amigo</h4>
+                        <h4 className="text-white font-semibold mb-3 text-lg">{t('objective.asFriend')}</h4>
                         <p className="text-neutral-400 text-base font-light">
-                            Descubrir al Impostor votándolo en la ronda de eliminación. Cuantos más
-                            votos correctos acumules, más puntos ganas.
+                            {t('objective.friendDescription')}
                         </p>
                     </div>
                     <div className={`${boxBg} p-6 rounded-xl`}>
                         <h4 className="text-orange-400 font-semibold mb-3 text-lg">
-                            Como Impostor
+                            {t('objective.asImpostor')}
                         </h4>
                         <p className="text-neutral-400 text-base font-light">
-                            Sobrevivir las 3 rondas sin ser descubierto. Si sobrevives a la tercera
-                            ronda, ganas la partida.
+                            {t('objective.impostorDescription')}
                         </p>
                     </div>
                 </div>
@@ -55,41 +50,35 @@ export function RulesContent({ isModal = false }) {
             {/* Qué necesitas */}
             <section className="py-12 first:pt-0 last:pb-0">
                 <h3 className="text-2xl font-serif text-orange-400 mb-6">
-                    ¿Qué necesitas para jugar?
+                    {t('requirements.title')}
                 </h3>
                 <div className="space-y-4 text-lg text-neutral-300 font-light">
                     <p>
-                        Solo necesitas tu <strong>móvil</strong> para mantenerte conectado a la
-                        partida. <strong>No es necesario descargar nada</strong>, juegas
-                        directamente en el navegador.
+                        {t('requirements.device1')} <strong>{t('requirements.phone')}</strong> {t('requirements.device2')} <strong>{t('requirements.noDownload')}</strong>{t('requirements.device3')}
                     </p>
                     <p>
-                        La comunicación de las pistas y el debate se hace de manera{" "}
-                        <strong>presencial o por videollamada</strong>.
+                        {t('requirements.communication1')}{" "}
+                        <strong>{t('requirements.communicationType')}</strong>.
                     </p>
                 </div>
             </section>
 
             {/* Preparación */}
             <section className="py-12 first:pt-0 last:pb-0">
-                <h3 className="text-2xl font-serif text-orange-400 mb-6">Preparación</h3>
+                <h3 className="text-2xl font-serif text-orange-400 mb-6">{t('preparation.title')}</h3>
                 <ol className="space-y-4 text-lg font-light list-decimal list-outside ml-6">
                     <li className="pl-2">
-                        <strong className="text-white">Anfitrión:</strong> Un jugador entra a la
-                        web, inicia sesión y crea la partida. Elige si el Impostor tendrá una{" "}
-                        <strong>Ayuda</strong>.
+                        <strong className="text-white">{t('preparation.step1.title')}</strong> {t('preparation.step1.text')}{" "}
+                        <strong>{t('preparation.step1.help')}</strong>.
                     </li>
                     <li className="pl-2">
-                        <strong className="text-white">Invitación:</strong> El Anfitrión comparte el
-                        enlace de invitación con el resto de jugadores.
+                        <strong className="text-white">{t('preparation.step2.title')}</strong> {t('preparation.step2.text')}
                     </li>
                     <li className="pl-2">
-                        <strong className="text-white">Registro:</strong> Los demás jugadores entran
-                        al enlace, inician sesión y se unen automáticamente a la sala.
+                        <strong className="text-white">{t('preparation.step3.title')}</strong> {t('preparation.step3.text')}
                     </li>
                     <li className="pl-2">
-                        <strong className="text-white">Inicio:</strong> Cuando todos están en la
-                        sala, el Anfitrión comienza el juego.
+                        <strong className="text-white">{t('preparation.step4.title')}</strong> {t('preparation.step4.text')}
                     </li>
                 </ol>
             </section>
@@ -97,7 +86,7 @@ export function RulesContent({ isModal = false }) {
             {/* Desarrollo */}
             <section className="py-12 first:pt-0 last:pb-0">
                 <h3 className="text-2xl font-serif text-orange-400 mb-8">
-                    Desarrollo de la Partida
+                    {t('gameplay.title')}
                 </h3>
                 <div className="space-y-8">
                     {/* 1 */}
@@ -106,20 +95,17 @@ export function RulesContent({ isModal = false }) {
                             1
                         </div>
                         <div className="space-y-2 pt-1">
-                            <h4 className="text-xl font-semibold text-white">Reparto de Cartas</h4>
+                            <h4 className="text-xl font-semibold text-white">{t('gameplay.step1.title')}</h4>
                             <p className="text-neutral-300 text-lg font-light">
-                                La app asigna roles y palabra secreta.{" "}
-                                <strong>¡No le digas a nadie qué carta te ha tocado!</strong>
+                                {t('gameplay.step1.text')}{" "}
+                                <strong>{t('gameplay.step1.warning')}</strong>
                             </p>
                             <ul className="list-disc ml-5 text-neutral-400 space-y-1 mt-2 font-light">
                                 <li>
-                                    <span className="text-neutral-300">Amigos:</span> Ven la palabra
-                                    secreta.
+                                    <span className="text-neutral-300">{t('gameplay.step1.friends')}</span> {t('gameplay.step1.friendsText')}
                                 </li>
                                 <li>
-                                    <span className="text-neutral-300">Impostor:</span> No ve la
-                                    palabra. Si la ayuda está activada, verá la categoría a la que
-                                    pertenece.
+                                    <span className="text-neutral-300">{t('gameplay.step1.impostor')}</span> {t('gameplay.step1.impostorText')}
                                 </li>
                             </ul>
                         </div>
@@ -131,13 +117,11 @@ export function RulesContent({ isModal = false }) {
                             2
                         </div>
                         <div className="space-y-2 pt-1">
-                            <h4 className="text-xl font-semibold text-white">Ronda de Pistas</h4>
+                            <h4 className="text-xl font-semibold text-white">{t('gameplay.step2.title')}</h4>
                             <p className="text-neutral-300 text-lg font-light">
-                                Cuando sea tu turno, debes decir una pista relacionada en voz alta
-                                con la palabra.{" "}
+                                {t('gameplay.step2.text')}{" "}
                                 <strong>
-                                    No debe ser ni muy obvia (para no ayudar al Impostor) ni muy
-                                    difícil (para no parecer sospechoso).
+                                    {t('gameplay.step2.tip')}
                                 </strong>
                             </p>
                         </div>
@@ -149,10 +133,9 @@ export function RulesContent({ isModal = false }) {
                             3
                         </div>
                         <div className="space-y-2 pt-1">
-                            <h4 className="text-xl font-semibold text-white">Debate y Votación</h4>
+                            <h4 className="text-xl font-semibold text-white">{t('gameplay.step3.title')}</h4>
                             <p className="text-neutral-300 text-lg font-light">
-                                Una vez todos han dado su pista, se inicia la votación. Cuando todos
-                                votan, se revela el resultado.
+                                {t('gameplay.step3.text')}
                             </p>
                         </div>
                     </div>
@@ -163,19 +146,17 @@ export function RulesContent({ isModal = false }) {
                             4
                         </div>
                         <div className="space-y-2 pt-1">
-                            <h4 className="text-xl font-semibold text-white">Resolución</h4>
+                            <h4 className="text-xl font-semibold text-white">{t('gameplay.step4.title')}</h4>
                             <p className="text-neutral-300 text-lg font-light">
-                                El jugador con más votos es <strong>eliminado de la partida</strong>{" "}
-                                y ya no juega la siguiente ronda.
+                                {t('gameplay.step4.text1')} <strong>{t('gameplay.step4.eliminated')}</strong>{" "}
+                                {t('gameplay.step4.text2')}
                             </p>
                             <ul className="list-disc ml-5 text-neutral-400 space-y-1 mt-2 font-light">
                                 <li>
-                                    <strong>Si se elimina al Impostor:</strong> La partida termina y
-                                    el Impostor pierde.
+                                    <strong>{t('gameplay.step4.ifImpostor')}</strong> {t('gameplay.step4.ifImpostorText')}
                                 </li>
                                 <li>
-                                    <strong>Si se elimina a un Amigo:</strong> El Impostor
-                                    sobrevive, gana puntos y la partida continúa una ronda más.
+                                    <strong>{t('gameplay.step4.ifFriend')}</strong> {t('gameplay.step4.ifFriendText')}
                                 </li>
                             </ul>
                         </div>
@@ -185,39 +166,37 @@ export function RulesContent({ isModal = false }) {
 
             {/* Puntuación */}
             <section className="py-12 first:pt-0 last:pb-0">
-                <h3 className="text-2xl font-serif text-orange-400 mb-6">Sistema de Puntuación</h3>
+                <h3 className="text-2xl font-serif text-orange-400 mb-6">{t('scoring.title')}</h3>
                 <div className={`grid ${isModal ? "grid-cols-1" : "md:grid-cols-2"} gap-6`}>
                     <div className={`${boxBg} p-6 rounded-xl`}>
-                        <h4 className="text-white font-semibold mb-3 text-lg">Amigos</h4>
+                        <h4 className="text-white font-semibold mb-3 text-lg">{t('scoring.friends')}</h4>
                         <ul className="text-neutral-300 space-y-2 font-light">
                             <li>
-                                • Por cada ronda que votas al impostor:{" "}
+                                • {t('scoring.friendsVote')}{" "}
                                 <strong className="text-orange-400">+2 pts</strong>
                             </li>
                             <li>
-                                • <span className="text-yellow-400">★</span> Bonus (votas bien todas
-                                las rondas y el impostor pierde):{" "}
+                                • <span className="text-yellow-400">★</span> {t('scoring.friendsBonus')}{" "}
                                 <strong className="text-orange-400">10 pts</strong>
                             </li>
                         </ul>
                     </div>
                     <div className={`${boxBg} p-6 rounded-xl`}>
-                        <h4 className="text-orange-400 font-semibold mb-3 text-lg">Impostor</h4>
+                        <h4 className="text-orange-400 font-semibold mb-3 text-lg">{t('scoring.impostor')}</h4>
                         <ul className="text-neutral-300 space-y-2">
                             <li>
-                                • Por cada ronda que sobrevives:{" "}
+                                • {t('scoring.impostorSurvive')}{" "}
                                 <strong className="text-orange-400">+2 pts</strong>
                             </li>
                             <li>
-                                • <span className="text-yellow-400">★</span> Bonus (sobrevives las 3
-                                rondas): <strong className="text-orange-400">10 pts</strong>
+                                • <span className="text-yellow-400">★</span> {t('scoring.impostorBonus')}{" "}
+                                <strong className="text-orange-400">10 pts</strong>
                             </li>
                         </ul>
                     </div>
                 </div>
                 <div className={`mt-6 ${boxBg} p-4 rounded-lg text-neutral-400 text-sm`}>
-                    <strong className="text-orange-400">Empates:</strong> Si hay empate en la
-                    votación, nadie es eliminado y el Impostor recibe sus puntos de esa ronda.
+                    <strong className="text-orange-400">{t('scoring.tieTitle')}</strong> {t('scoring.tieText')}
                 </div>
             </section>
         </div>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "../ui/Button";
 import { Avatar } from "../ui/Avatar";
 import { HelpLink } from "./HelpLink";
@@ -15,6 +16,7 @@ export function PlayerList({
     onOpenInstructions,
     onKickPlayer,
 }) {
+    const { t } = useTranslation('game');
     // State for kick confirmation modal
     const [kickTarget, setKickTarget] = useState(null);
 
@@ -66,7 +68,7 @@ export function PlayerList({
             const formerPlayer = gameState.formerPlayers[uid];
             return {
                 uid,
-                name: formerPlayer?.name || "Jugador desconectado",
+                name: formerPlayer?.name || t('disconnectedPlayer'),
                 photoURL: formerPlayer?.photoURL || null,
             };
         });
@@ -176,13 +178,13 @@ export function PlayerList({
                                             className={`font-medium ${isWinner ? "text-orange-400" : ""}`}
                                         >
                                             {p.name}
-                                            {p.uid === currentUserId ? " (Tú)" : ""}
+                                            {p.uid === currentUserId ? ` (${t('playing.you', 'You')})` : ""}
                                             {isWinner && " 🏆"}
                                         </span>
                                         {/* Indicador de eliminado en vista de puntuación */}
                                         {isRoundResult && isEliminated && (
                                             <span className="text-xs text-red-400 font-medium">
-                                                Eliminado
+                                                {t('playing.eliminated', 'Eliminated')}
                                             </span>
                                         )}
                                     </div>
@@ -204,7 +206,7 @@ export function PlayerList({
                             <div className="flex items-center gap-3">
                                 {isEliminated && isPlaying && (
                                     <span className="text-xs text-red-400 font-medium">
-                                        Eliminado
+                                        {t('playing.eliminated', 'Eliminated')}
                                     </span>
                                 )}
                                 {showScores ? (
@@ -228,7 +230,7 @@ export function PlayerList({
                                                 <div
                                                     className={`text-sm ${isWinner ? "text-orange-400" : "text-neutral-400"}`}
                                                 >
-                                                    Total: {score}
+                                                    {t('playing.total', 'Total')}: {score}
                                                 </div>
                                             </div>
                                         ) : (
@@ -293,7 +295,7 @@ export function PlayerList({
                                                     d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"
                                                 />
                                             </svg>
-                                            <span>{iVotedForThisPlayer ? "Votado" : "Votar"}</span>
+                                            <span>{iVotedForThisPlayer ? t('playing.voted') : t('playing.vote')}</span>
                                         </Button>
                                     )
                                 )}
@@ -303,7 +305,7 @@ export function PlayerList({
                                     <button
                                         onClick={() => setKickTarget(p)}
                                         className="p-2 rounded-full border border-red-500 hover:border-red-400 hover:bg-red-500/10 text-red-500 hover:text-red-400 transition-colors"
-                                        title={`Expulsar a ${p.name}`}
+                                        title={t('modals.kickPlayer.kickTitle', { name: p.name }) || `Kick ${p.name}`}
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </button>
@@ -317,8 +319,7 @@ export function PlayerList({
             {/* Indicador de quién empieza la ronda */}
             {isPlaying && startingPlayerId && (
                 <p className="text-sm text-neutral-400 font-light mt-4 text-center md:text-left">
-                    ☀️ {players.find((p) => p.uid === startingPlayerId)?.name || "Alguien"} da la
-                    primera pista
+                    ☀️ {players.find((p) => p.uid === startingPlayerId)?.name || t('playing.someone', 'Someone')} {t('playing.givesFirstClue', 'gives the first clue')}
                 </p>
             )}
 

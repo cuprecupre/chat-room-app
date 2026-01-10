@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "./ui/Button";
 import { Users } from "lucide-react";
 import { PlayerList } from "./game/PlayerList";
@@ -14,8 +15,9 @@ export function WaitingForNextGame({
     onLeaveRoom,
     onCopyLink
 }) {
+    const { t } = useTranslation('game');
     const host = state.players?.find((p) => p.uid === state.hostId);
-    const hostName = host ? host.name.toUpperCase() : "EL ANFITRIÓN";
+    const hostName = host ? host.name.toUpperCase() : t('lobby.host', 'THE HOST');
 
     const activePlayers = state.players?.filter(p => !p.isLateJoiner) || [];
     const waitingPlayers = state.players?.filter(p => p.isLateJoiner) || [];
@@ -25,13 +27,13 @@ export function WaitingForNextGame({
             {/* Room Identifier Badge */}
             <div className="flex items-center justify-center mb-6 animate-fadeIn">
                 <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-orange-400 rounded-full">
-                    SALA DE {hostName}
+                    {t('waitingNextGame.roomOf', "ROOM OF")} {hostName}
                 </span>
             </div>
 
             {/* Title */}
             <h2 className="text-4xl font-serif text-neutral-50 leading-tight">
-                Partida en curso
+                {t('waitingNextGame.title')}
             </h2>
 
             {/* Auto-join Message */}
@@ -57,7 +59,7 @@ export function WaitingForNextGame({
                     ></path>
                 </svg>
                 <span className="text-orange-400 text-sm font-medium">
-                    Te unirás automáticamente en la siguiente partida
+                    {t('waitingNextGame.autoJoin', "You'll automatically join the next game")}
                 </span>
             </div>
 
@@ -67,7 +69,7 @@ export function WaitingForNextGame({
                 {waitingPlayers.length > 0 && (
                     <div className="space-y-3">
                         <div className="text-sm font-semibold text-neutral-400 text-left px-1">
-                            Esperando para entrar: {waitingPlayers.length}
+                            {t('waitingNextGame.waitingToEnter', 'Waiting to enter')}: {waitingPlayers.length}
                         </div>
                         <PlayerList
                             players={waitingPlayers}
@@ -82,7 +84,7 @@ export function WaitingForNextGame({
                 {activePlayers.length > 0 && (
                     <div className="space-y-3">
                         <div className="text-sm font-semibold text-neutral-400 text-left px-1">
-                            Jugadores en la partida: {activePlayers.length}
+                            {t('waitingNextGame.playersInGame')}: {activePlayers.length}
                         </div>
                         <PlayerList
                             players={activePlayers}

@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { HelmetProvider } from "react-helmet-async";
 import { useAuth } from "../hooks/useAuth";
 import { useSocket } from "../hooks/useSocket";
 import { useGameActions } from "../hooks/useGameActions";
@@ -79,16 +81,31 @@ function AppRoutes({
     // Navigate to game when a room is created or joined
     useEffect(() => {
         const currentRoomId = gameState?.roomId;
-        const wasInLobby = location.pathname === ROUTES.LOBBY;
+        const wasInLobby = location.pathname === ROUTES.LOBBY || location.pathname === "/en/lobby";
 
         // If a new room ID appears and we're in the lobby, navigate to game
+        // Note: Protected routes handle regex/paths, but better to keep simple redirect
         if (currentRoomId && currentRoomId !== prevRoomIdRef.current && wasInLobby) {
             console.log("Navigating to room:", currentRoomId);
+            const isEnglish = location.pathname.startsWith('/en');
+            // Always redirect to base game route, let language persist via state/cookie
+            // Or if implementing strict /en/game, would add check here. 
+            // For now, game routes are language-agnostic in URL (lang persists in memory)
             navigate(`${ROUTES.GAME}?roomId=${currentRoomId}`);
         }
 
         prevRoomIdRef.current = currentRoomId;
     }, [gameState?.roomId, location.pathname, navigate]);
+
+    const handleGoToGuestAuth = () => {
+        const isEnglish = location.pathname.startsWith('/en');
+        navigate(isEnglish ? '/en/guest' : ROUTES.GUEST_AUTH);
+    };
+
+    const handleBackToHome = () => {
+        const isEnglish = location.pathname.startsWith('/en');
+        navigate(isEnglish ? '/en' : ROUTES.HOME);
+    };
 
     // Props for different route groups
     const publicRouteProps = {
@@ -97,6 +114,7 @@ function AppRoutes({
         loading,
         onOpenInstructions: openInstructions,
         onOpenFeedback: openFeedback,
+        onGoToGuestAuth: handleGoToGuestAuth,
     };
 
     const authRouteProps = {
@@ -107,6 +125,7 @@ function AppRoutes({
         loading,
         error,
         clearError,
+        onBack: handleBackToHome,
     };
 
     const protectedRouteProps = {
@@ -134,6 +153,7 @@ function AppRoutes({
         emit,
         joinGame: joinRoom,
         joinError,
+        joinGameError: joinError, // Legacy prop name support if needed
         clearJoinError,
         onOpenInstructions: openInstructions,
         onStartGame: startMatch,
@@ -154,14 +174,23 @@ function AppRoutes({
             <FeedbackModal isOpen={feedbackOpen} onClose={closeFeedback} user={user} />
 
             <Routes>
-                {/* ==================== PUBLIC ROUTES ==================== */}
+                {/* ==================== PUBLIC ROUTES (ES - Default) ==================== */}
                 <Route element={<UnauthenticatedLayout />}>
-                    <Route path={ROUTES.HOME} element={<HomeRoute {...publicRouteProps} />} />
+                    <Route path={ROUTES.HOME} element={<RootHandler><HomeRoute {...publicRouteProps} /></RootHandler>} />
                     <Route path={ROUTES.AUTH} element={<AuthRoute {...authRouteProps} />} />
                     <Route path={ROUTES.GUEST_AUTH} element={<GuestAuthRoute {...authRouteProps} />} />
                     <Route path={ROUTES.RULES} element={<RulesPage />} />
                     <Route path="/privacidad" element={<PrivacyPage />} />
                     <Route path="/cookies" element={<CookiesPage />} />
+
+                    {/* ==================== PUBLIC ROUTES (EN) ==================== */}
+                    <Route path="/en" element={<HomeRoute {...publicRouteProps} />} />
+                    <Route path="/en/auth" element={<AuthRoute {...authRouteProps} />} />
+                    <Route path="/en/guest" element={<GuestAuthRoute {...authRouteProps} />} />
+                    <Route path="/en/rules" element={<RulesPage />} />
+                    <Route path="/en/privacy" element={<PrivacyPage />} />
+                    <Route path="/en/cookies" element={<CookiesPage />} />
+
                     {import.meta.env.DEV && (
                         <>
                             <Route path="/debug" element={<DebugPreviews />} />
@@ -171,6 +200,7 @@ function AppRoutes({
                 </Route>
 
                 {/* ==================== PROTECTED ROUTES ==================== */}
+                {/* Protected routes do not enforce language in URL, they use current state */}
                 <Route element={<ProtectedRoute {...protectedRouteProps} />}>
                     <Route element={<MainLayout {...layoutProps} />}>
                         <Route
@@ -192,13 +222,41 @@ function AppRoutes({
                 />
 
                 {/* ==================== FALLBACK ==================== */}
-                <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+                <Route path="*" element={<SmartRedirect />} />
             </Routes>
         </>
     );
 }
 
+// Helper for language-aware redirects
+function SmartRedirect() {
+    const { i18n } = useTranslation();
+    const isEnglish = i18n.language.startsWith('en');
+    const target = isEnglish ? "/en" : "/";
+    return <Navigate to={target} replace />;
+}
+
+// Root handler for automatic language-based redirect
+// - If user's i18n language is 'en', redirect to '/en' for SEO
+// - Otherwise render Spanish content directly
+// - Does NOT change language state - only handles URL routing
+function RootHandler({ children }) {
+    const { i18n } = useTranslation();
+    const location = useLocation();
+
+    // If user's language preference is English, redirect to /en path for SEO
+    // The i18n state is the source of truth, we just adjust the URL
+    if (i18n.language?.startsWith('en')) {
+        const target = `/en${location.search}`;
+        return <Navigate to={target} replace />;
+    }
+
+    // Spanish users stay on / path
+    return children;
+}
+
 export function AppRouter() {
+    const { t } = useTranslation('common');
     const {
         user,
         loading,
@@ -239,8 +297,8 @@ export function AppRouter() {
                     <div className="flex flex-col items-center gap-3">
                         <Spinner size="md" />
                         <div>
-                            <p>Autenticando</p>
-                            <p className="text-sm text-neutral-400 mt-1">Verificando sesión...</p>
+                            <p>{t('system.authenticating', 'Autenticando')}</p>
+                            <p className="text-sm text-neutral-400 mt-1">{t('system.verifyingSession', 'Verificando sesión...')}</p>
                         </div>
                     </div>
                 </div>
@@ -249,24 +307,26 @@ export function AppRouter() {
     }
 
     return (
-        <BrowserRouter>
-            <AppRoutes
-                user={user}
-                loading={loading}
-                error={error}
-                login={login}
-                loginWithEmail={loginWithEmail}
-                registerWithEmail={registerWithEmail}
-                loginAsGuest={loginAsGuest}
-                logout={logout}
-                clearError={clearError}
-                connected={connected}
-                gameState={gameState}
-                emit={emit}
-                joinError={joinError}
-                clearJoinError={clearJoinError}
-                shutdownCountdown={shutdownCountdown}
-            />
-        </BrowserRouter>
+        <HelmetProvider>
+            <BrowserRouter>
+                <AppRoutes
+                    user={user}
+                    loading={loading}
+                    error={error}
+                    login={login}
+                    loginWithEmail={loginWithEmail}
+                    registerWithEmail={registerWithEmail}
+                    loginAsGuest={loginAsGuest}
+                    logout={logout}
+                    clearError={clearError}
+                    connected={connected}
+                    gameState={gameState}
+                    emit={emit}
+                    joinError={joinError}
+                    clearJoinError={clearJoinError}
+                    shutdownCountdown={shutdownCountdown}
+                />
+            </BrowserRouter>
+        </HelmetProvider>
     );
 }

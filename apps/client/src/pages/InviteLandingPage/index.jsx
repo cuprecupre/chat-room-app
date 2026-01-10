@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "../../components/ui/Button";
 import { Spinner } from "../../components/ui/Spinner";
 import { InvitationCard } from "../../components/InvitationCard";
@@ -12,6 +13,7 @@ import { GameNotFoundCard } from "../../components/InviteErrors";
  */
 export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
     const navigate = useNavigate();
+    const { t } = useTranslation('common');
     const { urlRoomId, previewHostName, error } = useGameInvite();
 
     // Handle cancel - go to landing page
@@ -45,8 +47,8 @@ export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
         <InvitationCard
             hostName={previewHostName}
             roomId={urlRoomId}
-            title="¡Te han invitado!"
-            subtitle="¿Quieres entrar ahora?"
+            title={t('invite.title')}
+            subtitle={t('invite.subtitle')}
         >
             {/* Guest Login Button */}
             <Button
@@ -56,7 +58,7 @@ export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
                 size="lg"
                 className="w-full h-14 text-base rounded-full"
             >
-                <span className="align-middle font-semibold">Jugar como invitado</span>
+                <span className="align-middle font-semibold">{t('invite.buttons.guest')}</span>
             </Button>
 
             {/* Google Login Button - Same style as LandingPage */}
@@ -104,7 +106,7 @@ export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
                         </svg>
                     )}
                 </span>
-                <span className="align-middle font-semibold">Continuar con Google</span>
+                <span className="align-middle font-semibold">{t('invite.buttons.google')}</span>
             </Button>
 
             {/* Temporarily hidden - Email Login
@@ -141,7 +143,7 @@ export function InviteLandingPage({ onLogin, onGoToEmailAuth, isLoading }) {
                 size="md"
                 className="w-full text-neutral-500 hover:text-neutral-300"
             >
-                Cancelar
+                {t('invite.buttons.cancel')}
             </Button>
         </InvitationCard>
     );

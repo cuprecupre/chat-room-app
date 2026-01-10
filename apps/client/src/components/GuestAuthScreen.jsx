@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "./ui/Button";
 import { Spinner } from "./ui/Spinner";
 
@@ -6,6 +7,7 @@ import { Spinner } from "./ui/Spinner";
 const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
 
 export function GuestAuthScreen({ onLoginAsGuest, onBack, isLoading, error, clearError }) {
+    const { t } = useTranslation('common');
     const [displayName, setDisplayName] = useState("");
     const [localError, setLocalError] = useState("");
 
@@ -19,11 +21,11 @@ export function GuestAuthScreen({ onLoginAsGuest, onBack, isLoading, error, clea
 
         const trimmedName = displayName.trim();
         if (trimmedName.length < 2) {
-            setLocalError("El nombre debe tener al menos 2 caracteres.");
+            setLocalError(t('auth.guest.errorMinLength', 'Name must be at least 2 characters.'));
             return;
         }
         if (trimmedName.length > 30) {
-            setLocalError("El nombre no puede tener más de 30 caracteres.");
+            setLocalError(t('auth.guest.errorMaxLength', 'Name cannot be more than 30 characters.'));
             return;
         }
 
@@ -48,14 +50,14 @@ export function GuestAuthScreen({ onLoginAsGuest, onBack, isLoading, error, clea
                         <div className="perspective-1000 animate-scaleIn">
                             <img
                                 src={heroImg}
-                                alt="El Impostor"
+                                alt="The Impostor"
                                 className="mx-auto w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10"
                                 loading="lazy"
                             />
                         </div>
-                        <h1 className="text-3xl font-serif text-neutral-50">Jugar como invitado</h1>
+                        <h1 className="text-3xl font-serif text-neutral-50">{t('auth.guest.title', 'Play as guest')}</h1>
                         <p className="text-neutral-400">
-                            Ingresa un nombre para que los demás jugadores te reconozcan
+                            {t('auth.guest.subtitle', 'Enter a name so other players can recognize you')}
                         </p>
                     </div>
 
@@ -66,7 +68,7 @@ export function GuestAuthScreen({ onLoginAsGuest, onBack, isLoading, error, clea
                                 htmlFor="guestName"
                                 className="block text-sm font-medium text-neutral-300 mb-2"
                             >
-                                Tu nombre
+                                {t('auth.guest.yourName', 'Your name')}
                             </label>
                             <input
                                 id="guestName"
@@ -77,10 +79,10 @@ export function GuestAuthScreen({ onLoginAsGuest, onBack, isLoading, error, clea
                                 disabled={isLoading}
                                 autoFocus
                                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
-                                placeholder="Ej: Juan"
+                                placeholder={t('auth.guest.placeholder', 'Ex: John')}
                             />
                             <p className="text-xs text-neutral-500 mt-1">
-                                Este nombre será visible para todos los jugadores
+                                {t('auth.guest.visibleNote', 'This name will be visible to all players')}
                             </p>
                         </div>
 
@@ -100,10 +102,10 @@ export function GuestAuthScreen({ onLoginAsGuest, onBack, isLoading, error, clea
                             {isLoading ? (
                                 <span className="flex items-center justify-center gap-2">
                                     <Spinner size="sm" />
-                                    Entrando...
+                                    {t('auth.guest.entering', 'Entering...')}
                                 </span>
                             ) : (
-                                "Entrar a jugar"
+                                t('auth.guest.enterToPlay', 'Enter to play')
                             )}
                         </Button>
                     </form>
@@ -129,13 +131,13 @@ export function GuestAuthScreen({ onLoginAsGuest, onBack, isLoading, error, clea
                                 d="M15 19l-7-7 7-7"
                             />
                         </svg>
-                        <span>Volver</span>
+                        <span>{t('buttons.back', 'Back')}</span>
                     </Button>
 
                     {/* Nota informativa */}
                     <div className="text-center text-xs text-neutral-500 space-y-1">
-                        <p>Como invitado podrás jugar sin registrarte.</p>
-                        <p>Tu sesión se mantendrá hasta que cierres el navegador.</p>
+                        <p>{t('auth.guest.note1', 'As a guest you can play without registering.')}</p>
+                        <p>{t('auth.guest.note2', 'Your session will be kept until you close the browser.')}</p>
                     </div>
                 </div>
             </div>
@@ -143,7 +145,7 @@ export function GuestAuthScreen({ onLoginAsGuest, onBack, isLoading, error, clea
             <footer className="w-full py-4 px-6">
                 <div className="flex items-center justify-center">
                     <p className="text-xs sm:text-sm text-neutral-500">
-                        © 2025 El impostor. Todos los derechos reservados.
+                        {t('footer.copyright', '© 2025 The Impostor. All rights reserved.')}
                     </p>
                 </div>
             </footer>

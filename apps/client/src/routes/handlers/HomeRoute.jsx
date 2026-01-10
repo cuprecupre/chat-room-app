@@ -13,6 +13,7 @@ export function HomeRoute({
     loading,
     onOpenInstructions,
     onOpenFeedback,
+    onGoToGuestAuth,
 }) {
     const roomId = useRoomIdFromUrl();
 
@@ -35,6 +36,7 @@ export function HomeRoute({
     return (
         <LandingPage
             onLogin={login}
+            onGoToGuestAuth={onGoToGuestAuth}
             isLoading={loading}
             onOpenInstructions={onOpenInstructions}
             onOpenFeedback={onOpenFeedback}

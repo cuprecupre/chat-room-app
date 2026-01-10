@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "./ui/Button";
 import { Spinner } from "./ui/Spinner";
 
@@ -13,6 +14,8 @@ export function LoginScreen({
     onOpenInstructions,
     onOpenFeedback,
 }) {
+    const { t } = useTranslation('common');
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
@@ -30,12 +33,10 @@ export function LoginScreen({
                         />
                     </div>
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif text-neutral-50 animate-fadeIn animate-delay-500">
-                        El impostor
+                        {t('login.appTitle')}
                     </h1>
-                    <p className="text-lg sm:text-xl text-neutral-300 animate-fadeIn animate-delay-600">
-                        Alguien no dice la verdad.
-                        <br />
-                        ¿Lo vas a descubrir?
+                    <p className="text-lg sm:text-xl text-neutral-300 animate-fadeIn animate-delay-600 whitespace-pre-line">
+                        {t('login.tagline')}
                     </p>
 
                     <div className="animate-fadeIn animate-delay-800">
@@ -84,7 +85,7 @@ export function LoginScreen({
                                 )}
                             </span>
                             <span className="align-middle">
-                                {isLoading ? "Conectando..." : "Continuar con Google"}
+                                {isLoading ? t('auth.authenticating') : t('auth.continueWithGoogle')}
                             </span>
                         </Button>
                     </div>
@@ -112,7 +113,7 @@ export function LoginScreen({
                                     />
                                 </svg>
                             </span>
-                            <span className="align-middle">Continuar con Email</span>
+                            <span className="align-middle">{t('auth.continueWithEmail')}</span>
                         </Button>
                     </div>
 
@@ -139,7 +140,7 @@ export function LoginScreen({
                                     />
                                 </svg>
                             </span>
-                            <span className="align-middle">Jugar como invitado</span>
+                            <span className="align-middle">{t('auth.continueAsGuest')}</span>
                         </Button>
                     </div>
 
@@ -161,7 +162,7 @@ export function LoginScreen({
                                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                                 />
                             </svg>
-                            <span>Reglas del juego</span>
+                            <span>{t('footer.gameRules')}</span>
                         </button>
                         <button
                             onClick={onOpenFeedback}
@@ -180,7 +181,7 @@ export function LoginScreen({
                                     d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
                                 />
                             </svg>
-                            <span>Ayudanos a mejorar</span>
+                            <span>{t('auth.helpImprove')}</span>
                         </button>
                     </div>
                 </div>
@@ -189,7 +190,7 @@ export function LoginScreen({
             <footer className="w-full py-4 px-6">
                 <div className="flex items-center justify-center">
                     <p className="text-xs sm:text-sm text-neutral-500">
-                        © 2025 El impostor. Todos los derechos reservados.
+                        {t('footer.copyright')}
                     </p>
                 </div>
             </footer>

@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { db } from "../lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Button } from "./ui/Button";
 import { Modal } from "./ui/Modal";
 
 export function FeedbackModal({ isOpen, onClose, user }) {
+    const { t } = useTranslation('common');
     const [message, setMessage] = useState("");
     const [type, setType] = useState("bug"); // bug, suggestion, other
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,18 +56,18 @@ export function FeedbackModal({ isOpen, onClose, user }) {
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Ayudanos a mejorar" size="md">
+        <Modal isOpen={isOpen} onClose={onClose} title={t('feedback.title', 'Help us improve')} size="md">
             {status === "success" ? (
                 <div className="text-center py-8">
                     <div className="text-5xl mb-4">✨</div>
-                    <h4 className="text-xl font-bold text-green-400 mb-2">¡Mensaje enviado!</h4>
-                    <p className="text-neutral-400">Gracias por ayudarnos a mejorar.</p>
+                    <h4 className="text-xl font-bold text-green-400 mb-2">{t('feedback.successTitle', 'Message sent!')}</h4>
+                    <p className="text-neutral-400">{t('feedback.successMessage', 'Thanks for helping us improve.')}</p>
                 </div>
             ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-neutral-300 mb-2">
-                            Tipo de mensaje
+                            {t('feedback.typeLabel', 'Message type')}
                         </label>
                         <div className="relative">
                             <select
@@ -73,9 +75,9 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                                 onChange={(e) => setType(e.target.value)}
                                 className="w-full appearance-none bg-neutral-800 text-white border-none rounded-lg py-2.5 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all cursor-pointer"
                             >
-                                <option value="bug">🚨 Problema</option>
-                                <option value="suggestion">💡 Idea</option>
-                                <option value="other">💭 Otros</option>
+                                <option value="bug">🚨 {t('feedback.typeBug', 'Problem')}</option>
+                                <option value="suggestion">💡 {t('feedback.typeIdea', 'Idea')}</option>
+                                <option value="other">💭 {t('feedback.typeOther', 'Other')}</option>
                             </select>
                             <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-neutral-400">
                                 <svg
@@ -97,12 +99,12 @@ export function FeedbackModal({ isOpen, onClose, user }) {
 
                     <div>
                         <label className="block text-sm font-medium text-neutral-300 mb-2">
-                            Tu comentario
+                            {t('feedback.commentLabel', 'Your comment')}
                         </label>
                         <textarea
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
-                            placeholder="Cuéntanos tu problema, sugerencia o cualquier comentario que tengas para mejorar el juego..."
+                            placeholder={t('feedback.placeholder', 'Tell us your problem, suggestion, or any comment to improve the game...')}
                             className="w-full h-32 bg-neutral-950 border-none rounded-lg p-3 text-white placeholder-neutral-500 focus:ring-2 focus:ring-orange-500 resize-none transition-all"
                             required
                         />
@@ -111,7 +113,7 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                     {status === "error" && (
                         <p className="text-red-400 text-sm bg-red-400/10 p-2 rounded">
                             {(errorObject && errorObject.message) ||
-                                "Hubo un error al enviar el mensaje. Inténtalo de nuevo."}
+                                t('feedback.errorMessage', 'There was an error sending the message. Try again.')}
                         </p>
                     )}
 
@@ -122,14 +124,14 @@ export function FeedbackModal({ isOpen, onClose, user }) {
                             onClick={onClose}
                             className="flex-1"
                         >
-                            Cancelar
+                            {t('buttons.cancel')}
                         </Button>
                         <Button
                             type="submit"
                             disabled={isSubmitting || !message.trim()}
                             className="flex-1"
                         >
-                            {isSubmitting ? "Enviando..." : "Enviar"}
+                            {isSubmitting ? t('feedback.sending', 'Sending...') : t('feedback.send', 'Send')}
                         </Button>
                     </div>
                 </form>

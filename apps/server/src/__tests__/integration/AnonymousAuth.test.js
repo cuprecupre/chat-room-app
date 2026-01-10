@@ -130,7 +130,7 @@ describe("Anonymous User Integration", () => {
 
             const impostorState = sim.getStateForPlayer(sim.getImpostorIndex());
             expect(impostorState.role).toBe("impostor");
-            expect(impostorState.secretWord).toBe("Descubre la palabra secreta");
+            expect(impostorState.secretWord).toBe("SECRET_WORD_HINT");
         });
 
         test("Anonymous impostor can win by surviving 3 rounds", () => {
@@ -154,7 +154,7 @@ describe("Anonymous User Integration", () => {
 
             const friendState = sim.getStateForPlayer(sim.getNonImpostorIndex());
             expect(friendState.role).toBe("friend");
-            expect(friendState.secretWord).not.toBe("Descubre la palabra secreta");
+            expect(friendState.secretWord).not.toBe("SECRET_WORD_HINT");
         });
 
         test("Anonymous friend can vote", () => {

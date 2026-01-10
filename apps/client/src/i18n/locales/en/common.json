@@ -1,0 +1,182 @@
+{
+    "nav": {
+        "howToPlay": "How to Play",
+        "rules": "Rules",
+        "playNow": "Play Now",
+        "openMenu": "Open user menu"
+    },
+    "buttons": {
+        "play": "Play",
+        "playAgain": "Play another game",
+        "continue": "Continue",
+        "close": "Close",
+        "copy": "Copy",
+        "copied": "Copied!",
+        "leave": "Leave",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "understood": "Got it",
+        "startGame": "Start game",
+        "nextRound": "Next round",
+        "back": "Back",
+        "forceExit": "Force exit"
+    },
+    "auth": {
+        "authenticating": "Authenticating",
+        "verifyingSession": "Verifying session...",
+        "continueWithGoogle": "Continue with Google",
+        "continueWithEmail": "Continue with Email",
+        "continueAsGuest": "Play as guest",
+        "logout": "Log out",
+        "login": "Log in",
+        "createAccount": "Create account",
+        "createNewAccount": "Create new account",
+        "email": "Email",
+        "password": "Password",
+        "nameAndSurname": "Name and Surname",
+        "loggingIn": "Logging in...",
+        "creatingAccount": "Creating account...",
+        "accountQuestion": "Do you have an account or want to create a new one?",
+        "minPassword": "Minimum 6 characters",
+        "enterNameError": "Please enter your name and surname.",
+        "helpImprove": "Help us improve",
+        "emailPlaceholder": "you@email.com",
+        "passwordPlaceholder": "••••••••",
+        "namePlaceholder": "Ex: John Doe",
+        "guest": {
+            "title": "Play as guest",
+            "subtitle": "Enter a name so other players can recognize you",
+            "yourName": "Your name",
+            "placeholder": "Ex: John",
+            "visibleNote": "This name will be visible to all players",
+            "enterToPlay": "Enter to play",
+            "entering": "Entering...",
+            "errorMinLength": "Name must be at least 2 characters.",
+            "errorMaxLength": "Name cannot be more than 30 characters.",
+            "note1": "As a guest you can play without registering.",
+            "note2": "Your session will be kept until you close the browser."
+        }
+    },
+    "errors": {
+        "generic": "An error occurred",
+        "connection": "Connection error",
+        "tryAgain": "Try again",
+        "connectionLost": "Connection lost",
+        "cantConnect": "Cannot connect to server. This may be due to network issues or the server is down.",
+        "retryConnection": "Retry connection",
+        "sessionReset": "Session reset. Return to lobby."
+    },
+    "labels": {
+        "free": "Free",
+        "noInstall": "No download",
+        "multiplayer": "Multiplayer",
+        "players": "players",
+        "round": "Round",
+        "points": "pts"
+    },
+    "footer": {
+        "copyright": "The Impostor © 2025",
+        "rules": "Rules",
+        "discord": "Discord",
+        "contact": "Contact",
+        "gameRules": "Game rules",
+        "support": "Support the developer",
+        "privacy": "Privacy",
+        "cookies": "Cookies"
+    },
+    "feedback": {
+        "title": "Help us improve",
+        "successTitle": "Message sent!",
+        "successMessage": "Thanks for helping us improve.",
+        "typeLabel": "Message type",
+        "typeBug": "Problem",
+        "typeIdea": "Idea",
+        "typeOther": "Other",
+        "commentLabel": "Your comment",
+        "placeholder": "Tell us your problem, suggestion, or any comment to improve the game...",
+        "errorMessage": "There was an error sending the message. Try again.",
+        "sending": "Sending...",
+        "send": "Send"
+    },
+    "system": {
+        "sessionExpired": "Your session has expired. Please log in again.",
+        "sessionReplaced": "Your session has been replaced by a new tab",
+        "serverMaintenance": "Server is under maintenance. New games cannot be created.",
+        "shutdownCheck": "The server is restarting...",
+        "maintenanceCancelled": "Maintenance has been cancelled",
+        "kicked": "You have been kicked from the room",
+        "kickedByHost": "You have been kicked from the room by the host",
+        "roomNotFound": "Room does not exist.",
+        "notInRoom": "You do not belong to this room.",
+        "gameNotFound": "Game does not exist.",
+        "hostLeftMatch": "The host has left the match",
+        "userBackToRoom": "{{name}} returned to the room",
+        "userJoined": "{{name}} joined the room",
+        "hostTransfer": "{{name}} left. {{newHost}} is now the host",
+        "userLeft": "{{name}} has left the game",
+        "userKicked": "{{name}} has been kicked from the room",
+        "disconnectedHostTransfer": "{{name}} disconnected. {{newHost}} is now the host",
+        "userDisconnected": "{{name}} disconnected",
+        "authenticating": "Authenticating",
+        "verifyingSession": "Verifying session..."
+    },
+    "lobby": {
+        "startPlaying": "Start playing",
+        "subtitle": "Create a room, invite your friends and start playing",
+        "createRoom": "Create new room",
+        "discordTitle": "Looking for players?",
+        "discordText": "Join <0>our Discord</0> to find matches.",
+        "remotePlay": "If playing remotely with friends, you can use WhatsApp, Discord, Zoom, or whatever you prefer for a video call."
+    },
+    "login": {
+        "appTitle": "The Impostor",
+        "tagline": "Someone is not telling the truth.\nWill you catch them?"
+    },
+    "game": {
+        "tie": "Tie",
+        "nobodyEliminated": "No one was eliminated",
+        "newClueRound": "New clue round",
+        "impostorRemains": "The impostor is still among us",
+        "round": "Round",
+        "votesAgainst": "Votes against",
+        "hasBeenEliminated": "has been eliminated",
+        "wasEliminated": "was eliminated"
+    },
+    "invite": {
+        "title": "You've been invited!",
+        "subtitle": "Join now?",
+        "receivedLink": "You received a link to join the game of",
+        "buttons": {
+            "guest": "Play as guest",
+            "google": "Continue with Google",
+            "cancel": "Cancel",
+            "join": "Join",
+            "joinRoom": "Join room",
+            "enter": "Enter room",
+            "backToHome": "Back to start",
+            "backToRoom": "Back to my room",
+            "createNewRoom": "Create new room"
+        },
+        "errors": {
+            "notFound": "Game does not exist or has ended.",
+            "roomNotFound": {
+                "title": "Room no longer exists",
+                "subtitle": "Create a new room to invite your friends to play another game."
+            },
+            "joinFailed": "Could not join",
+            "inProgress": "You are in a game. If you join, you will leave it."
+        }
+    },
+    "legal": {
+        "privacy": {
+            "title": "Privacy Policy",
+            "description": "Privacy Policy for The Impostor game. Learn how we handle your data.",
+            "backToHome": "Back to home"
+        },
+        "cookies": {
+            "title": "Cookie Policy",
+            "description": "Cookie Policy for The Impostor game. Learn about the cookies we use.",
+            "backToHome": "Back to home"
+        }
+    }
+}

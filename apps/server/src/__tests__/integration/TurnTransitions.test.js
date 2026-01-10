@@ -139,10 +139,10 @@ describe("Round Transitions (Integration)", () => {
             const friendState = sim.getStateForPlayer(sim.getNonImpostorIndex());
 
             expect(impostorState.role).toBe("impostor");
-            expect(impostorState.secretWord).toBe("Descubre la palabra secreta");
+            expect(impostorState.secretWord).toBe("SECRET_WORD_HINT");
 
             expect(friendState.role).toBe("friend");
-            expect(friendState.secretWord).not.toBe("Descubre la palabra secreta");
+            expect(friendState.secretWord).not.toBe("SECRET_WORD_HINT");
         });
     });
 

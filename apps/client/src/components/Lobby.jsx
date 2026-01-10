@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import { Video } from "lucide-react";
+import { useTranslation, Trans } from "react-i18next";
 import { Button } from "./ui/Button";
 
 // Firebase Storage CDN URL
 const homeImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
 
 export function Lobby({ onCreateGame }) {
+    const { t, i18n } = useTranslation('common');
     const handleCreateGame = () => {
-        onCreateGame();
+        // Pass current language so server uses correct word list
+        const lang = i18n.language?.startsWith('en') ? 'en' : 'es';
+        onCreateGame({ language: lang });
     };
 
     return (
@@ -20,17 +24,17 @@ export function Lobby({ onCreateGame }) {
                     loading="lazy"
                 />
                 <h2 className="text-4xl font-serif text-neutral-50 tracking-tight">
-                    Empezar a jugar
+                    {t('lobby.startPlaying')}
                 </h2>
                 <div className="space-y-4">
                     <p className="text-xl font-light text-neutral-400 leading-relaxed max-w-md mx-auto">
-                        Crea una sala, invita a tus amigos <br /> y empieza a jugar
+                        {t('lobby.subtitle')}
                     </p>
                 </div>
             </div>
             <div className="max-w-sm mx-auto space-y-6">
                 <Button onClick={handleCreateGame} variant="primary" size="md" className="w-full h-12 text-lg rounded-full shadow-lg">
-                    Crear nueva sala
+                    {t('lobby.createRoom')}
                 </Button>
 
 
@@ -51,10 +55,13 @@ export function Lobby({ onCreateGame }) {
                     </svg>
                     <div>
                         <p className="text-sm font-medium text-[#5865F2] mb-0.5 group-hover:text-white transition-colors">
-                            ¿Buscas gente para jugar?
+                            {t('lobby.discordTitle')}
                         </p>
                         <p className="text-sm text-neutral-400 leading-snug group-hover:text-neutral-300 transition-colors">
-                            Entra a <span className="underline font-medium hover:text-neutral-300">nuestro Discord</span> y encuentra partidas.
+                            <Trans
+                                i18nKey="lobby.discordText"
+                                components={[<span className="underline font-medium hover:text-neutral-300" />]}
+                            />
                         </p>
                     </div>
                 </a>
@@ -62,7 +69,7 @@ export function Lobby({ onCreateGame }) {
                 <div className="bg-neutral-500/10 rounded-lg p-4 flex gap-3 items-start text-left">
                     <Video className="w-5 h-5 text-neutral-400 shrink-0 mt-0.5" />
                     <p className="text-sm text-neutral-400 leading-snug">
-                        Si juegas a distancia con tus amigos, puedes hacer una videollamada por WhatsApp, Discord, Zoom, o la que prefieras.
+                        {t('lobby.remotePlay')}
                     </p>
                 </div>
             </div>
