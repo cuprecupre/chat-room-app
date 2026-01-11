@@ -46,6 +46,11 @@ const provider = new GoogleAuthProvider();
 provider.addScope("profile");
 provider.addScope("email");
 
+// Forzar selector de cuentas en cada login
+provider.setCustomParameters({
+    prompt: "select_account",
+});
+
 async function ensurePersistence() {
     try {
         console.log("🔧 Configurando persistencia browserLocalPersistence...");
