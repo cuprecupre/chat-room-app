@@ -59,24 +59,27 @@ export function ProfilePage() {
                     {/* Stats principales */}
                     <div className="grid grid-cols-3 gap-3 mb-8">
                         <div className="bg-neutral-900/50 rounded-xl p-4 text-center">
+                            <div className="text-2xl mb-1">⭐</div>
                             <div className="text-2xl font-bold text-orange-400">
-                                ⭐ {stats?.points || 0}
+                                {stats?.points || 0}
                             </div>
                             <div className="text-xs text-neutral-400 mt-1">
                                 {t("profile.points", "Puntos")}
                             </div>
                         </div>
                         <div className="bg-neutral-900/50 rounded-xl p-4 text-center">
+                            <div className="text-2xl mb-1">🎮</div>
                             <div className="text-2xl font-bold text-white">
-                                🎮 {stats?.gamesPlayed || 0}
+                                {stats?.gamesPlayed || 0}
                             </div>
                             <div className="text-xs text-neutral-400 mt-1">
                                 {t("profile.gamesPlayed", "Partidas")}
                             </div>
                         </div>
                         <div className="bg-neutral-900/50 rounded-xl p-4 text-center">
+                            <div className="text-2xl mb-1">🏆</div>
                             <div className="text-2xl font-bold text-white">
-                                🏆 {(stats?.winsAsImpostor || 0) + (stats?.winsAsFriend || 0)}
+                                {(stats?.winsAsImpostor || 0) + (stats?.winsAsFriend || 0)}
                             </div>
                             <div className="text-xs text-neutral-400 mt-1">
                                 {t("profile.wins", "Victorias")}
