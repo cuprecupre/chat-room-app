@@ -49,12 +49,15 @@
             "yourName": "Tu nombre",
             "placeholder": "Ej: Juan",
             "visibleNote": "Este nombre será visible para todos los jugadores",
-            "enterToPlay": "Entrar a jugar",
+            "enterToPlay": "Continuar como invitado",
+            "progressWarning": "Como invitado tu progreso no se guardará.",
             "entering": "Entrando...",
             "errorMinLength": "El nombre debe tener al menos 2 caracteres.",
             "errorMaxLength": "El nombre no puede tener más de 30 caracteres.",
             "note1": "Como invitado podrás jugar sin registrarte.",
-            "note2": "Tu sesión se mantendrá hasta que cierres el navegador."
+            "note2": "Tu sesión se mantendrá hasta que cierres el navegador.",
+            "googleRecommendation": "Guarda tu progreso en el juego y tus estadísticas accediendo con Google.",
+            "continueWithGoogle": "Continuar con Google"
         }
     },
     "errors": {

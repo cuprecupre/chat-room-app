@@ -49,12 +49,15 @@
             "yourName": "Your name",
             "placeholder": "Ex: John",
             "visibleNote": "This name will be visible to all players",
-            "enterToPlay": "Enter to play",
+            "enterToPlay": "Continue as guest",
+            "progressWarning": "As a guest your progress will not be saved.",
             "entering": "Entering...",
             "errorMinLength": "Name must be at least 2 characters.",
             "errorMaxLength": "Name cannot be more than 30 characters.",
             "note1": "As a guest you can play without registering.",
-            "note2": "Your session will be kept until you close the browser."
+            "note2": "Your session will be kept until you close the browser.",
+            "googleRecommendation": "Save your progress and stats by signing in with Google.",
+            "continueWithGoogle": "Continue with Google"
         }
     },
     "errors": {

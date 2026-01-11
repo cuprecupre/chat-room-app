@@ -123,6 +123,7 @@ function AppRoutes({
     const authRouteProps = {
         user,
         loginWithEmail,
+        login,
         registerWithEmail,
         loginAsGuest,
         loading,

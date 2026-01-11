@@ -8,6 +8,7 @@ import { GuestAuthPage } from "../../pages/GuestAuthPage";
  */
 export function GuestAuthRoute({
     user,
+    login,
     loginAsGuest,
     loading,
     error,
@@ -30,6 +31,7 @@ export function GuestAuthRoute({
     return (
         <GuestAuthPage
             onLoginAsGuest={loginAsGuest}
+            onLoginWithGoogle={login}
             isLoading={loading}
             error={error}
             clearError={clearError}
