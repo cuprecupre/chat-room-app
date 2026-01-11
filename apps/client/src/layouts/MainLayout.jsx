@@ -1,7 +1,7 @@
 import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { User, LogOut, ArrowLeft, DoorOpen } from "lucide-react";
+import { User, LogOut, ArrowLeft, DoorOpen, Menu } from "lucide-react";
 
 import { Avatar } from "../components/ui/Avatar";
 import { Footer } from "../components/Footer";
@@ -126,36 +126,29 @@ export function MainLayout({
                     <LanguageSelector />
 
                     <div className="flex items-center gap-3 sm:gap-4">
-                        {/* Points Badge */}
+                        {/* Points Badge with Avatar */}
                         <Link
                             to={ROUTES.PROFILE}
-                            className="flex items-center gap-1 px-2.5 py-1 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 rounded-full text-orange-400 text-sm font-medium transition-colors"
+                            className="flex items-center gap-2 pl-3 pr-1 py-1 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 rounded-full text-orange-400 text-sm font-medium transition-colors group"
                         >
-                            <span>⭐</span>
+                            <span className="text-base">⭐</span>
                             <span>{stats?.points || 0}</span>
+                            <Avatar
+                                photoURL={user.photoURL}
+                                displayName={user.displayName}
+                                size="sm"
+                                className="ml-1 !w-7 !h-7"
+                            />
                         </Link>
 
+                        {/* Hamburger Menu Trigger */}
                         <div className="relative" ref={menuRef}>
                             <button
                                 aria-label={t('nav.openMenu', 'Open user menu')}
                                 onClick={() => setMenuOpen((v) => !v)}
-                                className="relative group rounded-full ring-1 ring-transparent focus:outline-none active:scale-95 transition-all duration-150"
-                                style={{
-                                    backgroundColor: "transparent",
-                                    border: "none",
-                                    outline: "none",
-                                    WebkitTapHighlightColor: "transparent",
-                                    WebkitTouchCallout: "none",
-                                    WebkitUserSelect: "none",
-                                    userSelect: "none",
-                                }}
+                                className="p-2 text-neutral-400 hover:text-white hover:bg-white/10 rounded-full transition-colors active:scale-95"
                             >
-                                <Avatar
-                                    photoURL={user.photoURL}
-                                    displayName={user.displayName}
-                                    size="md"
-                                />
-                                <span className="pointer-events-none absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <Menu className="w-6 h-6" />
                             </button>
                             {menuOpen && (
                                 <div className="absolute right-0 mt-2 w-56 rounded-xl border border-white/10 bg-neutral-950/95 backdrop-blur-md shadow-2xl ring-1 ring-white/10 p-2 z-20">
