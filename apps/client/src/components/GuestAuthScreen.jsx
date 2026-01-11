@@ -64,14 +64,14 @@ export function GuestAuthScreen({ onLoginAsGuest, onLoginWithGoogle, onBack, isL
 
 
 
-                        <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-6 text-center">
+                        <div className="bg-gradient-to-br from-orange-500/20 to-orange-900/10 rounded-xl p-6 text-center">
                             <div className="flex flex-col items-center gap-3 mb-6">
                                 <img
                                     src={heroImg}
                                     alt="The Impostor"
                                     className="w-20 h-20 rounded-full object-cover shadow-lg mb-2 ring-2 ring-orange-500/20"
                                 />
-                                <p className="text-orange-200 text-lg leading-relaxed max-w-[95%]">
+                                <p className="text-white text-lg leading-relaxed max-w-[95%]">
                                     {t('auth.guest.googleRecommendation', 'If you want to save your progress and stats, we recommend signing in with a Google account.')}
                                 </p>
                             </div>
@@ -122,60 +122,62 @@ export function GuestAuthScreen({ onLoginAsGuest, onLoginWithGoogle, onBack, isL
                         </div>
                     </div>
                     <div className="w-full h-px bg-white/10 my-6" />
-                    <h1 className="text-3xl font-serif text-neutral-50 leading-tight mt-2 text-center">{t('auth.guest.title', 'Play as guest')}</h1>
+                    <div className="bg-white/5 rounded-xl p-6">
+                        <h1 className="text-3xl font-serif text-neutral-50 leading-tight mt-0 mb-6 text-center">{t('auth.guest.title', 'Play as guest')}</h1>
 
 
 
-                    {/* Formulario */}
-                    <form onSubmit={handleSubmit} className="space-y-4 animate-fadeIn">
-                        <div>
-                            <label
-                                htmlFor="guestName"
-                                className="block text-sm font-medium text-neutral-300 mb-2"
-                            >
-                                {t('auth.guest.yourName', 'Your name')}
-                            </label>
-                            <input
-                                id="guestName"
-                                type="text"
-                                value={displayName}
-                                onChange={(e) => setDisplayName(e.target.value)}
-                                required
-                                disabled={isLoading}
-                                autoFocus
-                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
-                                placeholder={t('auth.guest.placeholder', 'Ex: John')}
-                            />
+                        {/* Formulario */}
+                        <form onSubmit={handleSubmit} className="space-y-4 animate-fadeIn">
+                            <div>
+                                <label
+                                    htmlFor="guestName"
+                                    className="block text-sm font-medium text-neutral-300 mb-2"
+                                >
+                                    {t('auth.guest.yourName', 'Your name')}
+                                </label>
+                                <input
+                                    id="guestName"
+                                    type="text"
+                                    value={displayName}
+                                    onChange={(e) => setDisplayName(e.target.value)}
+                                    required
+                                    disabled={isLoading}
+                                    autoFocus
+                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
+                                    placeholder={t('auth.guest.placeholder', 'Ex: John')}
+                                />
 
-                        </div>
-
-                        {displayError && (
-                            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 text-red-400 text-sm">
-                                {displayError}
                             </div>
-                        )}
 
-                        <Button
-                            type="submit"
-                            variant="outline"
-                            size="lg"
-                            className="w-full border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20"
-                            disabled={isLoading}
-                        >
-                            {isLoading ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <Spinner size="sm" />
-                                    {t('auth.guest.entering', 'Entering...')}
-                                </span>
-                            ) : (
-                                t('auth.guest.enterToPlay', 'Enter to play')
+                            {displayError && (
+                                <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 text-red-400 text-sm">
+                                    {displayError}
+                                </div>
                             )}
-                        </Button>
-                        <p className="flex items-center justify-center gap-1.5 text-xs text-neutral-500 mt-3">
-                            <Info className="w-3 h-3" />
-                            <span>{t('auth.guest.progressWarning', 'As a guest your progress will not be saved.')}</span>
-                        </p>
-                    </form>
+
+                            <Button
+                                type="submit"
+                                variant="outline"
+                                size="lg"
+                                className="w-full border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20 h-14 rounded-full"
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <Spinner size="sm" />
+                                        {t('auth.guest.entering', 'Entering...')}
+                                    </span>
+                                ) : (
+                                    t('auth.guest.enterToPlay', 'Enter to play')
+                                )}
+                            </Button>
+                            <p className="flex items-center justify-center gap-1.5 text-xs text-neutral-300 mt-3">
+                                <Info className="w-3 h-3" />
+                                <span>{t('auth.guest.progressWarning', 'As a guest your progress will not be saved.')}</span>
+                            </p>
+                        </form>
+                    </div>
 
 
 
@@ -186,7 +188,7 @@ export function GuestAuthScreen({ onLoginAsGuest, onLoginWithGoogle, onBack, isL
             <footer className="w-full py-4 px-6">
                 <div className="flex items-center justify-center">
                     <p className="text-xs sm:text-sm text-neutral-500">
-                        {t('footer.copyright', '© 2025 The Impostor. All rights reserved.')}
+                        {t('footer.copyright', '© 2026 The Impostor. All rights reserved.')}
                     </p>
                 </div>
             </footer>
