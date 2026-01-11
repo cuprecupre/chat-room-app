@@ -180,5 +180,21 @@
             "description": "Cookie Policy for The Impostor game. Learn about the cookies we use.",
             "backToHome": "Back to home"
         }
+    },
+    "profile": {
+        "back": "Back",
+        "myProfile": "My profile",
+        "anonymous": "Player",
+        "points": "Points",
+        "gamesPlayed": "Games",
+        "wins": "Wins",
+        "detailedStats": "Detailed stats",
+        "asImpostor": "As impostor",
+        "asFriend": "As friend",
+        "games": "games",
+        "winsShort": "wins",
+        "completed": "Completed",
+        "abandoned": "Abandoned",
+        "playTime": "Play time"
     }
 }

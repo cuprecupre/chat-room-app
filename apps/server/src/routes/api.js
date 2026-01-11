@@ -102,6 +102,52 @@ router.get("/health", async (req, res) => {
     res.status(statusCode).json(health);
 });
 
+/**
+ * GET /api/player/:uid/stats
+ * Get player statistics from Firestore.
+ */
+router.get("/player/:uid/stats", async (req, res) => {
+    const { uid } = req.params;
+
+    if (!uid) {
+        return res.status(400).json({ error: "UID is required" });
+    }
+
+    try {
+        const stats = await dbService.getPlayerStats(uid);
+
+        if (!stats) {
+            // Return defaults if no stats found
+            return res.json({
+                points: 0,
+                gamesPlayed: 0,
+                gamesCompleted: 0,
+                gamesAbandoned: 0,
+                gamesAsImpostor: 0,
+                winsAsImpostor: 0,
+                winsAsFriend: 0,
+                playTimeSeconds: 0,
+            });
+        }
+
+        res.json({
+            points: stats.points || 0,
+            gamesPlayed: stats.gamesPlayed || 0,
+            gamesCompleted: stats.gamesCompleted || 0,
+            gamesAbandoned: stats.gamesAbandoned || 0,
+            gamesAsImpostor: stats.gamesAsImpostor || 0,
+            winsAsImpostor: stats.winsAsImpostor || 0,
+            winsAsFriend: stats.winsAsFriend || 0,
+            playTimeSeconds: stats.playTimeSeconds || 0,
+            displayName: stats.displayName,
+            photoURL: stats.photoURL,
+        });
+    } catch (error) {
+        console.error("[API] Error fetching player stats:", error);
+        res.status(500).json({ error: "Failed to fetch player stats" });
+    }
+});
+
 // ============================================
 // Admin Endpoints (protected by ADMIN_SECRET)
 // ============================================

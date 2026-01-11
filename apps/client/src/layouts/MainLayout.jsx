@@ -1,12 +1,14 @@
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { User, LogOut, ArrowLeft, DoorOpen } from "lucide-react";
 
 import { Avatar } from "../components/ui/Avatar";
 import { Footer } from "../components/Footer";
 import { LeaveMatchModal } from "../components/LeaveMatchModal";
 import { LeaveRoomModal } from "../components/LeaveRoomModal";
 import { LanguageSelector } from "../components/ui/LanguageSelector";
+import { usePlayerStats } from "../hooks/usePlayerStats";
 import { ROUTES } from "../routes/routes";
 
 export function MainLayout({
@@ -27,6 +29,7 @@ export function MainLayout({
     const menuRef = useRef(null);
     const navigate = useNavigate();
     const location = useLocation();
+    const { stats } = usePlayerStats();
 
     const leaveRoom = useCallback(() => {
         if (gameState?.roomId) {
@@ -118,9 +121,19 @@ export function MainLayout({
                     >
                         {t('login.appTitle')}
                     </button>
+
+                    {/* Language Selector - Center */}
+                    <LanguageSelector />
+
                     <div className="flex items-center gap-3 sm:gap-4">
-                        {/* Language Selector */}
-                        <LanguageSelector />
+                        {/* Points Badge */}
+                        <Link
+                            to={ROUTES.PROFILE}
+                            className="flex items-center gap-1 px-2.5 py-1 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 rounded-full text-orange-400 text-sm font-medium transition-colors"
+                        >
+                            <span>⭐</span>
+                            <span>{stats?.points || 0}</span>
+                        </Link>
 
                         <div className="relative" ref={menuRef}>
                             <button
@@ -157,14 +170,24 @@ export function MainLayout({
                                         )}
                                     </div>
                                     <div className="my-1 h-px bg-white/10" />
+                                    <Link
+                                        to={ROUTES.PROFILE}
+                                        onClick={() => setMenuOpen(false)}
+                                        className="flex items-center gap-2 w-full px-3 py-2 text-neutral-200 hover:text-white hover:bg-white/10 rounded-md"
+                                    >
+                                        <User className="h-4 w-4" />
+                                        <span>{t('profile.myProfile', 'Mi perfil')}</span>
+                                    </Link>
+                                    <div className="my-1 h-px bg-white/10" />
 
                                     {gameState?.roomId && (
                                         <>
                                             {(gameState?.phase === "playing" || gameState?.phase === "game_over") && (
                                                 <button
                                                     onClick={handleLeaveMatchClick}
-                                                    className="block w-full text-left px-3 py-2 text-orange-400 hover:text-orange-300 hover:bg-orange-500/10 rounded-md"
+                                                    className="flex items-center gap-2 w-full text-left px-3 py-2 text-orange-400 hover:text-orange-300 hover:bg-orange-500/10 rounded-md"
                                                 >
+                                                    <ArrowLeft className="h-4 w-4" />
                                                     {t('game:modals.leaveMatch.returnTitle', 'Return to room')}
                                                 </button>
                                             )}
@@ -174,8 +197,9 @@ export function MainLayout({
                                                         setShowLeaveRoomModal(true);
                                                         setMenuOpen(false);
                                                     }}
-                                                    className="block w-full text-left px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md"
+                                                    className="flex items-center gap-2 w-full text-left px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md"
                                                 >
+                                                    <DoorOpen className="h-4 w-4" />
                                                     {t('game:modals.leaveRoom.title', 'Leave room')}
                                                 </button>
                                             )}
@@ -184,8 +208,9 @@ export function MainLayout({
                                     )}
                                     <button
                                         onClick={handleLogout}
-                                        className="block w-full text-left px-3 py-2 text-neutral-200 hover:text-white hover:bg-white/10 rounded-md"
+                                        className="flex items-center gap-2 w-full text-left px-3 py-2 text-neutral-200 hover:text-white hover:bg-white/10 rounded-md"
                                     >
+                                        <LogOut className="h-4 w-4" />
                                         {t('auth.logout', 'Log out')}
                                     </button>
                                 </div>

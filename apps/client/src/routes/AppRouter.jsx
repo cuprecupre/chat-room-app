@@ -11,6 +11,7 @@ import { Spinner } from "../components/ui/Spinner";
 import { InstructionsModal } from "../components/InstructionsModal";
 import { FeedbackModal } from "../components/FeedbackModal";
 import { ShutdownToast } from "../components/ShutdownToast";
+import { PlayerStatsProvider } from "../context/PlayerStatsContext";
 import { MainLayout } from "../layouts/MainLayout";
 import { UnauthenticatedLayout } from "../layouts/UnauthenticatedLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -21,6 +22,7 @@ import { LobbyPage } from "../pages/LobbyPage";
 import { RulesPage } from "../pages/RulesPage";
 import { PrivacyPage } from "../pages/PrivacyPage";
 import { CookiesPage } from "../pages/CookiesPage";
+import { ProfilePage } from "../pages/ProfilePage";
 import { AdminIndex } from "../pages/Admin";
 import DebugPreviews from "../pages/DebugPreviews";
 import DebugPreviewSingle from "../pages/DebugPreviewSingle";
@@ -44,6 +46,7 @@ function AppRoutes({
     joinError,
     clearJoinError,
     shutdownCountdown,
+    socketRef,
 }) {
     const navigate = useNavigate();
     const location = useLocation();
@@ -202,12 +205,17 @@ function AppRoutes({
                 {/* ==================== PROTECTED ROUTES ==================== */}
                 {/* Protected routes do not enforce language in URL, they use current state */}
                 <Route element={<ProtectedRoute {...protectedRouteProps} />}>
-                    <Route element={<MainLayout {...layoutProps} />}>
+                    <Route element={
+                        <PlayerStatsProvider uid={user?.uid} socketRef={socketRef}>
+                            <MainLayout {...layoutProps} />
+                        </PlayerStatsProvider>
+                    }>
                         <Route
                             path={ROUTES.LOBBY}
                             element={<LobbyPage user={user} onCreateGame={createRoom} />}
                         />
                         <Route path={ROUTES.GAME} element={<GameRoute {...gameRouteProps} />} />
+                        <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
                     </Route>
                 </Route>
 
@@ -268,7 +276,7 @@ export function AppRouter() {
         logout,
         clearError,
     } = useAuth();
-    const { connected, gameState, emit, joinError, clearJoinError, shutdownCountdown } =
+    const { connected, gameState, emit, joinError, clearJoinError, shutdownCountdown, socketRef } =
         useSocket(user);
     const [showLoader, setShowLoader] = useState(false);
 
@@ -325,6 +333,7 @@ export function AppRouter() {
                     joinError={joinError}
                     clearJoinError={clearJoinError}
                     shutdownCountdown={shutdownCountdown}
+                    socketRef={socketRef}
                 />
             </BrowserRouter>
         </HelmetProvider>

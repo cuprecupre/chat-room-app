@@ -469,5 +469,6 @@ export function useSocket(user) {
         joinError,
         clearJoinError: () => setJoinError(null),
         shutdownCountdown,
+        socketRef,
     };
 }

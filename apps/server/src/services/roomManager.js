@@ -133,6 +133,20 @@ class RoomManager {
     }
 
     /**
+     * Notify specific users that their stats have been updated.
+     * @param {string[]} uids - Array of user IDs to notify
+     */
+    emitStatsUpdated(uids) {
+        if (!this.io) return;
+        uids.forEach(uid => {
+            const socketId = sessionManager.getUserSocket(uid);
+            if (socketId) {
+                this.io.to(socketId).emit("stats-updated");
+            }
+        });
+    }
+
+    /**
      * Get all rooms (debug/admin).
      */
     getAllRooms() {

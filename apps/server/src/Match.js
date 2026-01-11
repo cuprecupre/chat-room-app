@@ -196,6 +196,11 @@ class Match {
 
             dbService.updatePlayerStats(uid, statsUpdate);
         });
+
+        // Notify all participants that their stats have been updated
+        // Use require here to avoid circular dependency (Room -> Match -> RoomManager -> Room)
+        const roomManager = require("./services/roomManager");
+        roomManager.emitStatsUpdated([...participantIds]);
     }
 
     addPlayer(user) {
