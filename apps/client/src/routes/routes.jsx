@@ -7,6 +7,7 @@ export const ROUTES = {
     LOBBY: "/lobby",
     GAME: "/game",
     PROFILE: "/profile",
+    SETUP_PROFILE: "/setup-profile",
     ADMIN: "/admin",
 };
 

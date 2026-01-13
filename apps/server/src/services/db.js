@@ -52,7 +52,6 @@ class DBService {
                 ...roomData,
                 lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
             }, { merge: true });
-            console.log(`✅ [DB Service] Room ${roomId} persisted`);
         } catch (error) {
             console.error(`⚠️ [DB Service] Room save failed for ${roomId}: ${error.message}`);
         }
@@ -69,7 +68,6 @@ class DBService {
                 ...matchData,
                 savedAt: admin.firestore.FieldValue.serverTimestamp(),
             });
-            console.log(`✅ [DB Service] Match ${matchId} persisted`);
         } catch (error) {
             console.error(`⚠️ [DB Service] Match save failed for ${matchId}: ${error.message}`);
         }
@@ -129,7 +127,6 @@ class DBService {
             });
 
             await docRef.set(updates, { merge: true });
-            console.log(`✅ [DB Service] Stats updated for user ${uid}`);
         } catch (error) {
             console.error(`⚠️ [DB Service] Stats update failed for ${uid}: ${error.message}`);
         }

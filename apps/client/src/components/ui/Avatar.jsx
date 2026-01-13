@@ -51,16 +51,18 @@ export function Avatar({ photoURL, displayName, size = "md", className = "" }) {
     };
 
     const [imgError, setImgError] = React.useState(false);
+
+    React.useEffect(() => {
+        setImgError(false);
+    }, [photoURL]);
+
     const initials = getInitials(displayName);
     const bgColor = getColorFromName(displayName);
 
     // Si tiene foto de Google Y no ha fallado → mostrar imagen
     if (photoURL && !imgError) {
         return (
-            <div
-                className={`${sizeClass} rounded-full overflow-hidden ${className}`}
-                style={{ backgroundColor: "#e5e7eb" }}
-            >
+            <div className={`relative ${sizeClass} rounded-full overflow-hidden bg-neutral-800 ${className}`}>
                 <img
                     src={photoURL}
                     alt={displayName}
@@ -72,12 +74,16 @@ export function Avatar({ photoURL, displayName, size = "md", className = "" }) {
         );
     }
 
-    // Si NO tiene foto O la imagen falló → mostrar iniciales
+    // Si NO tiene foto o falló, usar BotTTS-Neutral por defecto basado en el nombre
+    const fallbackURL = `https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${encodeURIComponent(displayName || 'impostor')}`;
+
     return (
-        <div
-            className={`${sizeClass} rounded-full ${bgColor} flex items-center justify-center text-white font-semibold ${className}`}
-        >
-            {initials}
+        <div className={`${sizeClass} rounded-full overflow-hidden ${className}`}>
+            <img
+                src={fallbackURL}
+                alt={displayName}
+                className="w-full h-full object-cover bg-neutral-800"
+            />
         </div>
     );
 }

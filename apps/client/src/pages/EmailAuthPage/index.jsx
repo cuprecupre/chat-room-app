@@ -5,6 +5,7 @@ import { ROUTES } from "../../routes/routes";
 export function EmailAuthPage({
     onLoginWithEmail,
     onRegisterWithEmail,
+    onRecoverPassword,
     isLoading,
     error,
     clearError,
@@ -16,7 +17,7 @@ export function EmailAuthPage({
         if (onBack) {
             onBack();
         } else {
-            navigate(ROUTES.HOME);
+            navigate(-1);
         }
         clearError();
     };
@@ -25,6 +26,7 @@ export function EmailAuthPage({
         <EmailAuthScreen
             onLoginWithEmail={onLoginWithEmail}
             onRegisterWithEmail={onRegisterWithEmail}
+            onRecoverPassword={onRecoverPassword}
             onBack={handleBack}
             isLoading={isLoading}
             error={error}

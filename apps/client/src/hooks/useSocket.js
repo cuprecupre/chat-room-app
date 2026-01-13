@@ -65,10 +65,6 @@ export function useSocket(user) {
         // No conectar socket si el usuario no tiene displayName
         // (puede pasar al registrarse con email mientras se actualiza el perfil)
         if (user && !user.displayName) {
-            if (!hasLoggedWaitingDisplayName.current) {
-                console.log("⏳ useSocket - Esperando displayName...");
-                hasLoggedWaitingDisplayName.current = true;
-            }
             return;
         } else {
             hasLoggedWaitingDisplayName.current = false;
@@ -96,8 +92,6 @@ export function useSocket(user) {
                 let token;
                 try {
                     // Always get fresh token from auth.currentUser (guaranteed to have getIdToken method)
-                    // This prevents "Only the host..." errors if there's an old token in localStorage
-                    console.log("🔑 Obteniendo token de usuario actual...");
                     token = await auth.currentUser?.getIdToken();
                     if (token) {
                         saveToken(token);
@@ -138,7 +132,6 @@ export function useSocket(user) {
                 socketRef.current = socket;
 
                 socket.on("connect", () => {
-                    console.log("✅ Socket conectado:", user.displayName);
                     if (isMounted) {
                         setConnected(true);
                         setJoinError(null); // Limpiar errores al conectar
@@ -164,7 +157,6 @@ export function useSocket(user) {
                 });
 
                 socket.on("disconnect", (reason) => {
-                    console.log("🔌 useSocket - Socket desconectado. Razón:", reason);
                     if (isMounted) {
                         setConnected(false);
                         // Don't clear gameState on disconnect - keep it for reconnection
@@ -180,12 +172,10 @@ export function useSocket(user) {
                         context: error.context,
                     });
 
-                    // Si es error de autenticación, intentar refrescar token
                     if (
                         error.message?.includes("Authentication error") ||
                         error.message?.includes("Invalid token")
                     ) {
-                        console.log("🔄 Error de autenticación, intentando refrescar token...");
                         try {
                             if (user) {
                                 const freshToken = await user.getIdToken(true); // force refresh
@@ -203,12 +193,6 @@ export function useSocket(user) {
                 });
 
                 socket.on("game-state", (newState) => {
-                    console.log(
-                        "[Socket] Received game-state:",
-                        newState
-                            ? { phase: newState.phase, role: newState.role }
-                            : "null (user left or game ended)"
-                    );
                     if (isMounted) setGameState(newState);
                     if (socket.resumeTimer) {
                         clearTimeout(socket.resumeTimer);
@@ -218,15 +202,11 @@ export function useSocket(user) {
                     if (newState?.roomId) {
                         const currentUrlId = url.searchParams.get("roomId");
 
-                        // DETECCIÓN DE INVITACIÓN (Initial Load)
                         if (
                             initialLoadRef.current &&
                             currentUrlId &&
                             currentUrlId !== newState.roomId
                         ) {
-                            console.log(
-                                `[Socket] Invitation detected on load. Pending join to: ${currentUrlId}`
-                            );
                             isInvitationPendingRef.current = true;
                         }
 
@@ -235,19 +215,12 @@ export function useSocket(user) {
                             isInvitationPendingRef.current = false;
                         }
 
-                        // LÓGICA DE ACTUALIZACIÓN DE URL
                         if (isInvitationPendingRef.current) {
                             // Si estamos intentando unirnos a una invitación, IGNORAR actualizaciones del servidor
                             // que nos devuelvan a la partida vieja.
-                            console.log(
-                                `[Socket] Ignoring URL update (Invitation Pending). Keep: ${currentUrlId}, Ignore: ${newState.roomId}`
-                            );
                         } else {
                             // Comportamiento normal (Migración o Navegación dentro de partida)
                             if (currentUrlId !== newState.roomId) {
-                                console.log(
-                                    `[Socket] Updating URL roomId: ${currentUrlId} → ${newState.roomId}`
-                                );
                                 url.searchParams.set("roomId", newState.roomId);
                                 window.history.replaceState({}, "", url.toString());
                             }
@@ -257,26 +230,15 @@ export function useSocket(user) {
                     } else {
                         const urlRoomId = url.searchParams.get("roomId");
 
-                        // PROTECCIÓN INVITACIONES (Estado Null):
-                        // Si entramos con un link ?roomId=XYZ y el servidor dice null,
-                        // es probable que sea una invitación a sala nueva.
                         if (initialLoadRef.current && urlRoomId) {
-                            console.log(
-                                `[Socket] Invitation detected (Room not found yet). Pending join to: ${urlRoomId}`
-                            );
                             isInvitationPendingRef.current = true;
                         }
 
                         if (isInvitationPendingRef.current && urlRoomId) {
-                            console.log(
-                                `[Socket] Preserving URL roomId (Invitation Pending): ${urlRoomId}`
-                            );
                             // NO borrar URL
                         } else if (urlRoomId) {
                             // Solo borrar si NO es una invitación pendiente
-                            console.log(
-                                "[Socket] Clearing roomId from URL after receiving null state"
-                            );
+                            // Solo borrar si NO es una invitación pendiente
                             url.searchParams.delete("roomId");
                             window.history.replaceState({}, "", url.toString());
                         }
@@ -304,7 +266,6 @@ export function useSocket(user) {
 
                 // Antes de cada intento de reconexión, actualizar el token
                 socket.io.on("reconnect_attempt", async () => {
-                    console.log("🔄 Intentando reconexión, actualizando token...");
                     try {
                         // Intentar obtener token fresco
                         let freshToken = getToken();
@@ -393,7 +354,6 @@ export function useSocket(user) {
 
                 // Escuchar toasts del servidor (ej: cambio de host)
                 socket.on("toast", (message) => {
-                    console.log("[Socket] Toast from server:", message);
                     showToast(translateServerMessage(message));
                 });
 
@@ -402,7 +362,6 @@ export function useSocket(user) {
                 // ============================================
 
                 socket.on("shutdown-countdown", (data) => {
-                    console.log("[Socket] Shutdown countdown:", data);
                     if (isMounted) {
                         setShutdownCountdown({
                             remainingSeconds: data.remainingSeconds,
@@ -412,7 +371,6 @@ export function useSocket(user) {
                 });
 
                 socket.on("shutdown-complete", (data) => {
-                    console.log("[Socket] Shutdown complete:", data);
                     if (isMounted) {
                         setShutdownCountdown(null);
                         setGameState(null);

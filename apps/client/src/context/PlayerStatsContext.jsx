@@ -29,7 +29,6 @@ export function PlayerStatsProvider({ children, uid, socketRef }) {
                 return res.json();
             })
             .then((data) => {
-                console.log("[PlayerStats] Fetched:", data);
                 setStats(data);
             })
             .catch((err) => {
@@ -63,7 +62,6 @@ export function PlayerStatsProvider({ children, uid, socketRef }) {
         const socket = socketRef.current;
 
         const handleStatsUpdated = () => {
-            console.log("[PlayerStats] Received stats-updated, refetching...");
             // Small delay to ensure DB write is complete
             setTimeout(fetchStats, 500);
         };

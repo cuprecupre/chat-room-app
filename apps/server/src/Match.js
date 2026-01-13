@@ -281,7 +281,6 @@ class Match {
 
         // Save match record but don't update player stats
         dbService.saveMatch(this.matchId, matchData);
-        console.log(`[Match ${this.matchId}] Cancelled match persisted (no stats updated)`);
     }
 
     endGame(userId) {
@@ -295,7 +294,6 @@ class Match {
         if (userId !== this.hostId)
             throw new Error("Solo el host puede empezar un nuevo match.");
 
-        console.log(`[Match ${this.matchId}] playAgain called. Current phase: ${this.phase}`);
 
         // Limpiar formerPlayers para evitar crecimiento infinito del estado
         this.formerPlayers = {};
@@ -308,10 +306,6 @@ class Match {
 
         // Iniciar nuevo match con reset completo
         RoundManager.startNewMatch(this);
-
-        console.log(
-            `[Match ${this.matchId}] ✅ Nuevo match iniciado. Jugadores: ${this.players.length}`
-        );
     }
 
     castVote(voterId, targetId) {

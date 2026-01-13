@@ -9,8 +9,16 @@ import { showToast } from "../lib/toast";
 // Firebase Storage CDN URL
 const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
 
-export function ProtectedRoute({ user, connected, emit, gameState }) {
+import { ROUTES } from "./routes";
+
+export function ProtectedRoute({ user, connected, emit, gameState, needsProfileSetup }) {
     const { t, i18n } = useTranslation('common');
+
+    // Si el usuario necesita configurar su perfil, redirigir a /setup-profile
+    if (user && needsProfileSetup && window.location.pathname !== ROUTES.SETUP_PROFILE) {
+        return <Navigate to={ROUTES.SETUP_PROFILE} replace />;
+    }
+
     const [isStuck, setIsStuck] = useState(false);
     const [showConnectingLoader, setShowConnectingLoader] = useState(false);
     const connectingLoaderTimeoutRef = useRef(null);

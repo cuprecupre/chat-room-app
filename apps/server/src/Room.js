@@ -72,15 +72,27 @@ class Room {
      * Late joiners during a game get "lobby_wait" phase.
      */
     addPlayer(user) {
-        if (this.players.some(p => p.uid === user.uid)) {
-            return; // Already in room
-        }
+        const existingPlayer = this.players.find(p => p.uid === user.uid);
 
-        const joinedAt = Date.now();
         let safePhotoURL = user.photoURL || null;
         if (safePhotoURL && safePhotoURL.length > 500) {
             safePhotoURL = null;
         }
+
+        if (existingPlayer) {
+            // Update info if player already in room
+            existingPlayer.name = user.name || existingPlayer.name;
+            existingPlayer.photoURL = safePhotoURL || existingPlayer.photoURL;
+
+            // Also update formerPlayers copy
+            this.formerPlayers[user.uid] = {
+                name: existingPlayer.name,
+                photoURL: existingPlayer.photoURL,
+            };
+            return;
+        }
+
+        const joinedAt = Date.now();
 
         this.players.push({
             uid: user.uid,
@@ -160,7 +172,6 @@ class Room {
             throw new Error("Jugador no encontrado en la sala.");
         }
 
-        console.log(`[Room ${this.roomId}] Host kicking player: ${targetPlayer.name}`);
 
         // Remove player from room (and match if applicable)
         const removeResult = this.removePlayer(targetId);
@@ -199,10 +210,6 @@ class Room {
 
             // During game_over, don't remove from match - just mark as wanting to return to lobby
             // This preserves match data (impostor, secret word) for other players
-            if (this.phase === "game_over") {
-                console.log(`[Room ${this.roomId}] Player ${player.name} left results screen - returning to lobby`);
-                return { leftGameOver: true };
-            }
 
             const result = this.currentMatch.removePlayer(userId);
             return result;
@@ -235,7 +242,6 @@ class Room {
             // Update language if provided in options (e.g. from Lobby)
             if (newOptions.language) {
                 this.language = newOptions.language;
-                console.log(`[Room ${this.roomId}] Language updated to: ${this.language}`);
             }
 
             this.persist();
@@ -339,7 +345,6 @@ class Room {
                 if (this.phase === "host_cancelled") {
                     this.phase = "lobby";
                     this.currentMatch = null; // Clear match when returning to lobby
-                    console.log(`[Room ${this.roomId}] Auto-transitioned to lobby after host cancellation.`);
                     // Note: roomManager.emitRoomState should be called here,
                     // but we don't have access to it. Client will request state.
                 }
@@ -348,7 +353,6 @@ class Room {
             this.phase = "game_over";
         }
 
-        console.log(`[Room ${this.roomId}] Match ended. Players ready for next match: ${this.players.length}`);
     }
 
     // Alias for compatibility

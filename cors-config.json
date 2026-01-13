@@ -1,0 +1,22 @@
+[
+    {
+        "origin": [
+            "http://localhost:5173",
+            "https://develop-impostor.web.app",
+            "https://develop-impostor.firebaseapp.com"
+        ],
+        "method": [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE",
+            "HEAD"
+        ],
+        "responseHeader": [
+            "Content-Type",
+            "Authorization",
+            "x-goog-resumable"
+        ],
+        "maxAgeSeconds": 3600
+    }
+]

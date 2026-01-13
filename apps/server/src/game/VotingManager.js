@@ -16,14 +16,6 @@ const {
 const { getActivePlayers } = require("./PlayerManager");
 
 function castVote(match, voterId, targetId) {
-    // Debug log
-    console.log(`[Vote Debug] Match ${match.matchId}:`, {
-        phase: match.phase,
-        roundPlayers: match.roundPlayers,
-        eliminatedPlayers: match.eliminatedPlayers,
-        voterId,
-        targetId,
-    });
 
     // Validaciones
     if (match.phase !== "playing") {
@@ -45,7 +37,6 @@ function castVote(match, voterId, targetId) {
     if (targetId === null || targetId === undefined) {
         if (match.votes[voterId]) {
             delete match.votes[voterId];
-            console.log(`[Match ${match.matchId}] ${voterId} desmarcó su voto`);
         }
         return { phaseChanged: false, allVoted: false };
     }
@@ -65,9 +56,6 @@ function castVote(match, voterId, targetId) {
     // Registrar o cambiar voto
     const isChangingVote = match.votes[voterId] !== undefined;
     match.votes[voterId] = targetId;
-    console.log(
-        `[Match ${match.matchId}] ${voterId} ${isChangingVote ? "cambió su voto a" : "votó a"} ${targetId}`
-    );
 
     // Capturar fase antes de verificar votación
     const phaseBefore = match.phase;
@@ -86,7 +74,6 @@ function checkIfAllVoted(match) {
     const votedPlayers = Object.keys(match.votes).filter((uid) => activePlayers.includes(uid));
 
     if (votedPlayers.length === activePlayers.length) {
-        console.log(`[Match ${match.matchId}] Todos han votado. Procesando resultados...`);
         processVotingResults(match);
         return true;
     }
@@ -97,8 +84,6 @@ function processVotingResults(match) {
     const voteCount = {};
     const activePlayers = getActivePlayers(match);
 
-    console.log(`[Match ${match.matchId}] Procesando resultados. Jugadores activos:`, activePlayers);
-    console.log(`[Match ${match.matchId}] Votos registrados:`, match.votes);
 
     Object.entries(match.votes).forEach(([voter, target]) => {
         if (activePlayers.includes(voter)) {
@@ -106,7 +91,6 @@ function processVotingResults(match) {
         }
     });
 
-    console.log(`[Match ${match.matchId}] Conteo de votos:`, voteCount);
 
     // Encontrar el más votado
     let maxVotes = 0;
@@ -121,7 +105,6 @@ function processVotingResults(match) {
         }
     });
 
-    console.log(`[Match ${match.matchId}] Más votados:`, mostVoted, `con ${maxVotes} votos`);
 
     // Guardar historial de la ronda
     match.roundHistory = match.roundHistory || [];
@@ -142,7 +125,6 @@ function processVotingResults(match) {
     if (mostVoted.length !== 1) {
         const reason =
             mostVoted.length === 0 ? "sin votos" : `empate entre: ${mostVoted.join(", ")}`;
-        console.log(`[Match ${match.matchId}] No hay eliminación (${reason}).`);
 
         // NUEVO: En empate, el impostor SÍ recibe puntos
         giveImpostorSurvivalPoints(match);
@@ -156,7 +138,6 @@ function processVotingResults(match) {
             match.persistAnalytics("tie_round3");
         } else {
             // Siguiente ronda
-            console.log(`[Match ${match.matchId}] Empate: impostor recibe puntos. Siguiente ronda.`);
             match.phase = "round_result";
         }
         return;
@@ -173,7 +154,6 @@ function processVotingResults(match) {
         // Era un amigo - eliminarlo
         match.eliminatedPlayers = match.eliminatedPlayers || [];
         match.eliminatedPlayers.push(eliminatedId);
-        console.log(`[Match ${match.matchId}] ${eliminatedId} ha sido eliminado (era amigo).`);
 
         // Recalcular jugadores activos
         const remainingPlayers = getActivePlayers(match);

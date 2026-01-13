@@ -29,15 +29,11 @@ function selectImpostor(match) {
     let excludedPlayer = null;
     if (lastTwoImpostors.length === 2 && lastTwoImpostors[0] === lastTwoImpostors[1]) {
         excludedPlayer = lastTwoImpostors[0];
-        console.log(
-            `[Match ${match.matchId}] Jugador ${match.players.find((p) => p.uid === excludedPlayer)?.name} fue impostor en los últimos 2 matches, será excluido`
-        );
     }
 
     let candidates = match.players.map((p) => p.uid).filter((uid) => uid !== excludedPlayer);
 
     if (candidates.length === 0) {
-        console.log(`[Match ${match.matchId}] No hay candidatos elegibles, permitiendo a todos`);
         candidates = match.players.map((p) => p.uid);
     }
 
@@ -104,9 +100,6 @@ function startNewMatch(match) {
 
     const impostorName = match.players.find((p) => p.uid === match.impostorId)?.name || "desconocido";
     const startingName = match.players.find((p) => p.uid === match.startingPlayerId)?.name || "desconocido";
-    console.log(
-        `[Match ${match.matchId}] Nuevo match iniciado. Impostor: '${impostorName}', Inicia: '${startingName}', Palabra: '${word}'`
-    );
 
     // Iniciar la primera ronda
     startNextRound(match);
@@ -145,16 +138,10 @@ function startNextRound(match) {
         match.lastStartingPlayerId = match.startingPlayerId;
         const oldName = match.formerPlayers[oldStartingPlayer]?.name || oldStartingPlayer;
         const newName = match.players.find((p) => p.uid === match.startingPlayerId)?.name || "desconocido";
-        console.log(
-            `[Match ${match.matchId}] Jugador inicial '${oldName}' fue eliminado. Nuevo: '${newName}' (rotación actualizada)`
-        );
     }
 
     // La palabra ya fue seleccionada en startNewMatch, no cambia entre rondas
     const startingName = match.players.find((p) => p.uid === match.startingPlayerId)?.name || "desconocido";
-    console.log(
-        `[Match ${match.matchId}] Ronda ${match.currentRound}/${match.maxRounds}: palabra='${match.secretWord}', inicia='${startingName}'`
-    );
 
     match.phase = "playing";
 }
@@ -190,9 +177,6 @@ function endRound(match, impostorCaught) {
         } else {
             // Continuar a la siguiente ronda
             match.phase = "round_result";
-            console.log(
-                `[Match ${match.matchId}] Ronda ${match.currentRound} terminada. Impostor sobrevive.`
-            );
         }
     }
 }
@@ -205,9 +189,6 @@ function handleSuddenDeath(match) {
     match.winnerId = match.impostorId;
     match.phase = "game_over";
 
-    console.log(
-        `[Match ${match.matchId}] Muerte súbita: rotación normal`
-    );
 
     match.persistAnalytics("sudden_death");
     console.log(`[Match ${match.matchId}] ¡Muerte súbita! Solo quedan 2 jugadores. Impostor gana.`);

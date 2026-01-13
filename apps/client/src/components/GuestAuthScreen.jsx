@@ -64,15 +64,15 @@ export function GuestAuthScreen({ onLoginAsGuest, onLoginWithGoogle, onBack, isL
 
 
 
-                        <div className="bg-gradient-to-br from-orange-500/20 to-orange-900/10 rounded-xl p-6 text-center">
-                            <div className="flex flex-col items-center gap-3 mb-6">
+                        <div className="bg-neutral-900 border border-orange-500/10 rounded-2xl p-6 text-center animate-fadeIn shadow-lg">
+                            <div className="flex flex-col items-center gap-4 mb-6">
                                 <img
-                                    src={heroImg}
+                                    src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Impostor"
                                     alt="The Impostor"
-                                    className="w-20 h-20 rounded-full object-cover shadow-lg mb-2 ring-2 ring-orange-500/20"
+                                    className="w-20 h-20 rounded-full object-cover shadow-lg ring-1 ring-white/10 bg-neutral-800"
                                 />
-                                <p className="text-white text-lg leading-relaxed max-w-[95%]">
-                                    {t('auth.guest.googleRecommendation', 'If you want to save your progress and stats, we recommend signing in with a Google account.')}
+                                <p className="text-neutral-200 text-lg leading-relaxed max-w-[95%] font-light">
+                                    {t('auth.guest.googleRecommendation', 'Si quieres conservar tu progreso y estadísticas, te recomendamos acceder con una cuenta de Google.')}
                                 </p>
                             </div>
                             <Button

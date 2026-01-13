@@ -100,7 +100,6 @@ export function PlayerList({
     });
 
     const handleImageError = (e) => {
-        console.log("❌ Error cargando imagen:", e.target.src);
         // Si la imagen falla, mostrar iniciales del nombre
         const name = e.target.alt || "U";
         const initials = name

@@ -8,7 +8,7 @@
     "buttons": {
         "play": "Jugar",
         "playAgain": "Jugar otra partida",
-        "continue": "Continuar",
+        "continue": "Continuar al juego",
         "close": "Cerrar",
         "copy": "Copiar",
         "copied": "¡Copiado!",
@@ -19,6 +19,7 @@
         "startGame": "Comenzar partida",
         "nextRound": "Siguiente ronda",
         "back": "Volver",
+        "save": "Guardar",
         "forceExit": "Forzar salida"
     },
     "auth": {
@@ -33,7 +34,22 @@
         "createNewAccount": "Crear nueva cuenta",
         "email": "Email",
         "password": "Contraseña",
-        "nameAndSurname": "Nombre y Apellido",
+        "nameAndSurname": "Nombre de usuario",
+        "username": "Nombre de usuario",
+        "chooseAvatar": "Elige tu avatar",
+        "randomAvatar": "Aleatorio",
+        "selectionTitle": "Elige cómo jugar",
+        "accessWithEmail": "Acceder con Email",
+        "recoverPassword": "Recuperar Contraseña",
+        "forgotPassword": "¿Has olvidado tu contraseña?",
+        "recoverInstructions": "Introduce tu email y te enviaremos un enlace para restablecer tu contraseña.",
+        "emailSent": "¡Email enviado!",
+        "checkInbox": "Si el email está registrado, recibirás un enlace en unos segundos. Revisa también tu carpeta de spam.",
+        "backToLogin": "Volver al login",
+        "setupProfileTitle": "Personaliza tu perfil",
+        "setupProfileDesc": "Antes de empezar, elige cómo quieres que te vean los demás.",
+        "setupLaterInfo": "Podrás cambiar esto más tarde desde tu perfil.",
+        "or": "o",
         "loggingIn": "Iniciando...",
         "creatingAccount": "Creando cuenta...",
         "accountQuestion": "¿Ya tienes una cuenta o quieres crear una nueva?",
@@ -57,7 +73,8 @@
             "note1": "Como invitado podrás jugar sin registrarte.",
             "note2": "Tu sesión se mantendrá hasta que cierres el navegador.",
             "googleRecommendation": "¿Quieres conservar tu progreso en el juego? Accede con Google.",
-            "continueWithGoogle": "Continuar con Google"
+            "continueWithGoogle": "Continuar con Google",
+            "noProgressWarning": "Tu progreso no se guardará como invitado"
         }
     },
     "errors": {
@@ -198,6 +215,19 @@
         "winsShort": "victorias",
         "completed": "Completadas",
         "abandoned": "Abandonadas",
-        "playTime": "Tiempo jugado"
+        "playTime": "Tiempo jugado",
+        "saveProgressTitle": "¿Quieres guardar tu progreso?",
+        "saveProgressDesc": "Tu cuenta actual es temporal. Regístrate ahora para no perder tus puntos y estadísticas.",
+        "registerNow": "Registrar cuenta",
+        "editName": "Nombre de usuario",
+        "cannotEditInMatch": "No puedes editar tu perfil durante una partida",
+        "cannotEditWarning": "No puedes cambiar tu nombre mientras juegas"
+    },
+    "saveProgress": {
+        "title": "¡No pierdas tus puntos!",
+        "question": "¿Te ha gustado la partida?",
+        "description": "Registra tu cuenta ahora para guardar tus estadísticas, puntos y personalizar tu perfil permanentemente.",
+        "registerAction": "Registrarme y Guardar",
+        "maybeLater": "Quizás más tarde"
     }
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "./ui/Button";
 import { Avatar } from "./ui/Avatar";
@@ -7,11 +8,26 @@ import { Modal } from "./ui/Modal";
 import { AdBanner } from "./ui/AdBanner";
 import { Info } from "lucide-react";
 import confetti from "canvas-confetti";
+import { ROUTES } from "../routes/routes";
 
 export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
     const { t, i18n } = useTranslation('game');
     const { t: tc } = useTranslation('common');
+    const navigate = useNavigate();
     const [showScoringModal, setShowScoringModal] = useState(false);
+    const [showSaveProgressModal, setShowSaveProgressModal] = useState(false);
+
+    // Show save progress modal for anonymous users
+    useEffect(() => {
+        if (state.phase === "game_over" && user?.isAnonymous) {
+            // Check if player has any points or just always show it? 
+            // Better to always show it if they completed a game.
+            const timer = setTimeout(() => {
+                setShowSaveProgressModal(true);
+            }, 2000); // Wait 2s after confetti
+            return () => clearTimeout(timer);
+        }
+    }, [state.phase, user?.isAnonymous]);
 
     // Confetti effect when game ends
     useEffect(() => {
@@ -240,8 +256,57 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                 </div>
             </Modal>
 
+            {/* Modal de guardar progreso para invitados */}
+            <Modal
+                isOpen={showSaveProgressModal}
+                onClose={() => setShowSaveProgressModal(false)}
+                title={t('saveProgress.title', '¡No pierdas tus puntos!')}
+                size="md"
+            >
+                <div className="space-y-6 pt-2 pb-4 text-center">
+                    <div className="flex justify-center">
+                        <div className="relative">
+                            <div className="bg-orange-600/10 p-5 rounded-full border border-orange-500/20">
+                                <svg className="w-10 h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <p className="text-white text-xl font-serif">
+                            {t('saveProgress.question', '¿Te ha gustado la partida?')}
+                        </p>
+                        <p className="text-neutral-400 text-sm leading-relaxed px-4 font-light">
+                            {t('saveProgress.description', 'Registra tu cuenta ahora para guardar tus estadísticas, puntos y personalizar tu perfil permanentemente.')}
+                        </p>
+                    </div>
+
+                    <div className="grid gap-3 pt-4">
+                        <Button
+                            onClick={() => {
+                                navigate(ROUTES.GUEST_AUTH);
+                            }}
+                            variant="primary"
+                            size="lg"
+                            className="w-full h-14 rounded-xl text-base"
+                        >
+                            {t('saveProgress.registerAction', 'Registrarme y Guardar')}
+                        </Button>
+                        <Button
+                            onClick={() => setShowSaveProgressModal(false)}
+                            variant="ghost"
+                            size="md"
+                            className="w-full text-neutral-500 hover:text-white"
+                        >
+                            {t('saveProgress.maybeLater', 'Quizás más tarde')}
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
             {/* Bottom Bar (Fixed Bottom) */}
-            <div className="fixed bottom-0 left-0 right-0 pt-16 pb-0 px-0 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent z-40">
+            <div className="fixed bottom-0 left-0 right-0 pt-16 pb-0 px-0 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent z-40" >
                 <div className="w-full flex flex-col items-center">
                     {isHost ? (
                         <Button
@@ -289,7 +354,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                         </div>
                     )}
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

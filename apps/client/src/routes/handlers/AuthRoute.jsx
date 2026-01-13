@@ -10,6 +10,7 @@ export function AuthRoute({
     user,
     loginWithEmail,
     registerWithEmail,
+    recoverPassword,
     loading,
     error,
     clearError,
@@ -32,6 +33,7 @@ export function AuthRoute({
         <EmailAuthPage
             onLoginWithEmail={loginWithEmail}
             onRegisterWithEmail={registerWithEmail}
+            onRecoverPassword={recoverPassword}
             isLoading={loading}
             error={error}
             clearError={clearError}

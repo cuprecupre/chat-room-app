@@ -23,6 +23,7 @@ import { RulesPage } from "../pages/RulesPage";
 import { PrivacyPage } from "../pages/PrivacyPage";
 import { CookiesPage } from "../pages/CookiesPage";
 import { ProfilePage } from "../pages/ProfilePage";
+import { SetupProfilePage } from "../pages/SetupProfilePage";
 import { AdminIndex } from "../pages/Admin";
 import DebugPreviews from "../pages/DebugPreviews";
 import DebugPreviewSingle from "../pages/DebugPreviewSingle";
@@ -39,6 +40,7 @@ function AppRoutes({
     registerWithEmail,
     loginAsGuest,
     logout,
+    recoverPassword,
     clearError,
     connected,
     gameState,
@@ -47,6 +49,8 @@ function AppRoutes({
     clearJoinError,
     shutdownCountdown,
     socketRef,
+    needsProfileSetup,
+    setNeedsProfileSetup,
 }) {
     const navigate = useNavigate();
     const location = useLocation();
@@ -89,7 +93,6 @@ function AppRoutes({
         // If a new room ID appears and we're in the lobby, navigate to game
         // Note: Protected routes handle regex/paths, but better to keep simple redirect
         if (currentRoomId && currentRoomId !== prevRoomIdRef.current && wasInLobby) {
-            console.log("Navigating to room:", currentRoomId);
             const isEnglish = location.pathname.startsWith('/en');
             // Always redirect to base game route, let language persist via state/cookie
             // Or if implementing strict /en/game, would add check here. 
@@ -125,6 +128,7 @@ function AppRoutes({
         loginWithEmail,
         login,
         registerWithEmail,
+        recoverPassword,
         loginAsGuest,
         loading,
         error,
@@ -137,6 +141,7 @@ function AppRoutes({
         connected,
         emit,
         gameState,
+        needsProfileSetup,
     };
 
     const layoutProps = {
@@ -216,7 +221,8 @@ function AppRoutes({
                             element={<LobbyPage user={user} onCreateGame={createRoom} />}
                         />
                         <Route path={ROUTES.GAME} element={<GameRoute {...gameRouteProps} />} />
-                        <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+                        <Route path={ROUTES.PROFILE} element={<ProfilePage gameState={gameState} />} />
+                        <Route path={ROUTES.SETUP_PROFILE} element={<SetupProfilePage gameState={gameState} />} />
                     </Route>
                 </Route>
 
@@ -275,6 +281,9 @@ export function AppRouter() {
         registerWithEmail,
         loginAsGuest,
         logout,
+        recoverPassword,
+        needsProfileSetup,
+        setNeedsProfileSetup,
         clearError,
     } = useAuth();
     const { connected, gameState, emit, joinError, clearJoinError, shutdownCountdown, socketRef } =
@@ -327,6 +336,7 @@ export function AppRouter() {
                     registerWithEmail={registerWithEmail}
                     loginAsGuest={loginAsGuest}
                     logout={logout}
+                    recoverPassword={recoverPassword}
                     clearError={clearError}
                     connected={connected}
                     gameState={gameState}
@@ -335,6 +345,8 @@ export function AppRouter() {
                     clearJoinError={clearJoinError}
                     shutdownCountdown={shutdownCountdown}
                     socketRef={socketRef}
+                    needsProfileSetup={needsProfileSetup}
+                    setNeedsProfileSetup={setNeedsProfileSetup}
                 />
             </BrowserRouter>
         </HelmetProvider>

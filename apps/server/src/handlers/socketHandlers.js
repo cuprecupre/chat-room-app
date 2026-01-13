@@ -13,14 +13,12 @@ const INACTIVE_GRACE_PERIOD = 60000; // 1 minute for inactive users
  */
 function registerSocketHandlers(io, socket) {
     const user = socket.user;
-    console.log(`User connected: ${user.name} (${user.uid})`);
 
     // Handle multiple sessions: disconnect old socket if exists
     const oldSocketId = sessionManager.getUserSocket(user.uid);
     if (oldSocketId) {
         const oldSocket = io.sockets.sockets.get(oldSocketId);
         if (oldSocket) {
-            console.log(`Disconnecting old session for user ${user.name}`);
             oldSocket.emit(
                 "session-replaced",
                 "Tu sesión ha sido reemplazada por una nueva pestaña"
@@ -120,7 +118,6 @@ function registerSocketHandlers(io, socket) {
 function handleReconnection(socket, user) {
     // Check if user explicitly left - don't auto-rejoin
     if (sessionManager.hasExplicitlyLeft(user.uid)) {
-        console.log(`User ${user.name} recently left explicitly - NOT auto-rejoining`);
         sessionManager.clearExplicitlyLeft(user.uid);
         socket.emit("game-state", null);
         sessionManager.clearPendingDisconnect(user.uid);
@@ -130,10 +127,14 @@ function handleReconnection(socket, user) {
     // Check if user is already in a room
     const existingRoom = roomManager.findUserRoom(user.uid);
     if (existingRoom) {
+        // Refresh player data in the room (updates name/photo if changed)
+        existingRoom.addPlayer(user);
         socket.join(existingRoom.roomId);
-        console.log(`User ${user.name} reconnected to room ${existingRoom.roomId}`);
+
         sessionManager.clearPendingDisconnect(user.uid);
-        socket.emit("game-state", existingRoom.getStateFor(user.uid));
+
+        // Notify room about the update (in case name changed)
+        roomManager.emitRoomState(existingRoom);
         return;
     }
 
@@ -143,11 +144,9 @@ function handleReconnection(socket, user) {
         const pendingRoom = roomManager.getRoom(pending.roomId);
         if (pendingRoom && pendingRoom.players.some((p) => p.uid === user.uid)) {
             socket.join(pendingRoom.roomId);
-            console.log(`User ${user.name} reconnected to pending room ${pendingRoom.roomId}`);
             sessionManager.clearPendingDisconnect(user.uid);
             socket.emit("game-state", pendingRoom.getStateFor(user.uid));
         } else {
-            console.log(`User ${user.name} had pending disconnect but room/player no longer valid`);
             sessionManager.clearPendingDisconnect(user.uid);
             socket.emit("game-state", null);
         }
@@ -177,9 +176,6 @@ async function handleCreateRoom(socket, user, options = {}) {
 
     // Track room creation KPI
     dbService.updatePlayerStats(user.uid, { roomsCreated: 1 });
-
-    console.log(`Room created: ${newRoom.roomId} by ${user.name} with options:`, opts);
-    console.log(`[DEBUG] Room language set to: ${newRoom.language}`);
 }
 
 /**
@@ -210,8 +206,6 @@ async function handleJoinRoom(io, socket, user, roomId) {
     if (!isAlreadyInRoom) {
         dbService.updatePlayerStats(user.uid, { roomsJoined: 1 });
     }
-
-    console.log(`User ${user.name} joined room ${roomId}${roomToJoin.phase === 'playing' ? ' (late joiner)' : ''}`);
 }
 
 /**
@@ -283,7 +277,6 @@ function handleLeaveMatch(io, socket, user, roomId, callback) {
         return;
     }
 
-    console.log(`User ${user.name} is leaving the MATCH but staying in ROOM ${roomId}`);
 
     const result = room.leaveMatch(user.uid);
 
@@ -293,21 +286,18 @@ function handleLeaveMatch(io, socket, user, roomId, callback) {
     if (result && result.hostCancelled) {
         // Host cancelled the match - show special toast
         roomManager.emitToast(roomId, `El anfitrión ha abandonado la partida`);
-        console.log(`[Room ${roomId}] Host cancelled match. Farewell screen showing for all players.`);
 
         // Schedule lobby state emission after 5 seconds to sync clients
         setTimeout(() => {
             const freshRoom = roomManager.getRoom(roomId);
             if (freshRoom && freshRoom.phase === "lobby") {
                 roomManager.emitRoomState(freshRoom);
-                console.log(`[Room ${roomId}] Emitted lobby state after host_cancelled timeout.`);
             }
         }, 5000);
     } else {
         roomManager.emitToast(roomId, `${user.name} ha vuelto a la sala`);
     }
 
-    console.log(`User ${user.name} successfully left match in room ${roomId}`);
     safeCallback();
 }
 
@@ -326,7 +316,6 @@ function handleLeaveRoom(io, socket, user, roomId, callback) {
         return;
     }
 
-    console.log(`User ${user.name} is EXPLICITLY leaving room ${roomId}`);
 
     sessionManager.markExplicitlyLeft(user.uid);
     sessionManager.clearPendingDisconnect(user.uid);
@@ -356,7 +345,6 @@ function handleLeaveRoom(io, socket, user, roomId, callback) {
         roomManager.scheduleEmptyRoomCleanup(roomId, 0);
     }
 
-    console.log(`User ${user.name} successfully left room ${roomId}`);
     safeCallback();
 }
 
@@ -395,7 +383,6 @@ function handleKickPlayer(io, socket, user, roomId, targetId) {
         // Notify remaining players
         roomManager.emitToast(roomId, `${result.kickedPlayer.name} ha sido expulsado de la sala`);
 
-        console.log(`[Room ${roomId}] Player ${result.kickedPlayer.name} kicked by host ${user.name}`);
 
     } catch (error) {
         socket.emit("error", { message: error.message });
@@ -415,7 +402,6 @@ function handleGetState(socket, user) {
  * Handle disconnection.
  */
 function handleDisconnect(io, socket, user) {
-    console.log(`User disconnected: ${user.name}`);
 
     const userRoom = roomManager.findUserRoom(user.uid);
     const currentSocketId = sessionManager.getUserSocket(user.uid);
@@ -423,7 +409,6 @@ function handleDisconnect(io, socket, user) {
     // If there's already a new socket for this user, don't start a grace timer
     // We only care about disconnections of the CURRENT active session
     if (currentSocketId && currentSocketId !== socket.id) {
-        console.log(`[Disconnect] Ignoring ${user.name} disconnect (session replaced)`);
         sessionManager.removeUserSocket(user.uid, socket.id);
         sessionManager.removeHeartbeat(user.uid);
         return;
@@ -442,9 +427,6 @@ function handleDisconnect(io, socket, user) {
                 const room = roomManager.getRoom(userRoom.roomId);
                 if (!room) return;
 
-                console.log(
-                    `[Grace Expired] Removing user ${userName} from room ${userRoom.roomId}`
-                );
                 const { newHostInfo } = room.removePlayer(user.uid);
                 roomManager.emitRoomState(room);
 
@@ -453,9 +435,6 @@ function handleDisconnect(io, socket, user) {
                         roomManager.emitToast(
                             userRoom.roomId,
                             `${userName} se ha desconectado. Ahora el anfitrión es ${newHostInfo.name}`
-                        );
-                        console.log(
-                            `[Host Transfer] ${userName} desconectado. Nuevo host: ${newHostInfo.name}`
                         );
                     } else {
                         roomManager.emitToast(userRoom.roomId, `${userName} se ha desconectado`);
@@ -466,10 +445,6 @@ function handleDisconnect(io, socket, user) {
                 }
             },
             gracePeriod
-        );
-
-        console.log(
-            `[Disconnect] Grace timer started for user ${user.name} in room ${userRoom.roomId} (${graceType})`
         );
     }
 

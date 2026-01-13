@@ -8,7 +8,8 @@
     "buttons": {
         "play": "Play",
         "playAgain": "Play another game",
-        "continue": "Continue",
+        "continue": "Continue to game",
+        "save": "Save",
         "close": "Close",
         "copy": "Copy",
         "copied": "Copied!",
@@ -33,7 +34,22 @@
         "createNewAccount": "Create new account",
         "email": "Email",
         "password": "Password",
-        "nameAndSurname": "Name and Surname",
+        "nameAndSurname": "Username",
+        "username": "Username",
+        "chooseAvatar": "Choose your avatar",
+        "randomAvatar": "Random",
+        "selectionTitle": "How do you want to play?",
+        "accessWithEmail": "Access with Email",
+        "recoverPassword": "Recover Password",
+        "forgotPassword": "Forgot your password?",
+        "recoverInstructions": "Enter your email and we'll send you a link to reset your password.",
+        "emailSent": "Email sent!",
+        "checkInbox": "If the email is registered, you'll receive a link in a few seconds. Check your spam folder too.",
+        "backToLogin": "Back to login",
+        "setupProfileTitle": "Set up your profile",
+        "setupProfileDesc": "Before starting, choose how you want others to see you.",
+        "setupLaterInfo": "You can change this later from your profile.",
+        "or": "or",
         "loggingIn": "Logging in...",
         "creatingAccount": "Creating account...",
         "accountQuestion": "Do you have an account or want to create a new one?",
@@ -57,7 +73,8 @@
             "note1": "As a guest you can play without registering.",
             "note2": "Your session will be kept until you close the browser.",
             "googleRecommendation": "Save your progress and stats by signing in with Google.",
-            "continueWithGoogle": "Continue with Google"
+            "continueWithGoogle": "Continue with Google",
+            "noProgressWarning": "Your progress will not be saved as a guest"
         }
     },
     "errors": {
@@ -198,6 +215,19 @@
         "winsShort": "wins",
         "completed": "Completed",
         "abandoned": "Abandoned",
-        "playTime": "Play time"
+        "playTime": "Play time",
+        "saveProgressTitle": "Don't lose your progress!",
+        "saveProgressDesc": "Your current account is temporary. Register now to save your points and stats permanentenly.",
+        "registerNow": "Register account",
+        "editName": "Username",
+        "cannotEditInMatch": "You cannot edit your profile during a match",
+        "cannotEditWarning": "You cannot change your name while playing"
+    },
+    "saveProgress": {
+        "title": "Don't lose your points!",
+        "question": "Did you enjoy the game?",
+        "description": "Register your account now to save your stats, points and customize your profile permanently.",
+        "registerAction": "Register and Save",
+        "maybeLater": "Maybe later"
     }
 }

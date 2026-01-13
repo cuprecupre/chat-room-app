@@ -14,8 +14,11 @@ import {
     signInWithEmailAndPassword,
     signInAnonymously,
     updateProfile,
+    sendPasswordResetEmail,
+    getAdditionalUserInfo,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_APP_FIREBASE_API_KEY,
@@ -40,6 +43,7 @@ if (
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 const provider = new GoogleAuthProvider();
 
 // Configurar el proveedor de Google para solicitar permisos específicos
@@ -53,9 +57,7 @@ provider.setCustomParameters({
 
 async function ensurePersistence() {
     try {
-        console.log("🔧 Configurando persistencia browserLocalPersistence...");
         await setPersistence(auth, browserLocalPersistence);
-        console.log("✅ Persistencia configurada exitosamente");
     } catch (e) {
         // no-op UI here; components will render error toast if needed
         console.error("❌ Error al configurar persistencia:", {
@@ -70,6 +72,7 @@ export {
     app,
     auth,
     db,
+    storage,
     provider,
     ensurePersistence,
     signInWithRedirect,
@@ -82,4 +85,9 @@ export {
     signInWithEmailAndPassword,
     signInAnonymously,
     updateProfile,
+    sendPasswordResetEmail,
+    getAdditionalUserInfo,
+    ref,
+    uploadBytes,
+    getDownloadURL,
 };

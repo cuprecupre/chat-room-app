@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "./ui/Button";
 import { Spinner } from "./ui/Spinner";
+import { ArrowLeft, Mail, UserCircle, Info } from "lucide-react";
 
 // Firebase Storage CDN URL
 const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
@@ -10,6 +11,7 @@ export function LoginScreen({
     onLogin,
     onGoToEmailAuth,
     onGoToGuestAuth,
+    onBack,
     isLoading,
     onOpenInstructions,
     onOpenFeedback,
@@ -21,179 +23,155 @@ export function LoginScreen({
     }, []);
 
     return (
-        <div className="w-full min-h-screen flex flex-col">
-            <div className="flex-1 flex items-center justify-center p-4">
-                <div className="w-full max-w-md text-center space-y-4 sm:space-y-6">
-                    <div className="perspective-1000 animate-scaleIn animate-delay-200">
-                        <img
-                            src={heroImg}
-                            alt="El Impostor"
-                            className="mx-auto w-56 h-56 rounded-full object-cover shadow-xl ring-1 ring-white/10 animate-tilt-oscillate"
-                            loading="lazy"
-                        />
-                    </div>
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif text-neutral-50 animate-fadeIn animate-delay-500">
-                        {t('login.appTitle')}
-                    </h1>
-                    <p className="text-lg sm:text-xl text-neutral-300 animate-fadeIn animate-delay-600 whitespace-pre-line">
-                        {t('login.tagline')}
-                    </p>
+        <div className="w-full min-h-screen flex flex-col items-center bg-neutral-950 text-neutral-50 overflow-hidden">
+            {/* Background elements for depth - Aligned with LandingPage */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
+                <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-amber-600/[0.08] md:bg-amber-600/15 rounded-full blur-[80px] md:blur-[100px]" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] md:w-[600px] md:h-[600px] bg-orange-600/[0.08] md:bg-orange-600/15 rounded-full blur-[90px] md:blur-[120px]" />
+            </div>
 
-                    <div className="animate-fadeIn animate-delay-800">
+            {/* Back Button - Top Left */}
+            <div className="w-full max-w-md px-4 mt-6 mb-2 z-10">
+                <button
+                    onClick={onBack}
+                    className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors"
+                    disabled={isLoading}
+                >
+                    <ArrowLeft className="h-5 w-5" />
+                    <span>{t('buttons.back', 'Back')}</span>
+                </button>
+            </div>
+
+            <div className="flex-1 flex items-center justify-center p-4 w-full z-10">
+                <div className="w-full max-w-md space-y-8">
+                    {/* Hero Section */}
+                    <div className="text-center space-y-6">
+                        <div className="relative inline-block animate-scaleIn animate-delay-200">
+                            <img
+                                src={heroImg}
+                                alt="El Impostor"
+                                className="relative mx-auto w-32 h-32 md:w-36 md:h-36 rounded-full object-cover shadow-2xl ring-1 ring-white/10"
+                            />
+                        </div>
+                        <div className="space-y-1 animate-fadeIn animate-delay-400">
+                            <h1 className="text-4xl font-serif text-white tracking-tight">
+                                {t('login.appTitle', 'El Impostor')}
+                            </h1>
+                            <p className="text-neutral-400 text-lg font-light">
+                                {t('auth.selectionTitle', '¿Cómo quieres jugar?')}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Auth Options Container */}
+                    <div className="space-y-4 animate-fadeIn animate-delay-600">
+                        {/* Google Auth */}
                         <Button
                             onClick={onLogin}
                             disabled={isLoading}
-                            variant="outline"
-                            size="md"
-                            className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                            variant="primary"
+                            size="lg"
+                            className="w-full h-14 rounded-full text-base font-semibold group shadow-lg shadow-orange-950/20"
                         >
-                            <span className="mr-3 inline-flex items-center justify-center align-middle">
-                                {isLoading ? (
-                                    <Spinner size="sm" />
-                                ) : (
-                                    <svg
-                                        width="16"
-                                        height="16"
-                                        viewBox="0 0 16 16"
-                                        aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <g clipPath="url(#clip0_643_9687)">
-                                            <path
-                                                d="M8.00018 3.16667C9.18018 3.16667 10.2368 3.57333 11.0702 4.36667L13.3535 2.08333C11.9668 0.793333 10.1568 0 8.00018 0C4.87352 0 2.17018 1.79333 0.853516 4.40667L3.51352 6.47C4.14352 4.57333 5.91352 3.16667 8.00018 3.16667Z"
-                                                fill="#EA4335"
-                                            />
-                                            <path
-                                                d="M15.66 8.18335C15.66 7.66002 15.61 7.15335 15.5333 6.66669H8V9.67335H12.3133C12.12 10.66 11.56 11.5 10.72 12.0667L13.2967 14.0667C14.8 12.6734 15.66 10.6134 15.66 8.18335Z"
-                                                fill="#4285F4"
-                                            />
-                                            <path
-                                                d="M3.51 9.53001C3.35 9.04668 3.25667 8.53334 3.25667 8.00001C3.25667 7.46668 3.34667 6.95334 3.51 6.47001L0.85 4.40668C0.306667 5.48668 0 6.70668 0 8.00001C0 9.29334 0.306667 10.5133 0.853333 11.5933L3.51 9.53001Z"
-                                                fill="#FBBC05"
-                                            />
-                                            <path
-                                                d="M8.0001 16C10.1601 16 11.9768 15.29 13.2968 14.0633L10.7201 12.0633C10.0034 12.5467 9.0801 12.83 8.0001 12.83C5.91343 12.83 4.14343 11.4233 3.5101 9.52667L0.850098 11.59C2.1701 14.2067 4.87343 16 8.0001 16Z"
-                                                fill="#34A853"
-                                            />
-                                        </g>
-                                        <defs>
-                                            <clipPath id="clip0_643_9687">
-                                                <rect width="16" height="16" fill="white" />
-                                            </clipPath>
-                                        </defs>
-                                    </svg>
-                                )}
-                            </span>
-                            <span className="align-middle">
+                            <div className="mr-3 bg-white rounded-full p-1 w-7 h-7 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 16 16"
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <g clipPath="url(#clip0_643_9687)">
+                                        <path
+                                            d="M8.00018 3.16667C9.18018 3.16667 10.2368 3.57333 11.0702 4.36667L13.3535 2.08333C11.9668 0.793333 10.1568 0 8.00018 0C4.87352 0 2.17018 1.79333 0.853516 4.40667L3.51352 6.47C4.14352 4.57333 5.91352 3.16667 8.00018 3.16667Z"
+                                            fill="#EA4335"
+                                        />
+                                        <path
+                                            d="M15.66 8.18335C15.66 7.66002 15.61 7.15335 15.5333 6.66669H8V9.67335H12.3133C12.12 10.66 11.56 11.5 10.72 12.0667L13.2967 14.0667C14.8 12.6734 15.66 10.6134 15.66 8.18335Z"
+                                            fill="#4285F4"
+                                        />
+                                        <path
+                                            d="M3.51 9.53001C3.35 9.04668 3.25667 8.53334 3.25667 8.00001C3.25667 7.46668 3.34667 6.95334 3.51 6.47001L0.85 4.40668C0.306667 5.48668 0 6.70668 0 8.00001C0 9.29334 0.306667 10.5133 0.853333 11.5933L3.51 9.53001Z"
+                                            fill="#FBBC05"
+                                        />
+                                        <path
+                                            d="M8.0001 16C10.1601 16 11.9768 15.29 13.2968 14.0633L10.7201 12.0633C10.0034 12.5467 9.0801 12.83 8.0001 12.83C5.91343 12.83 4.14343 11.4233 3.5101 9.52667L0.850098 11.59C2.1701 14.2067 4.87343 16 8.0001 16Z"
+                                            fill="#34A853"
+                                        />
+                                    </g>
+                                    <defs>
+                                        <clipPath id="clip0_643_9687">
+                                            <rect width="16" height="16" fill="white" />
+                                        </clipPath>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <span>
                                 {isLoading ? t('auth.authenticating') : t('auth.continueWithGoogle')}
                             </span>
                         </Button>
-                    </div>
 
-                    <div className="animate-fadeIn animate-delay-900">
+                        <div className="flex items-center gap-4 py-2">
+                            <div className="h-px bg-white/10 flex-1" />
+                            <span className="text-neutral-500 text-xs uppercase tracking-widest">{t('auth.or', 'or')}</span>
+                            <div className="h-px bg-white/10 flex-1" />
+                        </div>
+
+                        {/* Email Auth */}
                         <Button
                             onClick={onGoToEmailAuth}
                             disabled={isLoading}
                             variant="outline"
-                            size="md"
-                            className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                            size="lg"
+                            className="w-full h-14 rounded-full text-base border-white/10 hover:bg-white/5 transition-all"
                         >
-                            <span className="mr-3 inline-flex items-center justify-center align-middle">
-                                <svg
-                                    className="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                    />
-                                </svg>
-                            </span>
-                            <span className="align-middle">{t('auth.continueWithEmail')}</span>
+                            <Mail className="mr-3 w-5 h-5 text-neutral-400" />
+                            <span>{t('auth.continueWithEmail')}</span>
                         </Button>
+
+                        {/* Guest Auth */}
+                        <div className="space-y-3 pt-2">
+                            <Button
+                                onClick={onGoToGuestAuth}
+                                disabled={isLoading}
+                                variant="outline"
+                                size="lg"
+                                className="w-full h-14 rounded-full text-base border-orange-500/30 text-orange-400 hover:bg-orange-500/5 transition-all"
+                            >
+                                <UserCircle className="mr-3 w-5 h-5" />
+                                <span>{t('auth.continueAsGuest')}</span>
+                            </Button>
+                            <p className="flex items-center justify-center gap-2 text-xs text-neutral-500 animate-fadeIn">
+                                <Info className="w-3.5 h-3.5" />
+                                <span>{t('auth.guest.noProgressWarning', 'Your progress will not be saved as a guest')}</span>
+                            </p>
+                        </div>
                     </div>
 
-                    <div className="animate-fadeIn animate-delay-1000">
-                        <Button
-                            onClick={onGoToGuestAuth}
-                            disabled={isLoading}
-                            variant="outline"
-                            size="md"
-                            className="bg-orange-600 border-orange-500 text-white hover:bg-orange-500"
-                        >
-                            <span className="mr-3 inline-flex items-center justify-center align-middle">
-                                <svg
-                                    className="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                    />
-                                </svg>
-                            </span>
-                            <span className="align-middle">{t('auth.continueAsGuest')}</span>
-                        </Button>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 animate-fadeIn animate-delay-1100">
+                    {/* Footer links */}
+                    <div className="flex items-center justify-center gap-8 pt-4 animate-fadeIn animate-delay-1000">
                         <button
                             onClick={onOpenInstructions}
-                            className="inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"
+                            className="text-sm text-neutral-500 hover:text-orange-400 transition-colors"
                         >
-                            <svg
-                                className="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                />
-                            </svg>
-                            <span>{t('footer.gameRules')}</span>
+                            {t('footer.gameRules')}
                         </button>
                         <button
                             onClick={onOpenFeedback}
-                            className="inline-flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-300 transition-colors duration-150"
+                            className="text-sm text-neutral-500 hover:text-orange-400 transition-colors"
                         >
-                            <svg
-                                className="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-                                />
-                            </svg>
-                            <span>{t('auth.helpImprove')}</span>
+                            {t('auth.helpImprove')}
                         </button>
                     </div>
                 </div>
             </div>
 
-            <footer className="w-full py-4 px-6">
-                <div className="flex items-center justify-center">
-                    <p className="text-xs sm:text-sm text-neutral-500">
-                        {t('footer.copyright')}
-                    </p>
-                </div>
+            <footer className="w-full py-6 z-10">
+                <p className="text-center text-xs text-neutral-600">
+                    {t('footer.copyright')}
+                </p>
             </footer>
         </div>
     );
 }
+

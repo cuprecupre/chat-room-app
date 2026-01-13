@@ -69,7 +69,6 @@ class RoomManager {
 
         if (roomsToRemove.length === 0) return;
 
-        console.log(`[RoomManager] Removing user ${userId} from ${roomsToRemove.length} previous rooms`);
 
         for (const room of roomsToRemove) {
             room.removePlayer(userId);
@@ -183,7 +182,6 @@ class RoomManager {
             }
 
             if (currentRoom.players.length > 0) {
-                console.log(`[RoomManager] Room ${roomId} has players, cancelling deletion`);
                 delete this.pendingDeletions[roomId];
                 return;
             }
@@ -203,7 +201,6 @@ class RoomManager {
         if (this.pendingDeletions[roomId]) {
             clearTimeout(this.pendingDeletions[roomId]);
             delete this.pendingDeletions[roomId];
-            console.log(`✅ [RoomManager] Cancelled deletion for room ${roomId}`);
         }
     }
 }

@@ -63,7 +63,6 @@ class SessionManager {
 
         // Set new timeout for 2 minutes of inactivity (just for monitoring)
         this.userHeartbeats[userId].timeout = setTimeout(() => {
-            console.log(`User ${userId} appears to be inactive, but keeping in game`);
         }, 120000);
     }
 
