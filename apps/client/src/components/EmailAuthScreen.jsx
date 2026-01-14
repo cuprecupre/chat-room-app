@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "./ui/Button";
 import { Spinner } from "./ui/Spinner";
 import { Avatar } from "./ui/Avatar";
-import { Camera, RefreshCw, X, ArrowLeft, Mail, UserCircle, Info } from "lucide-react";
+import { RefreshCw, ArrowLeft } from "lucide-react";
 
 // Firebase Storage CDN URL
 const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
@@ -11,7 +11,12 @@ const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.fire
 const STORAGE_KEY = "emailAuth:state";
 
 // Función helper fuera del componente para evitar recreación en cada render
-const getInitialState = () => {
+const getInitialState = (isUpgrading) => {
+    // If upgrading, default to register mode
+    if (isUpgrading) {
+        return { mode: "register", email: "", displayName: "" };
+    }
+
     try {
         const saved = sessionStorage.getItem(STORAGE_KEY);
         if (saved) {
@@ -24,15 +29,18 @@ const getInitialState = () => {
 export function EmailAuthScreen({
     onLoginWithEmail,
     onRegisterWithEmail,
+    onLinkWithEmail,
     onRecoverPassword,
     onBack,
+    onSuccess,
     isLoading,
     error,
     clearError,
+    isUpgrading = false,
 }) {
     const { t } = useTranslation('common');
     // Usar función inicializadora para ejecutar solo una vez
-    const [initialState] = useState(getInitialState);
+    const [initialState] = useState(() => getInitialState(isUpgrading));
     const [mode, setMode] = useState(initialState.mode); // "select" | "login" | "register" | "recover"
     const [email, setEmail] = useState(initialState.email);
     const [password, setPassword] = useState(""); // Nunca persistir contraseña
@@ -63,8 +71,9 @@ export function EmailAuthScreen({
     }, [mode]);
 
     // Persistir estado en sessionStorage cada vez que cambia
-
     useEffect(() => {
+        if (isUpgrading) return; // Don't persist state when upgrading to avoid conflicts
+
         const state = { mode, email, displayName };
         const stateString = JSON.stringify(state);
 
@@ -73,7 +82,7 @@ export function EmailAuthScreen({
             sessionStorage.setItem(STORAGE_KEY, stateString);
             lastSavedStateRef.current = stateString;
         }
-    }, [mode, email, displayName]);
+    }, [mode, email, displayName, isUpgrading]);
 
     const handleBack = () => {
         setEmail("");
@@ -82,6 +91,13 @@ export function EmailAuthScreen({
         setLocalError("");
         setRecoverySent(false);
         if (clearError) clearError();
+
+        if (isUpgrading) {
+            // When upgrading, back goes to previous screen (GuestAuth selection)
+            onBack();
+            return;
+        }
+
         if (mode === "select") {
             // Limpiar estado persistido al volver a LoginScreen
             sessionStorage.removeItem(STORAGE_KEY);
@@ -100,7 +116,7 @@ export function EmailAuthScreen({
         onLoginWithEmail(email, password);
     };
 
-    const handleRegister = (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
         setLocalError("");
 
@@ -109,7 +125,15 @@ export function EmailAuthScreen({
             return;
         }
         lastModeRef.current = "register";
-        onRegisterWithEmail(email, password, displayName, photoURL);
+
+        if (isUpgrading && onLinkWithEmail) {
+            const success = await onLinkWithEmail(email, password, displayName);
+            if (success && onSuccess) {
+                onSuccess();
+            }
+        } else {
+            onRegisterWithEmail(email, password, displayName, photoURL);
+        }
     };
 
     const handleRandomAvatar = () => {
@@ -142,33 +166,64 @@ export function EmailAuthScreen({
     const displayError = localError || error;
 
     return (
-        <div className="w-full min-h-screen flex flex-col">
-            <div className="flex-1 flex items-center justify-center p-4">
-                <div className="w-full max-w-md space-y-6">
+        <div className="w-full min-h-screen flex flex-col items-center">
+            {/* Back Button - Top Left */}
+            <div className="w-full max-w-md px-4 mt-6 mb-2">
+                <button
+                    onClick={handleBack}
+                    className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors"
+                    disabled={isLoading}
+                >
+                    <ArrowLeft className="h-5 w-5" />
+                    <span>{t('buttons.back', 'Volver')}</span>
+                </button>
+            </div>
+
+            <div className="flex-1 flex items-center justify-center p-4 w-full">
+                <div className="w-full max-w-md space-y-8">
                     {/* Logo/Header */}
-                    <div className="text-center space-y-4">
-                        <div className="perspective-1000 animate-scaleIn">
+                    <div className="text-center space-y-6">
+                        <div className="relative inline-block">
                             <img
                                 src={heroImg}
                                 alt="El Impostor"
-                                className="mx-auto w-32 h-32 rounded-full object-cover shadow-xl ring-1 ring-white/10"
+                                className="relative mx-auto w-32 h-32 md:w-36 md:h-36 rounded-full object-cover shadow-2xl ring-1 ring-white/10"
                                 loading="lazy"
                             />
                         </div>
-                        <h1 className="text-3xl font-serif text-neutral-50">
-                            {mode === "select" && (t('auth.accessWithEmail', 'Acceder con Email'))}
-                            {mode === "login" && t('auth.login')}
-                            {mode === "register" && t('auth.createAccount')}
-                            {mode === "recover" && (t('auth.recoverPassword', 'Recuperar Contraseña'))}
-                        </h1>
+                        <div className="space-y-1">
+                            <h1 className="text-4xl font-serif text-white tracking-tight">
+                                {mode === "select" && (t('auth.accessWithEmail', 'Acceder con Email'))}
+                                {mode === "login" && t('auth.login')}
+                                {mode === "register" && (isUpgrading ? t('auth.registerAccount', 'Registrar cuenta') : t('auth.createAccount'))}
+                                {mode === "recover" && (t('auth.recoverPassword', 'Recuperar Contraseña'))}
+                            </h1>
+                            {mode === "select" && (
+                                <p className="text-neutral-400 text-lg font-light">
+                                    {isUpgrading
+                                        ? t('auth.chooseMethod', 'Elige cómo registrar tu cuenta')
+                                        : t('auth.accountQuestion')
+                                    }
+                                </p>
+                            )}
+                        </div>
                     </div>
 
                     {/* Pantalla de selección */}
                     {mode === "select" && (
-                        <div className="space-y-4 animate-fadeIn">
-                            <p className="text-neutral-300 text-center">
-                                {t('auth.accountQuestion')}
-                            </p>
+                        <div className="space-y-4">
+                            <Button
+                                onClick={() => {
+                                    setMode("register");
+                                    setLocalError("");
+                                    if (clearError) clearError();
+                                }}
+                                variant="primary"
+                                size="lg"
+                                className="w-full h-14 rounded-full"
+                            >
+                                {t('auth.createNewAccount')}
+                            </Button>
 
                             <Button
                                 onClick={() => {
@@ -176,31 +231,26 @@ export function EmailAuthScreen({
                                     setLocalError("");
                                     if (clearError) clearError();
                                 }}
-                                variant="primary"
-                                size="lg"
-                                className="w-full"
-                            >
-                                {t('auth.login')}
-                            </Button>
-
-                            <Button
-                                onClick={() => {
-                                    setMode("register");
-                                    setLocalError("");
-                                    if (clearError) clearError();
-                                }}
                                 variant="outline"
                                 size="lg"
-                                className="w-full"
+                                className="w-full h-14 rounded-full"
                             >
-                                {t('auth.createNewAccount')}
+                                {t('auth.login')}
                             </Button>
                         </div>
                     )}
 
                     {/* Formulario de Login */}
                     {mode === "login" && (
-                        <form onSubmit={handleLogin} className="space-y-4 animate-fadeIn">
+                        <form onSubmit={handleLogin} className="space-y-4">
+                            {isUpgrading && (
+                                <div className="bg-orange-500/10 border border-orange-500/20 p-4 rounded-lg mb-4">
+                                    <p className="text-orange-200 text-sm">
+                                        {t('auth.upgradeLoginWarning', 'Si inicias sesión con otra cuenta, perderás el progreso actual de tu sesión de invitado.')}
+                                    </p>
+                                </div>
+                            )}
+
                             <div>
                                 <label
                                     htmlFor="email"
@@ -250,7 +300,7 @@ export function EmailAuthScreen({
                                 type="submit"
                                 variant="primary"
                                 size="lg"
-                                className="w-full"
+                                className="w-full h-14 rounded-full"
                                 disabled={isLoading}
                             >
                                 {isLoading ? (
@@ -280,34 +330,39 @@ export function EmailAuthScreen({
 
                     {/* Formulario de Registro */}
                     {mode === "register" && (
-                        <form onSubmit={handleRegister} className="space-y-6 animate-fadeIn">
-                            {/* Avatar Selector en Registro */}
-                            <div className="flex flex-col items-center gap-4">
-                                <p className="text-sm font-medium text-neutral-300">
-                                    {t('auth.chooseAvatar', 'Elige tu avatar')}
-                                </p>
-                                <div className="relative group">
-                                    <Avatar
-                                        photoURL={photoURL}
-                                        displayName={displayName || "U"}
-                                        size="xl"
-                                        className="shadow-xl bg-neutral-800"
-                                    />
-                                    <div className="absolute -bottom-2 -right-2 flex gap-1 z-20">
-                                        <button
-                                            type="button"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleRandomAvatar();
-                                            }}
-                                            className="bg-neutral-800 p-2 rounded-full text-white shadow-lg border border-white/10 hover:bg-neutral-700 transition-colors pointer-events-auto"
-                                            title={t('auth.randomAvatar')}
-                                        >
-                                            <RefreshCw className="w-3.5 h-3.5" />
-                                        </button>
+                        <form onSubmit={handleRegister} className="space-y-6">
+                            {/* Avatar Selector en Registro (Ocultar si es upgrade, mantenemos avatar actual que no se guarda aquí) */}
+                            {/* Si es upgrade, el usuario ya tiene su avatar y nombre de invitado, 
+                                pero aquí le pedimos confirmación o actualización de nombre */}
+
+                            {!isUpgrading && (
+                                <div className="flex flex-col items-center gap-4">
+                                    <p className="text-sm font-medium text-neutral-300">
+                                        {t('auth.chooseAvatar', 'Elige tu avatar')}
+                                    </p>
+                                    <div className="relative group">
+                                        <Avatar
+                                            photoURL={photoURL}
+                                            displayName={displayName || "U"}
+                                            size="xl"
+                                            className="shadow-xl bg-neutral-800"
+                                        />
+                                        <div className="absolute -bottom-2 -right-2 flex gap-1 z-20">
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleRandomAvatar();
+                                                }}
+                                                className="bg-neutral-800 p-2 rounded-full text-white shadow-lg border border-white/10 hover:bg-neutral-700 transition-colors pointer-events-auto"
+                                                title={t('auth.randomAvatar')}
+                                            >
+                                                <RefreshCw className="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
 
                             <div>
                                 <label
@@ -378,7 +433,7 @@ export function EmailAuthScreen({
                                 type="submit"
                                 variant="primary"
                                 size="lg"
-                                className="w-full"
+                                className="w-full h-14 rounded-full"
                                 disabled={isLoading}
                             >
                                 {isLoading ? (
@@ -387,7 +442,7 @@ export function EmailAuthScreen({
                                         {t('auth.creatingAccount')}
                                     </span>
                                 ) : (
-                                    t('auth.createAccount')
+                                    isUpgrading ? t('buttons.save', 'Guardar') : t('auth.createAccount')
                                 )}
                             </Button>
                         </form>
@@ -395,7 +450,7 @@ export function EmailAuthScreen({
 
                     {/* Formulario de Recuperación */}
                     {mode === "recover" && (
-                        <div className="space-y-4 animate-fadeIn">
+                        <div className="space-y-4">
                             {!recoverySent ? (
                                 <form onSubmit={handleRecover} className="space-y-4">
                                     <p className="text-neutral-400 text-sm text-center">
@@ -430,7 +485,7 @@ export function EmailAuthScreen({
                                         type="submit"
                                         variant="primary"
                                         size="lg"
-                                        className="w-full"
+                                        className="w-full h-14 rounded-full"
                                         disabled={isLoading}
                                     >
                                         {isLoading ? (
@@ -462,7 +517,7 @@ export function EmailAuthScreen({
                                         onClick={() => setMode("login")}
                                         variant="outline"
                                         size="md"
-                                        className="w-full"
+                                        className="w-full h-14 rounded-full"
                                     >
                                         {t('auth.backToLogin', 'Volver al login')}
                                     </Button>
@@ -470,30 +525,6 @@ export function EmailAuthScreen({
                             )}
                         </div>
                     )}
-
-                    {/* Botón de volver */}
-                    <Button
-                        onClick={handleBack}
-                        disabled={isLoading}
-                        variant="ghost"
-                        size="md"
-                        className="w-full flex items-center justify-center gap-2"
-                    >
-                        <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M15 19l-7-7 7-7"
-                            />
-                        </svg>
-                        <span>{t('buttons.back')}</span>
-                    </Button>
                 </div>
             </div>
 

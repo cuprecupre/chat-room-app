@@ -41,6 +41,8 @@ function AppRoutes({
     loginAsGuest,
     logout,
     recoverPassword,
+    linkWithGoogle,
+    linkWithEmail,
     clearError,
     connected,
     gameState,
@@ -130,6 +132,8 @@ function AppRoutes({
         registerWithEmail,
         recoverPassword,
         loginAsGuest,
+        linkWithGoogle,
+        linkWithEmail,
         loading,
         error,
         clearError,
@@ -282,6 +286,8 @@ export function AppRouter() {
         loginAsGuest,
         logout,
         recoverPassword,
+        linkWithGoogle,
+        linkWithEmail,
         needsProfileSetup,
         setNeedsProfileSetup,
         clearError,
@@ -337,6 +343,8 @@ export function AppRouter() {
                     loginAsGuest={loginAsGuest}
                     logout={logout}
                     recoverPassword={recoverPassword}
+                    linkWithGoogle={linkWithGoogle}
+                    linkWithEmail={linkWithEmail}
                     clearError={clearError}
                     connected={connected}
                     gameState={gameState}

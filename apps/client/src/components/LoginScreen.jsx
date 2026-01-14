@@ -13,6 +13,7 @@ export function LoginScreen({
     onGoToGuestAuth,
     onBack,
     isLoading,
+    isUpgrading = false,
     onOpenInstructions,
     onOpenFeedback,
 }) {
@@ -46,25 +47,29 @@ export function LoginScreen({
                 <div className="w-full max-w-md space-y-8">
                     {/* Hero Section */}
                     <div className="text-center space-y-6">
-                        <div className="relative inline-block animate-scaleIn animate-delay-200">
+                        <div className="relative inline-block">
                             <img
                                 src={heroImg}
                                 alt="El Impostor"
                                 className="relative mx-auto w-32 h-32 md:w-36 md:h-36 rounded-full object-cover shadow-2xl ring-1 ring-white/10"
                             />
                         </div>
-                        <div className="space-y-1 animate-fadeIn animate-delay-400">
+                        <div className="space-y-1">
                             <h1 className="text-4xl font-serif text-white tracking-tight">
-                                {t('login.appTitle', 'El Impostor')}
+                                {isUpgrading
+                                    ? t('auth.registerAccount', 'Registrar cuenta')
+                                    : t('login.appTitle', 'El Impostor')}
                             </h1>
                             <p className="text-neutral-400 text-lg font-light">
-                                {t('auth.selectionTitle', '¿Cómo quieres jugar?')}
+                                {isUpgrading
+                                    ? t('auth.chooseMethod', 'Elige cómo registrar tu cuenta')
+                                    : t('auth.selectionTitle', '¿Cómo quieres jugar?')}
                             </p>
                         </div>
                     </div>
 
                     {/* Auth Options Container */}
-                    <div className="space-y-4 animate-fadeIn animate-delay-600">
+                    <div className="space-y-4">
                         {/* Google Auth */}
                         <Button
                             onClick={onLogin}
@@ -123,46 +128,33 @@ export function LoginScreen({
                             disabled={isLoading}
                             variant="outline"
                             size="lg"
-                            className="w-full h-14 rounded-full text-base border-white/10 hover:bg-white/5 transition-all"
+                            className="w-full h-14 rounded-full text-base border-orange-500/30 text-orange-400 hover:bg-orange-500/5 transition-all shadow-lg shadow-orange-950/5"
                         >
-                            <Mail className="mr-3 w-5 h-5 text-neutral-400" />
+                            <Mail className="mr-3 w-5 h-5" />
                             <span>{t('auth.continueWithEmail')}</span>
                         </Button>
 
-                        {/* Guest Auth */}
-                        <div className="space-y-3 pt-2">
-                            <Button
-                                onClick={onGoToGuestAuth}
-                                disabled={isLoading}
-                                variant="outline"
-                                size="lg"
-                                className="w-full h-14 rounded-full text-base border-orange-500/30 text-orange-400 hover:bg-orange-500/5 transition-all"
-                            >
-                                <UserCircle className="mr-3 w-5 h-5" />
-                                <span>{t('auth.continueAsGuest')}</span>
-                            </Button>
-                            <p className="flex items-center justify-center gap-2 text-xs text-neutral-500 animate-fadeIn">
-                                <Info className="w-3.5 h-3.5" />
-                                <span>{t('auth.guest.noProgressWarning', 'Your progress will not be saved as a guest')}</span>
-                            </p>
-                        </div>
+                        {/* Guest Auth - Only show when NOT upgrading */}
+                        {!isUpgrading && (
+                            <div className="space-y-3 pt-2">
+                                <Button
+                                    onClick={onGoToGuestAuth}
+                                    disabled={isLoading}
+                                    variant="outline"
+                                    size="lg"
+                                    className="w-full h-14 rounded-full text-base border-orange-500/30 text-orange-400 hover:bg-orange-500/5 transition-all"
+                                >
+                                    <UserCircle className="mr-3 w-5 h-5" />
+                                    <span>{t('auth.continueAsGuest')}</span>
+                                </Button>
+                                <p className="flex items-center justify-center gap-2 text-xs text-neutral-500">
+                                    <Info className="w-3.5 h-3.5" />
+                                    <span>{t('auth.guest.noProgressWarning', 'Your progress will not be saved as a guest')}</span>
+                                </p>
+                            </div>
+                        )}
                     </div>
 
-                    {/* Footer links */}
-                    <div className="flex items-center justify-center gap-8 pt-4 animate-fadeIn animate-delay-1000">
-                        <button
-                            onClick={onOpenInstructions}
-                            className="text-sm text-neutral-500 hover:text-orange-400 transition-colors"
-                        >
-                            {t('footer.gameRules')}
-                        </button>
-                        <button
-                            onClick={onOpenFeedback}
-                            className="text-sm text-neutral-500 hover:text-orange-400 transition-colors"
-                        >
-                            {t('auth.helpImprove')}
-                        </button>
-                    </div>
                 </div>
             </div>
 

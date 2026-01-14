@@ -14,6 +14,9 @@ import {
     updateProfile,
     sendPasswordResetEmail,
     getAdditionalUserInfo,
+    linkWithPopup,
+    linkWithCredential,
+    EmailAuthProvider,
     storage,
     ref,
     uploadBytes,
@@ -362,6 +365,70 @@ export function AuthProvider({ children }) {
         }
     }, []);
 
+    // Link anonymous account with Google
+    const linkWithGoogle = useCallback(async () => {
+        if (!auth.currentUser || !auth.currentUser.isAnonymous) {
+            setError("Solo las cuentas de invitado pueden vincularse.");
+            return false;
+        }
+        setLoading(true);
+        setError(null);
+        try {
+            const result = await linkWithPopup(auth.currentUser, provider);
+            setUser(serializeUser(result.user));
+            setLoading(false);
+            return true;
+        } catch (err) {
+            let errorMessage = "Error al vincular la cuenta con Google.";
+            if (err?.code === "auth/credential-already-in-use") {
+                errorMessage = "Esta cuenta de Google ya está registrada. Inicia sesión directamente.";
+            } else if (err?.code === "auth/popup-closed-by-user") {
+                errorMessage = "Se cerró la ventana de autenticación.";
+            } else if (err?.code === "auth/cancelled-popup-request") {
+                errorMessage = "Se canceló la solicitud de autenticación.";
+            }
+            setError(errorMessage);
+            setLoading(false);
+            return false;
+        }
+    }, []);
+
+    // Link anonymous account with Email/Password
+    const linkWithEmail = useCallback(async (email, password, displayName) => {
+        if (!auth.currentUser || !auth.currentUser.isAnonymous) {
+            setError("Solo las cuentas de invitado pueden vincularse.");
+            return false;
+        }
+        setLoading(true);
+        setError(null);
+        try {
+            const credential = EmailAuthProvider.credential(email, password);
+            const result = await linkWithCredential(auth.currentUser, credential);
+
+            // Update display name if provided
+            if (displayName) {
+                await updateProfile(result.user, { displayName });
+                await result.user.reload();
+            }
+
+            setUser(serializeUser(auth.currentUser));
+            setLoading(false);
+            return true;
+        } catch (err) {
+            let errorMessage = "Error al vincular la cuenta con email.";
+            if (err?.code === "auth/email-already-in-use" || err?.code === "auth/credential-already-in-use") {
+                errorMessage = "Este email ya está registrado. Inicia sesión directamente.";
+            } else if (err?.code === "auth/weak-password") {
+                errorMessage = "La contraseña debe tener al menos 6 caracteres.";
+            } else if (err?.code === "auth/invalid-email") {
+                errorMessage = "Email inválido.";
+            }
+            setError(errorMessage);
+            setLoading(false);
+            return false;
+        }
+    }, []);
+
     const clearError = useCallback(() => {
         setError(null);
     }, []);
@@ -379,11 +446,13 @@ export function AuthProvider({ children }) {
             updateUserInfo,
             recoverPassword,
             uploadUserPhoto,
+            linkWithGoogle,
+            linkWithEmail,
             needsProfileSetup,
             setNeedsProfileSetup,
             clearError,
         }),
-        [user, loading, error, login, loginWithEmail, registerWithEmail, loginAsGuest, logout, updateUserInfo, recoverPassword, uploadUserPhoto, needsProfileSetup, clearError]
+        [user, loading, error, login, loginWithEmail, registerWithEmail, loginAsGuest, logout, updateUserInfo, recoverPassword, uploadUserPhoto, linkWithGoogle, linkWithEmail, needsProfileSetup, clearError]
     );
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useRoomIdFromUrl } from "../../hooks/useRoomIdFromUrl";
 import { ROUTES } from "../routes.jsx";
 import { EmailAuthPage } from "../../pages/EmailAuthPage";
@@ -11,15 +11,18 @@ export function AuthRoute({
     loginWithEmail,
     registerWithEmail,
     recoverPassword,
+    linkWithEmail,
     loading,
     error,
     clearError,
     onBack,
 }) {
     const roomId = useRoomIdFromUrl();
+    const location = useLocation();
+    const isUpgrading = location.state?.isUpgrading === true || user?.isAnonymous === true;
 
-    // If user is already authenticated
-    if (user) {
+    // If user is already authenticated and NOT anonymous, redirect
+    if (user && !user.isAnonymous) {
         // Redirect to game if there's a roomId
         if (roomId) {
             return <Navigate to={`${ROUTES.GAME}?roomId=${roomId}`} replace />;
@@ -28,16 +31,19 @@ export function AuthRoute({
         return <Navigate to={ROUTES.LOBBY} replace />;
     }
 
-    // Show email auth page for unauthenticated users
+    // Show email auth page for unauthenticated users OR anonymous users wanting to upgrade
     return (
         <EmailAuthPage
+            user={user}
             onLoginWithEmail={loginWithEmail}
             onRegisterWithEmail={registerWithEmail}
+            onLinkWithEmail={linkWithEmail}
             onRecoverPassword={recoverPassword}
             isLoading={loading}
             error={error}
             clearError={clearError}
             onBack={onBack}
+            isUpgrading={isUpgrading}
         />
     );
 }

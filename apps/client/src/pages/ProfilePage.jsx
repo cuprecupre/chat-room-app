@@ -85,18 +85,18 @@ export function ProfilePage({ gameState }) {
 
             {/* Banner para Invitados - Simplificado */}
             {user?.isAnonymous && (
-                <div className="bg-neutral-900 border border-orange-500/20 rounded-2xl p-6 mb-8 mt-2 animate-fadeIn shadow-lg">
-                    <div className="flex flex-col md:flex-row items-center gap-6">
-                        <div className="bg-orange-600/10 p-4 rounded-full">
+                <div className="bg-neutral-900 border border-orange-500/20 rounded-2xl p-6 mb-8 mt-2 shadow-lg">
+                    <div className="flex flex-col md:flex-row items-center gap-5">
+                        <div className="hidden md:flex bg-orange-600/10 p-4 rounded-full shrink-0">
                             <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
                         </div>
-                        <div className="flex-1 text-center md:text-left">
-                            <h3 className="text-xl font-serif text-white mb-1">
+                        <div className="flex-1 min-w-0 text-center md:text-left">
+                            <h3 className="text-lg md:text-xl font-serif text-white mb-1">
                                 {t("profile.saveProgressTitle", "¿Quieres guardar tu progreso?")}
                             </h3>
-                            <p className="text-neutral-400 text-sm font-light leading-snug">
+                            <p className="text-neutral-400 text-sm font-light leading-relaxed">
                                 {t("profile.saveProgressDesc", "Tu cuenta actual es temporal. Regístrate ahora para no perder tus puntos y estadísticas.")}
                             </p>
                         </div>
@@ -104,7 +104,7 @@ export function ProfilePage({ gameState }) {
                             onClick={handleRegisterClick}
                             variant="primary"
                             size="md"
-                            className="w-auto px-8 rounded-full shadow-lg"
+                            className="w-full md:w-auto px-6 md:px-8 rounded-full shadow-lg shrink-0"
                         >
                             {t("profile.registerNow", "Registrar cuenta")}
                         </Button>
@@ -254,7 +254,7 @@ export function ProfilePage({ gameState }) {
 
 function StatCard({ label, value }) {
     return (
-        <div className="bg-neutral-900/50 p-6 rounded-2xl border border-white/5 flex flex-col items-center justify-center text-center shadow-lg">
+        <div className="bg-neutral-900/50 p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg">
             <span className="text-3xl font-serif font-bold text-white mb-1">
                 {value}
             </span>

@@ -10,6 +10,8 @@ export function GuestAuthRoute({
     user,
     login,
     loginAsGuest,
+    linkWithGoogle,
+    linkWithEmail,
     loading,
     error,
     clearError,
@@ -17,8 +19,8 @@ export function GuestAuthRoute({
 }) {
     const roomId = useRoomIdFromUrl();
 
-    // If user is already authenticated
-    if (user) {
+    // If user is already authenticated and NOT anonymous, redirect
+    if (user && !user.isAnonymous) {
         // Redirect to game if there's a roomId
         if (roomId) {
             return <Navigate to={`${ROUTES.GAME}?roomId=${roomId}`} replace />;
@@ -27,11 +29,14 @@ export function GuestAuthRoute({
         return <Navigate to={ROUTES.LOBBY} replace />;
     }
 
-    // Show guest auth page for unauthenticated users
+    // Show guest auth page for unauthenticated users OR anonymous users wanting to upgrade
     return (
         <GuestAuthPage
+            user={user}
             onLoginAsGuest={loginAsGuest}
             onLoginWithGoogle={login}
+            onLinkWithGoogle={linkWithGoogle}
+            onLinkWithEmail={linkWithEmail}
             isLoading={loading}
             error={error}
             clearError={clearError}

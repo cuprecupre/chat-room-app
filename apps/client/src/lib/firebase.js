@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import {
     getAuth,
     GoogleAuthProvider,
+    EmailAuthProvider,
     setPersistence,
     browserLocalPersistence,
     signInWithRedirect,
@@ -16,6 +17,8 @@ import {
     updateProfile,
     sendPasswordResetEmail,
     getAdditionalUserInfo,
+    linkWithPopup,
+    linkWithCredential,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -87,6 +90,9 @@ export {
     updateProfile,
     sendPasswordResetEmail,
     getAdditionalUserInfo,
+    linkWithPopup,
+    linkWithCredential,
+    EmailAuthProvider,
     ref,
     uploadBytes,
     getDownloadURL,
