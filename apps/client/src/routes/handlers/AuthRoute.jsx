@@ -12,6 +12,8 @@ export function AuthRoute({
     registerWithEmail,
     recoverPassword,
     linkWithEmail,
+    linkWithGoogle, // New prop
+    login, // New prop for Google Login
     loading,
     error,
     clearError,
@@ -38,6 +40,8 @@ export function AuthRoute({
             onLoginWithEmail={loginWithEmail}
             onRegisterWithEmail={registerWithEmail}
             onLinkWithEmail={linkWithEmail}
+            onLinkWithGoogle={linkWithGoogle}
+            onLoginWithGoogle={login}
             onRecoverPassword={recoverPassword}
             isLoading={loading}
             error={error}

@@ -19,8 +19,8 @@ export function GuestAuthRoute({
 }) {
     const roomId = useRoomIdFromUrl();
 
-    // If user is already authenticated and NOT anonymous, redirect
-    if (user && !user.isAnonymous) {
+    // If user is already authenticated, redirect
+    if (user) {
         // Redirect to game if there's a roomId
         if (roomId) {
             return <Navigate to={`${ROUTES.GAME}?roomId=${roomId}`} replace />;

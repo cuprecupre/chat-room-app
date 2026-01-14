@@ -35,7 +35,7 @@ export function ProfilePage({ gameState }) {
     }, [user, isEditing]);
 
     const handleRegisterClick = () => {
-        navigate(ROUTES.GUEST_AUTH);
+        navigate(ROUTES.AUTH);
     };
 
     const handleSave = async () => {

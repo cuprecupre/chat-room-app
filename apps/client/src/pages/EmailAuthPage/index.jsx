@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { EmailAuthScreen } from "../../components/EmailAuthScreen";
+import { LoginScreen } from "../../components/LoginScreen";
 import { ROUTES } from "../../routes/routes";
 
 export function EmailAuthPage({
@@ -7,6 +9,8 @@ export function EmailAuthPage({
     onRegisterWithEmail,
     onLinkWithEmail,
     onRecoverPassword,
+    onLoginWithGoogle, // Added prop for Google Login
+    onLinkWithGoogle,  // Added prop for Google Linking
     isLoading,
     error,
     clearError,
@@ -14,15 +18,23 @@ export function EmailAuthPage({
     isUpgrading = false,
 }) {
     const navigate = useNavigate();
+    const [view, setView] = useState("selection"); // "selection" | "email"
 
-    const handleBack = () => {
+    const handleBackFromSelection = () => {
         if (clearError) clearError();
-        // If upgrading, go back to Guest Auth selection screen with upgrading state
+        // If coming from profile (upgrading), go back to profile
         if (isUpgrading) {
-            navigate(ROUTES.GUEST_AUTH, { state: { isUpgrading: true } });
+            navigate(ROUTES.PROFILE);
+        } else if (onBack) {
+            onBack();
         } else {
-            navigate(ROUTES.GUEST_AUTH);
+            navigate(ROUTES.HOME);
         }
+    };
+
+    const handleBackFromEmail = () => {
+        if (clearError) clearError();
+        setView("selection");
     };
 
     const handleSuccess = () => {
@@ -32,13 +44,46 @@ export function EmailAuthPage({
         }
     };
 
+    const handleGoogleAuth = async () => {
+        if (isUpgrading && onLinkWithGoogle) {
+            const success = await onLinkWithGoogle();
+            if (success) {
+                navigate(ROUTES.PROFILE);
+            }
+        } else if (onLoginWithGoogle) {
+            onLoginWithGoogle();
+        }
+    };
+
+    const handleGoToEmail = () => {
+        setView("email");
+    };
+
+    const handleGoToGuest = () => {
+        navigate(ROUTES.GUEST_AUTH);
+    };
+
+    if (view === "selection") {
+        return (
+            <LoginScreen
+                onLogin={handleGoogleAuth}
+                onGoToEmailAuth={handleGoToEmail}
+                onGoToGuestAuth={handleGoToGuest}
+                onBack={handleBackFromSelection}
+                isLoading={isLoading}
+                isUpgrading={isUpgrading}
+                error={error}
+            />
+        );
+    }
+
     return (
         <EmailAuthScreen
             onLoginWithEmail={onLoginWithEmail}
             onRegisterWithEmail={onRegisterWithEmail}
             onLinkWithEmail={onLinkWithEmail}
             onRecoverPassword={onRecoverPassword}
-            onBack={handleBack}
+            onBack={handleBackFromEmail}
             onSuccess={handleSuccess}
             isLoading={isLoading}
             error={error}
