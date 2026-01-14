@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { GuestAuthScreen } from "../../components/GuestAuthScreen";
 import { LoginScreen } from "../../components/LoginScreen";
@@ -20,6 +20,15 @@ export function GuestAuthPage({
 
     // Check if user is anonymous (upgrading account)
     const isUpgrading = user?.isAnonymous === true;
+
+    // Detect successful guest login and redirect
+    useEffect(() => {
+        // If we were in the guest name entry view and the user is now authenticated as anonymous,
+        // it means the login was successful.
+        if (view === "guest-name" && user?.isAnonymous) {
+            navigate(ROUTES.LOBBY || "/");
+        }
+    }, [user, view, navigate]);
 
     const handleBack = () => {
         if (view === "guest-name") {
@@ -69,6 +78,7 @@ export function GuestAuthPage({
                 onBack={handleBack}
                 isLoading={isLoading}
                 isUpgrading={isUpgrading}
+                error={error}
             />
         );
     }

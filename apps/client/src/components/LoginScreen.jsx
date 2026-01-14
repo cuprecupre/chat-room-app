@@ -16,6 +16,7 @@ export function LoginScreen({
     isUpgrading = false,
     onOpenInstructions,
     onOpenFeedback,
+    error,
 }) {
     const { t } = useTranslation('common');
 
@@ -70,6 +71,12 @@ export function LoginScreen({
 
                     {/* Auth Options Container */}
                     <div className="space-y-4">
+                        {error && (
+                            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 text-red-400 text-sm text-center">
+                                {error}
+                            </div>
+                        )}
+
                         {/* Google Auth */}
                         <Button
                             onClick={onLogin}
