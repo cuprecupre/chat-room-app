@@ -18,7 +18,7 @@ const AVATAR_SEEDS = [
 export function ProfilePage({ gameState }) {
     const { t } = useTranslation("common");
     const navigate = useNavigate();
-    const { user, logout, updateUserInfo } = useAuth();
+    const { user, updateUserInfo } = useAuth();
     const { stats, loading } = usePlayerStats(user?.uid);
     const isInMatch = gameState?.phase === "playing" || gameState?.phase === "round_result";
 
@@ -66,20 +66,14 @@ export function ProfilePage({ gameState }) {
     return (
         <div className="min-h-[60vh] max-w-2xl mx-auto px-4">
             {/* Header con botón volver */}
-            <div className="mt-4 mb-6 flex justify-between items-center">
+            {/* Header con botón volver */}
+            <div className="mt-4 mb-6">
                 <button
                     onClick={() => navigate(-1)}
                     className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors"
                 >
                     <ArrowLeft className="h-5 w-5" />
                     <span>{t("profile.back", "Volver")}</span>
-                </button>
-
-                <button
-                    onClick={logout}
-                    className="text-sm text-red-500 hover:text-red-400 transition-colors"
-                >
-                    {t("nav.logout", "Cerrar sesión")}
                 </button>
             </div>
 
@@ -230,23 +224,54 @@ export function ProfilePage({ gameState }) {
             </div>
 
             {/* Estadísticas */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <StatCard
-                    label={t("stats.gamesPlayed", "Partidas")}
-                    value={stats?.gamesPlayed || 0}
+                    label={t("stats.points", "Puntos")}
+                    value={stats?.points || 0}
                 />
                 <StatCard
                     label={t("stats.wins", "Victorias")}
                     value={(stats?.winsAsFriend || 0) + (stats?.winsAsImpostor || 0)}
                 />
                 <StatCard
-                    label={t("stats.points", "Puntos")}
-                    value={stats?.points || 0}
+                    label={t("stats.gamesPlayed", "Partidas")}
+                    value={stats?.gamesPlayed || 0}
                 />
                 <StatCard
                     label={t("stats.impostor", "Impostor")}
                     value={stats?.gamesAsImpostor || 0}
                 />
+            </div>
+
+            {/* Estadísticas detalladas */}
+            <div className="bg-neutral-900/50 rounded-2xl p-6 shadow-xl">
+                <h2 className="text-lg font-serif font-bold text-white mb-4">
+                    {t("profile.detailedStats", "Estadísticas detalladas")}
+                </h2>
+                <div className="space-y-4">
+                    <div className="flex justify-between items-center border-b border-white/5 pb-4">
+                        <span className="text-white font-medium">
+                            {t("profile.asImpostor", "Como impostor")}
+                        </span>
+                        <span className="text-neutral-400 text-sm">
+                            <span className="text-white font-bold text-lg">{stats?.gamesAsImpostor || 0}</span> {t("profile.games", "partidas")},
+                            {" "}
+                            <span className="text-white font-bold text-lg">{stats?.winsAsImpostor || 0}</span> {t("profile.winsShort", "victorias")}
+                        </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-white font-medium">
+                            {t("profile.asFriend", "Como amigo")}
+                        </span>
+                        <span className="text-neutral-400 text-sm">
+                            <span className="text-white font-bold text-lg">{(stats?.gamesPlayed || 0) - (stats?.gamesAsImpostor || 0)}</span>
+                            {" "}
+                            {t("profile.games", "partidas")},
+                            {" "}
+                            <span className="text-white font-bold text-lg">{stats?.winsAsFriend || 0}</span> {t("profile.winsShort", "victorias")}
+                        </span>
+                    </div>
+                </div>
             </div>
         </div >
     );
