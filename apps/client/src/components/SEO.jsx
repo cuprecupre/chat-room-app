@@ -10,7 +10,7 @@ export function SEO({ title, description, path = "" }) {
     const gameName = currentLang === 'en' ? 'The Impostor' : 'El Impostor';
 
     // Base URL (should be environment variable, but hardcoding provided domain for now)
-    const baseUrl = "https://impostor-app.onrender.com"; // Assuming render URL or actual custom domain
+    const baseUrl = "https://impostor.me";
 
     // Normalize path to not include leading slash
     const cleanPath = path.startsWith('/') ? path.slice(1) : path;
@@ -41,6 +41,7 @@ export function SEO({ title, description, path = "" }) {
             <meta name="twitter:description" content={description} />
 
             {/* Hreflang */}
+            <link rel="alternate" hreflang="x-default" href={esUrl} />
             <link rel="alternate" hreflang="es" href={esUrl} />
             <link rel="alternate" hreflang="en" href={enUrl} />
             <link rel="canonical" href={currentUrl} />
