@@ -5,8 +5,6 @@ import { Spinner } from "./ui/Spinner";
 import { Avatar } from "./ui/Avatar";
 import { RefreshCw, ArrowLeft } from "lucide-react";
 
-// Firebase Storage CDN URL
-const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
 
 const STORAGE_KEY = "emailAuth:state";
 
@@ -168,7 +166,7 @@ export function EmailAuthScreen({
     return (
         <div className="w-full min-h-screen flex flex-col items-center">
             {/* Back Button - Top Left */}
-            <div className="w-full max-w-md px-4 mt-6 mb-2">
+            <div className="w-full max-w-md mt-6 mb-2">
                 <button
                     onClick={handleBack}
                     className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors"
@@ -182,15 +180,7 @@ export function EmailAuthScreen({
             <div className="flex-1 flex items-center justify-center p-4 w-full">
                 <div className="w-full max-w-md space-y-8">
                     {/* Logo/Header */}
-                    <div className="text-center space-y-6">
-                        <div className="relative inline-block">
-                            <img
-                                src={heroImg}
-                                alt="El Impostor"
-                                className="relative mx-auto w-32 h-32 md:w-36 md:h-36 rounded-full object-cover shadow-2xl ring-1 ring-white/10"
-                                loading="lazy"
-                            />
-                        </div>
+                    <div className="text-center space-y-2">
                         <div className="space-y-1">
                             <h1 className="text-4xl font-serif text-white tracking-tight">
                                 {mode === "select" && (t('auth.accessWithEmail', 'Acceder con Email'))}

@@ -192,7 +192,7 @@ export function LandingPage({
             </nav >
 
             {/* Hero Section */}
-            < header className="relative pt-12 pb-20 px-6 md:pt-16 md:pb-32 overflow-hidden flex flex-col items-center text-center" >
+            < header className="relative pt-8 pb-20 px-6 md:pt-12 md:pb-32 overflow-hidden flex flex-col items-center text-center" >
                 {/* Dynamic Background Elements */}
                 < div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0" >
                     <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-amber-600/[0.08] md:bg-amber-600/15 rounded-full blur-[80px] md:blur-[100px]" />
@@ -214,8 +214,11 @@ export function LandingPage({
                         <span className="text-xl md:text-2xl font-sans font-normal text-neutral-400">
                             {t('hero.playNowTo')}
                         </span>
-                        <span className="text-4xl md:text-6xl/tight lg:text-6xl/tight font-serif font-normal text-white">
-                            {t('hero.title')}<br />{t('hero.titleLine2')}
+                        <span className="text-4xl md:text-6xl/tight lg:text-6xl/tight font-serif font-normal text-white text-balance">
+                            {t('hero.title')}
+                        </span>
+                        <span className="text-xl md:text-2xl font-sans font-normal text-neutral-400">
+                            {t('hero.titleLine2')}
                         </span>
                         <span className="text-xl md:text-3xl lg:text-4xl font-serif font-normal tracking-tight mt-1 bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600">
                             {t('hero.tagline')}
@@ -258,7 +261,7 @@ export function LandingPage({
                     </div>
 
                     <div className="space-y-2 mt-8">
-                        <p className="text-base md:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed animate-fadeIn animate-delay-500 font-light">
+                        <p className="text-base md:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed animate-fadeIn animate-delay-500 font-light text-balance">
                             {t('hero.subtitle')}
                         </p>
                     </div>
