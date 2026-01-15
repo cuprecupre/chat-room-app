@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "./ui/Button";
 import { Spinner } from "./ui/Spinner";
 import { ArrowLeft, Star, Info } from "lucide-react";
+import { checkProfanity } from "../utils/profanityFilter";
 
 // Firebase Storage CDN URL
 const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
@@ -27,6 +28,11 @@ export function GuestAuthScreen({ onLoginAsGuest, onLoginWithGoogle, onBack, isL
         }
         if (trimmedName.length > 30) {
             setLocalError(t('auth.guest.errorMaxLength', 'Name cannot be more than 30 characters.'));
+            return;
+        }
+
+        if (checkProfanity(trimmedName)) {
+            setLocalError(t('auth.guest.errorProfanity', 'Name contains inappropriate language.'));
             return;
         }
 

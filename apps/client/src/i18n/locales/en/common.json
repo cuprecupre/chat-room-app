@@ -70,6 +70,7 @@
             "entering": "Entering...",
             "errorMinLength": "Name must be at least 2 characters.",
             "errorMaxLength": "Name cannot be more than 30 characters.",
+            "errorProfanity": "Name contains inappropriate language. Repeated violations may result in account deletion without notice.",
             "note1": "As a guest you can play without registering.",
             "note2": "Your session will be kept until you close the browser.",
             "googleRecommendation": "Save your progress and stats by signing in with Google.",

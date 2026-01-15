@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Edit2, Check, X, Camera, RefreshCw } from "lucide-react";
+import { ArrowLeft, Edit2, Check, X, Pencil, RefreshCw } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { usePlayerStats } from "../hooks/usePlayerStats";
+import { checkProfanity } from "../utils/profanityFilter";
 import { Avatar } from "../components/ui/Avatar";
 import { Button } from "../components/ui/Button";
 import { ROUTES } from "../routes/routes";
@@ -26,6 +27,7 @@ export function ProfilePage({ gameState }) {
     const [editName, setEditName] = useState("");
     const [editPhoto, setEditPhoto] = useState("");
     const [isSaving, setIsSaving] = useState(false);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         if (user) {
@@ -40,6 +42,14 @@ export function ProfilePage({ gameState }) {
 
     const handleSave = async () => {
         if (!editName.trim()) return;
+
+        setError("");
+
+        if (checkProfanity(editName)) {
+            setError(t('auth.guest.errorProfanity', 'El nombre contiene lenguaje inapropiado.'));
+            return;
+        }
+
         setIsSaving(true);
         const success = await updateUserInfo(editName, editPhoto);
         if (success) {
@@ -120,14 +130,14 @@ export function ProfilePage({ gameState }) {
                                     onClick={() => setIsEditing(true)}
                                     className="absolute bottom-0 right-0 bg-neutral-800 p-2.5 rounded-full text-white shadow-lg border border-white/10 hover:bg-neutral-700 transition-colors"
                                 >
-                                    <Camera className="w-4 h-4" />
+                                    <Pencil className="w-4 h-4" />
                                 </button>
                             ) : (
                                 <div
                                     className="absolute bottom-0 right-0 bg-neutral-900/80 p-2.5 rounded-full text-neutral-500 shadow-lg border border-white/5 cursor-not-allowed"
                                     title={t('profile.cannotEditInMatch', 'No puedes editar tu perfil durante una partida')}
                                 >
-                                    <Camera className="w-4 h-4 opacity-50" />
+                                    <Pencil className="w-4 h-4 opacity-50" />
                                 </div>
                             )}
                         </div>
@@ -163,14 +173,14 @@ export function ProfilePage({ gameState }) {
                                     size="xl"
                                     className="shadow-2xl bg-neutral-800"
                                 />
-                                <div className="absolute -bottom-2 -right-2 flex gap-1 z-20">
+                                <div className="absolute -bottom-2 right-0 flex gap-1 z-20">
                                     <button
                                         type="button"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleRandomAvatar();
                                         }}
-                                        className="bg-neutral-800 p-2 rounded-full text-white shadow-lg border border-white/10 hover:bg-neutral-700 transition-colors pointer-events-auto"
+                                        className="bg-neutral-800 p-2 rounded-full text-white shadow-lg border border-white/10 hover:bg-neutral-700 transition-all active:scale-90 pointer-events-auto"
                                         title={t('auth.randomAvatar')}
                                     >
                                         <RefreshCw className="w-4 h-4" />
@@ -190,6 +200,11 @@ export function ProfilePage({ gameState }) {
                                     placeholder={t("auth.namePlaceholder", "Tu nombre...")}
                                     maxLength={20}
                                 />
+                                {error && (
+                                    <p className="text-red-400 text-xs pl-1">
+                                        {error}
+                                    </p>
+                                )}
                             </div>
                         </div>
 

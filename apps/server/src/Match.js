@@ -4,6 +4,7 @@ const PlayerManager = require("./game/PlayerManager");
 const VotingManager = require("./game/VotingManager");
 const RoundManager = require("./game/RoundManager");
 const GameStateSerializer = require("./game/GameStateSerializer");
+const { cleanProfanity } = require("./utils/profanityFilter");
 
 /**
  * Match - A single game session (1-3 rounds) within a Room.
@@ -167,7 +168,7 @@ class Match {
                 this.winnerId !== "tie";
 
             const statsUpdate = {
-                displayName: player.name,
+                displayName: cleanProfanity(player.name),
                 photoURL: player.photoURL || null,
                 gamesPlayed: 1,
                 points: this.playerScores[uid] || 0,

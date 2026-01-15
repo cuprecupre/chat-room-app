@@ -23,6 +23,7 @@ import {
     getDownloadURL,
 } from "../lib/firebase";
 import { saveToken, clearToken } from "../lib/tokenStorage";
+import { checkProfanity } from "../utils/profanityFilter";
 
 export const AuthContext = createContext(null);
 
@@ -248,6 +249,13 @@ export function AuthProvider({ children }) {
     const registerWithEmail = useCallback(async (email, password, displayName, photoData) => {
         setLoading(true);
         setError(null);
+
+        if (displayName && checkProfanity(displayName)) {
+            setError("El nombre contiene lenguaje inapropiado. Si detectamos que infringes estas normas borraremos el usuario sin previo aviso.");
+            setLoading(false);
+            return;
+        }
+
         try {
             const result = await createUserWithEmailAndPassword(auth, email, password);
             let finalPhotoURL = null;
@@ -327,6 +335,12 @@ export function AuthProvider({ children }) {
 
     const updateUserInfo = useCallback(async (displayName, photoData) => {
         if (!auth.currentUser) return false;
+
+        if (displayName && checkProfanity(displayName)) {
+            setError("El nombre contiene lenguaje inapropiado. Si detectamos que infringes estas normas borraremos el usuario sin previo aviso.");
+            return false;
+        }
+
         setLoading(true);
         setError(null);
         try {
@@ -399,6 +413,12 @@ export function AuthProvider({ children }) {
             setError("Solo las cuentas de invitado pueden vincularse.");
             return false;
         }
+
+        if (displayName && checkProfanity(displayName)) {
+            setError("El nombre contiene lenguaje inapropiado. Si detectamos que infringes estas normas borraremos el usuario sin previo aviso.");
+            return false;
+        }
+
         setLoading(true);
         setError(null);
         try {

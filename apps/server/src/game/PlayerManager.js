@@ -1,3 +1,5 @@
+const { cleanProfanity } = require("../utils/profanityFilter");
+
 function addPlayer(match, user) {
     const existingPlayer = match.players.find((p) => p.uid === user.uid);
 
@@ -12,7 +14,7 @@ function addPlayer(match, user) {
 
     if (existingPlayer) {
         // Update existing player info
-        existingPlayer.name = user.name || existingPlayer.name;
+        existingPlayer.name = user.name ? cleanProfanity(user.name) : existingPlayer.name;
         existingPlayer.photoURL = safePhotoURL || existingPlayer.photoURL;
 
         // Also update formerPlayers copy
@@ -26,13 +28,13 @@ function addPlayer(match, user) {
     const joinedAt = Date.now();
     match.players.push({
         uid: user.uid,
-        name: user.name,
+        name: cleanProfanity(user.name),
         photoURL: safePhotoURL,
         joinedAt: joinedAt,
     });
     // Guardar copia de datos del jugador
     match.formerPlayers[user.uid] = {
-        name: user.name,
+        name: cleanProfanity(user.name),
         photoURL: safePhotoURL,
     };
     // Solo inicializar puntuación si el jugador NO tiene puntos previos

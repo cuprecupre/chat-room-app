@@ -347,14 +347,14 @@ export function EmailAuthScreen({
                                             size="xl"
                                             className="shadow-xl bg-neutral-800"
                                         />
-                                        <div className="absolute -bottom-2 -right-2 flex gap-1 z-20">
+                                        <div className="absolute -bottom-2 right-0 flex gap-1 z-20">
                                             <button
                                                 type="button"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleRandomAvatar();
                                                 }}
-                                                className="bg-neutral-800 p-2 rounded-full text-white shadow-lg border border-white/10 hover:bg-neutral-700 transition-colors pointer-events-auto"
+                                                className="bg-neutral-800 p-2 rounded-full text-white shadow-lg border border-white/10 hover:bg-neutral-700 transition-all active:scale-90 pointer-events-auto"
                                                 title={t('auth.randomAvatar')}
                                             >
                                                 <RefreshCw className="w-3.5 h-3.5" />

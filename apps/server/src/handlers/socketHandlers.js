@@ -3,6 +3,7 @@ const sessionManager = require("../services/sessionManager");
 const statsManager = require("../services/statsManager");
 const shutdownManager = require("../services/shutdownManager");
 const dbService = require("../services/db");
+const { cleanProfanity } = require("../utils/profanityFilter");
 
 // Grace period constants
 const MOBILE_GRACE_PERIOD = 300000; // 5 minutes for mobile users
@@ -39,7 +40,7 @@ function registerSocketHandlers(io, socket) {
     dbService.updatePlayerStats(user.uid, {
         totalConnections: 1,
         setFirstSeen: true,
-        displayName: user.name,
+        displayName: cleanProfanity(user.name),
         photoURL: user.photoURL
     });
 

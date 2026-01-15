@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Camera, RefreshCw, Check, UserCircle } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
+import { checkProfanity } from "../utils/profanityFilter";
 import { Avatar } from "../components/ui/Avatar";
 import { Button } from "../components/ui/Button";
 import { ROUTES } from "../routes/routes";
@@ -42,6 +43,11 @@ export function SetupProfilePage({ gameState }) {
     const handleContinue = async () => {
         if (!name.trim()) {
             setError(t('auth.enterNameError', 'Introduce un nombre de usuario.'));
+            return;
+        }
+
+        if (checkProfanity(name)) {
+            setError(t('auth.guest.errorProfanity', 'El nombre contiene lenguaje inapropiado.'));
             return;
         }
 
@@ -85,13 +91,13 @@ export function SetupProfilePage({ gameState }) {
                                 size="xl"
                                 className="shadow-2xl bg-neutral-800"
                             />
-                            <div className="absolute -bottom-2 -right-2 flex gap-1 z-20">
+                            <div className="absolute -bottom-2 right-0 flex gap-1 z-20">
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         handleRandomAvatar();
                                     }}
-                                    className="bg-neutral-800 p-2.5 rounded-full text-white shadow-lg border border-white/10 hover:bg-neutral-700 transition-colors pointer-events-auto"
+                                    className="bg-neutral-800 p-2.5 rounded-full text-white shadow-lg border border-white/10 hover:bg-neutral-700 transition-all active:scale-90 pointer-events-auto"
                                     title={t('auth.randomAvatar')}
                                 >
                                     <RefreshCw className="w-4 h-4" />

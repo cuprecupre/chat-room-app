@@ -70,6 +70,7 @@
             "entering": "Entrando...",
             "errorMinLength": "El nombre debe tener al menos 2 caracteres.",
             "errorMaxLength": "El nombre no puede tener más de 30 caracteres.",
+            "errorProfanity": "El nombre contiene lenguaje inapropiado. Si detectamos que infringes estas normas borraremos el usuario sin previo aviso.",
             "note1": "Como invitado podrás jugar sin registrarte.",
             "note2": "Tu sesión se mantendrá hasta que cierres el navegador.",
             "googleRecommendation": "¿Quieres conservar tu progreso en el juego? Accede con Google.",
