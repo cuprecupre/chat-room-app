@@ -14,11 +14,7 @@ import { ROUTES } from "./routes";
 export function ProtectedRoute({ user, connected, emit, gameState, needsProfileSetup }) {
     const { t, i18n } = useTranslation('common');
 
-    // Si el usuario necesita configurar su perfil, redirigir a /setup-profile
-    if (user && needsProfileSetup && window.location.pathname !== ROUTES.SETUP_PROFILE) {
-        return <Navigate to={ROUTES.SETUP_PROFILE} replace />;
-    }
-
+    // ALL HOOKS MUST BE AT THE TOP - before any conditional returns
     const [isStuck, setIsStuck] = useState(false);
     const [showConnectingLoader, setShowConnectingLoader] = useState(false);
     const connectingLoaderTimeoutRef = useRef(null);
@@ -55,6 +51,12 @@ export function ProtectedRoute({ user, connected, emit, gameState, needsProfileS
             }
         };
     }, [user, connected, isStuck]);
+
+    // Si el usuario necesita configurar su perfil, redirigir a /setup-profile
+    // NOTE: This conditional return must come AFTER all hooks
+    if (user && needsProfileSetup && window.location.pathname !== ROUTES.SETUP_PROFILE) {
+        return <Navigate to={ROUTES.SETUP_PROFILE} replace />;
+    }
 
     const handleForceExit = () => {
         // Clear URL parameters immediately
