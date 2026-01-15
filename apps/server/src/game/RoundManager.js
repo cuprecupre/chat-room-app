@@ -143,7 +143,28 @@ function startNextRound(match) {
     // La palabra ya fue seleccionada en startNewMatch, no cambia entre rondas
     const startingName = match.players.find((p) => p.uid === match.startingPlayerId)?.name || "desconocido";
 
-    match.phase = "playing";
+    // Determinar fase según el modo de juego
+    if (match.gameMode === 'chat') {
+        // Chat mode: iniciar fase de ronda de pistas
+        const ChatModeManager = require("./ChatModeManager");
+        const roomManager = require("../services/roomManager");
+
+        match.chatModeManager = new ChatModeManager(match, {
+            onStateChange: () => {
+                // Emit updated state to all players when timeout/turn changes
+                const room = roomManager.getRoom(match.roomId);
+                if (room) {
+                    roomManager.emitRoomState(room);
+                }
+            }
+        });
+        match.chatModeManager.startClueRound();
+        match.phase = "clue_round";
+        console.log(`[Match ${match.matchId}] Ronda ${match.currentRound} - Modo Chat: fase clue_round`);
+    } else {
+        // Voice mode: ir directamente a votación
+        match.phase = "playing";
+    }
 }
 
 /**

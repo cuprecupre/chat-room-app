@@ -76,6 +76,7 @@ function registerSocketHandlers(io, socket) {
         handleRoomAction(socket, user, roomId, (r) => r.updateOptions(user.uid, options))
     );
     socket.on("cast-vote", (data) => handleCastVote(socket, user, data));
+    socket.on("submit-clue", (data) => handleSubmitClue(io, socket, user, data));
 
     // NEW handles for terminology
     socket.on("leave-match", (roomId, callback) =>
@@ -260,6 +261,54 @@ function handleCastVote(socket, user, { roomId, matchId, gameId, targetId }) {
         }
     } catch (error) {
         console.error(`Vote failed for room ${roomId}:`, error.message);
+        socket.emit("error-message", error.message);
+    }
+}
+
+/**
+ * Handle clue submission in Chat Mode.
+ */
+function handleSubmitClue(io, socket, user, { roomId, clue }) {
+    const room = roomManager.getRoom(roomId);
+    if (!room || !room.currentMatch) {
+        return socket.emit("error-message", "La partida no existe.");
+    }
+
+    const match = room.currentMatch;
+
+    // Verify game is in chat mode and clue_round phase
+    if (match.gameMode !== 'chat') {
+        return socket.emit("error-message", "Esta partida no está en modo chat.");
+    }
+    if (match.phase !== 'clue_round') {
+        return socket.emit("error-message", "No es momento de enviar pistas.");
+    }
+    if (!match.chatModeManager) {
+        return socket.emit("error-message", "Error interno: ChatModeManager no inicializado.");
+    }
+
+    try {
+        const result = match.chatModeManager.submitClue(user.uid, clue);
+
+        if (!result.success) {
+            return socket.emit("error-message", result.error);
+        }
+
+        // Acknowledge successful submission to the submitting player
+        socket.emit("clue-submitted-ack", { success: true, clue: result.clue });
+
+        // Emit updated state to all players
+        roomManager.emitRoomState(room);
+
+        // Check if all clues have been revealed (transition to voting)
+        if (match.chatModeManager.areAllCluesRevealed()) {
+            // Transition to voting phase
+            match.phase = "playing";
+            console.log(`[Match ${match.matchId}] All clues revealed - transitioning to voting phase`);
+            roomManager.emitRoomState(room);
+        }
+    } catch (error) {
+        console.error(`Submit clue failed for room ${roomId}:`, error.message);
         socket.emit("error-message", error.message);
     }
 }

@@ -32,6 +32,7 @@ class Room {
         this.options = {
             showImpostorHint: opts.showImpostorHint !== undefined
                 ? opts.showImpostorHint : true,
+            gameMode: opts.gameMode || 'voice', // 'voice' | 'chat'
         };
 
         // Room language (set by host, used for words/roles)

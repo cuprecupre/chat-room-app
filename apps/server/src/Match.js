@@ -3,6 +3,7 @@ const statsManager = require("./services/statsManager");
 const PlayerManager = require("./game/PlayerManager");
 const VotingManager = require("./game/VotingManager");
 const RoundManager = require("./game/RoundManager");
+const ChatModeManager = require("./game/ChatModeManager");
 const GameStateSerializer = require("./game/GameStateSerializer");
 const { cleanProfanity } = require("./utils/profanityFilter");
 
@@ -43,6 +44,7 @@ class Match {
             // Match options
             this.showImpostorHint = room.options?.showImpostorHint !== undefined
                 ? room.options.showImpostorHint : true;
+            this.gameMode = room.options?.gameMode || 'voice'; // 'voice' | 'chat'
             this.options = options.options || room.options;
 
             // Language for words/roles (from Room)
@@ -77,6 +79,7 @@ class Match {
             // Match options
             this.showImpostorHint = options.showImpostorHint !== undefined
                 ? options.showImpostorHint : true;
+            this.gameMode = options.gameMode || 'voice'; // 'voice' | 'chat'
             this.options = options;
 
             // Language for words/roles
@@ -118,6 +121,9 @@ class Match {
 
         // Update player order
         PlayerManager.updatePlayerOrder(this);
+
+        // Chat mode manager (initialized when chat mode starts)
+        this.chatModeManager = null;
     }
 
     /**

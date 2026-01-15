@@ -33,9 +33,48 @@ function getStateForPlayer(match, userId) {
         maxRounds: match.maxRounds,
         playerOrder: match.playerOrder,
         startingPlayerId: match.startingPlayerId,
+        gameMode: match.gameMode || 'voice', // 'voice' | 'chat'
     };
 
-    if (match.phase === "playing") {
+    // Chat Mode: clue_round phase
+    if (match.phase === "clue_round" && match.chatModeManager) {
+        const isInRound = match.roundPlayers.includes(userId);
+        const isEliminated = eliminated.includes(userId);
+
+        if (!isInRound && !isEliminated) {
+            baseState.phase = "lobby_wait";
+        } else {
+            const isImpostor = match.impostorId === userId;
+            baseState.role = isImpostor ? KEYS.IMPOSTOR : KEYS.FRIEND;
+            baseState.secretWord = isImpostor
+                ? KEYS.SECRET_WORD_HINT
+                : match.secretWord;
+            if (isImpostor && match.showImpostorHint) {
+                baseState.secretCategory = match.secretCategory;
+                baseState.secretWordTranslations = {
+                    es: { category: match.secretWordTranslations?.es?.category },
+                    en: { category: match.secretWordTranslations?.en?.category }
+                };
+            } else if (!isImpostor) {
+                baseState.secretWordTranslations = match.secretWordTranslations;
+            }
+
+            // Chat mode specific state
+            const chatState = match.chatModeManager.getState();
+            baseState.chatMode = {
+                currentTurnPlayerId: chatState.currentTurnPlayerId,
+                currentTurnIndex: chatState.currentTurnIndex,
+                revealedClues: chatState.revealedClues,
+                submittedPlayerIds: chatState.submittedPlayerIds,
+                revealedPlayerIds: chatState.revealedPlayerIds,
+                turnStartedAt: chatState.turnStartedAt,
+                timeoutMs: chatState.timeoutMs,
+                hasSubmitted: match.chatModeManager.hasSubmitted(userId),
+            };
+            baseState.activePlayers = match.roundPlayers.filter((uid) => !eliminated.includes(uid));
+            baseState.eliminatedPlayers = eliminated;
+        }
+    } else if (match.phase === "playing") {
         const isInRound = match.roundPlayers.includes(userId);
         const isEliminated = eliminated.includes(userId);
 
@@ -70,6 +109,13 @@ function getStateForPlayer(match, userId) {
             baseState.activePlayers = match.roundPlayers.filter((uid) => !eliminated.includes(uid));
             baseState.canVote = !isEliminated;
             baseState.roundHistory = match.roundHistory;
+
+            // Include revealed clues if in chat mode (for voting screen)
+            if (match.gameMode === 'chat' && match.chatModeManager) {
+                baseState.chatMode = {
+                    revealedClues: match.chatModeManager.getAllRevealedClues(),
+                };
+            }
         }
     } else if (match.phase === "round_result" || match.phase === "game_over") {
         // const lang = match.language || 'es';
