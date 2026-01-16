@@ -78,6 +78,17 @@ export function useGameActions(emit, gameState) {
         [emit, gameState?.roomId, gameState?.matchId]
     );
 
+    const submitClue = useCallback(
+        (clue) => {
+            if (!gameState?.roomId) return;
+            emit("submit-clue", {
+                roomId: gameState.roomId,
+                clue,
+            });
+        },
+        [emit, gameState?.roomId]
+    );
+
     return {
         createRoom,
         joinRoom,
@@ -89,5 +100,6 @@ export function useGameActions(emit, gameState) {
         leaveRoom,
         kickPlayer,
         castVote,
+        submitClue,
     };
 }

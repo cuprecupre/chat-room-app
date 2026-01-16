@@ -5,6 +5,7 @@ import { Avatar } from "../ui/Avatar";
 import { HelpLink } from "./HelpLink";
 import { Trash2 } from "lucide-react";
 import { KickPlayerModal } from "../KickPlayerModal";
+import { ChatBubble } from "../ui/ChatBubble";
 
 export function PlayerList({
     players,
@@ -139,6 +140,11 @@ export function PlayerList({
                     const score = playerScores[p.uid] || 0;
                     const scoreGained = lastRoundScores[p.uid] || 0;
                     const bonusPoints = playerBonus[p.uid] || 0;
+
+                    // Chat mode data
+                    const chatMode = gameState?.chatMode || {};
+                    const revealedClue = chatMode.revealedClues ? chatMode.revealedClues[p.uid] : null;
+
                     // Marcar como ganador a todos los que tengan el puntaje más alto
                     const maxScore = Math.max(...Object.values(playerScores));
                     const isWinner = isGameOver && score === maxScore;
@@ -146,170 +152,184 @@ export function PlayerList({
                     return (
                         <li
                             key={p.uid}
-                            className={`flex items-center justify-between bg-white/5 p-4 rounded-md ${isWinner ? "bg-orange-500/10" : ""}`}
+                            className={`flex flex-col bg-white/5 p-4 rounded-md transition-colors ${isWinner ? "bg-orange-500/10" : ""}`}
                         >
-                            <div className="flex items-center gap-3">
-                                <div className="relative">
-                                    <Avatar photoURL={p.photoURL} displayName={p.name} size="sm" />
-                                    {/* Check verde solo si este usuario ya votó (todos lo ven) */}
-                                    {isPlaying && hasVoted && (
-                                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-neutral-950 flex items-center justify-center">
-                                            <svg
-                                                className="w-2.5 h-2.5 text-black"
-                                                fill="currentColor"
-                                                viewBox="0 0 20 20"
-                                            >
-                                                <path
-                                                    fillRule="evenodd"
-                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                    clipRule="evenodd"
-                                                />
-                                            </svg>
-                                        </div>
-                                    )}
-                                    {!isPlaying && !showScores && (
-                                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-neutral-950"></div>
-                                    )}
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="flex flex-col">
-                                        <span
-                                            className={`font-medium ${isWinner ? "text-orange-400" : ""}`}
-                                        >
-                                            {p.name}
-                                            {p.uid === currentUserId ? ` (${t('playing.you', 'You')})` : ""}
-                                            {isWinner && " 🏆"}
-                                        </span>
-                                        {/* Indicador de eliminado en vista de puntuación */}
-                                        {isRoundResult && isEliminated && (
-                                            <span className="text-xs text-red-400 font-medium">
-                                                {t('playing.eliminated', 'Eliminated')}
-                                            </span>
+                            <div className="flex items-center justify-between w-full">
+                                <div className="flex items-center gap-3">
+                                    <div className="relative">
+                                        <Avatar photoURL={p.photoURL} displayName={p.name} size="sm" />
+                                        {/* Check verde solo si este usuario ya votó (todos lo ven) */}
+                                        {isPlaying && hasVoted && (
+                                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-neutral-950 flex items-center justify-center">
+                                                <svg
+                                                    className="w-2.5 h-2.5 text-black"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 20 20"
+                                                >
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                        clipRule="evenodd"
+                                                    />
+                                                </svg>
+                                            </div>
+                                        )}
+                                        {!isPlaying && !showScores && (
+                                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-neutral-950"></div>
                                         )}
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        {/* Indicador de jugador inicial */}
-                                        {isPlaying && startingPlayerId === p.uid && (
+                                        <div className="flex flex-col">
                                             <span
-                                                className="text-orange-400 text-sm"
-                                                title="Empieza esta ronda"
+                                                className={`font-medium ${isWinner ? "text-orange-400" : ""}`}
                                             >
-                                                ☀️
+                                                {p.name}
+                                                {p.uid === currentUserId ? ` (${t('playing.you', 'You')})` : ""}
+                                                {isWinner && " 🏆"}
                                             </span>
-                                        )}
+                                            {/* Indicador de eliminado en vista de puntuación */}
+                                            {isRoundResult && isEliminated && (
+                                                <span className="text-xs text-red-400 font-medium">
+                                                    {t('playing.eliminated', 'Eliminated')}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {/* Indicador de jugador inicial */}
+                                            {isPlaying && startingPlayerId === p.uid && (
+                                                <span
+                                                    className="text-orange-400 text-sm"
+                                                    title="Empieza esta ronda"
+                                                >
+                                                    ☀️
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Right side: scores, vote buttons, and kick button */}
-                            <div className="flex items-center gap-3">
-                                {isEliminated && isPlaying && (
-                                    <span className="text-xs text-red-400 font-medium">
-                                        {t('playing.eliminated', 'Eliminated')}
-                                    </span>
-                                )}
-                                {showScores ? (
-                                    <div className="text-right">
-                                        {isRoundResult ? (
-                                            // Mostrar puntos ganados y total en resultado de ronda (para todos)
-                                            <div className="flex flex-col items-end gap-0.5">
-                                                <div className="flex items-center gap-1.5">
-                                                    <div
-                                                        className={`text-xs font-medium ${scoreGained > 0 ? "text-green-400" : "text-neutral-500"}`}
-                                                    >
-                                                        {scoreGained > 0 ? "+" : ""}
-                                                        {scoreGained} pts
+                                {/* Right side: scores, vote buttons, and kick button */}
+                                <div className="flex items-center gap-3">
+                                    {isEliminated && isPlaying && (
+                                        <span className="text-xs text-red-400 font-medium">
+                                            {t('playing.eliminated', 'Eliminated')}
+                                        </span>
+                                    )}
+                                    {showScores ? (
+                                        <div className="text-right">
+                                            {isRoundResult ? (
+                                                // Mostrar puntos ganados y total en resultado de ronda (para todos)
+                                                <div className="flex flex-col items-end gap-0.5">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <div
+                                                            className={`text-xs font-medium ${scoreGained > 0 ? "text-green-400" : "text-neutral-500"}`}
+                                                        >
+                                                            {scoreGained > 0 ? "+" : ""}
+                                                            {scoreGained} pts
+                                                        </div>
+                                                        {bonusPoints > 0 && (
+                                                            <span className="text-[10px] font-bold text-yellow-400 bg-yellow-500/20 px-1.5 py-0.5 rounded-full">
+                                                                ★ BONUS
+                                                            </span>
+                                                        )}
                                                     </div>
+                                                    <div
+                                                        className={`text-sm ${isWinner ? "text-orange-400" : "text-neutral-400"}`}
+                                                    >
+                                                        {t('playing.total', 'Total')}: {score}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col items-end gap-1">
                                                     {bonusPoints > 0 && (
                                                         <span className="text-[10px] font-bold text-yellow-400 bg-yellow-500/20 px-1.5 py-0.5 rounded-full">
                                                             ★ BONUS
                                                         </span>
                                                     )}
-                                                </div>
-                                                <div
-                                                    className={`text-sm ${isWinner ? "text-orange-400" : "text-neutral-400"}`}
-                                                >
-                                                    {t('playing.total', 'Total')}: {score}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="flex flex-col items-end gap-1">
-                                                {bonusPoints > 0 && (
-                                                    <span className="text-[10px] font-bold text-yellow-400 bg-yellow-500/20 px-1.5 py-0.5 rounded-full">
-                                                        ★ BONUS
+                                                    <span
+                                                        className={`font-medium ${isWinner ? "text-orange-400" : "text-neutral-300"}`}
+                                                    >
+                                                        {score} pts
                                                     </span>
-                                                )}
-                                                <span
-                                                    className={`font-medium ${isWinner ? "text-orange-400" : "text-neutral-300"}`}
-                                                >
-                                                    {score} pts
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    isPlaying &&
-                                    canVote &&
-                                    // Mostrar botón solo si:
-                                    // 1. No he votado aún (mostrar todos los botones)
-                                    // 2. Ya voté por este jugador (mostrar solo este botón)
-                                    (myVote === null || iVotedForThisPlayer) &&
-                                    showVoteButton && (
-                                        <Button
-                                            onClick={() => {
-                                                // GTM event para medir votos
-                                                window.dataLayer = window.dataLayer || [];
-                                                window.dataLayer.push({
-                                                    event: 'vote_click',
-                                                    vote_action: iVotedForThisPlayer && canChangeVote ? 'remove' : 'cast',
-                                                });
-                                                // Si ya voté por este jugador y puedo cambiar voto, quitar el voto
-                                                if (iVotedForThisPlayer && canChangeVote) {
-                                                    onVote(null);
-                                                } else {
-                                                    // Votar por este jugador
-                                                    onVote(p.uid);
-                                                }
-                                            }}
-                                            variant="outline"
-                                            size="sm"
-                                            disabled={iVotedForThisPlayer && !canChangeVote}
-                                            className={`!w-auto gap-2 px-4 ${iVotedForThisPlayer
-                                                ? canChangeVote
-                                                    ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
-                                                    : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
-                                                : ""
-                                                }`}
-                                        >
-                                            <svg
-                                                className="w-4 h-4"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        isPlaying &&
+                                        canVote &&
+                                        // Mostrar botón solo si:
+                                        // 1. No he votado aún (mostrar todos los botones)
+                                        // 2. Ya voté por este jugador (mostrar solo este botón)
+                                        (myVote === null || iVotedForThisPlayer) &&
+                                        showVoteButton && (
+                                            <Button
+                                                onClick={() => {
+                                                    // GTM event para medir votos
+                                                    window.dataLayer = window.dataLayer || [];
+                                                    window.dataLayer.push({
+                                                        event: 'vote_click',
+                                                        vote_action: iVotedForThisPlayer && canChangeVote ? 'remove' : 'cast',
+                                                    });
+                                                    // Si ya voté por este jugador y puedo cambiar voto, quitar el voto
+                                                    if (iVotedForThisPlayer && canChangeVote) {
+                                                        onVote(null);
+                                                    } else {
+                                                        // Votar por este jugador
+                                                        onVote(p.uid);
+                                                    }
+                                                }}
+                                                variant="outline"
+                                                size="sm"
+                                                disabled={iVotedForThisPlayer && !canChangeVote}
+                                                className={`!w-auto gap-2 px-4 ${iVotedForThisPlayer
+                                                    ? canChangeVote
+                                                        ? "!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20"
+                                                        : "!border-green-500 !text-green-400 !bg-green-500/10 !hover:bg-green-500/10 cursor-not-allowed"
+                                                    : ""
+                                                    }`}
                                             >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"
-                                                />
-                                            </svg>
-                                            <span>{iVotedForThisPlayer ? t('playing.voted') : t('playing.vote')}</span>
-                                        </Button>
-                                    )
-                                )}
+                                                <svg
+                                                    className="w-4 h-4"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"
+                                                    />
+                                                </svg>
+                                                <span>{iVotedForThisPlayer ? t('playing.voted') : t('playing.vote')}</span>
+                                            </Button>
+                                        )
+                                    )}
 
-                                {/* Kick button - only visible to host in lobby, not for self */}
-                                {isLobby && isHost && p.uid !== currentUserId && onKickPlayer && (
-                                    <button
-                                        onClick={() => setKickTarget(p)}
-                                        className="p-2 rounded-full border border-red-500 hover:border-red-400 hover:bg-red-500/10 text-red-500 hover:text-red-400 transition-colors"
-                                        title={t('modals.kickPlayer.kickTitle', { name: p.name }) || `Kick ${p.name}`}
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
-                                )}
+                                    {/* Kick button - only visible to host in lobby, not for self */}
+                                    {isLobby && isHost && p.uid !== currentUserId && onKickPlayer && (
+                                        <button
+                                            onClick={() => setKickTarget(p)}
+                                            className="p-2 rounded-full border border-red-500 hover:border-red-400 hover:bg-red-500/10 text-red-500 hover:text-red-400 transition-colors"
+                                            title={t('modals.kickPlayer.kickTitle', { name: p.name }) || `Kick ${p.name}`}
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
+
+                            {/* Chat Mode Clue Bubble */}
+                            {isPlaying && gameState?.gameMode === 'chat' && revealedClue && (
+                                <div className="mt-3 pl-11 w-full">
+                                    <ChatBubble
+                                        text={revealedClue}
+                                        isRevealed={true}
+                                        position="left"
+                                        playerName={p.name}
+                                    />
+                                </div>
+                            )}
                         </li>
                     );
                 })}

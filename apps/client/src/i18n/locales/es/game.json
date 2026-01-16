@@ -59,7 +59,25 @@
         "impostorHelpOff": "El impostor no ve nada",
         "waitingForHostToStart": "Esperando a que el anfitrión empiece",
         "youAreHost": "Eres el anfitrión",
-        "startGame": "Comenzar partida"
+        "startGame": "Comenzar partida",
+        "chatMode": "Modo chat",
+        "chatModeDesc": "Los jugadores escriben sus pistas en lugar de hablar.",
+        "chatModeOn": "Modo chat activado"
+    },
+    "clueRound": {
+        "title": "Ronda de Pistas",
+        "round": "Ronda",
+        "turnOf": "Es el turno de",
+        "you": "¡Tú!",
+        "ready": "Listo",
+        "waiting": "Esperando...",
+        "clueSubmitted": "¡Pista enviada!",
+        "placeholder": "Escribe tu pista...",
+        "yourTurn": "¡Es tu turno!",
+        "canPreSubmit": "Puedes escribir antes de tu turno"
+    },
+    "preview": {
+        "showCard": "Ver rol"
     },
     "playing": {
         "impostorHint": "Ayuda extra: La palabra secreta\nestá relacionada con...",

@@ -4,6 +4,7 @@ import { GameStepper } from "../ui/GameStepper";
 import { RoundResultOverlay } from "../RoundResultOverlay";
 import { PlayerList } from "./PlayerList";
 import { GameCard } from "./GameCard";
+import { CardPreview } from "./CardPreview";
 import { SpectatorMode } from "./SpectatorMode";
 
 export function GameBoard({
@@ -21,6 +22,7 @@ export function GameBoard({
     const { t } = useTranslation('game');
     // Detectar si el usuario actual está eliminado
     const isMeEliminated = state.eliminatedPlayers?.includes(user.uid) || false;
+    const isChatMode = state.gameMode === 'chat';
 
     return (
         <>
@@ -43,31 +45,43 @@ export function GameBoard({
             </div>
 
             {/* Layout responsive: grid de 2 columnas en md+, stack en mobile */}
-            <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-0 md:gap-10 md:items-stretch">
+            {/* En modo chat (si no estoy eliminado), usamos una sola columna centrada para la lista */}
+            <div className={`w-full max-w-4xl mx-auto grid grid-cols-1 ${isChatMode && !isMeEliminated ? 'md:grid-cols-[1fr]' : 'md:grid-cols-[1fr_auto_1fr]'} gap-0 md:gap-10 md:items-stretch`}>
                 {/* Columna izquierda: Carta o Modo Espectador */}
-                <div className="w-full max-w-xs mx-auto md:max-w-none pt-8 md:pt-6 pb-8 md:pb-0 border-b border-white/10 md:border-b-0">
-                    {isMeEliminated ? (
-                        /* Modo Espectador para jugadores eliminados */
-                        <SpectatorMode />
-                    ) : (
-                        /* Carta normal para jugadores activos */
-                        <GameCard
-                            state={state}
-                            initialAnimationPending={initialAnimationPending}
-                            showCardEntrance={showCardEntrance}
-                            showRestOfUI={showRestOfUI}
-                        />
-                    )}
-                </div>
+                {(!isChatMode || isMeEliminated) && (
+                    <div className="w-full max-w-xs mx-auto md:max-w-none pt-8 md:pt-6 pb-8 md:pb-0 border-b border-white/10 md:border-b-0">
+                        {isMeEliminated ? (
+                            /* Modo Espectador para jugadores eliminados */
+                            <SpectatorMode />
+                        ) : (
+                            /* Carta normal para jugadores activos (Solo Voice Mode) */
+                            <GameCard
+                                state={state}
+                                initialAnimationPending={initialAnimationPending}
+                                showCardEntrance={showCardEntrance}
+                                showRestOfUI={showRestOfUI}
+                            />
+                        )}
+                    </div>
+                )}
 
                 {/* Divider - horizontal en mobile (oculto por nuevo pb-8), vertical en desktop */}
-                <div className="hidden md:block h-px w-full md:h-auto md:w-px bg-white/10 md:self-stretch"></div>
+                {(!isChatMode || isMeEliminated) && (
+                    <div className="hidden md:block h-px w-full md:h-auto md:w-px bg-white/10 md:self-stretch"></div>
+                )}
 
                 {/* Columna derecha: Lista de jugadores */}
                 <div
                     className={`w-full max-w-sm mx-auto md:max-w-none md:flex md:flex-col pt-8 md:pt-6 ${showRestOfUI ? "animate-fadeIn animate-delay-800" : "opacity-0 pointer-events-none"}`}
                 >
                     <div className="md:sticky md:top-24 md:flex-1 md:flex md:flex-col">
+                        {/* Chat Mode: Card Preview is here instead of left column */}
+                        {isChatMode && !isMeEliminated && (
+                            <div className="flex justify-center md:justify-start mb-6">
+                                <CardPreview state={state} />
+                            </div>
+                        )}
+
                         <div
                             className={`text-center md:text-left mb-5 ${showRestOfUI ? "animate-fadeIn animate-delay-400" : "opacity-0 pointer-events-none"}`}
                         >

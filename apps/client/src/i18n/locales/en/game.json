@@ -59,7 +59,25 @@
         "impostorHelpOff": "The impostor sees nothing",
         "waitingForHostToStart": "Waiting for host to start",
         "youAreHost": "You are the host",
-        "startGame": "Start game"
+        "startGame": "Start game",
+        "chatMode": "Chat mode",
+        "chatModeDesc": "Players write their clues instead of speaking.",
+        "chatModeOn": "Chat mode enabled"
+    },
+    "clueRound": {
+        "title": "Clue Round",
+        "round": "Round",
+        "turnOf": "It's the turn of",
+        "you": "You!",
+        "ready": "Ready",
+        "waiting": "Waiting...",
+        "clueSubmitted": "Clue submitted!",
+        "placeholder": "Write your clue...",
+        "yourTurn": "It's your turn!",
+        "canPreSubmit": "You can submit before your turn"
+    },
+    "preview": {
+        "showCard": "Show role"
     },
     "playing": {
         "impostorHint": "Extra hint: The secret word\nis related to...",

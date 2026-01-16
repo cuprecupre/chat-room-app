@@ -74,6 +74,7 @@ function AppRoutes({
         leaveRoom,
         kickPlayer,
         castVote,
+        submitClue,
     } = useGameActions(emit, gameState);
 
     const isHost = useMemo(
@@ -176,6 +177,7 @@ function AppRoutes({
         onLeaveRoom: leaveRoom,
         onLeaveMatch: leaveMatch,
         onVote: castVote,
+        onSubmitClue: submitClue,
         onKickPlayer: kickPlayer,
     };
 

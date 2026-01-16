@@ -1,0 +1,161 @@
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+/**
+ * ChatBubble - Animated chat bubble component for displaying clues
+ * 
+ * @param {string} text - The clue text to display
+ * @param {boolean} isRevealed - Whether the clue has been revealed
+ * @param {boolean} isTyping - Show typing indicator (...)
+ * @param {boolean} isWaiting - Show waiting state (empty bubble)
+ * @param {string} position - Bubble tail position: 'left' | 'right'
+ * @param {string} playerName - Name of the player (for accessibility)
+ */
+export function ChatBubble({
+    text,
+    isRevealed = false,
+    isTyping = false,
+    isWaiting = false,
+    position = 'left',
+    playerName = ''
+}) {
+    const bubbleVariants = {
+        hidden: {
+            scale: 0.8,
+            opacity: 0,
+            y: 10
+        },
+        visible: {
+            scale: 1,
+            opacity: 1,
+            y: 0,
+            transition: {
+                type: "spring",
+                stiffness: 400,
+                damping: 25
+            }
+        },
+        exit: {
+            scale: 0.8,
+            opacity: 0,
+            transition: { duration: 0.2 }
+        }
+    };
+
+    const typingDotVariants = {
+        animate: {
+            y: [0, -4, 0],
+            transition: {
+                duration: 0.6,
+                repeat: Infinity,
+                ease: "easeInOut"
+            }
+        }
+    };
+
+    // Determine bubble content
+    const renderContent = () => {
+        if (isTyping) {
+            return (
+                <div className="flex items-center gap-1 px-3 py-2">
+                    {[0, 1, 2].map((i) => (
+                        <motion.span
+                            key={i}
+                            className="w-2 h-2 bg-neutral-400 rounded-full"
+                            variants={typingDotVariants}
+                            animate="animate"
+                            style={{ animationDelay: `${i * 0.15}s` }}
+                        />
+                    ))}
+                </div>
+            );
+        }
+
+        if (isWaiting) {
+            return (
+                <div className="px-4 py-2 text-neutral-500 text-sm italic">
+                    ...
+                </div>
+            );
+        }
+
+        if (isRevealed && text) {
+            return (
+                <div className="px-4 py-2 text-neutral-100 text-sm font-medium">
+                    {text}
+                </div>
+            );
+        }
+
+        return null;
+    };
+
+    const content = renderContent();
+    if (!content) return null;
+
+    return (
+        <AnimatePresence mode="wait">
+            <motion.div
+                key={isTyping ? 'typing' : isRevealed ? 'revealed' : 'waiting'}
+                variants={bubbleVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className={`
+                    relative inline-block
+                    bg-neutral-800/90 backdrop-blur-sm
+                    rounded-2xl
+                    border border-neutral-700/50
+                    shadow-lg shadow-black/20
+                    ${position === 'left' ? 'rounded-bl-sm' : 'rounded-br-sm'}
+                `}
+                aria-label={playerName ? `Pista de ${playerName}: ${text || 'esperando'}` : undefined}
+            >
+                {content}
+
+                {/* Bubble tail */}
+                <div
+                    className={`
+                        absolute bottom-0 w-3 h-3
+                        bg-neutral-800/90
+                        border-b border-neutral-700/50
+                        ${position === 'left'
+                            ? '-left-1 border-l rounded-br-lg'
+                            : '-right-1 border-r rounded-bl-lg'
+                        }
+                    `}
+                    style={{
+                        clipPath: position === 'left'
+                            ? 'polygon(100% 0, 100% 100%, 0 100%)'
+                            : 'polygon(0 0, 100% 100%, 0 100%)'
+                    }}
+                />
+            </motion.div>
+        </AnimatePresence>
+    );
+}
+
+/**
+ * TypingIndicator - Animated dots for typing state
+ */
+export function TypingIndicator() {
+    return (
+        <div className="flex items-center gap-1">
+            {[0, 1, 2].map((i) => (
+                <motion.span
+                    key={i}
+                    className="w-1.5 h-1.5 bg-neutral-400 rounded-full"
+                    animate={{
+                        y: [0, -3, 0],
+                        opacity: [0.5, 1, 0.5]
+                    }}
+                    transition={{
+                        duration: 0.8,
+                        repeat: Infinity,
+                        delay: i * 0.15
+                    }}
+                />
+            ))}
+        </div>
+    );
+}

@@ -6,6 +6,7 @@ import { RoundStartOverlay } from "./RoundStartOverlay";
 import { LobbyScreen } from "./game/LobbyScreen";
 import { GameBoard } from "./game/GameBoard";
 import { TurnOverlay } from "./game/TurnOverlay";
+import { ClueRoundScreen } from "./game/ClueRoundScreen";
 import { HostLeftScreen } from "./HostLeftScreen";
 import { WaitingForNextGame } from "./WaitingForNextGame";
 
@@ -31,6 +32,7 @@ export function GameRoom({
     onCopyLink,
     onCopyGameCode,
     onVote,
+    onSubmitClue,
     isMobile,
     onOpenInstructions,
     onKickPlayer,
@@ -175,6 +177,16 @@ export function GameRoom({
                 />
             )}
 
+
+            {/* Chat Mode: Clue Round Phase */}
+            {state.phase === "clue_round" && (
+                <ClueRoundScreen
+                    state={state}
+                    user={user}
+                    onSubmitClue={onSubmitClue}
+                    onOpenInstructions={onOpenInstructions}
+                />
+            )}
 
             {/* Mostrar pantalla de playing (incluye round_result para evitar pantalla negra en empates) */}
             {(state.phase === "playing" || state.phase === "round_result") && (

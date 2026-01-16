@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, Share, Check } from "lucide-react";
+import { Link, Share, Check, MessageCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../ui/Button";
 import { PlayerList } from "./PlayerList";
@@ -22,13 +22,19 @@ export function LobbyScreen({
     const [showImpostorHint, setShowImpostorHint] = useState(
         state.options?.showImpostorHint !== undefined ? state.options.showImpostorHint : true
     );
+    const [gameMode, setGameMode] = useState(
+        state.options?.gameMode || 'voice'
+    );
 
     // Sync state when room options change (e.g. from server)
     useEffect(() => {
         if (state.options?.showImpostorHint !== undefined) {
             setShowImpostorHint(state.options.showImpostorHint);
         }
-    }, [state.options?.showImpostorHint]);
+        if (state.options?.gameMode) {
+            setGameMode(state.options.gameMode);
+        }
+    }, [state.options?.showImpostorHint, state.options?.gameMode]);
 
     const handleToggleHint = () => {
         const newValue = !showImpostorHint;
@@ -38,8 +44,16 @@ export function LobbyScreen({
         }
     };
 
+    const handleToggleGameMode = () => {
+        const newMode = gameMode === 'voice' ? 'chat' : 'voice';
+        setGameMode(newMode);
+        if (onUpdateOptions) {
+            onUpdateOptions({ gameMode: newMode });
+        }
+    };
+
     const handleStartGame = () => {
-        onStartGame({ showImpostorHint });
+        onStartGame({ showImpostorHint, gameMode });
     };
     const { t } = useTranslation('game');
     const { t: tc } = useTranslation('common');
@@ -110,6 +124,31 @@ export function LobbyScreen({
                                     >
                                         <span
                                             className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${showImpostorHint ? "translate-x-6" : "translate-x-1"
+                                                }`}
+                                        />
+                                    </button>
+                                </label>
+                            </div>
+
+                            {/* Game Mode Selector */}
+                            <div className="bg-white/5 rounded-md p-4 font-sans mb-4">
+                                <label className="flex items-center justify-between cursor-pointer gap-4">
+                                    <div className="flex-1 text-left">
+                                        <span className="text-sm font-semibold text-neutral-300">
+                                            {t('lobby.chatMode', 'Chat mode')}
+                                        </span>
+                                        <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
+                                            {t('lobby.chatModeDesc', 'Players write their clues instead of speaking.')}
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={handleToggleGameMode}
+                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-neutral-950 ${gameMode === 'chat' ? "bg-blue-500" : "bg-neutral-700"
+                                            }`}
+                                    >
+                                        <span
+                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${gameMode === 'chat' ? "translate-x-6" : "translate-x-1"
                                                 }`}
                                         />
                                     </button>
@@ -200,10 +239,18 @@ export function LobbyScreen({
 
                         <div className="w-full">
                             {state.options?.showImpostorHint && (
-                                <div className="mb-4 flex items-center justify-center gap-2">
+                                <div className="mb-2 flex items-center justify-center gap-2">
                                     <Check className="w-3.5 h-3.5 text-green-500" strokeWidth={3} />
                                     <span className="text-[10px] uppercase tracking-[0.15em] font-semibold text-green-500/80">
                                         {t('lobby.easyModeOn', 'Easy mode enabled')}
+                                    </span>
+                                </div>
+                            )}
+                            {state.options?.gameMode === 'chat' && (
+                                <div className="mb-4 flex items-center justify-center gap-2">
+                                    <MessageCircle className="w-3.5 h-3.5 text-blue-400" strokeWidth={2.5} />
+                                    <span className="text-[10px] uppercase tracking-[0.15em] font-semibold text-blue-400/80">
+                                        {t('lobby.chatModeOn', 'Chat mode enabled')}
                                     </span>
                                 </div>
                             )}

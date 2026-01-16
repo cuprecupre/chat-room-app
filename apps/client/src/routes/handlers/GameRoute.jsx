@@ -22,6 +22,7 @@ export function GameRoute({
     onLeaveRoom,
     onLeaveMatch,
     onVote,
+    onSubmitClue,
     onKickPlayer,
 }) {
     const urlRoomId = useRoomIdFromUrl();
@@ -54,6 +55,7 @@ export function GameRoute({
                 onLeaveRoom={onLeaveRoom}
                 onLeaveMatch={onLeaveMatch}
                 onVote={onVote}
+                onSubmitClue={onSubmitClue}
                 onKickPlayer={onKickPlayer}
             />
         );
