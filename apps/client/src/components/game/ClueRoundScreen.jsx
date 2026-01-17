@@ -1,27 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Clock, Check, MessageCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ChatBubble } from '../ui/ChatBubble';
-import { Button } from '../ui/Button';
-import { CardPreview } from './CardPreview';
-import { HelpCircle } from 'lucide-react';
-
-const MAX_CLUE_LENGTH = 30;
+import { Avatar } from '../ui/Avatar';
+import { GameCard } from './GameCard';
+import { HelpLink } from './HelpLink';
+import { GameHeader } from './GameHeader';
+import { ClueInput } from './ClueInput';
 
 /**
- * ClueRoundScreen - Main screen for the clue submission phase in Chat Mode
+ * ClueRoundScreen - Unified screen for Chat Mode (clue submission + voting)
+ * Uses same styles as PlayerList for consistency
  */
 export function ClueRoundScreen({
     state,
     user,
     onSubmitClue,
+    onVote,
     onOpenInstructions,
 }) {
     const { t } = useTranslation('game');
-    const [clueText, setClueText] = useState('');
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [timeLeft, setTimeLeft] = useState(90);
+
+    // Determine which phase we're in
+    const isVotingPhase = state.phase === 'playing';
+    const isCluePhase = state.phase === 'clue_round';
 
     const chatMode = state.chatMode || {};
     const currentTurnPlayerId = chatMode.currentTurnPlayerId;
@@ -34,13 +39,24 @@ export function ClueRoundScreen({
     const isMyTurn = currentTurnPlayerId === user.uid;
     const hasAlreadySubmitted = chatMode.hasSubmitted || hasSubmitted;
 
+    // Voting state
+    const hasVoted = state.hasVoted || false;
+    const myVote = state.myVote || null;
+    const votedPlayers = state.votedPlayers || [];
+    const activePlayers = state.activePlayers || [];
+    const canVote = state.canVote !== false;
+
     // Get current turn player info
     const currentTurnPlayer = state.players?.find(p => p.uid === currentTurnPlayerId);
     const currentTurnPlayerName = currentTurnPlayer?.name || 'Jugador';
 
-    // Timer effect
+    // Can change vote if not all have voted
+    const allVoted = votedPlayers.length === activePlayers.length;
+    const canChangeVote = hasVoted && !allVoted;
+
+    // Timer effect (only for clue phase)
     useEffect(() => {
-        if (!turnStartedAt) return;
+        if (!isCluePhase || !turnStartedAt) return;
 
         const updateTimer = () => {
             if (!turnStartedAt) return;
@@ -52,234 +68,164 @@ export function ClueRoundScreen({
         updateTimer();
         const interval = setInterval(updateTimer, 1000);
         return () => clearInterval(interval);
-    }, [turnStartedAt, timeoutMs]);
+    }, [turnStartedAt, timeoutMs, isCluePhase]);
 
     // Reset submission state when turn changes
     useEffect(() => {
         if (!submittedPlayerIds.includes(user.uid)) {
             setHasSubmitted(false);
-            setClueText('');
         }
     }, [currentTurnPlayerId, submittedPlayerIds, user.uid]);
 
-    const handleSubmit = () => {
-        if (!clueText.trim() || hasAlreadySubmitted) return;
-
+    const handleClueSubmit = (text) => {
         setHasSubmitted(true);
-        onSubmitClue(clueText.trim());
+        onSubmitClue(text);
     };
 
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSubmit();
+    const handleVote = (targetId) => {
+        if (!canVote || targetId === user.uid) return;
+        // If already voted for this player and can change, remove vote
+        if (myVote === targetId && canChangeVote) {
+            onVote(null);
+        } else {
+            onVote(targetId);
         }
     };
 
     // Players list sorted by turn order
-    const sortedPlayers = (state.activePlayers || [])
+    const sortedPlayers = (activePlayers.length > 0 ? activePlayers : state.players?.map(p => p.uid) || [])
         .map(uid => state.players?.find(p => p.uid === uid))
         .filter(Boolean);
 
-    // Fallback if no active players found
-    const playersToRender = sortedPlayers.length > 0 ? sortedPlayers : (state.players || []);
-
     return (
-        <div className="w-full max-w-md mx-auto px-4 py-6 space-y-6">
-            {/* Header */}
-            <div className="text-center space-y-2">
-                <div className="flex items-center justify-center gap-2 text-blue-400">
-                    <MessageCircle className="w-5 h-5" />
-                    <span className="text-xs uppercase tracking-widest font-semibold">
-                        {t('clueRound.title', 'Clue Round')}
-                    </span>
-                </div>
-                <h2 className="text-2xl font-serif text-neutral-100">
-                    {t('clueRound.round', 'Round')} {state.currentRound}
-                </h2>
+        <div className="w-full">
+            {/* Game Header (Stepper + Title) */}
+            <div className="pb-6 sm:pb-8 space-y-6">
+                <GameHeader state={state} />
             </div>
 
-            {/* Current Turn Indicator */}
-            <motion.div
-                key={currentTurnPlayerId}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-neutral-900/50 border border-neutral-800 rounded-xl p-4 text-center"
-            >
-                <p className="text-sm text-neutral-400 mb-1">
-                    {t('clueRound.turnOf', "It's the turn of")}
-                </p>
-                <p className="text-xl font-semibold text-neutral-100">
-                    {isMyTurn ? t('clueRound.you', 'You!') : currentTurnPlayerName}
-                </p>
+            {/* Main content container */}
+            <div className="w-full max-w-md mx-auto px-4 py-2 space-y-4">
 
-                {/* Timer */}
-                <div className={`flex items-center justify-center gap-2 mt-3 ${timeLeft <= 10 ? 'text-red-400' : 'text-neutral-400'
-                    }`}>
-                    <Clock className="w-4 h-4" />
-                    <span className="text-lg font-mono font-bold">{timeLeft}s</span>
+                {/* Game Card - Same as Voice Mode */}
+                <div className="w-full max-w-xs mx-auto">
+                    <GameCard
+                        state={state}
+                        showRestOfUI={true}
+                        showCardEntrance={false}
+                        initialAnimationPending={false}
+                    />
                 </div>
-            </motion.div>
 
-            {/* Tools Bar (Card Preview + Help) */}
-            <div className="flex justify-between items-center px-2">
-                <CardPreview state={state} />
+                {/* Players List - Using same styles as PlayerList.jsx */}
+                <ul className="space-y-2">
+                    {sortedPlayers.map((player) => {
+                        const isCurrentTurn = player.uid === currentTurnPlayerId;
+                        const isRevealed = revealedPlayerIds.includes(player.uid);
+                        const clue = revealedClues[player.uid];
+                        const hasPlayerSubmitted = submittedPlayerIds.includes(player.uid);
+                        const isMe = player.uid === user.uid;
+                        const hasPlayerVoted = votedPlayers.includes(player.uid);
+                        const iVotedForThisPlayer = myVote === player.uid;
+                        const showVoteButton = isVotingPhase && canVote && !isMe && activePlayers.includes(player.uid);
 
-                <button
-                    onClick={onOpenInstructions}
-                    className="
-                        w-10 h-10 rounded-full
-                        bg-neutral-800 border border-neutral-700
-                        flex items-center justify-center
-                        text-neutral-400 hover:text-white hover:bg-neutral-700
-                        transition-colors
-                    "
-                    aria-label={t('common.help', 'Help')}
-                >
-                    <HelpCircle className="w-5 h-5" />
-                </button>
-            </div>
+                        return (
+                            <li
+                                key={player.uid}
+                                className={`flex flex-col bg-white/5 p-4 rounded-md transition-colors ${isCluePhase && isCurrentTurn ? 'bg-blue-500/10' : ''
+                                    }`}
+                            >
+                                <div className="flex items-center justify-between w-full">
+                                    <div className="flex items-center gap-3">
+                                        <div className="relative">
+                                            <Avatar photoURL={player.photoURL} displayName={player.name} size="sm" />
+                                            {/* Status indicator */}
+                                            {isCluePhase && (isRevealed || hasPlayerSubmitted) && (
+                                                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-neutral-950 flex items-center justify-center">
+                                                    <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            )}
+                                            {isVotingPhase && hasPlayerVoted && (
+                                                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-neutral-950 flex items-center justify-center">
+                                                    <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <span className="font-medium">
+                                            {player.name}
+                                            {isMe ? ` (${t('playing.you', 'You')})` : ''}
+                                        </span>
+                                    </div>
 
-            {/* Players & Clues List */}
-            <div className="space-y-3">
-                {playersToRender.map((player, index) => {
-                    const isCurrentTurn = player.uid === currentTurnPlayerId;
-                    const isRevealed = revealedPlayerIds.includes(player.uid);
-                    const clue = revealedClues[player.uid];
-                    const hasPlayerSubmitted = submittedPlayerIds.includes(player.uid);
+                                    {/* Right side: status or vote button */}
+                                    <div className="flex items-center gap-3">
+                                        {isCluePhase && (
+                                            isRevealed ? null : isCurrentTurn ? (
+                                                <ChatBubble isTyping={true} position="right" />
+                                            ) : hasPlayerSubmitted ? (
+                                                <span className="text-xs text-blue-400/60 italic">{t('clueRound.ready', 'Ready')}</span>
+                                            ) : (
+                                                <span className="text-xs text-neutral-600 italic">{t('clueRound.waiting', 'Waiting...')}</span>
+                                            )
+                                        )}
 
-                    return (
-                        <motion.div
-                            key={player.uid}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className={`
-                                flex items-center gap-3 p-3 rounded-xl transition-colors
-                                ${isCurrentTurn
-                                    ? 'bg-blue-500/10 border border-blue-500/30'
-                                    : 'bg-neutral-900/30'
-                                }
-                            `}
-                        >
-                            {/* Avatar */}
-                            <div className="relative">
-                                <img
-                                    src={player.photoURL || `https://api.dicebear.com/7.x/thumbs/svg?seed=${player.uid}`}
-                                    alt={player.name}
-                                    className="w-10 h-10 rounded-full object-cover"
-                                />
-                                {isRevealed && (
-                                    <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-0.5">
-                                        <Check className="w-3 h-3 text-white" />
+                                        {isVotingPhase && showVoteButton && (myVote === null || iVotedForThisPlayer) && (
+                                            <Button
+                                                onClick={() => handleVote(player.uid)}
+                                                variant="outline"
+                                                size="sm"
+                                                disabled={iVotedForThisPlayer && !canChangeVote}
+                                                className={`!w-auto gap-2 px-4 ${iVotedForThisPlayer
+                                                    ? canChangeVote
+                                                        ? '!border-green-500 !text-green-400 !bg-green-500/10 hover:!bg-green-500/20'
+                                                        : '!border-green-500 !text-green-400 !bg-green-500/10 cursor-not-allowed'
+                                                    : ''
+                                                    }`}
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
+                                                </svg>
+                                                <span>{iVotedForThisPlayer ? t('playing.voted', 'Voted') : t('playing.vote', 'Vote')}</span>
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Clue bubble - shown below name, always visible when available */}
+                                {clue && (isRevealed || isVotingPhase) && (
+                                    <div className="mt-3 pl-11 w-full">
+                                        <ChatBubble
+                                            text={clue}
+                                            isRevealed={true}
+                                            position="left"
+                                            playerName={player.name}
+                                        />
                                     </div>
                                 )}
-                                {!isRevealed && hasPlayerSubmitted && (
-                                    <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-0.5">
-                                        <Check className="w-3 h-3 text-white" />
-                                    </div>
-                                )}
-                            </div>
+                            </li>
+                        );
+                    })}
+                </ul>
 
-                            {/* Name */}
-                            <div className="flex-1 min-w-0">
-                                <p className={`text-sm font-medium truncate ${player.uid === user.uid ? 'text-orange-400' : 'text-neutral-200'
-                                    }`}>
-                                    {player.name}
-                                    {player.uid === user.uid && ' (Tú)'}
-                                </p>
-                            </div>
+                {/* Help link like in PlayerList */}
+                {isVotingPhase && <HelpLink onOpenInstructions={onOpenInstructions} />}
 
-                            {/* Clue Bubble */}
-                            <div className="flex-shrink-0">
-                                {isRevealed ? (
-                                    <ChatBubble
-                                        text={clue}
-                                        isRevealed={true}
-                                        position="right"
-                                        playerName={player.name}
-                                    />
-                                ) : isCurrentTurn ? (
-                                    <ChatBubble
-                                        isTyping={true}
-                                        position="right"
-                                    />
-                                ) : hasPlayerSubmitted ? (
-                                    <span className="text-xs text-blue-400/60 italic">
-                                        {t('clueRound.ready', 'Ready')}
-                                    </span>
-                                ) : (
-                                    <span className="text-xs text-neutral-600 italic">
-                                        {t('clueRound.waiting', 'Waiting...')}
-                                    </span>
-                                )}
-                            </div>
-                        </motion.div>
-                    );
-                })}
+                {/* Bottom Input Area - Only in clue phase */}
+                {isCluePhase && (
+                    <ClueInput
+                        onSend={handleClueSubmit}
+                        isSubmitted={hasAlreadySubmitted}
+                        isMyTurn={isMyTurn}
+                    />
+                )}
+
+                {/* Bottom padding */}
+                <div className="h-32" />
             </div>
-
-            {/* Input Area (fixed at bottom) */}
-            <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-neutral-950 via-neutral-950/95 to-transparent pt-8 pb-6 px-4">
-                <div className="max-w-md mx-auto space-y-2">
-                    {hasAlreadySubmitted ? (
-                        <div className="flex items-center justify-center gap-2 py-3 text-green-400">
-                            <Check className="w-5 h-5" />
-                            <span className="text-sm font-medium">
-                                {t('clueRound.clueSubmitted', 'Clue submitted!')}
-                            </span>
-                        </div>
-                    ) : (
-                        <>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    value={clueText}
-                                    onChange={(e) => setClueText(e.target.value.slice(0, MAX_CLUE_LENGTH))}
-                                    onKeyDown={handleKeyDown}
-                                    placeholder={t('clueRound.placeholder', 'Write your clue...')}
-                                    maxLength={MAX_CLUE_LENGTH}
-                                    className="
-                                        w-full px-4 py-3 pr-14
-                                        bg-neutral-900 border border-neutral-700
-                                        rounded-xl text-neutral-100
-                                        placeholder:text-neutral-500
-                                        focus:outline-none focus:border-blue-500
-                                        transition-colors
-                                    "
-                                    autoComplete="off"
-                                />
-                                <button
-                                    onClick={handleSubmit}
-                                    disabled={!clueText.trim()}
-                                    className={`
-                                        absolute right-2 top-1/2 -translate-y-1/2
-                                        p-2 rounded-lg transition-colors
-                                        ${clueText.trim()
-                                            ? 'bg-blue-500 text-white hover:bg-blue-600'
-                                            : 'bg-neutral-800 text-neutral-500'
-                                        }
-                                    `}
-                                >
-                                    <Send className="w-4 h-4" />
-                                </button>
-                            </div>
-                            <div className="flex justify-between text-xs text-neutral-500 px-1">
-                                <span>
-                                    {isMyTurn
-                                        ? t('clueRound.yourTurn', "It's your turn!")
-                                        : t('clueRound.canPreSubmit', 'You can submit before your turn')
-                                    }
-                                </span>
-                                <span>{clueText.length}/{MAX_CLUE_LENGTH}</span>
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-
-            {/* Bottom padding for fixed input */}
-            <div className="h-32" />
         </div>
     );
 }

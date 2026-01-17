@@ -5,7 +5,7 @@
  * Clues are submitted by players but revealed in turn order.
  */
 
-const profanityFilter = require("../utils/profanityFilter");
+const { cleanProfanity } = require("../utils/profanityFilter");
 
 const CLUE_TIMEOUT_MS = 90000; // 90 seconds
 const MAX_CLUE_LENGTH = 30;
@@ -57,6 +57,15 @@ class ChatModeManager {
             return;
         }
 
+        // If the current player already submitted their clue before their turn,
+        // reveal it immediately and advance to the next turn
+        if (this.clues.has(currentPlayer)) {
+            this.revealCurrentClue();
+            // Notify about state change so clients see the revealed clue
+            this.onStateChange();
+            return;
+        }
+
         // Set timeout for this turn
         this.turnTimer = setTimeout(() => {
             this.handleTurnTimeout();
@@ -99,7 +108,7 @@ class ChatModeManager {
         }
 
         // Filter profanity
-        const filteredClue = profanityFilter.filter(trimmedClue);
+        const filteredClue = cleanProfanity(trimmedClue);
 
         // Store the clue
         this.clues.set(playerId, {

@@ -182,5 +182,9 @@
         "step5": "Vote for who you think is the impostor. If it's you, try to incriminate someone else.",
         "scoring": "Those who vote correctly earn points. If you're the impostor and survive, you earn points. If you're not the impostor but the majority votes for you, you're eliminated from the round.",
         "viewFullRules": "View complete game rules"
+    },
+    "voting": {
+        "title": "Vote!",
+        "voted": "voted"
     }
 }

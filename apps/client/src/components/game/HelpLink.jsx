@@ -19,7 +19,7 @@ export function HelpLink({ onOpenInstructions }) {
         <>
             <button
                 onClick={() => setShowModal(true)}
-                className="mt-10 text-sm text-orange-400 hover:text-orange-300 transition-colors underline underline-offset-2 w-full text-center md:text-left flex items-center justify-center md:justify-start gap-1.5"
+                className="mt-10 text-sm text-neutral-400 hover:text-neutral-300 transition-colors underline underline-offset-2 w-full text-center md:text-left flex items-center justify-center md:justify-start gap-1.5"
             >
                 <Info className="w-4 h-4" />
                 {t('help.howToPlay', 'How to play?')}

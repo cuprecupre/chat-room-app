@@ -9,8 +9,7 @@ export function Footer({ onOpenInstructions, onOpenFeedback, roomId, isMobile, o
     const isInMatch = phase === "playing" || phase === "game_over";
     return (
         <footer className="w-full pt-6 pb-40 sm:pb-6 px-6 relative z-10">
-            {/* Divider para separar del contenido */}
-            <div className="max-w-4xl mx-auto w-full h-px bg-neutral-800 mb-6"></div>
+
             <div className="flex flex-col gap-4">
                 {/* Botones globales (Reglas / Feedback / Abandonar) */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">

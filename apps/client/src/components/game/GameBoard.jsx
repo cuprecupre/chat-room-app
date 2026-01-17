@@ -1,6 +1,5 @@
-import React from "react";
 import { useTranslation } from "react-i18next";
-import { GameStepper } from "../ui/GameStepper";
+import { GameHeader } from "./GameHeader";
 import { RoundResultOverlay } from "../RoundResultOverlay";
 import { PlayerList } from "./PlayerList";
 import { GameCard } from "./GameCard";
@@ -33,15 +32,12 @@ export function GameBoard({
                 </div>
             )}
 
-            {/* Stepper de partida y rondas */}
-            <div
-                className={`w-full ${showRestOfUI ? "" : "opacity-0 pointer-events-none"}`}
-            >
-                <GameStepper
-                    roundCount={state.currentRound || 1}
-                    currentTurn={state.currentRound}
-                    showAnimation={showRestOfUI}
-                />
+            {/* Game Header (Stepper + Title) */}
+            <div className={`w-full pb-6 sm:pb-8 space-y-6 ${showRestOfUI ? "" : "opacity-0 pointer-events-none"}`}>
+                <GameHeader state={state} showAnimation={showRestOfUI} />
+
+                {/* Divider manual */}
+                <div className="h-px w-full bg-white/10 mt-6 max-w-4xl mx-auto"></div>
             </div>
 
             {/* Layout responsive: grid de 2 columnas en md+, stack en mobile */}
@@ -82,13 +78,7 @@ export function GameBoard({
                             </div>
                         )}
 
-                        <div
-                            className={`text-center md:text-left mb-5 ${showRestOfUI ? "animate-fadeIn animate-delay-400" : "opacity-0 pointer-events-none"}`}
-                        >
-                            <h2 className="text-3xl font-serif text-neutral-50">
-                                {t('board.clueAndVoteRound', 'Clue and voting round')}
-                            </h2>
-                        </div>
+
                         <PlayerList
                             players={state.players}
                             currentUserId={user.uid}

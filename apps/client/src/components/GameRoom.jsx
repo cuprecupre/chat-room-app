@@ -184,12 +184,24 @@ export function GameRoom({
                     state={state}
                     user={user}
                     onSubmitClue={onSubmitClue}
+                    onVote={onVote}
                     onOpenInstructions={onOpenInstructions}
                 />
             )}
 
-            {/* Mostrar pantalla de playing (incluye round_result para evitar pantalla negra en empates) */}
-            {(state.phase === "playing" || state.phase === "round_result") && (
+            {/* Chat Mode: Voting Phase - Use same ClueRoundScreen for unified UI */}
+            {state.phase === "playing" && state.gameMode === "chat" && (
+                <ClueRoundScreen
+                    state={state}
+                    user={user}
+                    onSubmitClue={onSubmitClue}
+                    onVote={onVote}
+                    onOpenInstructions={onOpenInstructions}
+                />
+            )}
+
+            {/* Voice Mode: Playing phase OR Round Result (any mode) */}
+            {((state.phase === "playing" && state.gameMode !== "chat") || state.phase === "round_result") && (
                 <GameBoard
                     state={state}
                     user={user}

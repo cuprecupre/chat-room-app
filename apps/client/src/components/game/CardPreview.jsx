@@ -1,100 +1,157 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { X, Eye } from 'lucide-react';
-import { GameCard } from './GameCard';
+import { Eye } from 'lucide-react';
+import { capitalize } from './utils';
+
+// Firebase Storage CDN URLs
+const CDN_BASE = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2F";
+const CDN_SUFFIX = "?alt=media";
+const cardImg = `${CDN_BASE}card.jpg${CDN_SUFFIX}`;
+const cardBackImg = `${CDN_BASE}card-back.jpg${CDN_SUFFIX}`;
 
 /**
- * CardPreview - A minimizable card that expands with a 3D flip animation
- * 
- * Displays as a small card initially. When clicked, it expands to center screen
- * showing the full GameCard content.
+ * CardPreview - A horizontal mini card that expands with 3D flip
+ * Shows as a small horizontal card. When clicked, it flips to reveal the back.
  */
 export function CardPreview({ state, className = "" }) {
-    const [isOpen, setIsOpen] = useState(false);
-    const { t } = useTranslation('game');
+    const [isFlipped, setIsFlipped] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
+    const { t, i18n } = useTranslation('game');
+    const flipTimeoutRef = useRef(null);
 
-    const toggleOpen = () => setIsOpen(!isOpen);
+    // Auto flip back after 5 seconds
+    useEffect(() => {
+        if (isFlipped) {
+            flipTimeoutRef.current = setTimeout(() => {
+                setIsFlipped(false);
+                setIsExpanded(false);
+            }, 5000);
+        }
+        return () => {
+            if (flipTimeoutRef.current) clearTimeout(flipTimeoutRef.current);
+        };
+    }, [isFlipped]);
+
+    const handleClick = () => {
+        if (!isExpanded) {
+            // First click: expand and flip
+            setIsExpanded(true);
+            setTimeout(() => setIsFlipped(true), 100);
+        } else if (isFlipped) {
+            // Already flipped: flip back and collapse
+            setIsFlipped(false);
+            setTimeout(() => setIsExpanded(false), 300);
+        } else {
+            // Expanded but not flipped: flip
+            setIsFlipped(true);
+        }
+    };
+
+    // Get translated content
+    const langKey = i18n.language?.split('-')[0] || 'es';
+    const translations = state?.secretWordTranslations?.[langKey];
+    let displayWord = translations?.word || state?.secretWord;
+    if (displayWord === 'SECRET_WORD_HINT') {
+        displayWord = t('card.hint');
+    }
+    const displayCategory = translations?.category || state?.secretCategory;
+    const isImpostor = state?.role === 'impostor';
 
     return (
-        <>
-            {/* Small Preview Card */}
+        <div className={`${className}`}>
             <motion.div
-                layoutId="card-container"
-                onClick={toggleOpen}
+                layout
+                onClick={handleClick}
                 className={`
-                    message-bubble cursor-pointer
-                    relative w-12 h-16 md:w-14 md:h-20
-                    bg-gradient-to-br from-neutral-800 to-neutral-900
-                    border border-neutral-700 rounded-lg shadow-lg
-                    flex items-center justify-center
-                    overflow-hidden group
-                    transition-transform hover:scale-105 active:scale-95
-                    ${className}
+                    cursor-pointer relative
+                    ${isExpanded
+                        ? 'w-48 h-28 md:w-56 md:h-32'
+                        : 'w-16 h-10 md:w-20 md:h-12'
+                    }
+                    transition-all duration-300
                 `}
-                whileHover={{ y: -2 }}
+                style={{ perspective: 1000 }}
             >
-                {/* Back pattern decoration */}
-                <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neutral-600 via-neutral-900 to-neutral-950" />
-
-                {/* Icon */}
-                <Eye className="w-5 h-5 text-neutral-400 group-hover:text-orange-400 transition-colors relative z-10" />
-
-                {/* Label (sr-only generally, but visible on hover maybe?) */}
-                <span className="sr-only">{t('preview.showCard', 'Show role')}</span>
-            </motion.div>
-
-            {/* Expanded Card Overlay */}
-            <AnimatePresence>
-                {isOpen && (
-                    <Portal>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-                            onClick={toggleOpen}
-                        >
-                            <motion.div
-                                layoutId="card-container"
-                                className="relative w-full max-w-sm aspect-[3/4] max-h-[80vh]"
-                                onClick={(e) => e.stopPropagation()} // Prevent close when clicking card itself
-                                initial={{ rotateY: 180, scale: 0.5 }}
-                                animate={{ rotateY: 0, scale: 1 }}
-                                exit={{ rotateY: 180, scale: 0.5, opacity: 0 }}
-                                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                                style={{ perspective: 1000 }}
-                            >
-                                {/* Close button */}
-                                <button
-                                    onClick={toggleOpen}
-                                    className="absolute -top-12 right-0 p-2 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-colors"
-                                >
-                                    <X className="w-6 h-6" />
-                                </button>
-
-                                {/* The Actual Game Card */}
-                                <div className="w-full h-full">
-                                    <GameCard
-                                        state={state}
-                                        showRestOfUI={true}
-                                        showCardEntrance={false}
-                                        initialAnimationPending={false}
-                                        expanded={true}
-                                    />
+                <motion.div
+                    className="flip-card-inner w-full h-full"
+                    animate={{ rotateY: isFlipped ? 180 : 0 }}
+                    transition={{ duration: 0.5, type: "spring", damping: 20 }}
+                    style={{ transformStyle: 'preserve-3d' }}
+                >
+                    {/* Front - Mini card with eye */}
+                    <div
+                        className="flip-card-front absolute inset-0 rounded-lg overflow-hidden"
+                        style={{ backfaceVisibility: 'hidden' }}
+                    >
+                        <div className={`
+                            w-full h-full 
+                            bg-gradient-to-br from-neutral-800 to-neutral-900
+                            border border-neutral-700
+                            flex items-center justify-center
+                            ${isExpanded ? 'gap-3' : 'gap-1'}
+                        `}>
+                            {/* Card image preview */}
+                            <div className={`
+                                relative overflow-hidden rounded
+                                ${isExpanded ? 'w-16 h-20' : 'w-6 h-8'}
+                            `}>
+                                <img
+                                    src={cardImg}
+                                    alt="Card"
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                            {isExpanded && (
+                                <div className="flex flex-col items-start text-white">
+                                    <span className="text-xs text-neutral-400">{t('card.tapTo', 'Tap to')}</span>
+                                    <span className="text-sm font-medium">{t('card.flip', 'flip')}</span>
                                 </div>
-                            </motion.div>
-                        </motion.div>
-                    </Portal>
-                )}
-            </AnimatePresence>
-        </>
-    );
-}
+                            )}
+                            {!isExpanded && (
+                                <Eye className="w-3 h-3 text-neutral-400" />
+                            )}
+                        </div>
+                    </div>
 
-// Simple Portal component
-function Portal({ children }) {
-    if (typeof window === 'undefined') return null;
-    return createPortal(children, document.body);
+                    {/* Back - Card info */}
+                    <div
+                        className="flip-card-back absolute inset-0 rounded-lg overflow-hidden"
+                        style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+                    >
+                        <div className="w-full h-full relative">
+                            <img
+                                src={cardBackImg}
+                                alt="Card back"
+                                className="absolute inset-0 w-full h-full object-cover"
+                            />
+                            <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-2 text-center backdrop-blur-[1px]">
+                                {isImpostor ? (
+                                    <>
+                                        <span className="text-[10px] text-orange-400 uppercase font-bold">
+                                            {t('roles.impostor', 'Impostor')}
+                                        </span>
+                                        {displayCategory && (
+                                            <span className="text-xs font-serif text-white mt-1">
+                                                {capitalize(displayCategory)}
+                                            </span>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="text-[10px] text-neutral-400 uppercase">
+                                            {t('card.secretWord', 'Secret word')}
+                                        </span>
+                                        <span className="text-sm font-serif text-white mt-0.5">
+                                            {capitalize(displayWord || '...')}
+                                        </span>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+            </motion.div>
+        </div>
+    );
 }

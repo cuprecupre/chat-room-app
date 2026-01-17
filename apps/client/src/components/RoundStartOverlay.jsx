@@ -1,18 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 export function RoundStartOverlay({ state }) {
     const { t } = useTranslation('game');
     const [visible, setVisible] = useState(false);
     const [displayedRound, setDisplayedRound] = useState(1);
+    const prevPhaseRef = useRef(state.phase);
+    const prevRoundRef = useRef(state.currentRound);
 
     useEffect(() => {
-        if (state.phase === "playing") {
+        const prevPhase = prevPhaseRef.current;
+        const prevRound = prevRoundRef.current;
+
+        // Update refs for next render
+        prevPhaseRef.current = state.phase;
+        prevRoundRef.current = state.currentRound;
+
+        // Don't show overlay when transitioning from clue_round to playing
+        // The round already started during clue_round phase
+        if (prevPhase === "clue_round" && state.phase === "playing") {
+            return;
+        }
+
+        // Show overlay when entering playing phase with a new round
+        if (state.phase === "playing" && (prevPhase !== "playing" || state.currentRound !== prevRound)) {
             setDisplayedRound(state.currentRound);
             setVisible(true);
             const timer = setTimeout(() => setVisible(false), 3000);
             return () => clearTimeout(timer);
-        } else {
+        } else if (state.phase !== "playing") {
             setVisible(false);
         }
     }, [state.currentRound, state.phase]);
