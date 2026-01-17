@@ -1,11 +1,12 @@
-import { Outlet, useNavigate } from "react-router-dom";
 import { useState, useCallback } from "react";
-
+import { Outlet, useNavigate } from "react-router-dom";
 import { Footer } from "../components/Footer";
 import { AppHeader } from "../components/AppHeader";
+import { SidebarMenu } from "../components/SidebarMenu";
 import { LeaveMatchModal } from "../components/LeaveMatchModal";
 import { LeaveRoomModal } from "../components/LeaveRoomModal";
 import { ROUTES } from "../routes/routes";
+import { usePlayerStats } from "../hooks/usePlayerStats";
 
 export function MainLayout({
     user,
@@ -20,16 +21,34 @@ export function MainLayout({
 }) {
     const [showLeaveRoomModal, setShowLeaveRoomModal] = useState(false);
     const [showLeaveMatchModal, setShowLeaveMatchModal] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate = useNavigate();
+    const { stats } = usePlayerStats();
 
-    const leaveRoom = useCallback(() => {
-        if (gameState?.roomId) {
-            // Remove roomId from URL immediately to prevent accidental reopen
+    const handleLogout = useCallback(async () => {
+        try {
+            // Clear URL parameters before logout
             const url = new URL(window.location);
             url.searchParams.delete("roomId");
             window.history.replaceState({}, "", url.toString());
 
-            // Emit leave-room and navigate to lobby
+            // Leave room if in one
+            if (gameState?.roomId) {
+                emit("leave-room", gameState.roomId);
+            }
+
+            await onLogout();
+            navigate(ROUTES.HOME);
+        } catch (e) {
+            console.error("Error during logout:", e);
+        }
+    }, [onLogout, emit, gameState, navigate]);
+
+    const leaveRoom = useCallback(() => {
+        if (gameState?.roomId) {
+            const url = new URL(window.location);
+            url.searchParams.delete("roomId");
+            window.history.replaceState({}, "", url.toString());
             emit("leave-room", gameState.roomId);
             navigate(ROUTES.LOBBY);
         }
@@ -42,32 +61,38 @@ export function MainLayout({
         }
     }, [emit, gameState]);
 
-    const handleLeaveMatchClick = useCallback(() => {
-        setShowLeaveMatchModal(true);
-    }, []);
-
     const handleTitleClick = useCallback(() => {
-        // If in a room (lobby or playing), show confirmation modal
         if (gameState?.roomId) {
             setShowLeaveRoomModal(true);
         } else {
-            // If not in room, go directly to lobby
             navigate(ROUTES.LOBBY);
         }
     }, [gameState, navigate]);
 
     return (
-        <div className="bg-neutral-950 text-white min-h-[100dvh] font-sans flex flex-col">
+        <div className="bg-neutral-950 text-white min-h-screen font-sans flex flex-col overflow-x-hidden">
+            {/* Sidebar Menu */}
+            {user && (
+                <SidebarMenu
+                    isOpen={isMenuOpen}
+                    onClose={() => setIsMenuOpen(false)}
+                    user={user}
+                    stats={stats}
+                    gameState={gameState}
+                    onLogout={handleLogout}
+                    onLeaveRoom={() => setShowLeaveRoomModal(true)}
+                    onLeaveMatch={() => setShowLeaveMatchModal(true)}
+                    onOpenInstructions={onOpenInstructions}
+                    onOpenFeedback={onOpenFeedback}
+                />
+            )}
+
             {/* Header - Full width */}
             <div className="w-full px-6 py-4 sm:px-6 border-b border-white/10">
                 <AppHeader
                     user={user}
-                    gameState={gameState}
-                    emit={emit}
-                    onLogout={onLogout}
                     onTitleClick={handleTitleClick}
-                    onLeaveRoomClick={() => setShowLeaveRoomModal(true)}
-                    onLeaveMatchClick={handleLeaveMatchClick}
+                    onOpenMenu={() => setIsMenuOpen(true)}
                 />
             </div>
 
@@ -78,21 +103,14 @@ export function MainLayout({
                 </main>
             </div>
 
-            {/* Footer - Full width */}
-            <div className="w-full px-6 py-4 border-t border-white/10 mt-auto">
-                <Footer
-                    onOpenInstructions={onOpenInstructions}
-                    onOpenFeedback={onOpenFeedback}
-                    roomId={gameState?.roomId}
-                    onCopyLink={onCopyLink}
-                    isMobile={isMobile}
-                    phase={gameState?.phase}
-                    onLeaveMatch={handleLeaveMatchClick}
-                    onLeaveRoom={() => setShowLeaveRoomModal(true)}
-                />
-            </div>
+            {/* Footer - Full width, hidden when in room/game */}
+            {!gameState?.roomId && (
+                <div className="w-full px-6 py-4 border-t border-white/10 mt-auto">
+                    <Footer roomId={gameState?.roomId} />
+                </div>
+            )}
 
-            {/* Modal de confirmación para abandonar sala */}
+            {/* Modals */}
             <LeaveRoomModal
                 isOpen={showLeaveRoomModal}
                 onClose={() => setShowLeaveRoomModal(false)}
@@ -102,7 +120,6 @@ export function MainLayout({
                 }}
             />
 
-            {/* Modal de confirmación para abandonar partida */}
             <LeaveMatchModal
                 isOpen={showLeaveMatchModal}
                 onClose={() => setShowLeaveMatchModal(false)}

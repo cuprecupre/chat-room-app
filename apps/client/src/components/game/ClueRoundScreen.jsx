@@ -8,6 +8,7 @@ import { GameCard } from './GameCard';
 import { HelpLink } from './HelpLink';
 import { GameHeader } from './GameHeader';
 import { ClueInput } from './ClueInput';
+import { Button } from '../ui/Button';
 
 /**
  * ClueRoundScreen - Unified screen for Chat Mode (clue submission + voting)

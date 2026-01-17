@@ -7,39 +7,34 @@ const languages = [
     { code: 'en', flag: '🇺🇸', name: 'English', shortCode: 'EN' },
 ];
 
-export function LanguageSelector({ className = '' }) {
+export function LanguageSelector({ className = '', fullWidth = false }) {
     const { i18n } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
-    const currentLang = languages.find(l => i18n.language?.startsWith(l.code)) || languages[0];
+    const currentLang = languages.find(l => i18n?.language?.startsWith(l.code)) || languages[0];
 
     // Close dropdown when clicking outside
     useEffect(() => {
+        if (fullWidth) return;
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setIsOpen(false);
             }
         };
-        // Use 'click' instead of 'mousedown' to allow button onClick to fire first
         document.addEventListener('click', handleClickOutside);
         return () => document.removeEventListener('click', handleClickOutside);
-    }, []);
+    }, [fullWidth]);
 
     const navigate = useNavigate();
     const location = useLocation();
 
     const handleChange = async (langCode) => {
-        // Wait for language change to complete (updates localStorage)
+        if (!i18n) return;
         await i18n.changeLanguage(langCode);
         setIsOpen(false);
 
-        // Update URL if on public pages
         const path = location.pathname;
-        const isEnglishPath = path.startsWith('/en');
-
-        // Define route mappings for public pages
-        // Format: [CommonKey]: { es: '/path', en: '/en/path' }
         const routeMap = {
             home: { es: '/', en: '/en' },
             rules: { es: '/reglas', en: '/en/rules' },
@@ -49,7 +44,6 @@ export function LanguageSelector({ className = '' }) {
             guest: { es: '/guest', en: '/en/guest' }
         };
 
-        // Find current route key
         let currentRouteKey = null;
         if (path === '/' || path === '/en' || path === '/en/') currentRouteKey = 'home';
         else if (path === '/reglas' || path === '/en/rules') currentRouteKey = 'rules';
@@ -64,9 +58,32 @@ export function LanguageSelector({ className = '' }) {
         }
     };
 
+    if (fullWidth) {
+        return (
+            <div className="flex flex-col gap-2">
+                {languages.map((lang) => (
+                    <button
+                        type="button"
+                        key={lang.code}
+                        onClick={() => handleChange(lang.code)}
+                        className={`w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl border transition-all ${i18n.language?.startsWith(lang.code)
+                            ? 'bg-orange-500/10 border-orange-500/30 text-orange-400'
+                            : 'bg-white/[0.03] border-white/5 text-neutral-400 hover:bg-white/[0.06]'
+                            }`}
+                    >
+                        <span className="text-xl">{lang.flag}</span>
+                        <span className="text-sm font-medium flex-1">{lang.name}</span>
+                        {i18n.language?.startsWith(lang.code) && (
+                            <div className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.6)]" />
+                        )}
+                    </button>
+                ))}
+            </div>
+        );
+    }
+
     return (
         <div className={`relative ${className}`} ref={dropdownRef}>
-            {/* Trigger Button */}
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
@@ -86,7 +103,6 @@ export function LanguageSelector({ className = '' }) {
                 </svg>
             </button>
 
-            {/* Dropdown Menu */}
             {isOpen && (
                 <div className="absolute top-full right-0 mt-2 w-48 bg-neutral-950/95 backdrop-blur-md border border-white/10 ring-1 ring-white/10 rounded-xl shadow-2xl z-50 animate-fadeIn p-2">
                     {languages.map((lang) => (
