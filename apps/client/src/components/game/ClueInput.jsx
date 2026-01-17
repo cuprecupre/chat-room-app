@@ -30,8 +30,8 @@ export function ClueInput({
     };
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 !m-0 !p-0 z-20 bg-neutral-950">
-            <div className="w-full bg-gradient-to-t from-neutral-950 via-neutral-950/95 to-transparent pt-8 pb-4 px-4">
+        <div className="fixed bottom-0 left-0 right-0 !m-0 !p-0 z-20">
+            <div className="w-full bg-gradient-to-t from-black via-black/95 to-transparent pt-12 pb-6 px-4">
                 <div className="max-w-md mx-auto space-y-2">
                     {isSubmitted ? (
                         <div className="flex items-center justify-center gap-2 py-3 text-green-400">

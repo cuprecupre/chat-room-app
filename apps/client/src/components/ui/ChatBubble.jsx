@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 /**
  * ChatBubble - Animated chat bubble component for displaying clues
@@ -15,10 +16,10 @@ export function ChatBubble({
     text,
     isRevealed = false,
     isTyping = false,
-    isWaiting = false,
     position = 'left',
     playerName = ''
 }) {
+    const { t } = useTranslation('game');
     const bubbleVariants = {
         hidden: {
             scale: 0.8,
@@ -57,31 +58,31 @@ export function ChatBubble({
     const renderContent = () => {
         if (isTyping) {
             return (
-                <div className="flex items-center gap-1 px-3 py-2">
+                <div className="flex items-center gap-1 px-4 py-3">
                     {[0, 1, 2].map((i) => (
                         <motion.span
                             key={i}
-                            className="w-2 h-2 bg-neutral-400 rounded-full"
-                            variants={typingDotVariants}
-                            animate="animate"
-                            style={{ animationDelay: `${i * 0.15}s` }}
+                            className="w-1.5 h-1.5 bg-neutral-400/80 rounded-full"
+                            animate={{
+                                y: [0, -5, 0],
+                                opacity: [0.4, 1, 0.4]
+                            }}
+                            transition={{
+                                duration: 0.8,
+                                repeat: Infinity,
+                                repeatDelay: 1,
+                                ease: "easeInOut",
+                                delay: i * 0.2
+                            }}
                         />
                     ))}
                 </div>
             );
         }
 
-        if (isWaiting) {
-            return (
-                <div className="px-4 py-2 text-neutral-500 text-sm italic">
-                    ...
-                </div>
-            );
-        }
-
         if (isRevealed && text) {
             return (
-                <div className="px-4 py-2 text-neutral-100 text-sm font-medium">
+                <div className="px-4 py-2 text-neutral-50 text-sm font-medium leading-relaxed">
                     {text}
                 </div>
             );
@@ -96,38 +97,35 @@ export function ChatBubble({
     return (
         <AnimatePresence mode="wait">
             <motion.div
-                key={isTyping ? 'typing' : isRevealed ? 'revealed' : 'waiting'}
+                key={isTyping ? 'typing' : 'revealed'}
                 variants={bubbleVariants}
                 initial="hidden"
                 animate="visible"
                 exit="exit"
                 className={`
                     relative inline-block
-                    bg-neutral-800/90 backdrop-blur-sm
+                    bg-neutral-800/95 backdrop-blur-md
                     rounded-2xl
-                    border border-neutral-700/50
-                    shadow-lg shadow-black/20
-                    ${position === 'left' ? 'rounded-bl-sm' : 'rounded-br-sm'}
+                    ${position === 'left' ? 'rounded-tl-none' : 'rounded-tr-none'}
                 `}
                 aria-label={playerName ? `Pista de ${playerName}: ${text || 'esperando'}` : undefined}
             >
                 {content}
 
-                {/* Bubble tail */}
+                {/* Bubble tail - Top corner refined */}
                 <div
                     className={`
-                        absolute bottom-0 w-3 h-3
-                        bg-neutral-800/90
-                        border-b border-neutral-700/50
+                        absolute top-0 w-3 h-3
+                        bg-neutral-800/95
                         ${position === 'left'
-                            ? '-left-1 border-l rounded-br-lg'
-                            : '-right-1 border-r rounded-bl-lg'
+                            ? '-left-[11px]'
+                            : '-right-[11px]'
                         }
                     `}
                     style={{
                         clipPath: position === 'left'
-                            ? 'polygon(100% 0, 100% 100%, 0 100%)'
-                            : 'polygon(0 0, 100% 100%, 0 100%)'
+                            ? 'polygon(100% 0, 0 0, 100% 80%)'
+                            : 'polygon(0 0, 100% 0, 0 80%)'
                     }}
                 />
             </motion.div>

@@ -28,7 +28,7 @@
         "noDownload": "No es necesario descargar nada",
         "device3": ", juegas directamente en el navegador.",
         "communication1": "La comunicación de las pistas y el debate se hace de manera",
-        "communicationType": "presencial o por videollamada"
+        "communicationType": "presencial, videollamada o chat"
     },
     "preparation": {
         "title": "Preparación",
@@ -63,7 +63,7 @@
         },
         "step2": {
             "title": "Ronda de Pistas",
-            "text": "Cuando sea tu turno, debes decir una pista relacionada en voz alta con la palabra.",
+            "text": "Cuando sea tu turno, debes dar una pista relacionada con la palabra (en voz alta o por chat según el modo elegido).",
             "tip": "No debe ser ni muy obvia (para no ayudar al Impostor) ni muy difícil (para no parecer sospechoso)."
         },
         "step3": {

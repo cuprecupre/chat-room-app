@@ -28,7 +28,7 @@
         "noDownload": "No download required",
         "device3": ", you play directly in your browser.",
         "communication1": "Clue communication and debate is done",
-        "communicationType": "in person or via video call"
+        "communicationType": "in person, via video call or chat"
     },
     "preparation": {
         "title": "Preparation",
@@ -63,7 +63,7 @@
         },
         "step2": {
             "title": "Clue Round",
-            "text": "When it's your turn, you must say a clue related to the word out loud.",
+            "text": "When it's your turn, you must give a clue related to the word (out loud or via chat depending on the mode).",
             "tip": "It shouldn't be too obvious (to not help the Impostor) or too vague (to not seem suspicious)."
         },
         "step3": {

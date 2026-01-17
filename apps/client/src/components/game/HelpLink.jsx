@@ -4,7 +4,7 @@ import { Info } from "lucide-react";
 import { Modal } from "../ui/Modal";
 import { Button } from "../ui/Button";
 
-export function HelpLink({ onOpenInstructions }) {
+export function HelpLink({ onOpenInstructions, isChatMode = false }) {
     const { t } = useTranslation('game');
     const [showModal, setShowModal] = useState(false);
 
@@ -46,17 +46,17 @@ export function HelpLink({ onOpenInstructions }) {
                         <p className="flex gap-3">
                             <span className="text-orange-400 font-semibold">2.</span>
                             <span>
-                                {t('help.step2', 'Each player says a clue out loud. The one with ☀️ in the player list starts first.')}
+                                {isChatMode ? t('help.step2Chat') : t('help.step2')}
                             </span>
                         </p>
                         <p className="flex gap-3">
                             <span className="text-orange-400 font-semibold">3.</span>
                             <span>
                                 <strong className="text-white">{t('help.ifFriend', 'If you are a friend:')}</strong>{" "}
-                                {t('help.friendAdvice', 'Say a subtle clue that proves you know the word, but without revealing it.')}
+                                {isChatMode ? t('help.friendAdviceChat') : t('help.friendAdvice')}
                                 <br />
                                 <strong className="text-orange-400">{t('help.ifImpostor', 'If you are the impostor:')}</strong>{" "}
-                                {t('help.impostorAdvice', 'Pretend you know it by using vague clues or mimicking others.')}
+                                {isChatMode ? t('help.impostorAdviceChat') : t('help.impostorAdvice')}
                             </span>
                         </p>
                         <p className="flex gap-3">

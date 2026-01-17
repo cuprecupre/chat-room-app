@@ -164,16 +164,6 @@ export function ClueRoundScreen({
 
                                     {/* Right side: status or vote button */}
                                     <div className="flex items-center gap-3">
-                                        {isCluePhase && (
-                                            isRevealed ? null : isCurrentTurn ? (
-                                                <ChatBubble isTyping={true} position="right" />
-                                            ) : hasPlayerSubmitted ? (
-                                                <span className="text-xs text-blue-400/60 italic">{t('clueRound.ready', 'Ready')}</span>
-                                            ) : (
-                                                <span className="text-xs text-neutral-600 italic">{t('clueRound.waiting', 'Waiting...')}</span>
-                                            )
-                                        )}
-
                                         {isVotingPhase && showVoteButton && (myVote === null || iVotedForThisPlayer) && (
                                             <Button
                                                 onClick={() => handleVote(player.uid)}
@@ -196,12 +186,13 @@ export function ClueRoundScreen({
                                     </div>
                                 </div>
 
-                                {/* Clue bubble - shown below name, always visible when available */}
-                                {clue && (isRevealed || isVotingPhase) && (
+                                {/* Clue/Typing area - always in the same place below the name */}
+                                {(clue || (isCluePhase && isCurrentTurn)) && (
                                     <div className="mt-3 pl-11 w-full">
                                         <ChatBubble
                                             text={clue}
-                                            isRevealed={true}
+                                            isRevealed={!!clue}
+                                            isTyping={!clue && isCurrentTurn}
                                             position="left"
                                             playerName={player.name}
                                         />
@@ -213,7 +204,7 @@ export function ClueRoundScreen({
                 </ul>
 
                 {/* Help link like in PlayerList */}
-                {isVotingPhase && <HelpLink onOpenInstructions={onOpenInstructions} />}
+                {isVotingPhase && <HelpLink onOpenInstructions={onOpenInstructions} isChatMode={true} />}
 
                 {/* Bottom Input Area - Only in clue phase */}
                 {isCluePhase && (

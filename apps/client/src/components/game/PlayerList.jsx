@@ -345,7 +345,10 @@ export function PlayerList({
             {/* Pasos del juego */}
 
             {/* Enlace de ayuda solo durante la fase playing */}
-            {isPlaying && <HelpLink onOpenInstructions={onOpenInstructions} />}
+            {isPlaying && <HelpLink
+                onOpenInstructions={onOpenInstructions}
+                isChatMode={gameState?.gameMode === 'chat'}
+            />}
 
             {/* Kick confirmation modal */}
             <KickPlayerModal
