@@ -88,7 +88,7 @@ export function MainLayout({
             )}
 
             {/* Header - Full width */}
-            <div className="w-full px-6 py-4 sm:px-6 border-b border-white/10">
+            <div className="w-full px-2 py-4 sm:px-6 border-b border-white/10">
                 <AppHeader
                     user={user}
                     onTitleClick={handleTitleClick}
@@ -97,7 +97,7 @@ export function MainLayout({
             </div>
 
             {/* Main content */}
-            <div className="w-full max-w-4xl mx-auto px-6 py-4 sm:p-6 lg:p-8">
+            <div className="w-full max-w-4xl mx-auto px-2 py-4 sm:p-6 lg:p-8">
                 <main>
                     <Outlet />
                 </main>

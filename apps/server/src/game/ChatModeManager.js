@@ -66,10 +66,12 @@ class ChatModeManager {
             return;
         }
 
-        // Set timeout for this turn
+        // Set timeout for this turn (DISABLED as per user request)
+        /*
         this.turnTimer = setTimeout(() => {
             this.handleTurnTimeout();
         }, CLUE_TIMEOUT_MS);
+        */
     }
 
     /**

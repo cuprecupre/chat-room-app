@@ -46,17 +46,17 @@ export function ClueInput({
                                     value={clueText}
                                     onChange={(e) => setClueText(e.target.value.slice(0, maxClueLength))}
                                     onKeyDown={handleKeyDown}
-                                    placeholder={t('clueRound.placeholder', 'Write your clue...')}
+                                    placeholder={t('clueRound.placeholder', 'Escribe tu pista...')}
                                     maxLength={maxClueLength}
-                                    className="w-full px-4 py-3 pr-14 bg-neutral-900 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                                    className="w-full px-5 py-3.5 pr-14 bg-neutral-300 border border-neutral-400 rounded-2xl text-neutral-900 placeholder:text-neutral-600 focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-xl"
                                     autoComplete="off"
                                 />
                                 <button
                                     onClick={handleSubmit}
                                     disabled={!clueText.trim()}
-                                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-colors ${clueText.trim() ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-neutral-800 text-neutral-500'}`}
+                                    className={`absolute right-1.5 top-1/2 -translate-y-1/2 p-2.5 rounded-xl transition-all ${clueText.trim() ? 'bg-orange-600 text-white hover:bg-orange-500 shadow-md active:scale-95' : 'bg-neutral-400 text-neutral-200'}`}
                                 >
-                                    <Send className="w-4 h-4" />
+                                    <Send className="w-4.5 h-4.5" />
                                 </button>
                             </div>
                             <div className="flex justify-between text-xs text-neutral-500 px-1">

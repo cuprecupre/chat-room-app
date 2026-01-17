@@ -187,7 +187,7 @@ export function LobbyScreen({
                     {/* Botón fijo solo en mobile con overlay gradiente premium (como Siguiente partida) */}
                     <div className="fixed bottom-0 left-0 right-0 sm:hidden z-40">
                         <div className="h-10 bg-gradient-to-t from-neutral-950/80 via-neutral-950/40 to-transparent"></div>
-                        <div className="bg-neutral-950 px-4 pb-8">
+                        <div className="bg-neutral-950 px-2 pb-8">
                             <div className="max-w-sm mx-auto">
                                 <Button
                                     onClick={handleStartGame}

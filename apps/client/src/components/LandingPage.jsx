@@ -195,8 +195,8 @@ export function LandingPage({
             < header className="relative pt-8 pb-20 px-6 md:pt-12 md:pb-32 overflow-hidden flex flex-col items-center text-center" >
                 {/* Dynamic Background Elements */}
                 < div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0" >
-                    <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-amber-600/[0.08] md:bg-amber-600/15 rounded-full blur-[80px] md:blur-[100px]" />
-                    <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] md:w-[600px] md:h-[600px] bg-orange-600/[0.08] md:bg-orange-600/15 rounded-full blur-[90px] md:blur-[120px]" />
+                    <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-amber-600/12 rounded-full blur-[80px] md:blur-[100px]" />
+                    <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] md:w-[600px] md:h-[600px] bg-orange-600/12 rounded-full blur-[90px] md:blur-[120px]" />
                 </div >
 
                 <div className="relative z-10 max-w-4xl mx-auto space-y-8">

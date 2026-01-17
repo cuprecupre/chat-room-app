@@ -28,8 +28,8 @@ export function LoginScreen({
         <div className="w-full min-h-screen flex flex-col items-center bg-neutral-950 text-neutral-50 overflow-hidden">
             {/* Background elements for depth - Aligned with LandingPage */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
-                <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-amber-600/[0.08] md:bg-amber-600/15 rounded-full blur-[80px] md:blur-[100px]" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] md:w-[600px] md:h-[600px] bg-orange-600/[0.08] md:bg-orange-600/15 rounded-full blur-[90px] md:blur-[120px]" />
+                <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-amber-600/12 rounded-full blur-[80px] md:blur-[100px]" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] md:w-[600px] md:h-[600px] bg-orange-600/12 rounded-full blur-[90px] md:blur-[120px]" />
             </div>
 
             {/* Back Button - Top Left */}

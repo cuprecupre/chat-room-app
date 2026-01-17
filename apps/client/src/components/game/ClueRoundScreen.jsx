@@ -23,7 +23,6 @@ export function ClueRoundScreen({
 }) {
     const { t } = useTranslation('game');
     const [hasSubmitted, setHasSubmitted] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(90);
 
     // Determine which phase we're in
     const isVotingPhase = state.phase === 'playing';
@@ -55,21 +54,7 @@ export function ClueRoundScreen({
     const allVoted = votedPlayers.length === activePlayers.length;
     const canChangeVote = hasVoted && !allVoted;
 
-    // Timer effect (only for clue phase)
-    useEffect(() => {
-        if (!isCluePhase || !turnStartedAt) return;
 
-        const updateTimer = () => {
-            if (!turnStartedAt) return;
-            const elapsed = Date.now() - turnStartedAt;
-            const remaining = Math.max(0, Math.ceil((timeoutMs - elapsed) / 1000));
-            setTimeLeft(isNaN(remaining) ? 90 : remaining);
-        };
-
-        updateTimer();
-        const interval = setInterval(updateTimer, 1000);
-        return () => clearInterval(interval);
-    }, [turnStartedAt, timeoutMs, isCluePhase]);
 
     // Reset submission state when turn changes
     useEffect(() => {
@@ -106,7 +91,7 @@ export function ClueRoundScreen({
             </div>
 
             {/* Main content container */}
-            <div className="w-full max-w-md mx-auto px-4 py-2 space-y-4">
+            <div className="w-full max-w-md mx-auto px-2 py-2 space-y-4">
 
                 {/* Game Card - Same as Voice Mode */}
                 <div className="w-full max-w-xs mx-auto">

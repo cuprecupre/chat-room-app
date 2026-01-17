@@ -3,6 +3,7 @@
 @theme {
     --font-serif: "Trocchi", serif;
     --font-trocchi: "Trocchi", serif;
+    --color-neutral-950: #000000;
 }
 
 @layer base {
