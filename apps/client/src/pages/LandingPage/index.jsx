@@ -33,7 +33,7 @@ export function LandingPage({
             <SEO
                 title={t('meta.title')}
                 description={t('meta.description')}
-                path={isEn ? '/en' : '/'}
+                path=""
             />
             <LandingPageComponent
                 onLogin={onLogin}

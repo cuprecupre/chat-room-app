@@ -15,7 +15,7 @@ export function CookiesPage() {
             <SEO
                 title={t('legal.cookies.title')}
                 description={t('legal.cookies.description')}
-                path={isEn ? '/en/cookies' : '/cookies'}
+                path="cookies"
             />
 
             <div className="max-w-3xl mx-auto">

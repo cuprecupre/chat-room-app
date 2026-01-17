@@ -99,7 +99,7 @@ describe("Refactored Components", () => {
 
         it("reveals content on click", async () => {
             render(<GameCard state={mockStateFriend} />);
-            const cardInner = screen.getByTitle("Toca para voltear la carta");
+            const cardInner = screen.getByTitle("Toca para girar");
             fireEvent.click(cardInner);
 
             // Verificamos que se muestre el contenido del dorso
@@ -110,7 +110,7 @@ describe("Refactored Components", () => {
 
         it("shows impostor info correctly", async () => {
             render(<GameCard state={mockStateImpostor} />);
-            const cardInner = screen.getByTitle("Toca para voltear la carta");
+            const cardInner = screen.getByTitle("Toca para girar");
             fireEvent.click(cardInner);
 
             await waitFor(() => {
