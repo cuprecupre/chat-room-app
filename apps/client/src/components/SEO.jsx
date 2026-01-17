@@ -12,21 +12,36 @@ export function SEO({ title, description, path = "" }) {
     // Base URL (should be environment variable, but hardcoding provided domain for now)
     const baseUrl = "https://impostor.me";
 
-    // Normalize path to not include leading slash
-    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    // Normalize path: remove leading slash and any '/en' prefix (path should be Spanish base path)
+    let cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    // Remove 'en/' or 'en' prefix if accidentally passed (path should be Spanish path only)
+    if (cleanPath === 'en' || cleanPath.startsWith('en/')) {
+        cleanPath = cleanPath === 'en' ? '' : cleanPath.slice(3);
+    }
+    // Remove trailing slash
+    cleanPath = cleanPath.endsWith('/') ? cleanPath.slice(0, -1) : cleanPath;
 
-    // Construct URLs
-    const esUrl = `${baseUrl}/${cleanPath}`;
-    const enUrl = `${baseUrl}/en/${cleanPath}`;
+    // Construct URLs - Spanish is always base, English adds /en prefix
+    const esUrl = cleanPath ? `${baseUrl}/${cleanPath}` : baseUrl;
+    const enUrl = cleanPath ? `${baseUrl}/en/${cleanPath}` : `${baseUrl}/en`;
 
-    // Current URL based on language
+    // Current URL based on language (for OG tags and social sharing)
     const currentUrl = currentLang === 'en' ? enUrl : esUrl;
+
+    // ALWAYS use Spanish as canonical to consolidate SEO authority
+    const canonicalUrl = esUrl;
 
     return (
         <Helmet>
             <html lang={currentLang} />
             <title>{title || gameName}</title>
             <meta name="description" content={description} />
+
+            {/* Geographic Targeting */}
+            <meta name="geo.region" content={currentLang === 'es' ? 'ES' : 'US'} />
+
+            {/* Content Language - reinforces primary language signal */}
+            <meta httpEquiv="content-language" content="es, en" />
 
             {/* Open Graph */}
             <meta property="og:title" content={title || gameName} />
@@ -40,20 +55,40 @@ export function SEO({ title, description, path = "" }) {
             <meta name="twitter:title" content={title || gameName} />
             <meta name="twitter:description" content={description} />
 
-            {/* Hreflang */}
+            {/* Canonical - ALWAYS points to Spanish version */}
+            <link rel="canonical" href={canonicalUrl} />
+
+            {/* Hreflang with regional variants for better geographic targeting */}
             <link rel="alternate" hreflang="x-default" href={esUrl} />
             <link rel="alternate" hreflang="es" href={esUrl} />
+            <link rel="alternate" hreflang="es-ES" href={esUrl} />
+            <link rel="alternate" hreflang="es-MX" href={esUrl} />
+            <link rel="alternate" hreflang="es-AR" href={esUrl} />
             <link rel="alternate" hreflang="en" href={enUrl} />
-            <link rel="canonical" href={currentUrl} />
+            <link rel="alternate" hreflang="en-US" href={enUrl} />
+            <link rel="alternate" hreflang="en-GB" href={enUrl} />
 
-            {/* Structured Data (JSON-LD) */}
+            {/* Structured Data (JSON-LD) - Spanish always primary */}
             <script type="application/ld+json">
                 {JSON.stringify({
                     "@context": "https://schema.org",
                     "@type": "WebSite",
                     "name": "El Impostor",
-                    "alternateName": ["El Impostor Online", "The Impostor Game"],
-                    "url": "https://impostor.me/"
+                    "alternateName": ["El Impostor Online", "Juego del Impostor", "The Impostor Game"],
+                    "url": "https://impostor.me/",
+                    "inLanguage": ["es", "en"],
+                    "availableLanguage": [
+                        {
+                            "@type": "Language",
+                            "name": "Spanish",
+                            "alternateName": "es"
+                        },
+                        {
+                            "@type": "Language",
+                            "name": "English",
+                            "alternateName": "en"
+                        }
+                    ]
                 })}
             </script>
 
@@ -83,7 +118,8 @@ export function SEO({ title, description, path = "" }) {
                         "priceCurrency": "EUR",
                         "availability": "https://schema.org/InStock"
                     },
-                    "inLanguage": currentLang
+                    "inLanguage": ["es", "en"],
+                    "availableLanguage": ["es", "en"]
                 })}
             </script>
         </Helmet>

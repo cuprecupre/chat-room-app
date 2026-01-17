@@ -15,7 +15,7 @@ export function PrivacyPage() {
             <SEO
                 title={t('legal.privacy.title')}
                 description={t('legal.privacy.description')}
-                path={isEn ? '/en/privacy' : '/privacidad'}
+                path="privacidad"
             />
 
             <div className="max-w-3xl mx-auto">
