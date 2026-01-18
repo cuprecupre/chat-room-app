@@ -62,7 +62,7 @@ export function ChatBubble({
                     {[0, 1, 2].map((i) => (
                         <motion.span
                             key={i}
-                            className="w-1.5 h-1.5 bg-white/80 rounded-full"
+                            className="w-1.5 h-1.5 bg-white rounded-full"
                             animate={{
                                 y: [0, -5, 0],
                                 opacity: [0.4, 1, 0.4]
@@ -82,7 +82,7 @@ export function ChatBubble({
 
         if (isRevealed && text) {
             return (
-                <div className="px-4 py-2 text-white text-sm font-medium leading-relaxed">
+                <div className="px-4 py-2 text-orange-400 text-sm font-medium leading-relaxed">
                     {text}
                 </div>
             );
@@ -102,32 +102,35 @@ export function ChatBubble({
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                className={`
-                    relative inline-block
-                    bg-orange-600 backdrop-blur-md
-                    rounded-2xl
-                    ${position === 'left' ? 'rounded-tl-none' : 'rounded-tr-none'}
-                `}
+                className="relative inline-block"
                 aria-label={playerName ? `Pista de ${playerName}: ${text || 'esperando'}` : undefined}
             >
-                {content}
+                {/* Background Layer: Body + Seamless Tail */}
+                <div className={`absolute inset-0 z-0 ${isTyping ? 'opacity-100' : 'opacity-10'}`}>
+                    {/* Main Body */}
+                    <div className={`absolute inset-0 bg-orange-600 rounded-2xl ${position === 'left' ? 'rounded-tl-none' : 'rounded-tr-none'}`} />
 
-                {/* Bubble tail - Top corner refined */}
-                <div
-                    className={`
-                        absolute top-0 w-3 h-3
-                        bg-orange-600
-                        ${position === 'left'
-                            ? '-left-[11px]'
-                            : '-right-[11px]'
-                        }
-                    `}
-                    style={{
-                        clipPath: position === 'left'
-                            ? 'polygon(100% 0, 0 0, 100% 80%)'
-                            : 'polygon(0 0, 100% 0, 0 80%)'
-                    }}
-                />
+                    {/* Tail connected to body */}
+                    <div
+                        className={`
+                            absolute top-0 w-3 h-3 bg-orange-600
+                            ${position === 'left'
+                                ? '-left-[11px]'
+                                : '-right-[11px]'
+                            }
+                        `}
+                        style={{
+                            clipPath: position === 'left'
+                                ? 'polygon(100% 0, 0 0, 100% 80%)'
+                                : 'polygon(0 0, 100% 0, 0 80%)'
+                        }}
+                    />
+                </div>
+
+                {/* Content Layer (on top) */}
+                <div className="relative z-10">
+                    {content}
+                </div>
             </motion.div>
         </AnimatePresence>
     );
