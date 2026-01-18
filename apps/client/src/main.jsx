@@ -5,14 +5,16 @@ import "./index.css";
 import "./i18n"; // Initialize i18n before App
 import App from "./App.jsx";
 
-// Limpiar cualquier Service Worker registrado anteriormente
-// Esto fuerza a los usuarios a obtener contenido fresco
-if ("serviceWorker" in navigator) {
+// Limpiar Service Workers solo una vez por sesión (legacy cleanup)
+if ("serviceWorker" in navigator && !sessionStorage.getItem("sw-cleaned")) {
     navigator.serviceWorker.getRegistrations().then((registrations) => {
-        registrations.forEach((registration) => {
-            registration.unregister();
-            console.log("🧹 Service Worker eliminado:", registration.scope);
-        });
+        if (registrations.length > 0) {
+            registrations.forEach((registration) => {
+                registration.unregister();
+                console.log("🧹 Service Worker eliminado:", registration.scope);
+            });
+            sessionStorage.setItem("sw-cleaned", "true");
+        }
     });
 }
 

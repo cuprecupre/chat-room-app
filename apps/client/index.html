@@ -3,10 +3,8 @@
 
 <head>
   <meta charset="UTF-8" />
-  <!-- Desactivar bfcache para forzar contenido fresco -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
+  <!-- Cache strategy: index.html uses no-cache at server level (Render headers)
+       Assets use content hashing (e.g., index-AoVP9OhW.js) for cache busting -->
 
   <!-- Google Consent Mode (v2) - Region-specific defaults -->
   <script>
@@ -82,7 +80,9 @@
   <meta name="theme-color" content="#000000" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Trocchi&display=swap" rel="stylesheet">
+  <!-- display=optional prevents FOUT (flash of unstyled text) -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Trocchi&display=optional">
+  <link href="https://fonts.googleapis.com/css2?family=Trocchi&display=optional" rel="stylesheet">
 
   <!-- Bloquea zoom por gesto y por doble-tap -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />

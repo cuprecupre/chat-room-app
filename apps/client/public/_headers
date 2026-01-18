@@ -1,0 +1,47 @@
+# Render Static Site Headers Configuration
+# https://render.com/docs/static-site-headers
+
+# Cache strategy:
+# - index.html: Always revalidate (ensures users get latest app version)
+# - Assets with hash: Cache forever (Vite adds content hash to filenames)
+
+/index.html
+  Cache-Control: no-cache
+
+/*.html
+  Cache-Control: no-cache
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images can be cached for a long time
+/*.png
+  Cache-Control: public, max-age=2592000
+
+/*.jpg
+  Cache-Control: public, max-age=2592000
+
+/*.jpeg
+  Cache-Control: public, max-age=2592000
+
+/*.svg
+  Cache-Control: public, max-age=2592000
+
+/*.ico
+  Cache-Control: public, max-age=2592000
+
+# Manifest should be revalidated more frequently
+/site.webmanifest
+  Cache-Control: public, max-age=86400
