@@ -155,7 +155,12 @@ describe("Round Transitions (Integration)", () => {
             const friendIndex = sim.getNonImpostorIndex();
             sim.allVoteFor(friendIndex);
 
-            // Should trigger sudden death
+            // The flow now goes to round_result first (to show the eliminated overlay)
+            expect(sim.getState().phase).toBe("round_result");
+
+            // Then continue triggers the actual sudden death
+            sim.continueToNextRound();
+
             expect(sim.getState().phase).toBe("game_over");
             expect(sim.getState().winnerId).toBe(impostorId);
             expect(sim.getState().playerScores[impostorId]).toBe(10);

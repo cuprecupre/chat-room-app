@@ -192,6 +192,12 @@ describe("VotingManager - New System", () => {
             VotingManager.processVotingResults(game);
 
             // user2 eliminated, only user1 (impostor) and user3 left
+            // New flow: goes to round_result first to show elimination overlay
+            expect(game.phase).toBe("round_result");
+            expect(game.eliminatedPlayers).toContain("user2");
+
+            // Then startNextRound triggers actual sudden death
+            RoundManager.startNextRound(game);
             expect(game.phase).toBe("game_over");
             expect(game.winnerId).toBe("user1");
             expect(game.playerScores["user1"]).toBe(10); // Max points (bonus applied)

@@ -315,15 +315,6 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                 <div className="w-full flex flex-col items-center">
                     {isHost ? (
                         <>
-                            {state.players.length < 3 && (
-                                <div className="w-full max-w-sm mb-4 mx-6">
-                                    <div className="bg-orange-900/50 border border-orange-500/30 rounded-lg px-4 py-3">
-                                        <p className="text-orange-200 text-sm text-center">
-                                            {t('gameOver.needMorePlayers', 'Se necesitan al menos 3 jugadores para jugar otra partida')}
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
                             <Button
                                 onClick={() => {
                                     window.dataLayer = window.dataLayer || [];
@@ -336,10 +327,15 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                                 variant="primary"
                                 size="lg"
                                 disabled={state.players.length < 3}
-                                className="w-full max-w-sm text-lg py-6 mb-6 mx-6"
+                                className="w-full max-w-sm text-lg py-6 mb-2 mx-6"
                             >
                                 {tc('buttons.playAgain')}
                             </Button>
+                            {state.players.length < 3 && (
+                                <p className="text-neutral-400 text-xs text-center mb-6">
+                                    {t('gameOver.needMorePlayers', 'Se necesitan al menos 3 jugadores para jugar otra partida')}
+                                </p>
+                            )}
                         </>
                     ) : (
                         <div className="w-full bg-orange-900 px-3 py-2 shadow-2xl animate-slideUp flex items-center justify-center min-h-[64px]">

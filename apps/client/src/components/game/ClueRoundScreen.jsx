@@ -85,7 +85,7 @@ export function ClueRoundScreen({
     }, [turnStartedAt, timeoutMs, isCluePhase]);
 
     const TurnTimer = () => (
-        <div className="flex items-center gap-1.5 text-orange-500 bg-orange-500/10 px-2 py-1 rounded-md animate-pulse">
+        <div className="flex items-center gap-1.5 text-orange-500 bg-orange-500/10 px-2 py-1 rounded-md">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="14"
@@ -266,13 +266,41 @@ export function ClueRoundScreen({
                 {isVotingPhase && showRestOfUI && <HelpLink onOpenInstructions={onOpenInstructions} isChatMode={true} />}
 
                 {/* Bottom Input Area - Only in clue phase */}
-                {isCluePhase && showRestOfUI && (
-                    <ClueInput
-                        onSend={handleClueSubmit}
-                        isSubmitted={hasAlreadySubmitted}
-                        isMyTurn={isMyTurn}
-                    />
-                )}
+                <AnimatePresence>
+                    {isCluePhase && showRestOfUI && !hasAlreadySubmitted && (
+                        isMyTurn ? (
+                            <motion.div
+                                key="clue-input"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 20 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <ClueInput
+                                    onSend={handleClueSubmit}
+                                    isSubmitted={hasAlreadySubmitted}
+                                    isMyTurn={isMyTurn}
+                                />
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="wait-message"
+                                className="fixed bottom-0 left-0 right-0 !m-0 !p-0 z-20"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 20 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <div className="w-full bg-gradient-to-t from-black via-black/95 to-transparent pt-12 pb-6 px-4">
+                                    <div className="max-w-md mx-auto space-y-2 text-center">
+                                        <p className="text-neutral-400">{t('clueRound.waitForTurn', 'Espera tu turno para escribir tu pista')}</p>
+                                        <p className="text-xs text-neutral-500 uppercase tracking-wide">{t('clueRound.thinkTime', 'Piénsala bien. Tendrás 90 segundos')}</p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )
+                    )}
+                </AnimatePresence>
 
                 {/* Bottom padding */}
                 <div className="h-32" />

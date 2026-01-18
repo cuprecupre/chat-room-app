@@ -78,6 +78,8 @@
         "clueSubmitted": "Clue submitted!",
         "placeholder": "Write your clue...",
         "yourTurn": "It's your turn!",
+        "waitForTurn": "Wait for your turn to write your clue",
+        "thinkTime": "THINK IT THROUGH. YOU'LL HAVE 90 SECONDS",
         "canPreSubmit": "You can submit before your turn"
     },
     "preview": {

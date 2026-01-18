@@ -66,12 +66,10 @@ class ChatModeManager {
             return;
         }
 
-        // Set timeout for this turn (DISABLED as per user request)
-        /*
+        // Set timeout for this turn
         this.turnTimer = setTimeout(() => {
             this.handleTurnTimeout();
         }, CLUE_TIMEOUT_MS);
-        */
     }
 
     /**
@@ -114,7 +112,7 @@ class ChatModeManager {
 
         // Store the clue
         this.clues.set(playerId, {
-            text: filteredClue || "[sin pista]",
+            text: filteredClue || "El jugador no ha dado pista",
             submittedAt: Date.now()
         });
 
@@ -140,7 +138,7 @@ class ChatModeManager {
         let clue = this.clues.get(currentPlayer);
         if (!clue) {
             // Player didn't submit - use empty clue
-            clue = { text: "[sin pista]", submittedAt: Date.now() };
+            clue = { text: "El jugador no ha dado pista", submittedAt: Date.now() };
             this.clues.set(currentPlayer, clue);
         }
 
