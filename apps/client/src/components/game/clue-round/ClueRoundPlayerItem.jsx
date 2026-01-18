@@ -106,7 +106,7 @@ export function ClueRoundPlayerItem({
                         text={clue}
                         isRevealed={!!clue}
                         isTyping={!clue && isCurrentTurn && !hasPlayerSubmitted}
-                        isError={clue === "El jugador no ha dado la pista a tiempo"}
+                        isError={clue === "El jugador no dio una pista a tiempo"}
                         position="left"
                         playerName={player.name}
                     />

@@ -112,7 +112,7 @@ class ChatModeManager {
 
         // Store the clue
         this.clues.set(playerId, {
-            text: filteredClue || "El jugador no ha dado la pista a tiempo",
+            text: filteredClue || "El jugador no dio una pista a tiempo",
             submittedAt: Date.now()
         });
 
@@ -138,7 +138,7 @@ class ChatModeManager {
         let clue = this.clues.get(currentPlayer);
         if (!clue) {
             // Player didn't submit - use empty clue
-            clue = { text: "El jugador no ha dado la pista a tiempo", submittedAt: Date.now() };
+            clue = { text: "El jugador no dio una pista a tiempo", submittedAt: Date.now() };
             this.clues.set(currentPlayer, clue);
         }
 
