@@ -55,7 +55,7 @@ export function ClueInput({
                             onKeyDown={handleKeyDown}
                             placeholder={t('clueRound.placeholder', 'Escribe tu pista...')}
                             maxLength={maxClueLength}
-                            className="w-full px-4 py-3 pr-12 bg-neutral-200 border border-neutral-300 rounded-xl text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:border-orange-500 transition-colors shadow-sm"
+                            className="w-full px-4 py-3 pr-12 bg-neutral-200 border border-neutral-300 rounded-xl text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:border-2 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/10 transition-all shadow-sm"
                             autoComplete="off"
                         />
                         <button
