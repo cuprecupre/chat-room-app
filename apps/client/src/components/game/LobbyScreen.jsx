@@ -189,19 +189,19 @@ export function LobbyScreen({
                                 <div className="text-sm font-semibold text-neutral-400 mt-4">
                                     {t('lobby.playersConnected', 'Players connected')}: {state.players.length}
                                 </div>
+                                <div className="w-full mt-4">
+                                    <PlayerList
+                                        players={state.players}
+                                        currentUserId={user.uid}
+                                        isHost={isHost}
+                                        onCopyLink={onCopyLink}
+                                        gameState={state}
+                                        onVote={onVote}
+                                        onOpenInstructions={onOpenInstructions}
+                                        onKickPlayer={onKickPlayer}
+                                    />
+                                </div>
                             </div>
-
-
-                            <PlayerList
-                                players={state.players}
-                                currentUserId={user.uid}
-                                isHost={isHost}
-                                onCopyLink={onCopyLink}
-                                gameState={state}
-                                onVote={onVote}
-                                onOpenInstructions={onOpenInstructions}
-                                onKickPlayer={onKickPlayer}
-                            />
                         </div>
                     </div>
 
