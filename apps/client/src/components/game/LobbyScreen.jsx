@@ -166,7 +166,7 @@ export function LobbyScreen({
                                 </label>
                             </div>
 
-                            <div className="flex flex-col items-center gap-4 mb-8">
+                            <div className="flex flex-col items-center gap-4 mb-8 bg-white/5 rounded-2xl p-6 border-2 border-white/10">
                                 <Button
                                     onClick={onCopyLink}
                                     variant="outline"
