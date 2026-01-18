@@ -195,9 +195,11 @@ describe("PlayerManager", () => {
             const match = createMockMatch();
             PlayerManager.addPlayer(match, createMockUser("user1", "Player 1"));
             PlayerManager.addPlayer(match, createMockUser("user2", "Player 2"));
+            PlayerManager.addPlayer(match, createMockUser("user3", "Player 3"));
+            PlayerManager.addPlayer(match, createMockUser("user4", "Player 4"));
             match.phase = "playing";
             match.impostorId = "user2";
-            match.roundPlayers = ["user1", "user2"];
+            match.roundPlayers = ["user1", "user2", "user3", "user4"];
 
             const { playerIsImpostor } = PlayerManager.removePlayer(match, "user1");
 

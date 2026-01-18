@@ -98,6 +98,30 @@ function removePlayer(match, userId) {
         return { newHostInfo, playerIsImpostor };
     }
 
+    // NUEVO: Verificar si quedan menos de 3 jugadores activos durante partida
+    if ((phaseBeforeRemoval === "playing" || phaseBeforeRemoval === "clue_round") && !playerIsImpostor) {
+        const activePlayers = match.roundPlayers.filter((uid) =>
+            !match.eliminatedPlayers.includes(uid)
+        );
+
+        if (activePlayers.length < 3) {
+            const ScoringManager = require("./ScoringManager");
+            console.log(`[Match ${match.matchId}] Menos de 3 jugadores activos (${activePlayers.length}). Impostor gana por abandono.`);
+
+            // Give impostor survival points for current round
+            ScoringManager.giveImpostorSurvivalPoints(match);
+            // Give impostor max bonus points
+            ScoringManager.giveImpostorMaxPoints(match);
+
+            // Force game over with impostor winning
+            match.winnerId = match.impostorId;
+            match.phase = "game_over";
+            match.persistAnalytics("impostor_survived");
+
+            return { newHostInfo, playerIsImpostor, matchEnded: true };
+        }
+    }
+
     // CRITICAL FIX: Si estábamos en votación y el jugador NO era impostor,
     // verificar si los jugadores restantes ya completaron la votación
     if (phaseBeforeRemoval === "playing" && !playerIsImpostor) {

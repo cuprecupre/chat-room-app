@@ -21,7 +21,8 @@
         "leaderboard": "Tabla de Posiciones",
         "howPointsWork": "¿Cómo se calculan los puntos?",
         "waitingForHost": "Esperando a que",
-        "toStartAnother": "inicie otra partida"
+        "toStartAnother": "inicie otra partida",
+        "needMorePlayers": "Se necesitan al menos 3 jugadores para jugar otra partida"
     },
     "scoring": {
         "title": "Sistema de Puntuación",

@@ -74,30 +74,34 @@ describe("Room & Match Session Flow", () => {
     test("Match Flow: Host creating match from room", async () => {
         const host = { uid: "host1", name: "Host" };
         const p2 = { uid: "p2", name: "P2" };
+        const p3 = { uid: "p3", name: "P3" };
 
         const room = roomManager.createRoom(host, {});
         room.addPlayer(p2);
+        room.addPlayer(p3);
 
-        expect(room.players).toHaveLength(2);
+        expect(room.players).toHaveLength(3);
 
         // Host starts match
         const match = room.startMatch(host.uid);
 
         expect(room.phase).toBe("playing");
         expect(room.currentMatch).toBe(match);
-        expect(match.players).toHaveLength(2);
+        expect(match.players).toHaveLength(3);
         expect(match.roomId).toBe(room.roomId);
     });
 
     test("Leave Match logic: User returns to lobby but stays in room", async () => {
         const host = { uid: "host1", name: "Host" };
         const p2 = { uid: "p2", name: "P2" };
+        const p3 = { uid: "p3", name: "P3" };
 
         const room = roomManager.createRoom(host, {});
         room.addPlayer(p2);
+        room.addPlayer(p3);
 
         const match = room.startMatch(host.uid);
-        expect(match.players).toHaveLength(2);
+        expect(match.players).toHaveLength(3);
 
         // P2 leaves match (returns to lobby)
         room.leaveMatch(p2.uid);

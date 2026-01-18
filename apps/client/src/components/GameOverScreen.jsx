@@ -251,21 +251,33 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
             <div className="fixed bottom-0 left-0 right-0 pt-16 pb-0 px-0 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent z-40" >
                 <div className="w-full flex flex-col items-center">
                     {isHost ? (
-                        <Button
-                            onClick={() => {
-                                window.dataLayer = window.dataLayer || [];
-                                window.dataLayer.push({
-                                    event: 'play_again_click',
-                                    location: 'game_over_screen',
-                                });
-                                onPlayAgain();
-                            }}
-                            variant="primary"
-                            size="lg"
-                            className="w-full max-w-sm text-lg py-6 mb-6 mx-6"
-                        >
-                            {tc('buttons.playAgain')}
-                        </Button>
+                        <>
+                            {state.players.length < 3 && (
+                                <div className="w-full max-w-sm mb-4 mx-6">
+                                    <div className="bg-orange-900/50 border border-orange-500/30 rounded-lg px-4 py-3">
+                                        <p className="text-orange-200 text-sm text-center">
+                                            {t('gameOver.needMorePlayers', 'Se necesitan al menos 3 jugadores para jugar otra partida')}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                            <Button
+                                onClick={() => {
+                                    window.dataLayer = window.dataLayer || [];
+                                    window.dataLayer.push({
+                                        event: 'play_again_click',
+                                        location: 'game_over_screen',
+                                    });
+                                    onPlayAgain();
+                                }}
+                                variant="primary"
+                                size="lg"
+                                disabled={state.players.length < 3}
+                                className="w-full max-w-sm text-lg py-6 mb-6 mx-6"
+                            >
+                                {tc('buttons.playAgain')}
+                            </Button>
+                        </>
                     ) : (
                         <div className="w-full bg-orange-900 px-3 py-2 shadow-2xl animate-slideUp flex items-center justify-center min-h-[64px]">
                             <p className="text-orange-50 text-sm leading-tight text-center w-full">

@@ -215,13 +215,13 @@ class Match {
     }
 
     removePlayer(userId) {
-        const { newHostInfo, playerIsImpostor } = PlayerManager.removePlayer(this, userId);
+        const { newHostInfo, playerIsImpostor, matchEnded } = PlayerManager.removePlayer(this, userId);
 
         if (this.phase === "playing" && !playerIsImpostor) {
             VotingManager.checkIfAllVoted(this);
         }
 
-        return newHostInfo;
+        return { newHostInfo, matchEnded };
     }
 
     /**

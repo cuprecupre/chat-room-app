@@ -12,10 +12,12 @@ function isWordInLanguage(word, lang) {
 describe("Language Selection Integration", () => {
     const hostUser = { uid: "host1", name: "Host", photoURL: null };
     const player2 = { uid: "p2", name: "Player 2", photoURL: null };
+    const player3 = { uid: "p3", name: "Player 3", photoURL: null };
 
     test("Room created with 'es' should select Spanish words", () => {
         const room = new Room(hostUser, { language: 'es' });
         room.addPlayer(player2);
+        room.addPlayer(player3);
 
         // Start match
         room.startMatch(hostUser.uid);
@@ -39,6 +41,7 @@ describe("Language Selection Integration", () => {
     test("Room created with 'en' should select English words", () => {
         const room = new Room(hostUser, { language: 'en' });
         room.addPlayer(player2);
+        room.addPlayer(player3);
 
         // Start match
         room.startMatch(hostUser.uid);
@@ -59,6 +62,7 @@ describe("Language Selection Integration", () => {
     test("Room defaulted should use 'es'", () => {
         const room = new Room(hostUser, {}); // No language
         room.addPlayer(player2);
+        room.addPlayer(player3);
 
         room.startMatch(hostUser.uid);
 
@@ -73,6 +77,7 @@ describe("Language Selection Integration", () => {
         // 1. Create room (defaults to 'es')
         const room = new Room(hostUser, {});
         room.addPlayer(player2);
+        room.addPlayer(player3);
 
         expect(room.language).toBe('es');
 

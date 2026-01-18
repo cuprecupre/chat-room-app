@@ -146,6 +146,12 @@ class Room {
         // Propagate removal to current match if exists
         if (this.currentMatch) {
             const matchResult = this.currentMatch.removePlayer(userId);
+
+            // Si la partida terminó por falta de jugadores, actualizar fase de Room
+            if (matchResult.matchEnded) {
+                this.onMatchEnd();
+            }
+
             return { ...matchResult, newHostInfo };
         }
 
@@ -257,15 +263,15 @@ class Room {
             console.error(`[Room ${this.roomId}] startMatch denied: userId=${userId} !== hostId=${this.hostId}`);
             throw new Error("Only the host can start a new match.");
         }
-        if (this.players.length < 2) {
-            throw new Error("Se necesitan al menos 2 jugadores para comenzar.");
+        if (this.players.length < 3) {
+            throw new Error("Se necesitan al menos 3 jugadores para comenzar.");
         }
 
         // Get eligible players (exclude late joiners)
         const eligiblePlayers = this.players.filter(p => !p.isLateJoiner);
 
-        if (eligiblePlayers.length < 2) {
-            throw new Error("Not enough eligible players to start.");
+        if (eligiblePlayers.length < 3) {
+            throw new Error("Se necesitan al menos 3 jugadores para comenzar.");
         }
 
         // Update room options if provided
@@ -368,6 +374,12 @@ class Room {
         if (userId !== this.hostId) {
             console.error(`[Room ${this.roomId}] playAgain denied: userId=${userId} !== hostId=${this.hostId}`);
             throw new Error("Only the host can start a new match.");
+        }
+
+        // Validar jugadores mínimos ANTES de resetear
+        const eligiblePlayers = this.players.filter(p => !p.isLateJoiner);
+        if (eligiblePlayers.length < 3) {
+            throw new Error("Se necesitan al menos 3 jugadores para comenzar una nueva partida.");
         }
 
         // Reset room phase

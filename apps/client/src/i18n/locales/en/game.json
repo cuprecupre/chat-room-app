@@ -21,7 +21,8 @@
         "leaderboard": "Leaderboard",
         "howPointsWork": "How are points calculated?",
         "waitingForHost": "Waiting for",
-        "toStartAnother": "to start another game"
+        "toStartAnother": "to start another game",
+        "needMorePlayers": "At least 3 players are needed to play another game"
     },
     "scoring": {
         "title": "Scoring System",

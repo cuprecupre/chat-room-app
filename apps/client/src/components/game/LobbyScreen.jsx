@@ -206,7 +206,7 @@ export function LobbyScreen({
                             <div className="max-w-md mx-auto">
                                 <Button
                                     onClick={handleStartGame}
-                                    disabled={state.players.length < 2}
+                                    disabled={state.players.length < 3}
                                     variant="primary"
                                     size="md"
                                     className="w-full shadow-2xl"
