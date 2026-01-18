@@ -106,7 +106,7 @@ export function LobbyScreen({
                                         <span className={`block font-bold text-sm mb-1 ${gameMode === 'chat' ? "text-orange-400" : "text-neutral-200"}`}>
                                             Modo Chat
                                         </span>
-                                        <p className="text-[10px] leading-relaxed text-neutral-400">
+                                        <p className="text-xs text-neutral-500 mt-1 leading-relaxed font-sans">
                                             Los jugadores dan sus pistas por medio de un chat interactivo.
                                         </p>
                                     </div>
@@ -130,7 +130,7 @@ export function LobbyScreen({
                                         <span className={`block font-bold text-sm mb-1 ${gameMode === 'voice' ? "text-orange-400" : "text-neutral-200"}`}>
                                             Modo voz
                                         </span>
-                                        <p className="text-[10px] leading-relaxed text-neutral-400">
+                                        <p className="text-xs text-neutral-500 mt-1 leading-relaxed font-sans">
                                             Los jugadores dan sus pistas por voz. Ideal para jugar juntos o en llamada.
                                         </p>
                                     </div>
