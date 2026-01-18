@@ -77,10 +77,8 @@ export function LobbyScreen({
             {isHost ? (
                 /* HOST VIEW */
                 <>
-                    <h2 className="text-4xl font-serif text-neutral-50 leading-tight">
-                        {t('lobby.inviteFriendsTitle', 'Invite your friends')}
-                        <br />
-                        {t('lobby.toStart', 'to start')}
+                    <h2 className="text-4xl font-serif text-neutral-50 leading-tight text-balance">
+                        {t('lobby.inviteFriendsTitle', 'Invite your friends')} {t('lobby.toStart', 'to start')}
                     </h2>
 
                     <div className="w-full space-y-4 mt-8">
@@ -230,7 +228,7 @@ export function LobbyScreen({
             ) : (
                 /* GUEST VIEW */
                 <>
-                    <h2 className="text-4xl font-serif text-neutral-50 leading-tight">
+                    <h2 className="text-4xl font-serif text-neutral-50 leading-tight text-balance">
                         {t('lobby.gameStartingSoon', 'Game starting soon')}
                     </h2>
 
