@@ -59,6 +59,8 @@ export function Avatar({ photoURL, displayName, size = "md", className = "" }) {
     const initials = getInitials(displayName);
     const bgColor = getColorFromName(displayName);
 
+    const [isLoaded, setIsLoaded] = React.useState(false);
+
     // Si tiene foto de Google Y no ha fallado → mostrar imagen
     if (photoURL && !imgError) {
         return (
@@ -66,7 +68,9 @@ export function Avatar({ photoURL, displayName, size = "md", className = "" }) {
                 <img
                     src={photoURL}
                     alt={displayName}
-                    className="w-full h-full object-cover"
+                    onLoad={() => setIsLoaded(true)}
+                    className={`w-full h-full object-cover transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'
+                        }`}
                     style={{ display: "block" }}
                     onError={() => setImgError(true)}
                 />
