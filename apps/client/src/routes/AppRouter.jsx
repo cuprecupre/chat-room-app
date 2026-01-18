@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, lazy } from "react";
 import { useTranslation } from "react-i18next";
 import { HelmetProvider } from "react-helmet-async";
 import { useAuth } from "../hooks/useAuth";
@@ -18,18 +18,20 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import { AdminProtectedRoute } from "./AdminProtectedRoute";
 import { ROUTES } from "./routes";
 import { HomeRoute, AuthRoute, GuestAuthRoute, GameRoute } from "./handlers";
-import { LobbyPage } from "../pages/LobbyPage";
-import { RulesPage } from "../pages/RulesPage";
-import { PrivacyPage } from "../pages/PrivacyPage";
-import { CookiesPage } from "../pages/CookiesPage";
-import { ProfilePage } from "../pages/ProfilePage";
-import { SetupProfilePage } from "../pages/SetupProfilePage";
-import { AdminIndex } from "../pages/Admin";
 import DebugPreviews from "../pages/DebugPreviews";
 import DebugPreviewSingle from "../pages/DebugPreviewSingle";
 
-// Firebase Storage CDN URL
-const heroImg = "https://firebasestorage.googleapis.com/v0/b/impostor-468e0.firebasestorage.app/o/impostor-assets%2Fimpostor-home.jpg?alt=media";
+// Lazy load pages for code splitting & faster initial load
+const LobbyPage = lazy(() => import("../pages/LobbyPage").then(module => ({ default: module.LobbyPage })));
+const RulesPage = lazy(() => import("../pages/RulesPage").then(module => ({ default: module.RulesPage })));
+const PrivacyPage = lazy(() => import("../pages/PrivacyPage").then(module => ({ default: module.PrivacyPage })));
+const CookiesPage = lazy(() => import("../pages/CookiesPage").then(module => ({ default: module.CookiesPage })));
+const ProfilePage = lazy(() => import("../pages/ProfilePage").then(module => ({ default: module.ProfilePage })));
+const SetupProfilePage = lazy(() => import("../pages/SetupProfilePage").then(module => ({ default: module.SetupProfilePage })));
+const AdminIndex = lazy(() => import("../pages/Admin").then(module => ({ default: module.AdminIndex })));
+
+// Local hero image (Self-hosted to prevent FOUC/Flicker)
+const heroImg = "/images/impostor-home.jpg";
 
 function AppRoutes({
     user,
@@ -296,22 +298,11 @@ export function AppRouter() {
     } = useAuth();
     const { connected, gameState, emit, joinError, clearJoinError, shutdownCountdown, socketRef } =
         useSocket(user);
-    const [showLoader, setShowLoader] = useState(false);
 
-    // Show loader only if loading takes more than 500ms (avoid flicker on quick reloads)
-    useEffect(() => {
-        let timeout;
-        if (loading) {
-            timeout = setTimeout(() => {
-                setShowLoader(true);
-            }, 500);
-        } else {
-            setShowLoader(false);
-        }
-        return () => clearTimeout(timeout);
-    }, [loading]);
 
-    if (loading && showLoader) {
+    // Optimized loader: Always show immediately when loading to prevent flickering
+    // effectively eliminating the white flash between auth states
+    if (loading) {
         return (
             <div className="w-full h-[100dvh] flex items-center justify-center bg-neutral-950 text-white">
                 <div className="flex flex-col items-center gap-6 text-center">
