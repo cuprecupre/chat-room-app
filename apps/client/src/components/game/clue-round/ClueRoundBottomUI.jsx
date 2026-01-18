@@ -22,9 +22,9 @@ export function ClueRoundBottomUI({
             {isVisible && (
                 <motion.div
                     key={isMyTurn ? "clue-input" : "wait-message"}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 20 }}
+                    initial={{ y: 20 }}
+                    animate={{ y: 0 }}
+                    exit={{ y: 20 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     className="fixed bottom-0 left-0 right-0 z-50 bg-black pt-2 pb-4 px-4 !m-0"
                 >
