@@ -16,6 +16,7 @@ export function ChatBubble({
     text,
     isRevealed = false,
     isTyping = false,
+    isError = false,
     position = 'left',
     playerName = ''
 }) {
@@ -82,7 +83,7 @@ export function ChatBubble({
 
         if (isRevealed && text) {
             return (
-                <div className="px-4 py-2 text-orange-400 text-sm font-medium leading-relaxed">
+                <div className={`px-4 py-2 ${isError ? 'text-neutral-400' : 'text-orange-400'} text-sm font-medium leading-relaxed`}>
                     {text}
                 </div>
             );
@@ -108,12 +109,12 @@ export function ChatBubble({
                 {/* Background Layer: Body + Seamless Tail */}
                 <div className={`absolute inset-0 z-0 ${isTyping ? 'opacity-100' : 'opacity-10'}`}>
                     {/* Main Body */}
-                    <div className={`absolute inset-0 bg-orange-600 rounded-2xl ${position === 'left' ? 'rounded-tl-none' : 'rounded-tr-none'}`} />
+                    <div className={`absolute inset-0 ${isError ? 'bg-neutral-500' : 'bg-orange-600'} rounded-2xl ${position === 'left' ? 'rounded-tl-none' : 'rounded-tr-none'}`} />
 
                     {/* Tail connected to body */}
                     <div
                         className={`
-                            absolute top-0 w-3 h-3 bg-orange-600
+                            absolute top-0 w-3 h-3 ${isError ? 'bg-neutral-500' : 'bg-orange-600'}
                             ${position === 'left'
                                 ? '-left-[11px]'
                                 : '-right-[11px]'
