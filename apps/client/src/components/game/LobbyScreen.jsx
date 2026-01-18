@@ -186,11 +186,12 @@ export function LobbyScreen({
                                 <p className="text-sm text-neutral-400 font-regular animate-pulse max-w-[280px] mx-auto">
                                     {t('lobby.shareAndWait', 'Share the link and wait for players to join')}
                                 </p>
+                                <div className="text-sm font-semibold text-neutral-400 mt-4">
+                                    {t('lobby.playersConnected', 'Players connected')}: {state.players.length}
+                                </div>
                             </div>
 
-                            <div className="text-sm font-semibold text-neutral-400 text-left px-1 mt-8 mb-3">
-                                {t('lobby.playersConnected', 'Players connected')}: {state.players.length}
-                            </div>
+
                             <PlayerList
                                 players={state.players}
                                 currentUserId={user.uid}
