@@ -200,6 +200,11 @@ export function LobbyScreen({
                                         onOpenInstructions={onOpenInstructions}
                                         onKickPlayer={onKickPlayer}
                                     />
+                                    {state.players.length < 3 && (
+                                        <p className="text-xs text-orange-400 mt-4 text-center animate-pulse">
+                                            {t('lobby.minPlayersWarning', 'Minimum 3 players needed to start')}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>

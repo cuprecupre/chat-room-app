@@ -50,6 +50,7 @@
         "alsoInvite": "También puedes invitar amigos a esta partida",
         "waitingForPlayers": "Esperando jugadores",
         "minPlayers": "Mínimo 4 jugadores para empezar",
+        "minPlayersWarning": "Se necesitan al menos 3 jugadores para comenzar",
         "inviteFriends": "¡Invita a tus amigos!",
         "shareLink": "Comparte este enlace:",
         "copyLink": "Copiar enlace",
