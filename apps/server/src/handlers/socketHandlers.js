@@ -199,7 +199,14 @@ async function handleJoinRoom(io, socket, user, roomId) {
 
     roomToJoin.addPlayer(user);
     socket.join(roomId);
-    roomManager.emitRoomState(roomToJoin);
+
+    // Send full state to the joining player
+    socket.emit("game-state", roomToJoin.getStateFor(user.uid));
+
+    // Send delta update to existing players (bandwidth optimization)
+    if (!isAlreadyInRoom) {
+        roomManager.emitPlayerUpdate(roomToJoin, "joined", user);
+    }
 
     // Cancel any pending cleanup for this room (player rejoined)
     roomManager.cancelEmptyRoomCleanup(roomId);
@@ -372,6 +379,8 @@ function handleLeaveRoom(io, socket, user, roomId, callback) {
         return;
     }
 
+    // Save player info before removal for delta update
+    const leavingPlayer = { uid: user.uid, name: user.name, photoURL: user.photoURL };
 
     sessionManager.markExplicitlyLeft(user.uid);
     sessionManager.clearPendingDisconnect(user.uid);
@@ -382,8 +391,10 @@ function handleLeaveRoom(io, socket, user, roomId, callback) {
     socket.emit("game-state", null);
     socket.leave(roomId);
 
-    // Notify remaining players
-    roomManager.emitRoomState(room);
+    // Send delta update to remaining players (bandwidth optimization)
+    if (room.players.length > 0) {
+        roomManager.emitPlayerUpdate(room, "left", leavingPlayer);
+    }
 
     // Send toast notification
     if (room.players.length > 0) {
@@ -433,12 +444,11 @@ function handleKickPlayer(io, socket, user, roomId, targetId) {
         // Clear session data for kicked player
         sessionManager.clearPendingDisconnect(targetId);
 
-        // Emit updated room state to remaining players
-        roomManager.emitRoomState(room);
+        // Send delta update to remaining players (bandwidth optimization)
+        roomManager.emitPlayerUpdate(room, "kicked", result.kickedPlayer);
 
-        // Notify remaining players
+        // Notify remaining players with toast
         roomManager.emitToast(roomId, `${result.kickedPlayer.name} ha sido expulsado de la sala`);
-
 
     } catch (error) {
         socket.emit("error", { message: error.message });
