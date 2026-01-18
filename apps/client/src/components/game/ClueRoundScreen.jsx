@@ -271,7 +271,7 @@ export function ClueRoundScreen({
                         isMyTurn ? (
                             <motion.div
                                 key="clue-input"
-                                initial={{ y: 0 }}
+                                initial={{ y: "100%" }}
                                 animate={{ y: 0 }}
                                 exit={{ y: "100%" }}
                                 transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
@@ -291,7 +291,7 @@ export function ClueRoundScreen({
                             <motion.div
                                 key="wait-message"
                                 className="fixed bottom-0 left-0 right-0 !m-0 !p-0 z-20"
-                                initial={{ y: 20, opacity: 0 }}
+                                initial={{ y: "100%", opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 exit={{ y: "100%" }}
                                 transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
