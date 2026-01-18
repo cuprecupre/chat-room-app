@@ -63,7 +63,8 @@
         "startGame": "Comenzar partida",
         "chatMode": "Modo chat",
         "chatModeDesc": "Los jugadores escriben sus pistas en lugar de hablar.",
-        "chatModeOn": "Modo chat activado"
+        "chatModeOn": "Modo chat activado",
+        "voiceModeOn": "Modo voz activado"
     },
     "clueRound": {
         "title": "Ronda de Pistas",

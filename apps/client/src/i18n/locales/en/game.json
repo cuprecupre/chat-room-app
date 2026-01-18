@@ -63,7 +63,8 @@
         "startGame": "Start game",
         "chatMode": "Chat mode",
         "chatModeDesc": "Players write their clues instead of speaking.",
-        "chatModeOn": "Chat mode enabled"
+        "chatModeOn": "Chat mode enabled",
+        "voiceModeOn": "Voice mode enabled"
     },
     "clueRound": {
         "title": "Clue Round",
