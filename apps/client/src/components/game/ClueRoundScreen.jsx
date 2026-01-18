@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, MoreVertical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ChatBubble } from '../ui/ChatBubble';
 import { Avatar } from '../ui/Avatar';
@@ -9,6 +9,8 @@ import { HelpLink } from './HelpLink';
 import { GameHeader } from './GameHeader';
 import { ClueInput } from './ClueInput';
 import { Button } from '../ui/Button';
+import { KickPlayerModal } from '../KickPlayerModal';
+import { PlayerActionsSheet } from './PlayerActionsSheet';
 
 /**
  * ClueRoundScreen - Unified screen for Chat Mode (clue submission + voting)
@@ -20,9 +22,16 @@ export function ClueRoundScreen({
     onSubmitClue,
     onVote,
     onOpenInstructions,
+    showRestOfUI = true,
+    initialAnimationPending = false,
+    showCardEntrance = false,
+    onKickPlayer,
+    isHost,
 }) {
     const { t } = useTranslation('game');
     const [hasSubmitted, setHasSubmitted] = useState(false);
+    const [kickTarget, setKickTarget] = useState(null);
+    const [actionTarget, setActionTarget] = useState(null);
 
     // Determine which phase we're in
     const isVotingPhase = state.phase === 'playing';
@@ -86,8 +95,8 @@ export function ClueRoundScreen({
     return (
         <div className="w-full">
             {/* Game Header (Stepper + Title) */}
-            <div className="pb-6 sm:pb-8 space-y-6">
-                <GameHeader state={state} />
+            <div className={`pb-6 sm:pb-8 space-y-6 ${showRestOfUI ? "" : "opacity-0 pointer-events-none"}`}>
+                <GameHeader state={state} showAnimation={showRestOfUI} />
             </div>
 
             {/* Main content container */}
@@ -97,14 +106,14 @@ export function ClueRoundScreen({
                 <div className="w-full max-w-xs mx-auto">
                     <GameCard
                         state={state}
-                        showRestOfUI={true}
-                        showCardEntrance={false}
-                        initialAnimationPending={false}
+                        showRestOfUI={showRestOfUI}
+                        showCardEntrance={showCardEntrance}
+                        initialAnimationPending={initialAnimationPending}
                     />
                 </div>
 
                 {/* Players List - Using same styles as PlayerList.jsx */}
-                <ul className="space-y-2">
+                <ul className={`space-y-2 ${showRestOfUI ? "animate-fadeIn animate-delay-800" : "opacity-0 pointer-events-none"}`}>
                     {sortedPlayers.map((player) => {
                         const isCurrentTurn = player.uid === currentTurnPlayerId;
                         const isRevealed = revealedPlayerIds.includes(player.uid);
@@ -126,13 +135,6 @@ export function ClueRoundScreen({
                                         <div className="relative">
                                             <Avatar photoURL={player.photoURL} displayName={player.name} size="sm" />
                                             {/* Status indicator */}
-                                            {isCluePhase && (isRevealed || hasPlayerSubmitted) && (
-                                                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-neutral-950 flex items-center justify-center">
-                                                    <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                                    </svg>
-                                                </div>
-                                            )}
                                             {isVotingPhase && hasPlayerVoted && (
                                                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-neutral-950 flex items-center justify-center">
                                                     <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
@@ -168,31 +170,43 @@ export function ClueRoundScreen({
                                                 <span>{iVotedForThisPlayer ? t('playing.voted', 'Voted') : t('playing.vote', 'Vote')}</span>
                                             </Button>
                                         )}
+
+                                        {/* Kick action for host */}
+                                        {isHost && !isMe && onKickPlayer && (
+                                            <button
+                                                onClick={() => setActionTarget(player)}
+                                                className="p-2 -mr-2 text-neutral-400 hover:text-white rounded-full hover:bg-white/5 transition-colors"
+                                            >
+                                                <MoreVertical className="w-5 h-5" />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
                                 {/* Clue/Typing area - always in the same place below the name */}
-                                {(clue || (isCluePhase && isCurrentTurn)) && (
-                                    <div className="mt-3 pl-11 w-full">
-                                        <ChatBubble
-                                            text={clue}
-                                            isRevealed={!!clue}
-                                            isTyping={!clue && isCurrentTurn}
-                                            position="left"
-                                            playerName={player.name}
-                                        />
-                                    </div>
-                                )}
+                                {
+                                    (clue || (isCluePhase && isCurrentTurn)) && (
+                                        <div className="mt-3 pl-11 w-full">
+                                            <ChatBubble
+                                                text={clue}
+                                                isRevealed={!!clue}
+                                                isTyping={!clue && isCurrentTurn}
+                                                position="left"
+                                                playerName={player.name}
+                                            />
+                                        </div>
+                                    )
+                                }
                             </li>
                         );
                     })}
                 </ul>
 
                 {/* Help link like in PlayerList */}
-                {isVotingPhase && <HelpLink onOpenInstructions={onOpenInstructions} isChatMode={true} />}
+                {isVotingPhase && showRestOfUI && <HelpLink onOpenInstructions={onOpenInstructions} isChatMode={true} />}
 
                 {/* Bottom Input Area - Only in clue phase */}
-                {isCluePhase && (
+                {isCluePhase && showRestOfUI && (
                     <ClueInput
                         onSend={handleClueSubmit}
                         isSubmitted={hasAlreadySubmitted}
@@ -202,6 +216,30 @@ export function ClueRoundScreen({
 
                 {/* Bottom padding */}
                 <div className="h-32" />
+
+                {/* Player options sheet (Drawer) */}
+                <PlayerActionsSheet
+                    isOpen={!!actionTarget}
+                    onClose={() => setActionTarget(null)}
+                    playerName={actionTarget?.name || ""}
+                    onKick={() => {
+                        setKickTarget(actionTarget);
+                        setActionTarget(null);
+                    }}
+                />
+
+                {/* Kick confirmation modal */}
+                <KickPlayerModal
+                    isOpen={!!kickTarget}
+                    onClose={() => setKickTarget(null)}
+                    onConfirm={() => {
+                        if (kickTarget) {
+                            onKickPlayer(kickTarget.uid);
+                            setKickTarget(null);
+                        }
+                    }}
+                    playerName={kickTarget?.name || ""}
+                />
             </div>
         </div>
     );

@@ -22,13 +22,17 @@ export function RoundStartOverlay({ state }) {
             return;
         }
 
-        // Show overlay when entering playing phase with a new round
-        if (state.phase === "playing" && (prevPhase !== "playing" || state.currentRound !== prevRound)) {
+        // Show overlay when entering playing OR clue_round phase with a new round
+        // This covers both Voice Mode (starts in playing) and Chat Mode (starts in clue_round)
+        const isGamePhase = state.phase === "playing" || state.phase === "clue_round";
+        const prevWasGamePhase = prevPhase === "playing" || prevPhase === "clue_round";
+
+        if (isGamePhase && (!prevWasGamePhase || state.currentRound !== prevRound)) {
             setDisplayedRound(state.currentRound);
             setVisible(true);
             const timer = setTimeout(() => setVisible(false), 3000);
             return () => clearTimeout(timer);
-        } else if (state.phase !== "playing") {
+        } else if (!isGamePhase) {
             setVisible(false);
         }
     }, [state.currentRound, state.phase]);

@@ -106,7 +106,61 @@ export function LobbyScreen({
 
                         <div className="w-full pt-2">
                             {/* Opciones de juego (solo para el host antes de empezar) */}
-                            <div className="bg-white/5 rounded-md p-4 font-sans mb-4">
+
+                            {/* Game Mode Selector (Square Toggles) */}
+                            <div className="grid grid-cols-2 gap-3 mb-6">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setGameMode('chat');
+                                        if (onUpdateOptions) onUpdateOptions({ gameMode: 'chat' });
+                                    }}
+                                    className={`flex flex-col items-center justify-between p-4 rounded-2xl border-2 transition-all text-left h-full ${gameMode === 'chat'
+                                        ? "border-orange-500 bg-orange-500/5 shadow-[0_0_15px_rgba(249,115,22,0.1)]"
+                                        : "border-white/10 bg-white/5 hover:border-white/20"
+                                        }`}
+                                >
+                                    <div className="w-full">
+                                        <span className={`block font-bold text-sm mb-1 ${gameMode === 'chat' ? "text-orange-400" : "text-neutral-200"}`}>
+                                            Modo Chat
+                                        </span>
+                                        <p className="text-[10px] leading-relaxed text-neutral-400">
+                                            Los jugadores dan sus pistas por medio de un chat interactivo.
+                                        </p>
+                                    </div>
+                                    <div className={`mt-3 w-full flex justify-end ${gameMode === 'chat' ? "text-orange-500" : "text-white/10"}`}>
+                                        <MessageCircle className="w-4 h-4" />
+                                    </div>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setGameMode('voice');
+                                        if (onUpdateOptions) onUpdateOptions({ gameMode: 'voice' });
+                                    }}
+                                    className={`flex flex-col items-center justify-between p-4 rounded-2xl border-2 transition-all text-left h-full ${gameMode === 'voice'
+                                        ? "border-orange-500 bg-orange-500/5 shadow-[0_0_15px_rgba(249,115,22,0.1)]"
+                                        : "border-white/10 bg-white/5 hover:border-white/20"
+                                        }`}
+                                >
+                                    <div className="w-full">
+                                        <span className={`block font-bold text-sm mb-1 ${gameMode === 'voice' ? "text-orange-400" : "text-neutral-200"}`}>
+                                            Modo voz
+                                        </span>
+                                        <p className="text-[10px] leading-relaxed text-neutral-400">
+                                            Los jugadores dan sus pistas por voz. Ideal para jugar juntos o en llamada.
+                                        </p>
+                                    </div>
+                                    <div className={`mt-3 w-full flex justify-end ${gameMode === 'voice' ? "text-orange-500" : "text-white/10"}`}>
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                        </svg>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <div className="bg-white/5 rounded-md p-4 font-sans mb-6">
                                 <label className="flex items-center justify-between cursor-pointer gap-4">
                                     <div className="flex-1 text-left">
                                         <span className="text-sm font-semibold text-neutral-300">
@@ -130,31 +184,6 @@ export function LobbyScreen({
                                 </label>
                             </div>
 
-                            {/* Game Mode Selector */}
-                            <div className="bg-white/5 rounded-md p-4 font-sans mb-4">
-                                <label className="flex items-center justify-between cursor-pointer gap-4">
-                                    <div className="flex-1 text-left">
-                                        <span className="text-sm font-semibold text-neutral-300">
-                                            {t('lobby.chatMode', 'Chat mode')}
-                                        </span>
-                                        <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
-                                            {t('lobby.chatModeDesc', 'Players write their clues instead of speaking.')}
-                                        </p>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={handleToggleGameMode}
-                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-neutral-950 ${gameMode === 'chat' ? "bg-blue-500" : "bg-neutral-700"
-                                            }`}
-                                    >
-                                        <span
-                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${gameMode === 'chat' ? "translate-x-6" : "translate-x-1"
-                                                }`}
-                                        />
-                                    </button>
-                                </label>
-                            </div>
-
                             <div className="text-sm font-semibold text-neutral-400 text-left px-1 mt-8 mb-3">
                                 {t('lobby.playersConnected', 'Players connected')}: {state.players.length}
                             </div>
@@ -169,34 +198,20 @@ export function LobbyScreen({
                                 onKickPlayer={onKickPlayer}
                             />
                         </div>
-
-                        {/* Botón fijo en mobile, normal en desktop */}
-                        <div className="hidden sm:block">
-                            <Button
-                                onClick={handleStartGame}
-                                disabled={state.players.length < 2}
-                                variant="primary"
-                                size="md"
-                                className="w-full"
-                            >
-                                {tc('buttons.startGame')}
-                            </Button>
-                        </div>
                     </div>
 
-                    {/* Botón fijo solo en mobile con overlay gradiente premium (como Siguiente partida) */}
-                    <div className="fixed bottom-0 left-0 right-0 sm:hidden z-40">
-                        <div className="h-10 bg-gradient-to-t from-neutral-950/80 via-neutral-950/40 to-transparent"></div>
-                        <div className="bg-neutral-950 px-2 pb-8">
-                            <div className="max-w-sm mx-auto">
+                    {/* Fixed Start Game Button (Host only) */}
+                    <div className="fixed bottom-0 left-0 right-0 z-40">
+                        <div className="w-full bg-gradient-to-t from-black via-black/95 to-transparent pt-12 pb-8 px-4">
+                            <div className="max-w-md mx-auto">
                                 <Button
                                     onClick={handleStartGame}
                                     disabled={state.players.length < 2}
                                     variant="primary"
                                     size="md"
-                                    className="w-full shadow-lg"
+                                    className="w-full shadow-2xl"
                                 >
-                                    Comenzar partida
+                                    {tc('buttons.startGame')}
                                 </Button>
                             </div>
                         </div>

@@ -99,8 +99,9 @@ export function GameRoom({
         const prevPhase = prevPhaseRef.current;
         const currentPhase = state.phase;
 
-        // Si pasamos a playing desde otra fase
-        if (currentPhase === "playing" && prevPhase !== "playing") {
+        // Si pasamos a playing o clue_round desde otra fase
+        if ((currentPhase === "playing" || currentPhase === "clue_round") &&
+            prevPhase !== "playing" && prevPhase !== "clue_round") {
             // Mostrar animación de entrada si viene del lobby o game_over
             const shouldShowAnimation = prevPhase === "lobby" || prevPhase === "game_over";
 
@@ -186,6 +187,11 @@ export function GameRoom({
                     onSubmitClue={onSubmitClue}
                     onVote={onVote}
                     onOpenInstructions={onOpenInstructions}
+                    showRestOfUI={showRestOfUI}
+                    initialAnimationPending={initialAnimationPending}
+                    showCardEntrance={showCardEntrance}
+                    onKickPlayer={onKickPlayer}
+                    isHost={isHost}
                 />
             )}
 
@@ -197,6 +203,11 @@ export function GameRoom({
                     onSubmitClue={onSubmitClue}
                     onVote={onVote}
                     onOpenInstructions={onOpenInstructions}
+                    showRestOfUI={showRestOfUI}
+                    initialAnimationPending={initialAnimationPending}
+                    showCardEntrance={showCardEntrance}
+                    onKickPlayer={onKickPlayer}
+                    isHost={isHost}
                 />
             )}
 
@@ -213,6 +224,7 @@ export function GameRoom({
                     showRestOfUI={showRestOfUI}
                     initialAnimationPending={initialAnimationPending}
                     showCardEntrance={showCardEntrance}
+                    onKickPlayer={onKickPlayer}
                 />
             )}
 

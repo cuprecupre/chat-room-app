@@ -39,7 +39,7 @@ export function GameCard({ state, initialAnimationPending, showCardEntrance, sho
         const currentRound = state.currentRound;
 
         if (
-            state.phase === "playing" &&
+            (state.phase === "playing" || state.phase === "clue_round") &&
             prevRound &&
             currentRound > prevRound &&
             currentRound > 1
@@ -54,7 +54,8 @@ export function GameCard({ state, initialAnimationPending, showCardEntrance, sho
         const prevPhase = prevPhaseRef.current;
         const currentPhase = state.phase;
 
-        if (currentPhase === "playing" && prevPhase !== "playing") {
+        if ((currentPhase === "playing" || currentPhase === "clue_round") &&
+            (prevPhase !== "playing" && prevPhase !== "clue_round")) {
             setReveal(false);
         }
         prevPhaseRef.current = currentPhase;
@@ -62,7 +63,7 @@ export function GameCard({ state, initialAnimationPending, showCardEntrance, sho
 
     // Iniciar animación de carta al entrar en fase playing
     useEffect(() => {
-        if (state.phase === "playing") {
+        if (state.phase === "playing" || state.phase === "clue_round") {
             setCardAnimating(true);
             if (cardFloatTimeoutRef.current) clearTimeout(cardFloatTimeoutRef.current);
             cardFloatTimeoutRef.current = setTimeout(() => {

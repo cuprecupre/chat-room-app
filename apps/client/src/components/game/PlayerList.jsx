@@ -3,8 +3,9 @@ import { useTranslation } from "react-i18next";
 import { Button } from "../ui/Button";
 import { Avatar } from "../ui/Avatar";
 import { HelpLink } from "./HelpLink";
-import { Trash2 } from "lucide-react";
+import { Trash2, MoreVertical } from "lucide-react";
 import { KickPlayerModal } from "../KickPlayerModal";
+import { PlayerActionsSheet } from "./PlayerActionsSheet";
 import { ChatBubble } from "../ui/ChatBubble";
 
 export function PlayerList({
@@ -20,6 +21,7 @@ export function PlayerList({
     const { t } = useTranslation('game');
     // State for kick confirmation modal
     const [kickTarget, setKickTarget] = useState(null);
+    const [actionTarget, setActionTarget] = useState(null);
 
     const isLobby = gameState?.phase === "lobby";
     const isPlaying = gameState?.phase === "playing";
@@ -306,14 +308,13 @@ export function PlayerList({
                                         )
                                     )}
 
-                                    {/* Kick button - only visible to host in lobby, not for self */}
-                                    {isLobby && isHost && p.uid !== currentUserId && onKickPlayer && (
+                                    {/* Actions menu (3 dots) - visible to host always, not for self */}
+                                    {isHost && p.uid !== currentUserId && onKickPlayer && (
                                         <button
-                                            onClick={() => setKickTarget(p)}
-                                            className="p-2 rounded-full border border-red-500 hover:border-red-400 hover:bg-red-500/10 text-red-500 hover:text-red-400 transition-colors"
-                                            title={t('modals.kickPlayer.kickTitle', { name: p.name }) || `Kick ${p.name}`}
+                                            onClick={() => setKickTarget(null) || setActionTarget(p)}
+                                            className="p-2 -mr-2 text-neutral-400 hover:text-white rounded-full hover:bg-white/5 transition-colors"
                                         >
-                                            <Trash2 className="w-4 h-4" />
+                                            <MoreVertical className="w-5 h-5" />
                                         </button>
                                     )}
                                 </div>
@@ -349,6 +350,18 @@ export function PlayerList({
                 onOpenInstructions={onOpenInstructions}
                 isChatMode={gameState?.gameMode === 'chat'}
             />}
+
+            {/* Player options sheet (Drawer) */}
+            <PlayerActionsSheet
+                isOpen={!!actionTarget}
+                onClose={() => setActionTarget(null)}
+                playerName={actionTarget?.name || ""}
+                onKick={() => {
+                    setKickTarget(actionTarget);
+                    // Sheet closes automatically via onClose in props or here we can rely on state target change
+                    setActionTarget(null);
+                }}
+            />
 
             {/* Kick confirmation modal */}
             <KickPlayerModal

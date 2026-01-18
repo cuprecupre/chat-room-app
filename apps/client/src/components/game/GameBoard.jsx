@@ -17,6 +17,7 @@ export function GameBoard({
     showRestOfUI,
     initialAnimationPending,
     showCardEntrance,
+    onKickPlayer,
 }) {
     const { t } = useTranslation('game');
     // Detectar si el usuario actual está eliminado
@@ -87,6 +88,7 @@ export function GameBoard({
                             gameState={state}
                             onVote={onVote}
                             onOpenInstructions={onOpenInstructions}
+                            onKickPlayer={onKickPlayer}
                         />
                     </div>
                 </div>
