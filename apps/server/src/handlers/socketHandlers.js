@@ -302,10 +302,16 @@ function handleSubmitClue(io, socket, user, { roomId, clue }) {
 
         // Check if all clues have been revealed (transition to voting)
         if (match.chatModeManager.areAllCluesRevealed()) {
-            // Transition to voting phase
-            match.phase = "playing";
-            console.log(`[Match ${match.matchId}] All clues revealed - transitioning to voting phase`);
-            roomManager.emitRoomState(room);
+            // Add a delay so players can read the last clue
+            setTimeout(() => {
+                // Ensure match is still active and in correct phase before transitioning
+                if (match && match.phase === 'clue_round') {
+                    // Transition to voting phase
+                    match.phase = "playing";
+                    console.log(`[Match ${match.matchId}] All clues revealed - transitioning to voting phase`);
+                    roomManager.emitRoomState(room);
+                }
+            }, 4000); // 4 seconds delay
         }
     } catch (error) {
         console.error(`Submit clue failed for room ${roomId}:`, error.message);
