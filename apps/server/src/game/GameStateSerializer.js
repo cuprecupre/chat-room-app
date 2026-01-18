@@ -210,6 +210,7 @@ function getEnrichedGameData(match) {
     return {
         matchId: match.matchId,
         roomId: match.roomId,
+        gameMode: match.gameMode || 'voice',
         impostorId: match.impostorId,
         winnerId: match.winnerId || null,
         winningTeam,
