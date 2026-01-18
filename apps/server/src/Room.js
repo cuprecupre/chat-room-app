@@ -263,6 +263,11 @@ class Room {
             console.error(`[Room ${this.roomId}] startMatch denied: userId=${userId} !== hostId=${this.hostId}`);
             throw new Error("Only the host can start a new match.");
         }
+
+        // Prevent starting a match while the room is effectively shutting down/resetting
+        if (this.phase === 'host_cancelled') {
+            throw new Error("La sala se está reiniciando tras el abandono del host.");
+        }
         if (this.players.length < 3) {
             throw new Error("Se necesitan al menos 3 jugadores para comenzar.");
         }
