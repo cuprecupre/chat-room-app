@@ -124,6 +124,57 @@ class RoomManager {
     }
 
     /**
+     * Emit minimal phase update (reduces bandwidth vs full state).
+     * @param {Room} room - Room instance
+     */
+    emitPhaseUpdate(room) {
+        if (!this.io) return;
+
+        const match = room.currentMatch;
+        const delta = {
+            phase: room.phase,
+            matchPhase: match?.phase || null,
+            currentRound: match?.currentRound || null,
+            maxRounds: match?.maxRounds || null,
+        };
+
+        room.players.forEach(p => {
+            const playerSocketId = sessionManager.getUserSocket(p.uid);
+            if (playerSocketId) {
+                this.io.to(playerSocketId).emit("phase-update", delta);
+            }
+        });
+    }
+
+    /**
+     * Emit minimal player list update (join/leave/kick).
+     * @param {Room} room - Room instance
+     * @param {string} action - "joined", "left", or "kicked"
+     * @param {Object} playerInfo - { uid, name, photoURL }
+     */
+    emitPlayerUpdate(room, action, playerInfo) {
+        if (!this.io) return;
+
+        const delta = {
+            action,
+            player: {
+                uid: playerInfo.uid,
+                name: playerInfo.name,
+                photoURL: playerInfo.photoURL || null,
+            },
+            hostId: room.hostId,
+            playerCount: room.players.length,
+        };
+
+        room.players.forEach(p => {
+            const playerSocketId = sessionManager.getUserSocket(p.uid);
+            if (playerSocketId) {
+                this.io.to(playerSocketId).emit("player-update", delta);
+            }
+        });
+    }
+
+    /**
      * Send toast to all players in a room.
      */
     emitToast(roomId, message) {

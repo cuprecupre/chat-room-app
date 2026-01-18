@@ -264,6 +264,48 @@ export function useSocket(user) {
                     }
                 });
 
+                // Optimized phase update - only updates phase-related fields
+                socket.on("phase-update", (delta) => {
+                    if (isMounted) {
+                        setGameState((prev) => {
+                            if (!prev) return prev;
+                            return {
+                                ...prev,
+                                phase: delta.phase,
+                                matchPhase: delta.matchPhase,
+                                currentRound: delta.currentRound,
+                                maxRounds: delta.maxRounds,
+                            };
+                        });
+                    }
+                });
+
+                // Optimized player update - applies incremental change to player list
+                socket.on("player-update", (delta) => {
+                    if (isMounted) {
+                        setGameState((prev) => {
+                            if (!prev) return prev;
+
+                            let players = [...prev.players];
+
+                            if (delta.action === "joined") {
+                                // Only add if not already present
+                                if (!players.some(p => p.uid === delta.player.uid)) {
+                                    players.push(delta.player);
+                                }
+                            } else if (delta.action === "left" || delta.action === "kicked") {
+                                players = players.filter(p => p.uid !== delta.player.uid);
+                            }
+
+                            return {
+                                ...prev,
+                                players,
+                                hostId: delta.hostId,
+                            };
+                        });
+                    }
+                });
+
                 // Antes de cada intento de reconexión, actualizar el token
                 socket.io.on("reconnect_attempt", async () => {
                     try {
