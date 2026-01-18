@@ -309,7 +309,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, onEndMatch, user })
 
             {/* Bottom Bar (Fixed Bottom) */}
             <div className="fixed bottom-0 left-0 right-0 z-40">
-                <div className="bg-gradient-to-t from-neutral-950 from-60% to-transparent pt-12 pb-6 px-4">
+                <div className={`bg-gradient-to-t from-neutral-950 from-60% to-transparent pt-12 ${isHost ? 'pb-6 px-4' : 'pb-0 px-0'}`}>
                     <div className="w-full flex flex-col items-center">
                         {isHost ? (
                             <>
