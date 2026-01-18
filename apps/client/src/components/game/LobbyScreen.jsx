@@ -103,15 +103,15 @@ export function LobbyScreen({
                                         }`}
                                 >
                                     <div className="w-full">
-                                        <span className={`block font-bold text-sm mb-1 ${gameMode === 'chat' ? "text-orange-400" : "text-neutral-200"}`}>
-                                            Modo Chat
-                                        </span>
+                                        <div className={`flex items-center gap-2 mb-1 ${gameMode === 'chat' ? "text-orange-400" : "text-neutral-200"}`}>
+                                            <MessageCircle className={`w-4 h-4 ${gameMode === 'chat' ? "text-orange-500" : "text-neutral-400"}`} />
+                                            <span className="block font-bold text-sm">
+                                                Modo Chat
+                                            </span>
+                                        </div>
                                         <p className="text-xs text-neutral-500 mt-1 leading-relaxed font-sans">
                                             Los jugadores dan sus pistas por medio de un chat interactivo.
                                         </p>
-                                    </div>
-                                    <div className={`mt-3 w-full flex justify-end ${gameMode === 'chat' ? "text-orange-500" : "text-white/10"}`}>
-                                        <MessageCircle className="w-4 h-4" />
                                     </div>
                                 </button>
 
@@ -127,17 +127,17 @@ export function LobbyScreen({
                                         }`}
                                 >
                                     <div className="w-full">
-                                        <span className={`block font-bold text-sm mb-1 ${gameMode === 'voice' ? "text-orange-400" : "text-neutral-200"}`}>
-                                            Modo voz
-                                        </span>
+                                        <div className={`flex items-center gap-2 mb-1 ${gameMode === 'voice' ? "text-orange-400" : "text-neutral-200"}`}>
+                                            <svg className={`w-4 h-4 ${gameMode === 'voice' ? "text-orange-500" : "text-neutral-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                            </svg>
+                                            <span className="block font-bold text-sm">
+                                                Modo voz
+                                            </span>
+                                        </div>
                                         <p className="text-xs text-neutral-500 mt-1 leading-relaxed font-sans">
                                             Los jugadores dan sus pistas por voz. Ideal para jugar juntos o en llamada.
                                         </p>
-                                    </div>
-                                    <div className={`mt-3 w-full flex justify-end ${gameMode === 'voice' ? "text-orange-500" : "text-white/10"}`}>
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                                        </svg>
                                     </div>
                                 </button>
                             </div>
