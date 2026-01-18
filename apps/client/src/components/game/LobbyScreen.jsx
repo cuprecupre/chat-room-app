@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, Share, Check, MessageCircle } from "lucide-react";
+import { Link, Share, Check, MessageCircle, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../ui/Button";
 import { PlayerList } from "./PlayerList";
@@ -167,6 +167,7 @@ export function LobbyScreen({
                             </div>
 
                             <div className="flex flex-col items-center gap-4 mb-8 bg-white/5 rounded-2xl p-6">
+                                <Users className="w-8 h-8 text-neutral-400 mb-2" strokeWidth={1.5} />
                                 <Button
                                     onClick={onCopyLink}
                                     variant="outline"
