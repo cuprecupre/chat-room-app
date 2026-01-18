@@ -57,7 +57,7 @@ export function ClueInput({
                             <Send className="w-4.5 h-4.5" />
                         </button>
                     </div>
-                    <div className="flex justify-between text-xs text-neutral-500 px-1">
+                    <div className="flex justify-between text-xs text-neutral-500 px-1 pb-2">
                         <span>{isMyTurn ? t('clueRound.yourTurn', "It's your turn!") : t('clueRound.canPreSubmit', 'You can submit before your turn')}</span>
                         <span>{clueText.length}/{maxClueLength}</span>
                     </div>

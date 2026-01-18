@@ -277,8 +277,8 @@ export function ClueRoundScreen({
                                 transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                                 style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 20 }}
                             >
-                                <div className="w-full bg-gradient-to-t from-black from-80% to-transparent pt-10 pb-2 px-4">
-                                    <div className="max-w-md mx-auto space-y-2">
+                                <div className="w-full bg-gradient-to-t from-black from-80% to-transparent pt-8 pb-0 px-4">
+                                    <div className="max-w-md mx-auto">
                                         <ClueInput
                                             onSend={handleClueSubmit}
                                             isSubmitted={hasAlreadySubmitted}
@@ -296,8 +296,8 @@ export function ClueRoundScreen({
                                 exit={{ y: "100%" }}
                                 transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                             >
-                                <div className="w-full bg-gradient-to-t from-black from-80% to-transparent pt-10 pb-2 px-4">
-                                    <div className="max-w-md mx-auto space-y-2 text-center">
+                                <div className="w-full bg-gradient-to-t from-black from-80% to-transparent pt-8 pb-0 px-4">
+                                    <div className="max-w-md mx-auto text-center pb-2">
                                         <p className="text-neutral-400">{t('clueRound.waitForTurn', 'Espera tu turno para escribir tu pista')}</p>
                                         <p className="text-xs text-neutral-500 uppercase tracking-wide">{t('clueRound.thinkTime', 'Piénsala bien. Tendrás 90 segundos')}</p>
                                     </div>
