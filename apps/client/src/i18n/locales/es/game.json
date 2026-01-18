@@ -80,7 +80,8 @@
         "yourTurn": "¡Es tu turno!",
         "waitForTurn": "Espera tu turno para escribir tu pista",
         "thinkTime": "PIÉNSALA BIEN. TENDRÁS 90 SEGUNDOS",
-        "canPreSubmit": "Puedes escribir antes de tu turno"
+        "canPreSubmit": "Puedes escribir antes de tu turno",
+        "noClue": "El jugador no ha dado la pista a tiempo"
     },
     "preview": {
         "showCard": "Ver rol"

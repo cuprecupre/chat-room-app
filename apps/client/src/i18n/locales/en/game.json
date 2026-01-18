@@ -80,7 +80,8 @@
         "yourTurn": "It's your turn!",
         "waitForTurn": "Wait for your turn to write your clue",
         "thinkTime": "THINK IT THROUGH. YOU'LL HAVE 90 SECONDS",
-        "canPreSubmit": "You can submit before your turn"
+        "canPreSubmit": "You can submit before your turn",
+        "noClue": "The player did not give the clue in time"
     },
     "preview": {
         "showCard": "Show role"
