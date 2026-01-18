@@ -16,8 +16,18 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
     const navigate = useNavigate();
     const [showScoringModal, setShowScoringModal] = useState(false);
     const [showSaveProgressModal, setShowSaveProgressModal] = useState(false);
+    // State for the initial dramatic reveal overlay
+    const [showRevealOverlay, setShowRevealOverlay] = useState(true);
 
-
+    // Auto-dismiss reveal overlay after 5 seconds
+    useEffect(() => {
+        if (state.phase === "game_over" && showRevealOverlay) {
+            const timer = setTimeout(() => {
+                setShowRevealOverlay(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [state.phase, showRevealOverlay]);
 
     // Confetti effect when game ends
     useEffect(() => {
@@ -96,6 +106,59 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
         }
     }
 
+    // --- REVEAL OVERLAY COMPONENT ---
+    if (showRevealOverlay) {
+        return (
+            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-neutral-950 p-4 animate-fadeIn">
+                <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md space-y-8 text-center animate-scaleIn">
+                    <div className="space-y-2">
+                        <h2 className={`text-4xl md:text-5xl font-serif ${impostorWon ? 'text-orange-500' : 'text-green-400'}`}>
+                            {winnerTitle}
+                        </h2>
+                        {winnerSubtitle && (
+                            <p className="text-xl text-neutral-300">{winnerSubtitle}</p>
+                        )}
+                    </div>
+
+                    <div className="w-16 h-px bg-white/10 mx-auto"></div>
+
+                    <div className="space-y-4">
+                        <p className="text-sm uppercase tracking-widest text-neutral-400">
+                            {t('gameOver.impostorWas')}
+                        </p>
+                        <div className="flex flex-col items-center gap-4">
+                            <Avatar
+                                src={impostor?.photoURL}
+                                alt={impostor?.name}
+                                size="xl"
+                                className={`border-4 ${impostorWon ? 'border-orange-500' : 'border-neutral-700'}`}
+                            />
+                            <p className="text-3xl text-white font-bold">
+                                {impostor?.name || t('gameOver.unknown')}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="pt-8">
+                        <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden w-64 mx-auto">
+                            <div className="h-full bg-white animate-progress origin-left" style={{ animationDuration: '5000ms' }}></div>
+                        </div>
+                        <p className="text-xs text-neutral-500 mt-2">{t('gameOver.redirectingToScores', 'Showing results...')}</p>
+                    </div>
+
+                    <Button
+                        onClick={() => setShowRevealOverlay(false)}
+                        variant="ghost"
+                        className="text-neutral-400 hover:text-white mt-4"
+                    >
+                        {tc('buttons.skip', 'Skip')}
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
+    // --- MAIN GAME OVER SCREEN ---
     return (
         <div className="w-full max-w-4xl mx-auto animate-fadeIn pb-32 pt-4 px-0 md:px-4">
             {/* Ad Banner - DESACTIVADO hasta verificación de AdSense */}

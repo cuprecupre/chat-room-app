@@ -160,8 +160,11 @@ function processVotingResults(match) {
 
         // Verificar muerte súbita (solo quedan 2 jugadores = impostor + 1 amigo)
         if (remainingPlayers.length <= 2) {
-            console.log(`[Match ${match.matchId}] ¡Muerte súbita! Solo quedan 2 jugadores.`);
-            handleSuddenDeath(match);
+            console.log(`[Match ${match.matchId}] ¡Muerte súbita inminente! Solo quedan 2 jugadores. Procediendo a round_result.`);
+            // NO llamar a handleSuddenDeath() aquí.
+            // Llamar a endRound() permite mostrar el overlay de "Eliminado" en el cliente.
+            // La muerte súbita se gatillará en startNextRound() cuando el host avance.
+            endRound(match, false);
         } else if (match.currentRound >= match.maxRounds) {
             // Ronda 3 completada, impostor sobrevive
             console.log(`[Match ${match.matchId}] Ronda 3 completada. ¡El impostor gana!`);
