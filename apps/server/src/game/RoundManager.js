@@ -118,6 +118,15 @@ function startNextRound(match) {
         .map((p) => p.uid)
         .filter((uid) => !match.eliminatedPlayers.includes(uid));
 
+    // CRITICAL: Al presionar "Siguiente ronda", si ya hay un ganador (determinado en endRound o suddenDeath)
+    // pasamos finalmente a game_over. Esto permite que el overlay de round_result se muestre primero.
+    if (match.winnerId) {
+        console.log(`[Match ${match.matchId}] Ganador detectado (${match.winnerId}). Finalizando match.`);
+        match.phase = "game_over";
+        match.persistAnalytics();
+        return;
+    }
+
     // CRITICAL: Verificar muerte súbita ANTES de iniciar ronda
     // Si solo quedan 2 jugadores (impostor + 1 amigo), el impostor gana automáticamente
     if (match.roundPlayers.length <= 2) {
@@ -180,8 +189,8 @@ function endRound(match, impostorCaught) {
         // Encontrar al amigo ganador (el que tiene más puntos)
         const winner = findWinner(match);
         match.winnerId = winner;
-        match.phase = "game_over";
-        match.persistAnalytics("impostor_caught");
+        match.phase = "round_result";
+        // match.persistAnalytics será llamado cuando el host pase de round_result a game_over
 
         console.log(`[Match ${match.matchId}] ¡Impostor descubierto! Ganador: ${winner}`);
     } else {
@@ -192,8 +201,7 @@ function endRound(match, impostorCaught) {
             // Impostor sobrevivió 3 rondas - gana
             giveImpostorMaxPoints(match);
             match.winnerId = match.impostorId;
-            match.phase = "game_over";
-            match.persistAnalytics("impostor_survived");
+            match.phase = "round_result";
             console.log(`[Match ${match.matchId}] ¡Impostor sobrevivió 3 rondas! Gana.`);
         } else {
             // Continuar a la siguiente ronda
@@ -208,10 +216,8 @@ function endRound(match, impostorCaught) {
 function handleSuddenDeath(match) {
     giveImpostorMaxPoints(match);
     match.winnerId = match.impostorId;
-    match.phase = "game_over";
+    match.phase = "round_result";
 
-
-    match.persistAnalytics("sudden_death");
     console.log(`[Match ${match.matchId}] ¡Muerte súbita! Solo quedan 2 jugadores. Impostor gana.`);
 }
 

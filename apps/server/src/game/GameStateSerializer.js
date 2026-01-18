@@ -136,6 +136,16 @@ function getStateForPlayer(match, userId) {
         baseState.secretWordTranslations = match.secretWordTranslations;
         baseState.roundHistory = match.roundHistory;
 
+        // NEW: include winner info if available (match ended but showing result)
+        if (match.winnerId) {
+            const winnerId = match.winnerId;
+            const winner = match.players.find((p) => p.uid === winnerId);
+            const formerWinner = match.formerPlayers[winnerId];
+            baseState.winner = winner ? winner.name : formerWinner ? formerWinner.name : "Empate";
+            baseState.winnerId = winnerId;
+            baseState.impostorWon = winnerId === match.impostorId;
+        }
+
         if (match.phase === "game_over") {
             // Usar winnerId directamente (ya calculado en endRound)
             const winnerId = match.winnerId;

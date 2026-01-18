@@ -66,10 +66,18 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
 
                     <div className="w-16 h-px bg-white/10 mx-auto"></div>
 
-                    {state.players.filter(p => !state.eliminatedPlayers?.includes(p.uid)).length > 2 && (
+                    {!state.winnerId && state.players.filter(p => !state.eliminatedPlayers?.includes(p.uid)).length > 2 && (
                         <div>
                             <p className="text-2xl font-serif italic text-orange-400">
                                 {t('game.impostorRemains')}
+                            </p>
+                        </div>
+                    )}
+
+                    {state.winnerId && (
+                        <div>
+                            <p className="text-2xl font-serif italic text-neutral-400 animate-pulse">
+                                {t('gameOver.redirectingToScores', 'Mostrando resultados...')}
                             </p>
                         </div>
                     )}

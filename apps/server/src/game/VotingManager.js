@@ -134,8 +134,7 @@ function processVotingResults(match) {
             giveImpostorMaxPoints(match);
             console.log(`[Match ${match.matchId}] Ronda 3 con empate. ¡El impostor gana!`);
             match.winnerId = match.impostorId;
-            match.phase = "game_over";
-            match.persistAnalytics("tie_round3");
+            match.phase = "round_result";
         } else {
             // Siguiente ronda
             match.phase = "round_result";
