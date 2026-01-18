@@ -195,12 +195,13 @@ export function ClueRoundScreen({
 
                                 {/* Clue/Typing area - always in the same place below the name */}
                                 {
-                                    (clue || (isCluePhase && isCurrentTurn)) && (
+                                    // Show bubble if: 1. Player has a revealed clue OR 2. It's the clue phase, it's this player's turn, and they haven't submitted
+                                    (clue || (isCluePhase && isCurrentTurn && !hasPlayerSubmitted)) && (
                                         <div className="mt-3 pl-11 w-full">
                                             <ChatBubble
                                                 text={clue}
                                                 isRevealed={!!clue}
-                                                isTyping={!clue && isCurrentTurn}
+                                                isTyping={!clue && isCurrentTurn && !hasPlayerSubmitted}
                                                 position="left"
                                                 playerName={player.name}
                                             />
