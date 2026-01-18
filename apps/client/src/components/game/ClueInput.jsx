@@ -38,6 +38,15 @@ export function ClueInput({
                 </div>
             ) : (
                 <>
+                    <div className="flex justify-between items-center mb-1 px-1">
+                        <span className={`text-[10px] uppercase tracking-[0.1em] font-semibold ${isMyTurn ? 'text-orange-500' : 'text-neutral-500'}`}>
+                            {isMyTurn ? t('clueRound.yourTurn', "¡Es tu turno!") : t('clueRound.canPreSubmit', 'Puedes escribir antes')}
+                        </span>
+                        <span className="text-[10px] tabular-nums text-neutral-500 opacity-50">
+                            {clueText.length}/{maxClueLength}
+                        </span>
+                    </div>
+
                     <div className="relative">
                         <input
                             type="text"
@@ -46,20 +55,16 @@ export function ClueInput({
                             onKeyDown={handleKeyDown}
                             placeholder={t('clueRound.placeholder', 'Escribe tu pista...')}
                             maxLength={maxClueLength}
-                            className="w-full px-5 py-3.5 pr-14 bg-neutral-300 border border-neutral-400 rounded-2xl text-neutral-900 placeholder:text-neutral-600 focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-xl"
+                            className="w-full px-4 py-3 pr-12 bg-neutral-200 border border-neutral-300 rounded-xl text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:border-orange-500 transition-colors shadow-sm"
                             autoComplete="off"
                         />
                         <button
                             onClick={handleSubmit}
                             disabled={!clueText.trim()}
-                            className={`absolute right-1.5 top-1/2 -translate-y-1/2 p-2.5 rounded-xl transition-all ${clueText.trim() ? 'bg-orange-600 text-white hover:bg-orange-500 shadow-md active:scale-95' : 'bg-neutral-400 text-neutral-200'}`}
+                            className={`absolute right-1 top-1 bottom-1 px-3 rounded-lg transition-all ${clueText.trim() ? 'bg-orange-600 text-white active:scale-95' : 'text-neutral-400 opacity-30 cursor-not-allowed'}`}
                         >
-                            <Send className="w-4.5 h-4.5" />
+                            <Send className="w-4 h-4" />
                         </button>
-                    </div>
-                    <div className="flex justify-between text-xs text-neutral-500 px-1 mt-2 pb-0">
-                        <span>{isMyTurn ? t('clueRound.yourTurn', "It's your turn!") : t('clueRound.canPreSubmit', 'You can submit before your turn')}</span>
-                        <span>{clueText.length}/{maxClueLength}</span>
                     </div>
                 </>
             )}
