@@ -5,8 +5,8 @@ import { Avatar } from "../ui/Avatar";
 import { HelpLink } from "./HelpLink";
 import { Trash2, MoreVertical } from "lucide-react";
 import { KickPlayerModal } from "../KickPlayerModal";
-import { PlayerActionsSheet } from "./PlayerActionsSheet";
 import { ChatBubble } from "../ui/ChatBubble";
+import { DropdownMenu, DropdownItem } from "../ui/DropdownMenu";
 
 export function PlayerList({
     players,
@@ -310,12 +310,20 @@ export function PlayerList({
 
                                     {/* Actions menu (3 dots) - visible to host always, not for self */}
                                     {isHost && p.uid !== currentUserId && onKickPlayer && (
-                                        <button
-                                            onClick={() => setKickTarget(null) || setActionTarget(p)}
-                                            className="p-2 -mr-2 text-neutral-400 hover:text-white rounded-full hover:bg-white/5 transition-colors"
+                                        <DropdownMenu
+                                            trigger={
+                                                <button className="p-2 -mr-2 text-neutral-400 hover:text-white rounded-full hover:bg-white/5 transition-colors">
+                                                    <MoreVertical className="w-5 h-5" />
+                                                </button>
+                                            }
                                         >
-                                            <MoreVertical className="w-5 h-5" />
-                                        </button>
+                                            <DropdownItem
+                                                danger
+                                                onClick={() => setKickTarget(p)}
+                                            >
+                                                {t('common.kick', 'Eliminar jugador')}
+                                            </DropdownItem>
+                                        </DropdownMenu>
                                     )}
                                 </div>
                             </div>
@@ -351,17 +359,8 @@ export function PlayerList({
                 isChatMode={gameState?.gameMode === 'chat'}
             />}
 
-            {/* Player options sheet (Drawer) */}
-            <PlayerActionsSheet
-                isOpen={!!actionTarget}
-                onClose={() => setActionTarget(null)}
-                playerName={actionTarget?.name || ""}
-                onKick={() => {
-                    setKickTarget(actionTarget);
-                    // Sheet closes automatically via onClose in props or here we can rely on state target change
-                    setActionTarget(null);
-                }}
-            />
+            {/* Player options sheet (Drawer) - Removed */}
+            {/* <PlayerActionsSheet ... /> */}
 
             {/* Kick confirmation modal */}
             <KickPlayerModal

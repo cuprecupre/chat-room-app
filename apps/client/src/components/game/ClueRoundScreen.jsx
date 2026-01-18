@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, MoreVertical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ChatBubble } from '../ui/ChatBubble';
@@ -10,7 +10,7 @@ import { GameHeader } from './GameHeader';
 import { ClueInput } from './ClueInput';
 import { Button } from '../ui/Button';
 import { KickPlayerModal } from '../KickPlayerModal';
-import { PlayerActionsSheet } from './PlayerActionsSheet';
+import { DropdownMenu, DropdownItem } from '../ui/DropdownMenu';
 
 /**
  * ClueRoundScreen - Unified screen for Chat Mode (clue submission + voting)
@@ -31,7 +31,6 @@ export function ClueRoundScreen({
     const { t } = useTranslation('game');
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [kickTarget, setKickTarget] = useState(null);
-    const [actionTarget, setActionTarget] = useState(null);
 
     // Determine which phase we're in
     const isVotingPhase = state.phase === 'playing';
@@ -102,8 +101,8 @@ export function ClueRoundScreen({
             {/* Main content container */}
             <div className="w-full max-w-md mx-auto px-2 py-2 space-y-4">
 
-                {/* Game Card - Same as Voice Mode */}
-                <div className="w-full max-w-xs mx-auto">
+                {/* Game Card - Always visible */}
+                <div className="w-full max-w-xs mx-auto mb-6">
                     <GameCard
                         state={state}
                         showRestOfUI={showRestOfUI}
@@ -112,8 +111,11 @@ export function ClueRoundScreen({
                     />
                 </div>
 
-                {/* Players List - Using same styles as PlayerList.jsx */}
-                <ul className={`space-y-2 ${showRestOfUI ? "animate-fadeIn animate-delay-800" : "opacity-0 pointer-events-none"}`}>
+                {/* Players List - Moves up when card disappears */}
+                <motion.ul
+                    layout
+                    className={`space-y-2 ${showRestOfUI ? "animate-fadeIn animate-delay-800" : "opacity-0 pointer-events-none"}`}
+                >
                     {sortedPlayers.map((player) => {
                         const isCurrentTurn = player.uid === currentTurnPlayerId;
                         const isRevealed = revealedPlayerIds.includes(player.uid);
@@ -171,14 +173,22 @@ export function ClueRoundScreen({
                                             </Button>
                                         )}
 
-                                        {/* Kick action for host */}
+                                        {/* Kick action for host - using Dropdown */}
                                         {isHost && !isMe && onKickPlayer && (
-                                            <button
-                                                onClick={() => setActionTarget(player)}
-                                                className="p-2 -mr-2 text-neutral-400 hover:text-white rounded-full hover:bg-white/5 transition-colors"
+                                            <DropdownMenu
+                                                trigger={
+                                                    <button className="p-2 -mr-2 text-neutral-400 hover:text-white rounded-full hover:bg-white/5 transition-colors">
+                                                        <MoreVertical className="w-5 h-5" />
+                                                    </button>
+                                                }
                                             >
-                                                <MoreVertical className="w-5 h-5" />
-                                            </button>
+                                                <DropdownItem
+                                                    danger
+                                                    onClick={() => setKickTarget(player)}
+                                                >
+                                                    {t('common.kick', 'Eliminar jugador')}
+                                                </DropdownItem>
+                                            </DropdownMenu>
                                         )}
                                     </div>
                                 </div>
@@ -200,7 +210,7 @@ export function ClueRoundScreen({
                             </li>
                         );
                     })}
-                </ul>
+                </motion.ul>
 
                 {/* Help link like in PlayerList */}
                 {isVotingPhase && showRestOfUI && <HelpLink onOpenInstructions={onOpenInstructions} isChatMode={true} />}
@@ -216,17 +226,6 @@ export function ClueRoundScreen({
 
                 {/* Bottom padding */}
                 <div className="h-32" />
-
-                {/* Player options sheet (Drawer) */}
-                <PlayerActionsSheet
-                    isOpen={!!actionTarget}
-                    onClose={() => setActionTarget(null)}
-                    playerName={actionTarget?.name || ""}
-                    onKick={() => {
-                        setKickTarget(actionTarget);
-                        setActionTarget(null);
-                    }}
-                />
 
                 {/* Kick confirmation modal */}
                 <KickPlayerModal
