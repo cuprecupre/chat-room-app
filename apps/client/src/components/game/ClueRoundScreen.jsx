@@ -62,6 +62,50 @@ export function ClueRoundScreen({
     const allVoted = votedPlayers.length === activePlayers.length;
     const canChangeVote = hasVoted && !allVoted;
 
+    // Timer state
+    const [timeLeft, setTimeLeft] = useState(timeoutMs / 1000);
+
+    // Update timer
+    useEffect(() => {
+        if (!isCluePhase || !turnStartedAt) return;
+
+        const updateTimer = () => {
+            const now = Date.now();
+            const elapsed = now - turnStartedAt;
+            const remaining = Math.max(0, Math.ceil((timeoutMs - elapsed) / 1000));
+            setTimeLeft(remaining);
+        };
+
+        // Initial update
+        updateTimer();
+
+        // Interval
+        const interval = setInterval(updateTimer, 1000);
+        return () => clearInterval(interval);
+    }, [turnStartedAt, timeoutMs, isCluePhase]);
+
+    const TurnTimer = () => (
+        <div className="flex items-center gap-1.5 text-orange-500 bg-orange-500/10 px-2 py-1 rounded-md animate-pulse">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            >
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <span className="text-sm font-bold tabular-nums">
+                {timeLeft}s
+            </span>
+        </div>
+    );
+
 
 
     // Reset submission state when turn changes
@@ -153,6 +197,11 @@ export function ClueRoundScreen({
 
                                     {/* Right side: status or vote button */}
                                     <div className="flex items-center gap-3">
+                                        {/* Timer only for current turn player and not submitted */}
+                                        {isCluePhase && isCurrentTurn && !hasPlayerSubmitted && (
+                                            <TurnTimer />
+                                        )}
+
                                         {isVotingPhase && showVoteButton && (myVote === null || iVotedForThisPlayer) && (
                                             <Button
                                                 onClick={() => handleVote(player.uid)}
