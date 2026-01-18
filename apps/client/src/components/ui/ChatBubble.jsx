@@ -62,7 +62,7 @@ export function ChatBubble({
                     {[0, 1, 2].map((i) => (
                         <motion.span
                             key={i}
-                            className="w-1.5 h-1.5 bg-neutral-400/80 rounded-full"
+                            className="w-1.5 h-1.5 bg-white/80 rounded-full"
                             animate={{
                                 y: [0, -5, 0],
                                 opacity: [0.4, 1, 0.4]
@@ -82,7 +82,7 @@ export function ChatBubble({
 
         if (isRevealed && text) {
             return (
-                <div className="px-4 py-2 text-neutral-50 text-sm font-medium leading-relaxed">
+                <div className="px-4 py-2 text-white text-sm font-medium leading-relaxed">
                     {text}
                 </div>
             );
@@ -104,7 +104,7 @@ export function ChatBubble({
                 exit="exit"
                 className={`
                     relative inline-block
-                    bg-neutral-800/95 backdrop-blur-md
+                    bg-orange-600 backdrop-blur-md
                     rounded-2xl
                     ${position === 'left' ? 'rounded-tl-none' : 'rounded-tr-none'}
                 `}
@@ -116,7 +116,7 @@ export function ChatBubble({
                 <div
                     className={`
                         absolute top-0 w-3 h-3
-                        bg-neutral-800/95
+                        bg-orange-600
                         ${position === 'left'
                             ? '-left-[11px]'
                             : '-right-[11px]'
