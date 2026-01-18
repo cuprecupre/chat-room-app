@@ -84,25 +84,7 @@ export function LobbyScreen({
                     </h2>
 
                     <div className="w-full space-y-4 mt-8">
-                        <Button
-                            onClick={onCopyLink}
-                            variant="outline"
-                            size="md"
-                            className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20 gap-2 !w-auto"
-                        >
-                            {isMobile ? (
-                                <Share className="w-4 h-4" />
-                            ) : (
-                                <Link className="w-4 h-4" />
-                            )}
-                            {isMobile
-                                ? t('lobby.shareInvite', 'Share invite')
-                                : t('lobby.copyRoomLink', 'Copy room link')}
-                        </Button>
 
-                        <p className="text-sm text-neutral-400 font-regular animate-pulse max-w-[280px] mx-auto">
-                            {t('lobby.shareAndWait', 'Share the link and wait for players to join')}
-                        </p>
 
                         <div className="w-full pt-2">
                             {/* Opciones de juego (solo para el host antes de empezar) */}
@@ -182,6 +164,27 @@ export function LobbyScreen({
                                         />
                                     </button>
                                 </label>
+                            </div>
+
+                            <div className="flex flex-col items-center gap-4 mb-8">
+                                <Button
+                                    onClick={onCopyLink}
+                                    variant="outline"
+                                    size="md"
+                                    className="border-orange-500 text-orange-400 hover:bg-orange-500/10 active:bg-orange-500/20 gap-2 !w-auto"
+                                >
+                                    {isMobile ? (
+                                        <Share className="w-4 h-4" />
+                                    ) : (
+                                        <Link className="w-4 h-4" />
+                                    )}
+                                    {isMobile
+                                        ? t('lobby.shareInvite', 'Share invite')
+                                        : t('lobby.copyRoomLink', 'Copy room link')}
+                                </Button>
+                                <p className="text-sm text-neutral-400 font-regular animate-pulse max-w-[280px] mx-auto">
+                                    {t('lobby.shareAndWait', 'Share the link and wait for players to join')}
+                                </p>
                             </div>
 
                             <div className="text-sm font-semibold text-neutral-400 text-left px-1 mt-8 mb-3">
