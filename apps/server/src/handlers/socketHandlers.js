@@ -6,7 +6,7 @@ const dbService = require("../services/db");
 const { cleanProfanity } = require("../utils/profanityFilter");
 
 // Grace period constants
-const MOBILE_GRACE_PERIOD = 300000; // 5 minutes for mobile users
+const MOBILE_GRACE_PERIOD = 60000; // 1 minute for mobile users
 const INACTIVE_GRACE_PERIOD = 60000; // 1 minute for inactive users
 
 /**
@@ -62,6 +62,9 @@ function registerSocketHandlers(io, socket) {
                 r.onMatchEnd();
             }
         })
+    );
+    socket.on("return-to-lobby", (roomId) =>
+        handleRoomAction(socket, user, roomId, (r) => r.returnToLobby(user.uid))
     );
     socket.on("next-round", (roomId) =>
         handleRoomAction(socket, user, roomId, (r) => {

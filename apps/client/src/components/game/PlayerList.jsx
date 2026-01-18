@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownItem } from "../ui/DropdownMenu";
 
 export function PlayerList({
     players,
+    connectedPlayers, // Optional: explicit list of connected players (useful when 'players' includes disconnected ones)
     currentUserId,
     isHost,
     onCopyLink,
@@ -56,6 +57,10 @@ export function PlayerList({
 
     // Si hay 3 o más ganadores, no hay ganadores reales
     const hasNoWinners = winners.length >= 3;
+
+    // Store connected player UIDs for status indicator
+    // If connectedPlayers is provided, use it. Otherwise use the main players list.
+    const connectedPlayerUids = new Set((connectedPlayers || players).map(p => p.uid));
 
     // Combinar jugadores conectados con desconectados en pantallas de resultados
     let displayPlayers = players;
@@ -178,6 +183,10 @@ export function PlayerList({
                                         )}
                                         {!isPlaying && !showScores && (
                                             <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-neutral-950"></div>
+                                        )}
+                                        {/* Connection status in game over */}
+                                        {isGameOver && (
+                                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-neutral-950 ${connectedPlayerUids.has(p.uid) ? 'bg-green-500' : 'bg-red-500'}`}></div>
                                         )}
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -319,6 +328,7 @@ export function PlayerList({
                                         >
                                             <DropdownItem
                                                 danger
+                                                icon={Trash2}
                                                 onClick={() => setKickTarget(p)}
                                             >
                                                 {t('common.kick', 'Eliminar jugador')}

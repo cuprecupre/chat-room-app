@@ -371,6 +371,21 @@ class Room {
 
     }
 
+    /**
+     * Return all players to the lobby.
+     * Clears the current match and resets room phase.
+     */
+    returnToLobby(userId) {
+        if (userId !== this.hostId) {
+            throw new Error("Solo el anfitrión puede devolver a todos a la sala.");
+        }
+
+        // Reset to lobby phase
+        this.phase = "lobby";
+        this.currentMatch = null;
+        console.log(`[Room ${this.roomId}] Host sent everyone back to lobby`);
+    }
+
     // Alias for compatibility
     onGameEnd(gameResult) {
         return this.onMatchEnd(gameResult);

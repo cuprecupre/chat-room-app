@@ -123,9 +123,13 @@ class SessionManager {
         // Clear any existing pending disconnect
         this.clearPendingDisconnect(userId);
 
+        const timeoutSeconds = Math.round(timeout / 1000);
+        console.log(`[SessionManager] Grace period started for ${userId} in room ${roomId} (${timeoutSeconds}s)`);
+
         this.pendingDisconnects[userId] = {
             roomId,
             timeout: setTimeout(() => {
+                console.log(`[SessionManager] Grace period expired for ${userId} - removing from room ${roomId}`);
                 callback();
                 delete this.pendingDisconnects[userId];
             }, timeout),
@@ -144,6 +148,7 @@ class SessionManager {
      */
     clearPendingDisconnect(userId) {
         if (this.pendingDisconnects[userId]) {
+            console.log(`[SessionManager] Grace period cancelled for ${userId} - reconnected`);
             clearTimeout(this.pendingDisconnects[userId].timeout);
             delete this.pendingDisconnects[userId];
         }

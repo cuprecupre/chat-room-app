@@ -9,6 +9,7 @@ export function GamePage({
     onOpenInstructions,
     onStartGame,
     onPlayAgain,
+    onEndMatch,
     onNextRound,
     onLeaveRoom,
     onLeaveMatch,
@@ -39,6 +40,7 @@ export function GamePage({
             user={user}
             onStartGame={onStartGame}
             onPlayAgain={onPlayAgain}
+            onEndMatch={onEndMatch}
             onNextRound={onNextRound}
             onLeaveRoom={onLeaveRoom}
             onLeaveMatch={onLeaveMatch}

@@ -154,6 +154,26 @@ export function useSocket(user) {
 
                     // Store interval for cleanup
                     socket.heartbeatInterval = heartbeatInterval;
+
+                    // Proactive token refresh - refresh every 45 minutes to prevent expiration
+                    const TOKEN_REFRESH_INTERVAL = 45 * 60 * 1000; // 45 minutes
+                    const tokenRefreshInterval = setInterval(async () => {
+                        if (socket.connected && auth.currentUser) {
+                            try {
+                                const freshToken = await auth.currentUser.getIdToken(true);
+                                saveToken(freshToken);
+                                socket.auth.token = freshToken;
+                                console.log("🔄 Token refrescado proactivamente");
+                            } catch (error) {
+                                console.error("❌ Error refrescando token proactivamente:", error);
+                            }
+                        } else {
+                            clearInterval(tokenRefreshInterval);
+                        }
+                    }, TOKEN_REFRESH_INTERVAL);
+
+                    // Store interval for cleanup
+                    socket.tokenRefreshInterval = tokenRefreshInterval;
                 });
 
                 socket.on("disconnect", (reason) => {
@@ -451,6 +471,10 @@ export function useSocket(user) {
                 // Clear heartbeat interval
                 if (socketRef.current.heartbeatInterval) {
                     clearInterval(socketRef.current.heartbeatInterval);
+                }
+                // Clear token refresh interval
+                if (socketRef.current.tokenRefreshInterval) {
+                    clearInterval(socketRef.current.tokenRefreshInterval);
                 }
                 socketRef.current.disconnect();
                 socketRef.current = null;

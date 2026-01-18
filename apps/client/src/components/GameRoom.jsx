@@ -25,6 +25,7 @@ export function GameRoom({
     user,
     onStartGame,
     onPlayAgain,
+    onEndMatch,
     onNextRound,
     onLeaveRoom,
     onLeaveMatch,
@@ -242,6 +243,7 @@ export function GameRoom({
                 state={state}
                 isHost={isHost}
                 onPlayAgain={onPlayAgain}
+                onEndMatch={onEndMatch}
                 user={user}
                 onCopyLink={onCopyLink}
             />

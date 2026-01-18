@@ -18,6 +18,7 @@ export function GameRoute({
     onStartGame,
     onUpdateOptions,
     onPlayAgain,
+    onEndMatch,
     onNextRound,
     onLeaveRoom,
     onLeaveMatch,
@@ -51,6 +52,7 @@ export function GameRoute({
                 onStartGame={onStartGame}
                 onUpdateOptions={onUpdateOptions}
                 onPlayAgain={onPlayAgain}
+                onEndMatch={onEndMatch}
                 onNextRound={onNextRound}
                 onLeaveRoom={onLeaveRoom}
                 onLeaveMatch={onLeaveMatch}

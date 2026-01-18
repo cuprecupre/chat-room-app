@@ -266,32 +266,37 @@ export function ClueRoundScreen({
                 {isVotingPhase && showRestOfUI && <HelpLink onOpenInstructions={onOpenInstructions} isChatMode={true} />}
 
                 {/* Bottom Input Area - Only in clue phase */}
-                <AnimatePresence>
+                <AnimatePresence mode="wait">
                     {isCluePhase && showRestOfUI && !hasAlreadySubmitted && (
                         isMyTurn ? (
                             <motion.div
                                 key="clue-input"
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 20 }}
-                                transition={{ duration: 0.3 }}
+                                initial={{ y: 0 }}
+                                animate={{ y: 0 }}
+                                exit={{ y: "100%" }}
+                                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                                style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 20 }}
                             >
-                                <ClueInput
-                                    onSend={handleClueSubmit}
-                                    isSubmitted={hasAlreadySubmitted}
-                                    isMyTurn={isMyTurn}
-                                />
+                                <div className="w-full bg-gradient-to-t from-black from-80% to-transparent pt-16 pb-8 px-4">
+                                    <div className="max-w-md mx-auto space-y-2">
+                                        <ClueInput
+                                            onSend={handleClueSubmit}
+                                            isSubmitted={hasAlreadySubmitted}
+                                            isMyTurn={isMyTurn}
+                                        />
+                                    </div>
+                                </div>
                             </motion.div>
                         ) : (
                             <motion.div
                                 key="wait-message"
                                 className="fixed bottom-0 left-0 right-0 !m-0 !p-0 z-20"
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 20 }}
-                                transition={{ duration: 0.3 }}
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: "100%" }}
+                                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                             >
-                                <div className="w-full bg-gradient-to-t from-black via-black/95 to-transparent pt-12 pb-6 px-4">
+                                <div className="w-full bg-gradient-to-t from-black from-80% to-transparent pt-16 pb-8 px-4">
                                     <div className="max-w-md mx-auto space-y-2 text-center">
                                         <p className="text-neutral-400">{t('clueRound.waitForTurn', 'Espera tu turno para escribir tu pista')}</p>
                                         <p className="text-xs text-neutral-500 uppercase tracking-wide">{t('clueRound.thinkTime', 'Piénsala bien. Tendrás 90 segundos')}</p>

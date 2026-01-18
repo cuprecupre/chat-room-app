@@ -30,43 +30,39 @@ export function ClueInput({
     };
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 !m-0 !p-0 z-20">
-            <div className="w-full bg-gradient-to-t from-black via-black/95 to-transparent pt-12 pb-6 px-4">
-                <div className="max-w-md mx-auto space-y-2">
-                    {isSubmitted ? (
-                        <div className="flex items-center justify-center gap-2 py-3 text-green-400">
-                            <Check className="w-5 h-5" />
-                            <span className="text-sm font-medium">{t('clueRound.clueSubmitted', 'Clue submitted!')}</span>
-                        </div>
-                    ) : (
-                        <>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    value={clueText}
-                                    onChange={(e) => setClueText(e.target.value.slice(0, maxClueLength))}
-                                    onKeyDown={handleKeyDown}
-                                    placeholder={t('clueRound.placeholder', 'Escribe tu pista...')}
-                                    maxLength={maxClueLength}
-                                    className="w-full px-5 py-3.5 pr-14 bg-neutral-300 border border-neutral-400 rounded-2xl text-neutral-900 placeholder:text-neutral-600 focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-xl"
-                                    autoComplete="off"
-                                />
-                                <button
-                                    onClick={handleSubmit}
-                                    disabled={!clueText.trim()}
-                                    className={`absolute right-1.5 top-1/2 -translate-y-1/2 p-2.5 rounded-xl transition-all ${clueText.trim() ? 'bg-orange-600 text-white hover:bg-orange-500 shadow-md active:scale-95' : 'bg-neutral-400 text-neutral-200'}`}
-                                >
-                                    <Send className="w-4.5 h-4.5" />
-                                </button>
-                            </div>
-                            <div className="flex justify-between text-xs text-neutral-500 px-1">
-                                <span>{isMyTurn ? t('clueRound.yourTurn', "It's your turn!") : t('clueRound.canPreSubmit', 'You can submit before your turn')}</span>
-                                <span>{clueText.length}/{maxClueLength}</span>
-                            </div>
-                        </>
-                    )}
+        <>
+            {isSubmitted ? (
+                <div className="flex items-center justify-center gap-2 py-3 text-green-400">
+                    <Check className="w-5 h-5" />
+                    <span className="text-sm font-medium">{t('clueRound.clueSubmitted', 'Clue submitted!')}</span>
                 </div>
-            </div>
-        </div>
+            ) : (
+                <>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value={clueText}
+                            onChange={(e) => setClueText(e.target.value.slice(0, maxClueLength))}
+                            onKeyDown={handleKeyDown}
+                            placeholder={t('clueRound.placeholder', 'Escribe tu pista...')}
+                            maxLength={maxClueLength}
+                            className="w-full px-5 py-3.5 pr-14 bg-neutral-300 border border-neutral-400 rounded-2xl text-neutral-900 placeholder:text-neutral-600 focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-xl"
+                            autoComplete="off"
+                        />
+                        <button
+                            onClick={handleSubmit}
+                            disabled={!clueText.trim()}
+                            className={`absolute right-1.5 top-1/2 -translate-y-1/2 p-2.5 rounded-xl transition-all ${clueText.trim() ? 'bg-orange-600 text-white hover:bg-orange-500 shadow-md active:scale-95' : 'bg-neutral-400 text-neutral-200'}`}
+                        >
+                            <Send className="w-4.5 h-4.5" />
+                        </button>
+                    </div>
+                    <div className="flex justify-between text-xs text-neutral-500 px-1">
+                        <span>{isMyTurn ? t('clueRound.yourTurn', "It's your turn!") : t('clueRound.canPreSubmit', 'You can submit before your turn')}</span>
+                        <span>{clueText.length}/{maxClueLength}</span>
+                    </div>
+                </>
+            )}
+        </>
     );
 }

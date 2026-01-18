@@ -10,7 +10,7 @@ import { Info } from "lucide-react";
 import confetti from "canvas-confetti";
 import { ROUTES } from "../routes/routes";
 
-export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
+export function GameOverScreen({ state, isHost, onPlayAgain, onEndMatch, user }) {
     const { t, i18n } = useTranslation('game');
     const { t: tc } = useTranslation('common');
     const navigate = useNavigate();
@@ -175,49 +175,11 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                 )}
                 <h1 className="text-3xl md:text-5xl font-serif text-orange-400">{winnerTitle}</h1>
                 {winnerSubtitle && (
-                    <p className="text-xl md:text-2xl text-neutral-300 mt-2">{winnerSubtitle}</p>
+                    <p className="text-xl md:text-2xl text-orange-400 mt-2">{winnerSubtitle}</p>
                 )}
             </div>
 
             <div className="grid grid-cols-1 gap-12 items-start max-w-lg mx-auto pb-32">
-                {/* Impostor Reveal */}
-                <div className="w-full bg-neutral-900 rounded-2xl p-6 md:p-8 text-center">
-                    <div className="grid grid-cols-2 gap-x-8 items-start relative">
-                        {/* Impostor Column */}
-                        <div className="flex flex-col items-center justify-center px-4">
-                            <p className="text-xs uppercase tracking-wider text-neutral-400 mb-3">
-                                {t('gameOver.impostorWas')}
-                            </p>
-                            {impostor ? (
-                                <div className="flex items-center justify-center w-full">
-                                    <span className="text-xl text-white font-medium text-center break-words leading-tight max-w-full">
-                                        {impostor.name}
-                                    </span>
-                                </div>
-                            ) : (
-                                <span className="text-neutral-500">{t('gameOver.unknown')}</span>
-                            )}
-                        </div>
-
-                        {/* Secret Word Column - Conditional */}
-                        {state.secretWord && (
-                            <>
-                                {/* Vertical Divider */}
-                                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/10 -translate-x-1/2"></div>
-
-                                <div className="flex flex-col items-center justify-center px-4">
-                                    <p className="text-xs uppercase tracking-wider text-neutral-400 mb-3">
-                                        {t('gameOver.secretWord')}
-                                    </p>
-                                    <p className="text-xl text-white font-medium text-center break-words leading-tight max-w-full capitalize">
-                                        {displaySecretWord}
-                                    </p>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                </div>
-
                 <div className="w-full">
                     <h2 className="text-2xl font-serif text-white mb-6 text-center">
                         {t('gameOver.leaderboard')}
@@ -225,6 +187,7 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                     <div className="rounded-2xl p-1">
                         <PlayerList
                             players={allPlayers}
+                            connectedPlayers={state.players}
                             currentUserId={user.uid}
                             isHost={isHost}
                             gameState={state}
@@ -239,6 +202,40 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
                             {t('gameOver.howPointsWork')}
                         </button>
                     </div>
+                </div>
+
+                {/* Impostor Reveal - Moved below leaderboard */}
+                <div className="w-full bg-neutral-900 rounded-2xl p-6 md:p-8 text-center space-y-6">
+                    {/* Impostor */}
+                    <div className="flex flex-col items-center justify-center">
+                        <p className="text-xs uppercase tracking-wider text-neutral-400 mb-2">
+                            {t('gameOver.impostorWas')}
+                        </p>
+                        {impostor ? (
+                            <span className="text-xl text-white font-medium">
+                                {impostor.name}
+                            </span>
+                        ) : (
+                            <span className="text-neutral-500">{t('gameOver.unknown')}</span>
+                        )}
+                    </div>
+
+                    {/* Secret Word - Conditional */}
+                    {state.secretWord && (
+                        <>
+                            {/* Horizontal Divider */}
+                            <div className="w-full h-px bg-white/10"></div>
+
+                            <div className="flex flex-col items-center justify-center">
+                                <p className="text-xs uppercase tracking-wider text-neutral-400 mb-2">
+                                    {t('gameOver.secretWord')}
+                                </p>
+                                <p className="text-xl text-white font-medium capitalize">
+                                    {displaySecretWord}
+                                </p>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -311,63 +308,75 @@ export function GameOverScreen({ state, isHost, onPlayAgain, user }) {
 
 
             {/* Bottom Bar (Fixed Bottom) */}
-            <div className="fixed bottom-0 left-0 right-0 pt-16 pb-0 px-0 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent z-40" >
-                <div className="w-full flex flex-col items-center">
-                    {isHost ? (
-                        <>
-                            <Button
-                                onClick={() => {
-                                    window.dataLayer = window.dataLayer || [];
-                                    window.dataLayer.push({
-                                        event: 'play_again_click',
-                                        location: 'game_over_screen',
-                                    });
-                                    onPlayAgain();
-                                }}
-                                variant="primary"
-                                size="lg"
-                                disabled={state.players.length < 3}
-                                className="w-full max-w-sm text-lg py-6 mb-2 mx-6"
-                            >
-                                {tc('buttons.playAgain')}
-                            </Button>
-                            {state.players.length < 3 && (
-                                <p className="text-neutral-400 text-xs text-center mb-6">
-                                    {t('gameOver.needMorePlayers', 'Se necesitan al menos 3 jugadores para jugar otra partida')}
-                                </p>
-                            )}
-                        </>
-                    ) : (
-                        <div className="w-full bg-orange-900 px-3 py-2 shadow-2xl animate-slideUp flex items-center justify-center min-h-[64px]">
-                            <p className="text-orange-50 text-sm leading-tight text-center w-full">
-                                <svg
-                                    className="animate-spin h-5 w-5 text-orange-200 inline-block align-middle mr-3 -translate-y-[1px]"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
+            <div className="fixed bottom-0 left-0 right-0 z-40">
+                <div className="bg-gradient-to-t from-neutral-950 from-60% to-transparent pt-12 pb-6 px-4">
+                    <div className="w-full flex flex-col items-center">
+                        {isHost ? (
+                            <>
+                                {state.players.length < 3 && (
+                                    <Button
+                                        onClick={onEndMatch}
+                                        variant="outline"
+                                        size="lg"
+                                        className="w-full max-w-sm text-base py-4 mb-4 mx-6 bg-neutral-950"
+                                    >
+                                        {t('gameOver.returnToRoom', 'Volver a la sala')}
+                                    </Button>
+                                )}
+                                <Button
+                                    onClick={() => {
+                                        window.dataLayer = window.dataLayer || [];
+                                        window.dataLayer.push({
+                                            event: 'play_again_click',
+                                            location: 'game_over_screen',
+                                        });
+                                        onPlayAgain();
+                                    }}
+                                    variant="primary"
+                                    size="lg"
+                                    disabled={state.players.length < 3}
+                                    className="w-full max-w-sm text-lg py-6 mb-2 mx-6"
                                 >
-                                    <circle
-                                        className="opacity-40"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                    ></circle>
-                                    <path
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                    ></path>
-                                </svg>
-                                {t('gameOver.waitingForHost')} <span className="text-orange-400 font-bold">
-                                    {state.players.find((p) => p.uid === state.hostId)?.name ||
-                                        "host"}
-                                </span> {t('gameOver.toStartAnother')}
-                            </p>
-                        </div>
-                    )}
+                                    {tc('buttons.playAgain')}
+                                </Button>
+                                {state.players.length < 3 && (
+                                    <p className="text-neutral-400 text-xs text-center mb-6">
+                                        {t('gameOver.needMorePlayers', 'Se necesitan al menos 3 jugadores para jugar otra partida')}
+                                    </p>
+                                )}
+                            </>
+                        ) : (
+                            <div className="w-full bg-orange-900 px-3 py-2 shadow-2xl animate-slideUp flex items-center justify-center min-h-[64px]">
+                                <p className="text-orange-50 text-sm leading-tight text-center w-full">
+                                    <svg
+                                        className="animate-spin h-5 w-5 text-orange-200 inline-block align-middle mr-3 -translate-y-[1px]"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-40"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                    {t('gameOver.waitingForHost')} <span className="text-orange-400 font-bold">
+                                        {state.players.find((p) => p.uid === state.hostId)?.name ||
+                                            "host"}
+                                    </span> {t('gameOver.toStartAnother')}
+                                </p>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 }

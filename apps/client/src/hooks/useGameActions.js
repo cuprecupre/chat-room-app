@@ -37,6 +37,11 @@ export function useGameActions(emit, gameState) {
         [emit, gameState?.roomId]
     );
 
+    const endMatch = useCallback(
+        () => emit("return-to-lobby", gameState?.roomId),
+        [emit, gameState?.roomId]
+    );
+
     const leaveMatch = useCallback(() => {
         if (gameState?.roomId) {
             emit("leave-match", gameState.roomId);
@@ -95,6 +100,7 @@ export function useGameActions(emit, gameState) {
         updateOptions,
         startMatch,
         playAgain,
+        endMatch,
         nextRound,
         leaveMatch,
         leaveRoom,

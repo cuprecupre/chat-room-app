@@ -54,7 +54,7 @@ export function SidebarMenu({
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="fixed right-0 top-0 h-full w-full max-w-[300px] bg-neutral-950 border-l border-white/10 z-[60] flex flex-col shadow-2xl"
+                        className="fixed right-0 top-0 h-full w-full max-w-[300px] bg-neutral-950 border-l border-white/10 z-[60] flex flex-col shadow-2xl px-4 sm:px-0"
                     >
                         {/* Header */}
                         <div className="p-6 flex items-center justify-between border-b border-white/5">
