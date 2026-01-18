@@ -73,14 +73,6 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
                             </p>
                         </div>
                     )}
-
-                    {state.winnerId && (
-                        <div>
-                            <p className="text-2xl font-serif italic text-neutral-400 animate-pulse">
-                                {t('gameOver.redirectingToScores', 'Mostrando resultados...')}
-                            </p>
-                        </div>
-                    )}
                 </div>
 
                 {isHost && (

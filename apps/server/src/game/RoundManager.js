@@ -216,8 +216,9 @@ function endRound(match, impostorCaught) {
 function handleSuddenDeath(match) {
     giveImpostorMaxPoints(match);
     match.winnerId = match.impostorId;
-    match.phase = "round_result";
+    match.phase = "game_over";
 
+    match.persistAnalytics("sudden_death");
     console.log(`[Match ${match.matchId}] ¡Muerte súbita! Solo quedan 2 jugadores. Impostor gana.`);
 }
 
