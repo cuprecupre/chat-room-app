@@ -267,6 +267,10 @@ class Room {
             throw new Error("Se necesitan al menos 3 jugadores para comenzar.");
         }
 
+        // Fix: Force reset eligibility if we are starting from lobby
+        // This fixes the issue where players might be flagged as late joiners from previous sessions
+        this.players.forEach(p => p.isLateJoiner = false);
+
         // Get eligible players (exclude late joiners)
         const eligiblePlayers = this.players.filter(p => !p.isLateJoiner);
 
