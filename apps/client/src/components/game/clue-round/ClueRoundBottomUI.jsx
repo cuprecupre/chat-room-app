@@ -22,10 +22,15 @@ export function ClueRoundBottomUI({
             {isVisible && (
                 <motion.div
                     key={isMyTurn ? "clue-input" : "wait-message"}
-                    initial={{ y: 20 }}
+                    initial={{ y: "100%" }}
                     animate={{ y: 0 }}
-                    exit={{ y: 20 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    exit={{ y: "100%" }}
+                    transition={{
+                        type: "spring",
+                        damping: 25,
+                        stiffness: 200,
+                        mass: 0.8
+                    }}
                     className="fixed bottom-0 left-0 right-0 z-50 bg-black pt-2 pb-4 px-4 !m-0"
                 >
                     {/* Gradient transition ABOVE the solid base */}
