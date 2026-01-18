@@ -61,7 +61,7 @@ export function ClueInput({
                         <button
                             onClick={handleSubmit}
                             disabled={!clueText.trim()}
-                            className={`absolute right-1 top-1 bottom-1 px-3 rounded-lg transition-all ${clueText.trim() ? 'bg-orange-600 text-white active:scale-95' : 'text-neutral-400 opacity-30 cursor-not-allowed'}`}
+                            className={`absolute right-1 top-1 bottom-1 px-3 rounded-lg transition-all bg-orange-600 text-white ${clueText.trim() ? 'active:scale-95' : 'opacity-40 cursor-not-allowed'}`}
                         >
                             <Send className="w-4 h-4" />
                         </button>
