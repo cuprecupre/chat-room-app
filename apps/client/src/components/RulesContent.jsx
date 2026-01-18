@@ -11,8 +11,8 @@ export function RulesContent({ isModal = false }) {
         <div className="divide-y divide-white/10 text-neutral-300">
             {/* Introducción */}
             <section className="py-12 first:pt-0 last:pb-0">
-                <h3 className="text-2xl font-serif text-orange-400 mb-6">{t('introduction.title')}</h3>
-                <p className="text-lg leading-relaxed font-light">
+                <h3 className="text-2xl font-serif text-orange-400 mb-6 text-balance">{t('introduction.title')}</h3>
+                <p className="text-lg leading-relaxed font-light text-pretty">
                     <strong>{t('introduction.gameName')}</strong> {t('introduction.description')}
                 </p>
                 <div className={`mt-4 p-4 ${boxBg} rounded-lg`}>
@@ -24,23 +24,23 @@ export function RulesContent({ isModal = false }) {
 
             {/* Objetivo */}
             <section className="py-12 first:pt-0 last:pb-0">
-                <h3 className="text-2xl font-serif text-orange-400 mb-6">{t('objective.title')}</h3>
-                <p className="text-lg leading-relaxed mb-6 font-light">
+                <h3 className="text-2xl font-serif text-orange-400 mb-6 text-balance">{t('objective.title')}</h3>
+                <p className="text-lg leading-relaxed mb-6 font-light text-pretty">
                     {t('objective.description')}{" "}
                     <strong className="text-orange-400">{t('objective.rounds')}</strong>.
                 </p>
                 <div className="grid md:grid-cols-2 gap-6">
                     <div className={`${boxBg} p-6 rounded-xl`}>
-                        <h4 className="text-white font-semibold mb-3 text-lg">{t('objective.asFriend')}</h4>
-                        <p className="text-neutral-400 text-base font-light">
+                        <h4 className="text-white font-semibold mb-3 text-lg text-balance">{t('objective.asFriend')}</h4>
+                        <p className="text-neutral-400 text-base font-light text-pretty">
                             {t('objective.friendDescription')}
                         </p>
                     </div>
                     <div className={`${boxBg} p-6 rounded-xl`}>
-                        <h4 className="text-orange-400 font-semibold mb-3 text-lg">
+                        <h4 className="text-orange-400 font-semibold mb-3 text-lg text-balance">
                             {t('objective.asImpostor')}
                         </h4>
-                        <p className="text-neutral-400 text-base font-light">
+                        <p className="text-neutral-400 text-base font-light text-pretty">
                             {t('objective.impostorDescription')}
                         </p>
                     </div>
@@ -49,10 +49,10 @@ export function RulesContent({ isModal = false }) {
 
             {/* Qué necesitas */}
             <section className="py-12 first:pt-0 last:pb-0">
-                <h3 className="text-2xl font-serif text-orange-400 mb-6">
+                <h3 className="text-2xl font-serif text-orange-400 mb-6 text-balance">
                     {t('requirements.title')}
                 </h3>
-                <div className="space-y-4 text-lg text-neutral-300 font-light">
+                <div className="space-y-4 text-lg text-neutral-300 font-light text-pretty">
                     <p>
                         {t('requirements.device1')} <strong>{t('requirements.phone')}</strong> {t('requirements.device2')} <strong>{t('requirements.noDownload')}</strong>{t('requirements.device3')}
                     </p>
@@ -65,8 +65,8 @@ export function RulesContent({ isModal = false }) {
 
             {/* Preparación */}
             <section className="py-12 first:pt-0 last:pb-0">
-                <h3 className="text-2xl font-serif text-orange-400 mb-6">{t('preparation.title')}</h3>
-                <ol className="space-y-4 text-lg font-light list-decimal list-outside ml-6">
+                <h3 className="text-2xl font-serif text-orange-400 mb-6 text-balance">{t('preparation.title')}</h3>
+                <ol className="space-y-4 text-lg font-light list-decimal list-outside ml-6 text-pretty">
                     <li className="pl-2">
                         <strong className="text-white">{t('preparation.step1.title')}</strong> {t('preparation.step1.text')}{" "}
                         <strong>{t('preparation.step1.help')}</strong>.
@@ -85,7 +85,7 @@ export function RulesContent({ isModal = false }) {
 
             {/* Desarrollo */}
             <section className="py-12 first:pt-0 last:pb-0">
-                <h3 className="text-2xl font-serif text-orange-400 mb-8">
+                <h3 className="text-2xl font-serif text-orange-400 mb-8 text-balance">
                     {t('gameplay.title')}
                 </h3>
                 <div className="space-y-8">
@@ -95,8 +95,8 @@ export function RulesContent({ isModal = false }) {
                             1
                         </div>
                         <div className="space-y-2 pt-1">
-                            <h4 className="text-xl font-semibold text-white">{t('gameplay.step1.title')}</h4>
-                            <p className="text-neutral-300 text-lg font-light">
+                            <h4 className="text-xl font-semibold text-white text-balance">{t('gameplay.step1.title')}</h4>
+                            <p className="text-neutral-300 text-lg font-light text-pretty">
                                 {t('gameplay.step1.text')}{" "}
                                 <strong>{t('gameplay.step1.warning')}</strong>
                             </p>
@@ -146,8 +146,8 @@ export function RulesContent({ isModal = false }) {
                             4
                         </div>
                         <div className="space-y-2 pt-1">
-                            <h4 className="text-xl font-semibold text-white">{t('gameplay.step4.title')}</h4>
-                            <p className="text-neutral-300 text-lg font-light">
+                            <h4 className="text-xl font-semibold text-white text-balance">{t('gameplay.step4.title')}</h4>
+                            <p className="text-neutral-300 text-lg font-light text-pretty">
                                 {t('gameplay.step4.text1')} <strong>{t('gameplay.step4.eliminated')}</strong>{" "}
                                 {t('gameplay.step4.text2')}
                             </p>
@@ -166,7 +166,7 @@ export function RulesContent({ isModal = false }) {
 
             {/* Puntuación */}
             <section className="py-12 first:pt-0 last:pb-0">
-                <h3 className="text-2xl font-serif text-orange-400 mb-6">{t('scoring.title')}</h3>
+                <h3 className="text-2xl font-serif text-orange-400 mb-6 text-balance">{t('scoring.title')}</h3>
                 <div className={`grid ${isModal ? "grid-cols-1" : "md:grid-cols-2"} gap-6`}>
                     <div className={`${boxBg} p-6 rounded-xl`}>
                         <h4 className="text-white font-semibold mb-3 text-lg">{t('scoring.friends')}</h4>

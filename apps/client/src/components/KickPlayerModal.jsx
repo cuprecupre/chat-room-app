@@ -15,7 +15,7 @@ export function KickPlayerModal({ isOpen, onClose, onConfirm, playerName }) {
             size="sm"
         >
             <div className="text-center space-y-4">
-                <p className="text-neutral-400">
+                <p className="text-neutral-400 text-pretty">
                     {t('modals.kickPlayer.confirmMessage', { playerName })} <span className="text-white font-medium">{playerName}</span>?
                 </p>
                 <div className="space-y-2 pt-2">

@@ -32,7 +32,7 @@ export function LeaveMatchModal({ isOpen, onClose, onConfirm, isGameOver, isHost
             size="sm"
         >
             <div className="text-center space-y-4">
-                <p className="text-neutral-400">
+                <p className="text-neutral-400 text-pretty">
                     {getMessage()}
                 </p>
                 <div className="space-y-2 pt-2">

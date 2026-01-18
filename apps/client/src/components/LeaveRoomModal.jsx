@@ -15,7 +15,7 @@ export function LeaveRoomModal({ isOpen, onClose, onConfirm }) {
             size="sm"
         >
             <div className="text-center space-y-4">
-                <p className="text-neutral-400">
+                <p className="text-neutral-400 text-pretty">
                     {t('modals.leaveRoom.description')}
                 </p>
                 <div className="space-y-2 pt-2">
