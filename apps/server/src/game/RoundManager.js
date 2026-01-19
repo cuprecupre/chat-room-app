@@ -21,33 +21,40 @@ const MAX_ROUNDS = 3;
 
 /**
  * Seleccionar impostor (solo al inicio del match)
- * Mantiene historial para evitar que el mismo sea impostor en partidas consecutivas
+ * Usa selección aleatoria ponderada para distribuir el rol de forma justa.
+ * Los jugadores que han sido impostor recientemente tienen menos probabilidad de serlo de nuevo.
  */
 function selectImpostor(match) {
-    const lastTwoImpostors = match.impostorHistory.slice(0, 2);
+    const playerIds = match.players.map(p => p.uid);
 
-    let excludedPlayer = null;
-    if (lastTwoImpostors.length === 2 && lastTwoImpostors[0] === lastTwoImpostors[1]) {
-        excludedPlayer = lastTwoImpostors[0];
+    // Mirar las últimas N partidas (N = número de jugadores actuales)
+    const historyWindow = match.impostorHistory.slice(0, playerIds.length);
+
+    // Contar cuántas veces cada jugador fue impostor recientemente
+    const recentCounts = {};
+    playerIds.forEach(uid => recentCounts[uid] = 0);
+    historyWindow.forEach(uid => {
+        if (recentCounts.hasOwnProperty(uid)) {
+            recentCounts[uid]++;
+        }
+    });
+
+    // Calcular pesos inversamente proporcionales al conteo reciente
+    // Fórmula: peso = 1 / (conteo + 1) para evitar divisiones por cero
+    const weights = playerIds.map(uid => 1 / (recentCounts[uid] + 1));
+    const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+
+    // Selección aleatoria ponderada
+    let random = Math.random() * totalWeight;
+    for (let i = 0; i < playerIds.length; i++) {
+        random -= weights[i];
+        if (random <= 0) {
+            return playerIds[i];
+        }
     }
 
-    let candidates = match.players.map((p) => p.uid).filter((uid) => uid !== excludedPlayer);
-
-    if (candidates.length === 0) {
-        candidates = match.players.map((p) => p.uid);
-    }
-
-    // Fisher-Yates shuffle
-    const shuffledCandidates = [...candidates];
-    for (let i = shuffledCandidates.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledCandidates[i], shuffledCandidates[j]] = [
-            shuffledCandidates[j],
-            shuffledCandidates[i],
-        ];
-    }
-
-    return shuffledCandidates[0];
+    // Fallback: devolver el último jugador si algo falla
+    return playerIds[playerIds.length - 1];
 }
 
 /**
