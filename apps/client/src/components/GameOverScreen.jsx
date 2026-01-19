@@ -138,11 +138,6 @@ export function GameOverScreen({ state, isHost, onPlayAgain, onEndMatch, user })
                                     size="2xl"
                                     className={`ring-8 ring-offset-4 ring-offset-neutral-950 ${impostorWon ? 'ring-orange-500' : 'ring-green-500/50'}`}
                                 />
-                                {!impostorWon && (
-                                    <div className="absolute -top-4 -right-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-tighter animate-pulse shadow-lg">
-                                        {t('playing.eliminated')}
-                                    </div>
-                                )}
                             </div>
                             <p className="text-4xl md:text-5xl text-white font-serif drop-shadow-2xl">
                                 {impostor?.name || t('gameOver.unknown')}

@@ -30,6 +30,22 @@ class ChatModeManager {
         this.clues.clear();
         this.currentTurnIndex = 0;
         this.revealedPlayerIds = [];
+
+        // Create rotated turn order starting from the match's startingPlayerId
+        const activePlayers = this.match.roundPlayers;
+        const startingIndex = activePlayers.indexOf(this.match.startingPlayerId);
+
+        if (startingIndex > 0) {
+            // Rotate the array so startingPlayerId is first
+            this.rotatedTurnOrder = [
+                ...activePlayers.slice(startingIndex),
+                ...activePlayers.slice(0, startingIndex)
+            ];
+        } else {
+            // startingPlayerId is first or not found, use original order
+            this.rotatedTurnOrder = [...activePlayers];
+        }
+
         this.startTurn();
     }
 
@@ -37,11 +53,12 @@ class ChatModeManager {
      * Get the current player whose turn it is.
      */
     getCurrentTurnPlayer() {
-        const activePlayers = this.match.roundPlayers;
-        if (this.currentTurnIndex >= activePlayers.length) {
+        // Use rotated turn order if available, fallback to roundPlayers
+        const turnOrder = this.rotatedTurnOrder || this.match.roundPlayers;
+        if (this.currentTurnIndex >= turnOrder.length) {
             return null;
         }
-        return activePlayers[this.currentTurnIndex];
+        return turnOrder[this.currentTurnIndex];
     }
 
     /**
