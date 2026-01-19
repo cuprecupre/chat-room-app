@@ -69,6 +69,8 @@ function getStateForPlayer(match, userId) {
                 revealedPlayerIds: chatState.revealedPlayerIds,
                 turnStartedAt: chatState.turnStartedAt,
                 timeoutMs: chatState.timeoutMs,
+                transitionStartedAt: match.chatModeManager.transitionStartedAt,
+                transitionTimeoutMs: 4000,
                 hasSubmitted: match.chatModeManager.hasSubmitted(userId),
             };
             baseState.activePlayers = match.roundPlayers.filter((uid) => !eliminated.includes(uid));

@@ -18,6 +18,7 @@ class ChatModeManager {
         this.revealedPlayerIds = [];
         this.turnStartedAt = null;
         this.turnTimer = null;
+        this.transitionStartedAt = null; // When all clues revealed, countdown for voting starts
         // Callback for state changes (e.g., timeout) to emit to clients
         this.onStateChange = options.onStateChange || (() => { });
     }

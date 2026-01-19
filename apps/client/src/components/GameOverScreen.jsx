@@ -111,48 +111,60 @@ export function GameOverScreen({ state, isHost, onPlayAgain, onEndMatch, user })
         return (
             <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-neutral-950 p-4 animate-fadeIn">
                 <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md space-y-8 text-center animate-scaleIn">
-                    <div className="space-y-2">
-                        <h2 className={`text-4xl md:text-5xl font-serif ${impostorWon ? 'text-orange-500' : 'text-green-400'}`}>
-                            {winnerTitle}
-                        </h2>
+                    <div className="space-y-6">
+                        <div>
+                            <h2 className={`text-6xl md:text-8xl font-serif tracking-tight ${impostorWon ? 'text-orange-500' : 'text-green-400'}`}>
+                                {winnerTitle}
+                            </h2>
+                        </div>
                         {winnerSubtitle && (
-                            <p className="text-xl text-neutral-300">{winnerSubtitle}</p>
+                            <p className="text-2xl md:text-3xl text-neutral-400 font-serif italic">
+                                {winnerSubtitle}
+                            </p>
                         )}
                     </div>
 
-                    <div className="w-16 h-px bg-white/10 mx-auto"></div>
+                    <div className="w-24 h-px bg-white/20 mx-auto"></div>
 
-                    <div className="space-y-4">
-                        <p className="text-sm uppercase tracking-widest text-neutral-400">
+                    <div className="space-y-6 animate-fadeIn animate-delay-300">
+                        <p className="text-sm uppercase tracking-widest text-neutral-500 font-bold">
                             {t('gameOver.impostorWas')}
                         </p>
-                        <div className="flex flex-col items-center gap-4">
-                            <Avatar
-                                src={impostor?.photoURL}
-                                alt={impostor?.name}
-                                size="xl"
-                                className={`border-4 ${impostorWon ? 'border-orange-500' : 'border-neutral-700'}`}
-                            />
-                            <p className="text-3xl text-white font-bold">
+                        <div className="flex flex-col items-center gap-6">
+                            <div className="relative">
+                                <Avatar
+                                    src={impostor?.photoURL}
+                                    alt={impostor?.name}
+                                    size="2xl"
+                                    className={`ring-8 ring-offset-4 ring-offset-neutral-950 ${impostorWon ? 'ring-orange-500' : 'ring-green-500/50'}`}
+                                />
+                                {!impostorWon && (
+                                    <div className="absolute -top-4 -right-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-tighter animate-pulse shadow-lg">
+                                        {t('playing.eliminated')}
+                                    </div>
+                                )}
+                            </div>
+                            <p className="text-4xl md:text-5xl text-white font-serif drop-shadow-2xl">
                                 {impostor?.name || t('gameOver.unknown')}
                             </p>
                         </div>
                     </div>
 
-                    <div className="pt-8">
-                        <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden w-64 mx-auto">
-                            <div className="h-full bg-white animate-progress origin-left" style={{ animationDuration: '5000ms' }}></div>
-                        </div>
-                        <p className="text-xs text-neutral-500 mt-2">{t('gameOver.redirectingToScores', 'Showing results...')}</p>
-                    </div>
-
                     <Button
                         onClick={() => setShowRevealOverlay(false)}
                         variant="ghost"
-                        className="text-neutral-400 hover:text-white mt-4"
+                        className="text-neutral-500 hover:text-white mt-8"
                     >
                         {tc('buttons.skip', 'Skip')}
                     </Button>
+                </div>
+
+                {/* Harmonized Full-width Progress Bar */}
+                <div className="fixed bottom-0 left-0 right-0 h-3 bg-neutral-900 pointer-events-none">
+                    <div
+                        className="h-full bg-white origin-left animate-progress"
+                        style={{ animationDuration: '5000ms' }}
+                    ></div>
                 </div>
             </div>
         );
@@ -173,9 +185,13 @@ export function GameOverScreen({ state, isHost, onPlayAgain, onEndMatch, user })
                         {winnerLabel}
                     </p>
                 )}
-                <h1 className="text-3xl md:text-5xl font-serif text-orange-400">{winnerTitle}</h1>
+                <h1 className={`text-3xl md:text-5xl font-serif ${impostorWon ? 'text-orange-400' : 'text-green-400'}`}>
+                    {winnerTitle}
+                </h1>
                 {winnerSubtitle && (
-                    <p className="text-xl md:text-2xl text-orange-400 mt-2">{winnerSubtitle}</p>
+                    <p className={`text-xl md:text-2xl mt-2 ${impostorWon ? 'text-orange-400' : 'text-green-400'}`}>
+                        {winnerSubtitle}
+                    </p>
                 )}
             </div>
 

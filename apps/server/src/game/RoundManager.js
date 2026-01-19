@@ -189,10 +189,11 @@ function endRound(match, impostorCaught) {
         // Encontrar al amigo ganador (el que tiene más puntos)
         const winner = findWinner(match);
         match.winnerId = winner;
-        match.phase = "round_result";
-        // match.persistAnalytics será llamado cuando el host pase de round_result a game_over
 
-        console.log(`[Match ${match.matchId}] ¡Impostor descubierto! Ganador: ${winner}`);
+        // BACK TO SEQUENTIAL: Always go to round_result first to show elimination details.
+        match.phase = "round_result";
+
+        console.log(`[Match ${match.matchId}] ¡Impostor descubierto! Ganador: ${winner}. Transición a round_result.`);
     } else {
         // Impostor sobrevivió esta ronda
         giveImpostorSurvivalPoints(match);

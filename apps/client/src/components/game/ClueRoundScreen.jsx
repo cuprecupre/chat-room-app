@@ -179,6 +179,16 @@ export function ClueRoundScreen({
                 onClueSubmit={handleClueSubmit}
                 t={t}
             />
+
+            {/* Transition Progress Bar (When all clues revealed) */}
+            {isCluePhase && chatMode.transitionStartedAt && (
+                <div className="fixed bottom-0 left-0 right-0 z-[60] h-3 bg-neutral-900 overflow-hidden pointer-events-none">
+                    <div
+                        className="h-full bg-orange-500 origin-left animate-progress"
+                        style={{ animationDuration: `${chatMode.transitionTimeoutMs || 4000}ms` }}
+                    ></div>
+                </div>
+            )}
         </div>
     );
 }

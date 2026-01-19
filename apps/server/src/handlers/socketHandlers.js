@@ -312,6 +312,9 @@ function handleSubmitClue(io, socket, user, { roomId, clue }) {
 
         // Check if all clues have been revealed (transition to voting)
         if (match.chatModeManager.areAllCluesRevealed()) {
+            match.chatModeManager.transitionStartedAt = Date.now();
+            roomManager.emitRoomState(room);
+
             // Add a delay so players can read the last clue
             setTimeout(() => {
                 // Ensure match is still active and in correct phase before transitioning

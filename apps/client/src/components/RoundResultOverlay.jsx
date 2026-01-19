@@ -63,16 +63,6 @@ export function RoundResultOverlay({ state, isHost, onNextRound, currentUserId }
                             <p className="text-2xl text-neutral-300">{t('game.nobodyEliminated')}</p>
                         </div>
                     )}
-
-                    <div className="w-16 h-px bg-white/10 mx-auto"></div>
-
-                    {!state.winnerId && state.players.filter(p => !state.eliminatedPlayers?.includes(p.uid)).length > 2 && (
-                        <div>
-                            <p className="text-2xl font-serif italic text-orange-400">
-                                {t('game.impostorRemains')}
-                            </p>
-                        </div>
-                    )}
                 </div>
 
                 {isHost && (
